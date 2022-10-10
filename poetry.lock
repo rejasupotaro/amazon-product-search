@@ -270,6 +270,18 @@ pycodestyle = ">=2.9.0,<2.10.0"
 pyflakes = ">=2.5.0,<2.6.0"
 
 [[package]]
+name = "fugashi"
+version = "1.2.0"
+description = "A Cython MeCab wrapper for fast, pythonic Japanese tokenization."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.extras]
+unidic-lite = ["unidic-lite"]
+unidic = ["unidic"]
+
+[[package]]
 name = "gitdb"
 version = "4.0.9"
 description = "Git Object Database"
@@ -719,6 +731,14 @@ name = "invoke"
 version = "1.7.3"
 description = "Pythonic task execution"
 category = "dev"
+optional = false
+python-versions = "*"
+
+[[package]]
+name = "ipadic"
+version = "1.0.0"
+description = "IPAdic packaged for Python"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -1396,7 +1416,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "flake8 
 [metadata]
 lock-version = "1.1"
 python-versions = "3.9.13"
-content-hash = "653514afcdea3398df436694be46f8a628e72539999e0a9f82c780e42994a6a5"
+content-hash = "1f35d818e7e37c4af7ea696174a0129cc70a4a6d598b24cfc99cb9bd3a1e08ad"
 
 [metadata.files]
 altair = [
@@ -1450,6 +1470,7 @@ entrypoints = [
 fastavro = []
 fasteners = []
 flake8 = []
+fugashi = []
 gitdb = [
     {file = "gitdb-4.0.9-py3-none-any.whl", hash = "sha256:8033ad4e853066ba6ca92050b9df2f89301b8fc8bf7e9324d412a63f8bf1a8fd"},
     {file = "gitdb-4.0.9.tar.gz", hash = "sha256:bac2fd45c0a1c9cf619e63a90d62bdc63892ef92387424b855792a6cabe789aa"},
@@ -1496,6 +1517,9 @@ httplib2 = [
 idna = []
 importlib-metadata = []
 invoke = []
+ipadic = [
+    {file = "ipadic-1.0.0.tar.gz", hash = "sha256:f5923d31eca6131acaaf18ed28d8998665b1347b640d3a6476f64650e9a71c07"},
+]
 isort = [
     {file = "isort-5.10.1-py3-none-any.whl", hash = "sha256:6f62d78e2f89b4500b080fe3a81690850cd254227f27f75c3a0c491a1f351ba7"},
     {file = "isort-5.10.1.tar.gz", hash = "sha256:e8443a5e7a020e9d7f97f1d7d9cd17c88bcb3bc7e218bf9cf5095fe550be2951"},

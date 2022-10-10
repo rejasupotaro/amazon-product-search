@@ -10,6 +10,8 @@ streamlit = "^1.13.0"
 streamlit-aggrid = "^0.3.3"
 pandas = "^1.5.0"
 apache-beam = {version = "2.41.0", extras = ["gcp"]}
+fugashi = "^1.2.0"
+ipadic = "^1.0.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
