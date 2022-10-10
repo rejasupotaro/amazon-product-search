@@ -1,6 +1,12 @@
 from invoke import task
 
 import misc
+from indexer import pipeline
+
+
+@task
+def index(c):
+    pipeline.run()
 
 
 @task

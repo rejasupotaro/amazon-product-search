@@ -2,19 +2,19 @@ import pandas as pd
 import streamlit as st
 from st_aggrid import AgGrid
 
+from amazon_product_search import source
+
 DATA_DIR = "./data"
 
 
 @st.cache
 def load_products(locale: str, nrows: int = 100) -> pd.DataFrame:
-    filename = f"{DATA_DIR}/product_catalogue-v0.3_{locale}.csv.zip"
-    return pd.read_csv(filename, nrows=nrows)
+    return source.load_products(locale, nrows)
 
 
 @st.cache
 def load_labels(locale: str, nrows: int = 100) -> pd.DataFrame:
-    filename = f"{DATA_DIR}/train-v0.3_{locale}.csv.zip"
-    return pd.read_csv(filename, nrows=nrows)
+    return source.load_labels(locale, nrows)
 
 
 def draw_products():
