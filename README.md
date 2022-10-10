@@ -23,10 +23,12 @@ Download the dataset on the internet. Then run the following command.
 
 ```shell
 $ poetry run inv split-dataset-by-locale
+$ poetry run inv index --locale=jp
 ```
 
 ## Demo
 
 ```shell
 $ poetry run streamlit run src/demo/dataset.py
+$ poetry run streamlit run src/demo/sparse_search.py
 ```

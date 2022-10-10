@@ -1,8 +1,8 @@
 version: "3"
 services:
-  es:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.2
-    container_name: es
+  es-8:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.4.3
+    container_name: es-8
     environment:
       - xpack.security.enabled=false
       - discovery.type=single-node
@@ -13,15 +13,15 @@ services:
     ports:
       - 9200:9200
     volumes:
-      - es-data:/usr/share/elasticsearch/data
+      - es-data:/usr/share/elasticsearch/8/data
 
-  kibana:
-    image: docker.elastic.co/kibana/kibana:7.16.2
-    container_name: kibana
+  kibana-8:
+    image: docker.elastic.co/kibana/kibana:8.4.3
+    container_name: kibana-8
     ports:
       - "5601:5601"
     environment:
-      - ELASTICSEARCH_HOSTS=http://es:9200
+      - ELASTICSEARCH_HOSTS=http://es-8:9200
 volumes:
   es-data:
     driver: local

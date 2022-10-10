@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Callable, Dict, List, Optional, Union
 
 import apache_beam as beam
@@ -11,7 +12,7 @@ class WriteToElasticsearch(beam.PTransform):
         self,
         es_host: str,
         index_name: str,
-        max_batch_size: int = 10,
+        max_batch_size: int = 100,
         id_fn: Optional[Callable[[Dict[str, Any]], str]] = None,
     ):
         self.write_fn = BulkWriteFn(
@@ -70,6 +71,7 @@ class BulkWriteFn(beam.DoFn):
         if not self.batch:
             return 0, 0
         success, errors = self.es_client.index_docs(self.index_name, self.batch, self.id_fn)
+        logging.info(f"Bulk API is called. success: {success}, errors: {errors}")
 
         self.batch.clear()
         return success, errors

@@ -1,29 +1,31 @@
 import logging
+from typing import Optional
 
 import apache_beam as beam
 from apache_beam.transforms.ptransform import PTransform
 
 from amazon_product_search import source
 from indexer.io.elasticsearch_io import WriteToElasticsearch
+from indexer.options import IndexerOptions
 from indexer.transforms import AnalyzeFn
 
 
-def get_input_source(locale: str) -> PTransform:
-    products_df = source.load_products(locale=locale, nrows=10)
+def get_input_source(locale: str, nrows: Optional[int] = None) -> PTransform:
+    products_df = source.load_products(locale, nrows)
     products_df = products_df.fillna("")
     products = products_df.to_dict("records")
-    return beam.Create(products)
+    logging.info(f"We have {len(products)} products to index")
+    return beam.Create(products) | beam.Reshuffle()
 
 
-def run():
-    logging.getLogger().setLevel(logging.INFO)
-
-    locale = "jp"
-    text_fields = ["product_title", "product_description", "product_bullet_point"]
-    es_host = "http://localhost:9200"
+def run(options: IndexerOptions):
+    locale = options.locale
+    es_host = options.es_host
+    nrows = options.nrows
     index_name = f"products_{locale}"
+    text_fields = ["product_title", "product_description", "product_bullet_point"]
 
-    input_source = get_input_source(locale)
+    input_source = get_input_source(locale, nrows)
 
     with beam.Pipeline() as pipeline:
         products = pipeline | input_source | beam.ParDo(AnalyzeFn(text_fields))

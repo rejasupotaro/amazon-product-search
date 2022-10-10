@@ -13,9 +13,9 @@ class EsClient:
 
     def create_index(self, index_name: str):
         with open("schema/es/products.json") as file:
-            schema = json.load(file)
-            print(schema)
-        self.es.indices.create(index=index_name, body=schema)
+            mappings = json.load(file)
+            print(mappings)
+        self.es.indices.create(index=index_name, mappings=mappings)
 
     def index_doc(self, index_name: str, doc: Dict[str, Any]):
         self.es.index(index=index_name, document=doc)
