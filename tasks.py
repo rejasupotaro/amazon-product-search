@@ -1,5 +1,7 @@
 from invoke import task
 
+import misc
+
 
 @task
 def lint(c):
@@ -16,3 +18,8 @@ def lint(c):
     print("Running mypy...")
     c.run("poetry run mypy src")
     print("Done")
+
+
+@task
+def split_dataset_by_locale(c):
+    misc.split_dataset_by_locale()
