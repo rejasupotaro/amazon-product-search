@@ -9,7 +9,28 @@ python = "3.9.13"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
+black = "^22.10.0"
+invoke = "^1.7.3"
+isort = "^5.10.1"
+mypy = "^0.982"
+pyproject-flake8 = "^5.0.4"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+profile = "black"
+line_length = 120
+
+[tool.flake8]
+max-line-length = 120
+ignore = "E203,W503"
+
+[tool.mypy]
+python_version = "3.9"
+mypy_path = ["src"]
+ignore_missing_imports = true
