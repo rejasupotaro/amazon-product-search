@@ -23,5 +23,5 @@ $ poetry run inv split-dataset-by-locale
 ## Demo
 
 ```
-$ poetry run streamlit run src/demo/catalog.py
+$ poetry run streamlit run src/demo/dataset.py
 ```
