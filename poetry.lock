@@ -227,6 +227,36 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "elastic-transport"
+version = "8.4.0"
+description = "Transport classes and utilities shared among Python Elastic client libraries"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+certifi = "*"
+urllib3 = ">=1.26.2,<2"
+
+[package.extras]
+develop = ["pytest", "pytest-cov", "pytest-mock", "pytest-asyncio", "pytest-httpserver", "trustme", "mock", "requests", "aiohttp"]
+
+[[package]]
+name = "elasticsearch"
+version = "8.4.3"
+description = "Python client for Elasticsearch"
+category = "main"
+optional = false
+python-versions = ">=3.6, <4"
+
+[package.dependencies]
+elastic-transport = ">=8,<9"
+
+[package.extras]
+async = ["aiohttp (>=3,<4)"]
+requests = ["requests (>=2.4.0,<3.0.0)"]
+
+[[package]]
 name = "entrypoints"
 version = "0.4"
 description = "Discover and load entry points from installed packages."
@@ -1416,7 +1446,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "flake8 
 [metadata]
 lock-version = "1.1"
 python-versions = "3.9.13"
-content-hash = "1f35d818e7e37c4af7ea696174a0129cc70a4a6d598b24cfc99cb9bd3a1e08ad"
+content-hash = "8a1cdbba9ab6ba8a16facba82dda06a205e9ac7b6de510126752a471b2798b50"
 
 [metadata.files]
 altair = [
@@ -1463,6 +1493,8 @@ dill = [
 docopt = [
     {file = "docopt-0.6.2.tar.gz", hash = "sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491"},
 ]
+elastic-transport = []
+elasticsearch = []
 entrypoints = [
     {file = "entrypoints-0.4-py3-none-any.whl", hash = "sha256:f174b5ff827504fd3cd97cc3f8649f3693f51538c7e4bdf3ef002c8429d42f9f"},
     {file = "entrypoints-0.4.tar.gz", hash = "sha256:b706eddaa9218a19ebcd67b56818f05bb27589b1ca9e8d797b74affad4ccacd4"},
