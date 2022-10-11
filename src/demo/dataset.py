@@ -18,14 +18,14 @@ def load_labels(locale: str, nrows: int = 100) -> pd.DataFrame:
 
 
 def draw_products():
-    locale = st.selectbox("Locale", ["jp", "us", "es"])
+    locale = st.selectbox("Locale:", ["jp", "us", "es"])
     products_df = load_products(locale)
     st.text(f"{len(products_df)} products found")
     AgGrid(products_df)
 
 
 def draw_labels():
-    locale = st.selectbox("Locale", ["jp", "us", "es"])
+    locale = st.selectbox("Locale:", ["jp", "us", "es"])
 
     labels_df = load_labels(locale)
     products_df = load_products(locale)
@@ -37,15 +37,13 @@ def draw_labels():
 
 
 def main():
-    st.set_page_config(layout="wide")
-
-    page_names_to_funcs = {
+    datasets_to_funcs = {
         "Products": draw_products,
         "Labels": draw_labels,
     }
 
-    selected_page = st.sidebar.selectbox("Select a page", page_names_to_funcs.keys())
-    page_names_to_funcs[selected_page]()
+    selected_dataset = st.selectbox("Dataset:", datasets_to_funcs.keys())
+    datasets_to_funcs[selected_dataset]()
 
 
 if __name__ == "__main__":

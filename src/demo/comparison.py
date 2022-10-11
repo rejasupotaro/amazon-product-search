@@ -63,8 +63,6 @@ def compute_metrics(variant: Variant, query: str, labels_df: pd.DataFrame) -> Di
 
 
 def main():
-    st.set_page_config(layout="wide")
-
     st.write("## Offline Experiment")
 
     locale = "jp"

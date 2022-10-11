@@ -27,8 +27,6 @@ def draw_products(results: List[Result]):
 
 
 def main():
-    st.set_page_config(layout="wide")
-
     st.markdown("#### Input")
     query = st.text_input("Query:")
     use_description = st.checkbox("Use description")
