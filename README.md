@@ -29,5 +29,5 @@ $ poetry run inv index --locale=jp
 ## Demo
 
 ```shell
-$ poetry run streamlit run src/demo/entrypoint.py
+$ poetry run streamlit run src/demo/readme.py
 ```

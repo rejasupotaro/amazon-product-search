@@ -27,6 +27,8 @@ def draw_products(results: List[Result]):
 
 
 def main():
+    st.set_page_config(page_icon="️🔍", layout="wide")
+
     st.markdown("## Indices")
     indices = es_client.list_indices()
     selected_index = st.selectbox("Index:", indices)

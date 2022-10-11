@@ -37,6 +37,8 @@ def draw_labels():
 
 
 def main():
+    st.set_page_config(page_icon="️🔍", layout="wide")
+
     datasets_to_funcs = {
         "Products": draw_products,
         "Labels": draw_labels,
