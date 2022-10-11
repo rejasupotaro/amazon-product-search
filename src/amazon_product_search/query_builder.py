@@ -9,33 +9,14 @@ def build(params: RequestParams) -> Dict[str, Any]:
             "match_all": {},
         }
 
+    fields = ["product_title"]
     if params.use_description:
-        return {
-            "bool": {
-                "minimum_should_match": 1,
-                "should": [
-                    {
-                        "match": {
-                            "product_title": {
-                                "query": params.query,
-                            },
-                        }
-                    },
-                    {
-                        "match": {
-                            "product_description": {
-                                "query": params.query,
-                            },
-                        }
-                    },
-                ],
-            },
-        }
+        fields.append("product_description")
 
     return {
-        "match": {
-            "product_title": {
-                "query": params.query,
-            },
-        },
+        "multi_match": {
+            "query": params.query,
+            "fields": fields,
+            "operator": "or",
+        }
     }

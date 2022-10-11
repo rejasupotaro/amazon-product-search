@@ -31,4 +31,5 @@ $ poetry run inv index --locale=jp
 ```shell
 $ poetry run streamlit run src/demo/dataset.py
 $ poetry run streamlit run src/demo/sparse_search.py
+$ poetry run streamlit run src/demo/comparison.py
 ```
