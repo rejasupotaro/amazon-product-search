@@ -75,6 +75,11 @@ def main():
     st.write("#### Variants")
     st.write(variants)
 
+    clicked = st.button("Run")
+
+    if not clicked:
+        return
+
     labels_df = load_labels(locale, nrows)
     query_dict: Dict[str, pd.DataFrame] = {}
     for query, query_labels_df in labels_df.groupby("query"):
