@@ -1,69 +1,14 @@
-from dataclasses import dataclass
 from typing import Any, Dict, List
 
 import streamlit as st
 
+from amazon_product_search import query_builder
 from amazon_product_search.es_client import EsClient
+from amazon_product_search.models.search import RequestParams, Response, Result
 
 es_client = EsClient(
     es_host="http://localhost:9200",
 )
-
-
-@dataclass
-class RequestParams:
-    query: str
-    use_description: bool
-
-
-@dataclass
-class Result:
-    product: Dict[str, Any]
-    score: float
-
-
-@dataclass
-class Response:
-    results: List[Result]
-    total_hits: int
-
-
-def build_query(params: RequestParams) -> Dict[str, Any]:
-    if not params.query:
-        return {
-            "match_all": {},
-        }
-
-    if params.use_description:
-        return {
-            "bool": {
-                "minimum_should_match": 1,
-                "should": [
-                    {
-                        "match": {
-                            "product_title": {
-                                "query": params.query,
-                            },
-                        }
-                    },
-                    {
-                        "match": {
-                            "product_description": {
-                                "query": params.query,
-                            },
-                        }
-                    },
-                ],
-            },
-        }
-
-    return {
-        "match": {
-            "product_title": {
-                "query": params.query,
-            },
-        },
-    }
 
 
 def search(es_query: Dict[str, Any]) -> Response:
@@ -93,7 +38,7 @@ def main():
     )
 
     st.markdown("##### Elasticsearch Query")
-    es_query = build_query(params)
+    es_query = query_builder.build(params)
     st.json(es_query)
 
     st.markdown("----")
