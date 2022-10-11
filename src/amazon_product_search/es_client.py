@@ -8,6 +8,9 @@ class EsClient:
     def __init__(self, es_host: str):
         self.es = Elasticsearch(es_host)
 
+    def list_indices(self) -> List[str]:
+        return [alias for alias in self.es.indices.get_alias().keys() if not alias.startswith(".")]
+
     def delete_index(self, index_name):
         self.es.indices.delete(index=index_name)
 
@@ -16,6 +19,9 @@ class EsClient:
             mappings = json.load(file)
             print(mappings)
         self.es.indices.create(index=index_name, mappings=mappings)
+
+    def count_docs(self, index_name: str) -> Any:
+        return self.es.count(index=index_name)
 
     def index_doc(self, index_name: str, doc: Dict[str, Any]):
         self.es.index(index=index_name, document=doc)

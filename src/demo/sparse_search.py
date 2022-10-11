@@ -11,8 +11,8 @@ es_client = EsClient(
 )
 
 
-def search(es_query: Dict[str, Any]) -> Response:
-    es_response = es_client.search(index_name="products_jp", es_query=es_query)
+def search(es_query: Dict[str, Any], index_name: str) -> Response:
+    es_response = es_client.search(index_name=index_name, es_query=es_query)
     response = Response(
         results=[Result(product=hit["_source"], score=hit["_score"]) for hit in es_response["hits"]["hits"]],
         total_hits=es_response["hits"]["total"]["value"],
@@ -27,7 +27,17 @@ def draw_products(results: List[Result]):
 
 
 def main():
-    st.markdown("#### Input")
+    st.markdown("## Indices")
+    indices = es_client.list_indices()
+    selected_index = st.selectbox("Index:", indices)
+
+    st.markdown("#### Count")
+    count = es_client.count_docs(selected_index)
+    st.write(count)
+
+    st.write("## Search")
+
+    st.write("#### Input")
     query = st.text_input("Query:")
     use_description = st.checkbox("Use description")
     params = RequestParams(
@@ -35,14 +45,14 @@ def main():
         use_description=use_description,
     )
 
-    st.markdown("##### Elasticsearch Query")
+    st.write("Elasticsearch Query:")
     es_query = query_builder.build(params)
     st.json(es_query)
 
-    st.markdown("----")
+    st.write("----")
 
-    st.markdown("#### Output")
-    response = search(es_query)
+    st.write("#### Output")
+    response = search(es_query, selected_index)
     st.write(f"{response.total_hits} products found")
     draw_products(response.results)
 
