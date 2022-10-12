@@ -5,7 +5,10 @@ from typing import Any, Dict, List
 @dataclass
 class RequestParams:
     query: str
-    use_description: bool
+    use_description: bool = False
+    use_bullet_point: bool = False
+    use_brand: bool = False
+    use_color_name: bool = False
 
 
 @dataclass

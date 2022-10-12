@@ -18,8 +18,11 @@ es_client = EsClient(
 @dataclass
 class Variant:
     name: str
-    use_description: bool
-    top_k: int
+    use_description: bool = False
+    use_bullet_point: bool = False
+    use_brand: bool = False
+    use_color_name: bool = False
+    top_k: int = False
 
 
 @st.cache
@@ -31,6 +34,9 @@ def compute_metrics(variant: Variant, query: str, labels_df: pd.DataFrame) -> Di
     params = RequestParams(
         query=query,
         use_description=variant.use_description,
+        use_bullet_point=variant.use_bullet_point,
+        use_brand=variant.use_brand,
+        use_color_name=variant.use_color_name,
     )
     es_query = query_builder.build(params)
 
@@ -59,11 +65,14 @@ def main():
     st.write("## Offline Experiment")
 
     locale = "jp"
-    nrows = 1000
+    nrows = 10000
 
     variants = [
-        Variant(name="title", use_description=False, top_k=100),
+        Variant(name="title", top_k=100),
         Variant(name="title_description", use_description=True, top_k=100),
+        Variant(name="title_bullet_point", use_bullet_point=True, top_k=100),
+        Variant(name="title_brand", use_brand=True, top_k=100),
+        Variant(name="title_color_name", use_color_name=True, top_k=100),
     ]
     st.write("#### Variants")
     st.write(variants)

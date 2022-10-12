@@ -42,9 +42,15 @@ def main():
     st.write("#### Input")
     query = st.text_input("Query:")
     use_description = st.checkbox("Use description")
+    use_bullet_point = st.checkbox("Use bullet point")
+    use_brand = st.checkbox("Use brand")
+    use_color_name = st.checkbox("Use color name")
     params = RequestParams(
         query=query,
         use_description=use_description,
+        use_bullet_point=use_bullet_point,
+        use_brand=use_brand,
+        use_color_name=use_color_name,
     )
 
     st.write("Elasticsearch Query:")
