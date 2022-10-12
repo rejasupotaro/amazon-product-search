@@ -1,11 +1,12 @@
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, Set
+from typing import Any, Dict
 
 import pandas as pd
 import streamlit as st
 
 from amazon_product_search import query_builder, source
 from amazon_product_search.es_client import EsClient
+from amazon_product_search.metrics import compute_ap, compute_ndcg, compute_recall
 from amazon_product_search.models.search import RequestParams, Response, Result
 
 es_client = EsClient(
@@ -25,20 +26,6 @@ def load_labels(locale: str, nrows: int) -> pd.DataFrame:
     return source.load_labels(locale, nrows)
 
 
-def compute_recall(retrieved_ids: Iterable[str], relevant_ids: Set[str]) -> int:
-    for retrieved_id in retrieved_ids:
-        if retrieved_id in relevant_ids:
-            return 1
-    return 0
-
-
-def compute_map(retrieved_ids: Iterable[str], relevant_ids: Set[str]) -> float:
-    for i, retrieved_id in enumerate(retrieved_ids):
-        if retrieved_id in relevant_ids:
-            return 1 / (i + 1)
-    return 0
-
-
 def compute_metrics(variant: Variant, query: str, labels_df: pd.DataFrame) -> Dict[str, Any]:
     params = RequestParams(
         query=query,
@@ -54,11 +41,14 @@ def compute_metrics(variant: Variant, query: str, labels_df: pd.DataFrame) -> Di
     )
     retrieved_ids = [result.product["product_id"] for result in response.results]
     relevant_ids = labels_df[labels_df["esci_label"] == "exact"]["product_id"].tolist()
+    judgements: Dict[str, str] = {row["product_id"]: row["esci_label"] for row in labels_df.to_dict("records")}
     return {
         "variant": variant.name,
+        "query": query,
         "total_hits": response.total_hits,
         "recall": compute_recall(retrieved_ids, relevant_ids),
-        "map": compute_map(retrieved_ids, relevant_ids),
+        "map": compute_ap(retrieved_ids, relevant_ids),
+        "ndcg": compute_ndcg(retrieved_ids, judgements),
     }
 
 
@@ -101,18 +91,20 @@ def main():
     progress_text.text(f"Done ({n} / {total_examples})")
 
     st.write("#### Result")
+    results_df = st.write(pd.DataFrame(metrics))
     metrics_df = (
-        pd.DataFrame(metrics)
-        .groupby("variant")
+        results_df.groupby("variant")
         .agg(
             {
                 "total_hits": "mean",
                 "recall": "mean",
                 "map": "mean",
+                "ndcg": "mean",
             }
         )
         .reset_index()
     )
+    metrics_df["total_hits"] = metrics_df["total_hits"].apply(int)
     st.write(metrics_df)
 
 
