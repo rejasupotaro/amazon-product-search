@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Any, Dict
 
 import pandas as pd
+import plotly.express as px
 import streamlit as st
 
 from amazon_product_search import query_builder, source
@@ -91,9 +92,9 @@ def main():
     progress_text.text(f"Done ({n} / {total_examples})")
 
     st.write("#### Result")
-    results_df = st.write(pd.DataFrame(metrics))
-    metrics_df = (
-        results_df.groupby("variant")
+    metrics_df = pd.DataFrame(metrics)
+    stats_df = (
+        metrics_df.groupby("variant")
         .agg(
             {
                 "total_hits": "mean",
@@ -104,8 +105,12 @@ def main():
         )
         .reset_index()
     )
-    metrics_df["total_hits"] = metrics_df["total_hits"].apply(int)
-    st.write(metrics_df)
+    stats_df["total_hits"] = stats_df["total_hits"].apply(int)
+    st.write(stats_df)
+
+    for metric in ["total_hits", "recall", "map", "ndcg"]:
+        fig = px.box(metrics_df, y=metric, color="variant")
+        st.plotly_chart(fig)
 
 
 if __name__ == "__main__":
