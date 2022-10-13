@@ -10,6 +10,7 @@ from amazon_product_search import query_builder, source
 from amazon_product_search.es_client import EsClient
 from amazon_product_search.metrics import compute_ap, compute_ndcg, compute_zero_hit_rate
 from amazon_product_search.models.search import RequestParams, Response, Result
+from amazon_product_search.nlp.normalizer import normalize_query
 
 es_client = EsClient(
     es_host="http://localhost:9200",
@@ -108,6 +109,7 @@ def main():
     metrics = []
     for variant in variants:
         for query, query_labels_df in query_dict.items():
+            query = normalize_query(query)
             progress_text.text(f"Query ({n} / {total_examples}): {query}")
             n += 1
             progress_bar.progress(n / total_examples)

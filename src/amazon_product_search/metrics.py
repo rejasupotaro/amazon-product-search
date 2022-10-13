@@ -38,7 +38,7 @@ def compute_dcg(gains: list[float]) -> float:
     return result
 
 
-def compute_ndcg(retrieved_ids: list[str], judgements: list[str, str]) -> Optional[float]:
+def compute_ndcg(retrieved_ids: list[str], judgements: dict[str, str]) -> Optional[float]:
     y_pred = [LABEL_TO_GAIN[judgements[doc_id]] if doc_id in judgements else 0 for doc_id in retrieved_ids]
     y_true = sorted(y_pred, reverse=True)
     idcg_val = compute_dcg(y_true)

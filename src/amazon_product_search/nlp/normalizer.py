@@ -44,10 +44,17 @@ def remove_extra_spaces(s: str) -> str:
     return WHITESPACE_PATTERN.sub(" ", s).strip()
 
 
-def normalize(s: str) -> str:
+def normalize_doc(s: str) -> str:
     s = remove_html_tags(s)
     s = unicodedata.normalize("NFKC", s)
     s = s.lower()
     s = remove_punctuations(s)
+    s = remove_extra_spaces(s)
+    return s
+
+
+def normalize_query(s: str) -> str:
+    s = unicodedata.normalize("NFKC", s)
+    s = s.lower()
     s = remove_extra_spaces(s)
     return s
