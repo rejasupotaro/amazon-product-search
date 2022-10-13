@@ -1,8 +1,8 @@
-from typing import Dict, List, Optional, Set
+from typing import Optional
 
 import numpy as np
 
-LABEL_TO_GAIN: Dict[str, float] = {
+LABEL_TO_GAIN: dict[str, float] = {
     "exact": 1.0,
     "substitute": 0.1,
     "complement": 0.01,
@@ -10,7 +10,13 @@ LABEL_TO_GAIN: Dict[str, float] = {
 }
 
 
-def compute_ap(retrieved_ids: List[str], relevant_ids: Set[str]) -> Optional[float]:
+def compute_zero_hit_rate(xs: list[int]) -> Optional[float]:
+    if len(xs) == 0:
+        return None
+    return len([x for x in xs if x == 0]) / len(xs)
+
+
+def compute_ap(retrieved_ids: list[str], relevant_ids: set[str]) -> Optional[float]:
     if not retrieved_ids or not relevant_ids:
         return None
 
@@ -25,14 +31,14 @@ def compute_ap(retrieved_ids: List[str], relevant_ids: Set[str]) -> Optional[flo
     return gain / num_relevant_docs
 
 
-def compute_dcg(gains: List[float]) -> float:
+def compute_dcg(gains: list[float]) -> float:
     result = 0.0
     for i, gain in enumerate(gains):
         result += gain / np.log2(i + 2)
     return result
 
 
-def compute_ndcg(retrieved_ids: List[str], judgements: Dict[str, str]) -> Optional[float]:
+def compute_ndcg(retrieved_ids: list[str], judgements: list[str, str]) -> Optional[float]:
     y_pred = [LABEL_TO_GAIN[judgements[doc_id]] if doc_id in judgements else 0 for doc_id in retrieved_ids]
     y_true = sorted(y_pred, reverse=True)
     idcg_val = compute_dcg(y_true)

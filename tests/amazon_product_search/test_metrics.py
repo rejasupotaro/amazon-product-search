@@ -1,7 +1,22 @@
 import numpy as np
 import pytest
 
-from amazon_product_search.metrics import compute_ap, compute_ndcg
+from amazon_product_search.metrics import compute_ap, compute_ndcg, compute_zero_hit_rate
+
+
+@pytest.mark.parametrize(
+    "xs,expected",
+    [
+        ([], None),
+        ([1], 0),
+        ([0], 1),
+        ([1, 0], 0.5),
+        ([0, 1], 0.5),
+    ],
+)
+def test_compute_zero_hit_rate(xs, expected):
+    actual = compute_zero_hit_rate(xs)
+    assert actual == expected
 
 
 @pytest.mark.parametrize(

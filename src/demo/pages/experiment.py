@@ -1,13 +1,14 @@
 from dataclasses import dataclass
-from typing import Any, Dict
+from typing import Any
 
+import numpy as np
 import pandas as pd
 import plotly.express as px
 import streamlit as st
 
 from amazon_product_search import query_builder, source
 from amazon_product_search.es_client import EsClient
-from amazon_product_search.metrics import compute_ap, compute_ndcg
+from amazon_product_search.metrics import compute_ap, compute_ndcg, compute_zero_hit_rate
 from amazon_product_search.models.search import RequestParams, Response, Result
 
 es_client = EsClient(
@@ -30,7 +31,7 @@ def load_labels(locale: str, nrows: int) -> pd.DataFrame:
     return source.load_labels(locale, nrows)
 
 
-def compute_metrics(variant: Variant, query: str, labels_df: pd.DataFrame) -> Dict[str, Any]:
+def compute_metrics(variant: Variant, query: str, labels_df: pd.DataFrame) -> dict[str, Any]:
     params = RequestParams(
         query=query,
         use_description=variant.use_description,
@@ -48,14 +49,28 @@ def compute_metrics(variant: Variant, query: str, labels_df: pd.DataFrame) -> Di
     )
     retrieved_ids = [result.product["product_id"] for result in response.results]
     relevant_ids = labels_df[labels_df["esci_label"] == "exact"]["product_id"].tolist()
-    judgements: Dict[str, str] = {row["product_id"]: row["esci_label"] for row in labels_df.to_dict("records")}
+    judgements: dict[str, str] = {row["product_id"]: row["esci_label"] for row in labels_df.to_dict("records")}
     return {
         "variant": variant.name,
         "query": query,
         "total_hits": response.total_hits,
-        "map": compute_ap(retrieved_ids, relevant_ids),
+        "ap": compute_ap(retrieved_ids, relevant_ids),
         "ndcg": compute_ndcg(retrieved_ids, judgements),
     }
+
+
+def compute_stats(metrics_df: pd.DataFrame) -> pd.DataFrame:
+    stats_df = (
+        metrics_df.groupby("variant")
+        .agg(
+            total_hits=("total_hits", lambda series: int(np.mean(series))),
+            zero_hit_rate=("total_hits", lambda series: compute_zero_hit_rate(series.values)),
+            map=("ap", "mean"),
+            ndcg=("ndcg", "mean"),
+        )
+        .reset_index()
+    )
+    return stats_df
 
 
 def main():
@@ -64,7 +79,7 @@ def main():
     st.write("## Offline Experiment")
 
     locale = "jp"
-    nrows = 10000
+    nrows = 1000
 
     variants = [
         Variant(name="title", top_k=100),
@@ -82,7 +97,7 @@ def main():
         return
 
     labels_df = load_labels(locale, nrows)
-    query_dict: Dict[str, pd.DataFrame] = {}
+    query_dict: dict[str, pd.DataFrame] = {}
     for query, query_labels_df in labels_df.groupby("query"):
         query_dict[query] = query_labels_df
 
@@ -101,21 +116,10 @@ def main():
 
     st.write("#### Result")
     metrics_df = pd.DataFrame(metrics)
-    stats_df = (
-        metrics_df.groupby("variant")
-        .agg(
-            {
-                "total_hits": "mean",
-                "map": "mean",
-                "ndcg": "mean",
-            }
-        )
-        .reset_index()
-    )
-    stats_df["total_hits"] = stats_df["total_hits"].apply(int)
+    stats_df = compute_stats(metrics_df)
     st.write(stats_df)
 
-    for metric in ["total_hits", "map", "ndcg"]:
+    for metric in ["total_hits", "ap", "ndcg"]:
         fig = px.box(metrics_df, y=metric, color="variant")
         st.plotly_chart(fig)
 
