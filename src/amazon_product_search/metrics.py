@@ -10,18 +10,19 @@ LABEL_TO_GAIN: Dict[str, float] = {
 }
 
 
-def compute_recall(retrieved_ids: List[str], relevant_ids: Set[str]) -> int:
-    for retrieved_id in retrieved_ids:
-        if retrieved_id in relevant_ids:
-            return 1
-    return 0
+def compute_ap(retrieved_ids: List[str], relevant_ids: Set[str]) -> Optional[float]:
+    if not retrieved_ids or not relevant_ids:
+        return None
 
-
-def compute_ap(retrieved_ids: List[str], relevant_ids: Set[str]) -> float:
+    gain = 0.0
+    num_relevant_docs = 0
     for i, retrieved_id in enumerate(retrieved_ids):
         if retrieved_id in relevant_ids:
-            return 1 / (i + 1)
-    return 0
+            num_relevant_docs += 1
+            gain += num_relevant_docs / (i + 1)
+    if num_relevant_docs == 0:
+        return None
+    return gain / num_relevant_docs
 
 
 def compute_dcg(gains: List[float]) -> float:

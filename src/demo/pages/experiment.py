@@ -7,7 +7,7 @@ import streamlit as st
 
 from amazon_product_search import query_builder, source
 from amazon_product_search.es_client import EsClient
-from amazon_product_search.metrics import compute_ap, compute_ndcg, compute_recall
+from amazon_product_search.metrics import compute_ap, compute_ndcg
 from amazon_product_search.models.search import RequestParams, Response, Result
 
 es_client = EsClient(
@@ -53,7 +53,6 @@ def compute_metrics(variant: Variant, query: str, labels_df: pd.DataFrame) -> Di
         "variant": variant.name,
         "query": query,
         "total_hits": response.total_hits,
-        "recall": compute_recall(retrieved_ids, relevant_ids),
         "map": compute_ap(retrieved_ids, relevant_ids),
         "ndcg": compute_ndcg(retrieved_ids, judgements),
     }
@@ -107,7 +106,6 @@ def main():
         .agg(
             {
                 "total_hits": "mean",
-                "recall": "mean",
                 "map": "mean",
                 "ndcg": "mean",
             }
@@ -117,7 +115,7 @@ def main():
     stats_df["total_hits"] = stats_df["total_hits"].apply(int)
     st.write(stats_df)
 
-    for metric in ["total_hits", "recall", "map", "ndcg"]:
+    for metric in ["total_hits", "map", "ndcg"]:
         fig = px.box(metrics_df, y=metric, color="variant")
         st.plotly_chart(fig)
 

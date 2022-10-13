@@ -19,7 +19,7 @@ def test_doc_to_action(mock_es):
             "_op_type": "index",
             "_index": "products",
             "_id": "1",
-            "doc": {
+            "_source": {
                 "product_id": "1",
                 "product_title": "Product Title",
             },
