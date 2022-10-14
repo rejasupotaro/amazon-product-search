@@ -8,7 +8,7 @@ import streamlit as st
 
 from amazon_product_search import query_builder, source
 from amazon_product_search.es_client import EsClient
-from amazon_product_search.metrics import compute_ap, compute_ndcg, compute_zero_hit_rate
+from amazon_product_search.metrics import compute_ap, compute_ndcg, compute_recall, compute_zero_hit_rate
 from amazon_product_search.models.search import RequestParams, Response, Result
 from amazon_product_search.nlp.normalizer import normalize_query
 
@@ -49,12 +49,13 @@ def compute_metrics(variant: Variant, query: str, labels_df: pd.DataFrame) -> di
         total_hits=es_response["hits"]["total"]["value"],
     )
     retrieved_ids = [result.product["product_id"] for result in response.results]
-    relevant_ids = labels_df[labels_df["esci_label"] == "exact"]["product_id"].tolist()
+    relevant_ids = set(labels_df[labels_df["esci_label"] == "exact"]["product_id"].tolist())
     judgements: dict[str, str] = {row["product_id"]: row["esci_label"] for row in labels_df.to_dict("records")}
     return {
         "variant": variant.name,
         "query": query,
         "total_hits": response.total_hits,
+        "recall": compute_recall(retrieved_ids, relevant_ids),
         "ap": compute_ap(retrieved_ids, relevant_ids),
         "ndcg": compute_ndcg(retrieved_ids, judgements),
     }
@@ -66,6 +67,7 @@ def compute_stats(metrics_df: pd.DataFrame) -> pd.DataFrame:
         .agg(
             total_hits=("total_hits", lambda series: int(np.mean(series))),
             zero_hit_rate=("total_hits", lambda series: compute_zero_hit_rate(series.values)),
+            recall=("recall", "mean"),
             map=("ap", "mean"),
             ndcg=("ndcg", "mean"),
         )
@@ -74,13 +76,19 @@ def compute_stats(metrics_df: pd.DataFrame) -> pd.DataFrame:
     return stats_df
 
 
+def draw_figures(metrics_df: pd.DataFrame):
+    for metric in ["total_hits", "recall", "ap", "ndcg"]:
+        fig = px.box(metrics_df, y=metric, color="variant")
+        st.plotly_chart(fig)
+
+
 def main():
     st.set_page_config(page_icon="️🔍", layout="wide")
 
     st.write("## Offline Experiment")
 
     locale = "jp"
-    nrows = 1000
+    nrows = 10000
 
     variants = [
         Variant(name="title", top_k=100),
@@ -120,10 +128,7 @@ def main():
     metrics_df = pd.DataFrame(metrics)
     stats_df = compute_stats(metrics_df)
     st.write(stats_df)
-
-    for metric in ["total_hits", "ap", "ndcg"]:
-        fig = px.box(metrics_df, y=metric, color="variant")
-        st.plotly_chart(fig)
+    draw_figures(metrics_df)
 
 
 if __name__ == "__main__":

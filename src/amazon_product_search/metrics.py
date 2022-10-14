@@ -16,6 +16,12 @@ def compute_zero_hit_rate(xs: list[int]) -> Optional[float]:
     return len([x for x in xs if x == 0]) / len(xs)
 
 
+def compute_recall(retrieved_ids: list[str], relevant_ids: set[str]) -> Optional[float]:
+    if not relevant_ids:
+        return None
+    return len(set(retrieved_ids) & relevant_ids) / len(relevant_ids)
+
+
 def compute_ap(retrieved_ids: list[str], relevant_ids: set[str]) -> Optional[float]:
     if not retrieved_ids or not relevant_ids:
         return None
