@@ -1,2 +1,7 @@
+PROJECT_ID = "amazon-product-search-344705"
+PROJECT_NAME = "amazon-product-search"
+IMAGE_NAME = "dense-indexer"
+IMAGE_URI = f"gcr.io/{PROJECT_ID}/{PROJECT_NAME}/{IMAGE_NAME}"
+REGION = "asia-northeast1"
 DATA_DIR = "data"
 MODELS_DIR = "models"
