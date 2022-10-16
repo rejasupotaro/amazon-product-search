@@ -4,7 +4,7 @@ from typing import Any, Callable, Dict, List, Optional, Union
 import apache_beam as beam
 from apache_beam import PCollection
 
-from amazon_product_search.es_client import EsClient
+from amazon_product_search.sparse_retrieval.es_client import EsClient
 
 
 class WriteToElasticsearch(beam.PTransform):
