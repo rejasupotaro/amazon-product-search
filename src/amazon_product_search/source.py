@@ -2,7 +2,7 @@ from typing import Optional
 
 import pandas as pd
 
-DATA_DIR = "./data"
+DATA_DIR = "data"
 
 
 def load_products(locale: str, nrows: Optional[int] = None) -> pd.DataFrame:

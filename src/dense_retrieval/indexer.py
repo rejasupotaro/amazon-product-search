@@ -2,6 +2,7 @@ import pandas as pd
 from annoy import AnnoyIndex
 
 from amazon_product_search.nlp.normalizer import normalize_doc
+from amazon_product_search.source import load_products
 from dense_retrieval.encoder import Encoder
 
 DATA_DIR = "data"
@@ -15,17 +16,14 @@ def preprocess(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
 
 
 def load_dataset(locale: str) -> pd.DataFrame:
-    products_filepath = f"{DATA_DIR}/product_catalogue-v0.3_{locale}.csv.zip"
-    products_df = pd.read_csv(
-        products_filepath, usecols=["index", "product_id", "product_title", "product_brand"], nrows=100
-    )
+    products_df = load_products(locale, nrows=100)
     products_df.fillna("", inplace=True)
     products_df = preprocess(products_df, columns=["product_title", "product_brand"])
     products_df["product"] = products_df["product_title"] + " " + products_df["product_brand"]
     return products_df
 
 
-def train(locale: str, model_name: str):
+def index(locale: str, model_name: str):
     print("Load dataset")
     products_df = load_dataset(locale)
 
@@ -63,4 +61,4 @@ if __name__ == "__main__":
     # model_name = "paraphrase-multilingual-mpnet-base-v2"
     # model_name = "stsb-xlm-r-multilingual"
 
-    train(locale="jp", model_name=model_name)
+    index(locale="jp", model_name=model_name)

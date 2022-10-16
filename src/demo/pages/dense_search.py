@@ -1,9 +1,9 @@
 from typing import Any
 
-import pandas as pd
 import streamlit as st
 from annoy import AnnoyIndex
 
+from amazon_product_search.source import load_products
 from dense_retrieval.encoder import Encoder
 
 MODELS_DIR = "models"
@@ -16,10 +16,7 @@ class Retriever:
         self.t = AnnoyIndex(f=768, metric="dot")
         self.t.load(f"{MODELS_DIR}/products.ann")
 
-        products_filepath = f"{DATA_DIR}/product_catalogue-v0.3_jp.csv.zip"
-        products_df = pd.read_csv(
-            products_filepath, usecols=["index", "product_id", "product_title", "product_brand"], nrows=100
-        )
+        products_df = load_products(locale="jp", nrows=100)
         products_df.fillna("", inplace=True)
         self.id_to_product: dict[str, Any] = {}
         for row in products_df.to_dict("records"):

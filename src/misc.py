@@ -1,6 +1,6 @@
 import pandas as pd
 
-DATA_DIR = "./data"
+DATA_DIR = "data"
 
 
 def _split_products_by_locale():
