@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Union
 
 import numpy as np
 import pandas as pd
@@ -18,13 +18,22 @@ es_client = EsClient(
 
 
 @dataclass
-class Variant:
+class SparseSearchConfig:
     name: str
     use_description: bool = False
     use_bullet_point: bool = False
     use_brand: bool = False
     use_color_name: bool = False
-    top_k: int = False
+    top_k: int = 100
+
+
+@dataclass
+class DenseSearchConfig:
+    name: str
+    top_k: int = 100
+
+
+Variant = Union[SparseSearchConfig, DenseSearchConfig]
 
 
 @st.cache
@@ -32,22 +41,37 @@ def load_labels(locale: str, nrows: int) -> pd.DataFrame:
     return source.load_labels(locale, nrows)
 
 
-def compute_metrics(variant: Variant, query: str, labels_df: pd.DataFrame) -> dict[str, Any]:
+def sparse_search(config: SparseSearchConfig, query: str) -> Response:
     params = RequestParams(
         query=query,
-        use_description=variant.use_description,
-        use_bullet_point=variant.use_bullet_point,
-        use_brand=variant.use_brand,
-        use_color_name=variant.use_color_name,
+        use_description=config.use_description,
+        use_bullet_point=config.use_bullet_point,
+        use_brand=config.use_brand,
+        use_color_name=config.use_color_name,
     )
     es_query = query_builder.build(params)
-
-    es_response = es_client.search(index_name="products_jp", es_query=es_query, size=variant.top_k)
-
-    response = Response(
+    es_response = es_client.search(index_name="products_jp", es_query=es_query, size=config.top_k)
+    return Response(
         results=[Result(product=hit["_source"], score=hit["_score"]) for hit in es_response["hits"]["hits"]],
         total_hits=es_response["hits"]["total"]["value"],
     )
+
+
+def dense_search(config: DenseSearchConfig, query: str) -> Response:
+    return Response(
+        results=[],
+        total_hits=100,
+    )
+
+
+def compute_metrics(variant: Variant, query: str, labels_df: pd.DataFrame) -> dict[str, Any]:
+    if isinstance(variant, SparseSearchConfig):
+        response = sparse_search(variant, query)
+    elif isinstance(variant, DenseSearchConfig):
+        response = dense_search(variant, query)
+    else:
+        raise ValueError
+
     retrieved_ids = [result.product["product_id"] for result in response.results]
     relevant_ids = set(labels_df[labels_df["esci_label"] == "exact"]["product_id"].tolist())
     judgements: dict[str, str] = {row["product_id"]: row["esci_label"] for row in labels_df.to_dict("records")}
@@ -88,14 +112,15 @@ def main():
     st.write("## Offline Experiment")
 
     locale = "jp"
-    nrows = 10000
+    nrows = 100
 
     variants = [
-        Variant(name="title", top_k=100),
-        Variant(name="title_description", use_description=True, top_k=100),
-        Variant(name="title_bullet_point", use_bullet_point=True, top_k=100),
-        Variant(name="title_brand", use_brand=True, top_k=100),
-        Variant(name="title_color_name", use_color_name=True, top_k=100),
+        # SparseSearchConfig(name="title", top_k=100),
+        # SparseSearchConfig(name="title_description", use_description=True, top_k=100),
+        # SparseSearchConfig(name="title_bullet_point", use_bullet_point=True, top_k=100),
+        # SparseSearchConfig(name="title_brand", use_brand=True, top_k=100),
+        # SparseSearchConfig(name="title_color_name", use_color_name=True, top_k=100),
+        DenseSearchConfig(name="dense", top_k=100)
     ]
     st.write("#### Variants")
     st.write(variants)
