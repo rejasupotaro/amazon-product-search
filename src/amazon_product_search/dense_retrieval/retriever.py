@@ -13,7 +13,7 @@ class Retriever:
         self.t = AnnoyIndex(f=768, metric="dot")
         self.t.load(f"{MODELS_DIR}/products.ann")
 
-        products_df = load_products(locale="jp", nrows=100)
+        products_df = load_products(locale="jp", nrows=1000)
         products_df.fillna("", inplace=True)
         self.id_to_product: dict[str, Any] = {}
         for row in products_df.to_dict("records"):
@@ -23,6 +23,8 @@ class Retriever:
         vector = self.encoder.encode(query)
         products = []
         for product_idx in self.t.get_nns_by_vector(vector, 5):
-            product = self.id_to_product[product_idx]
-            products.append(product)
+            if product_idx not in self.id_to_product:
+                products.append({"id": product_idx, "product_title": "NOT_FOUND"})
+                continue
+            products.append(self.id_to_product[product_idx])
         return products

@@ -14,7 +14,7 @@ def preprocess(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
 
 
 def load_dataset(locale: str) -> pd.DataFrame:
-    products_df = load_products(locale, nrows=100)
+    products_df = load_products(locale, nrows=1000)
     products_df.fillna("", inplace=True)
     products_df = preprocess(products_df, columns=["product_title", "product_brand"])
     products_df["product"] = products_df["product_title"] + " " + products_df["product_brand"]
