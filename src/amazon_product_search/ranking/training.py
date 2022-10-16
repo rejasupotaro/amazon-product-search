@@ -9,11 +9,9 @@ from sklearn.model_selection import train_test_split
 from torch import nn
 from torch.utils.data import DataLoader
 
+from amazon_product_search.constants import DATA_DIR, MODELS_DIR
 from amazon_product_search.metrics import LABEL_TO_GAIN
 from amazon_product_search.nlp.normalizer import normalize_doc
-
-DATA_DIR = "data"
-MODELS_DIR = "models"
 
 
 def preprocess(df: pd.DataFrame, columns: List[str]) -> pd.DataFrame:

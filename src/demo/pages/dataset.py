@@ -4,8 +4,6 @@ from st_aggrid import AgGrid
 
 from amazon_product_search import source
 
-DATA_DIR = "./data"
-
 
 @st.cache
 def load_products(locale: str, nrows: int = 100) -> pd.DataFrame:

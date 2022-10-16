@@ -2,7 +2,7 @@ from typing import Optional
 
 import pandas as pd
 
-DATA_DIR = "data"
+from amazon_product_search.constants import DATA_DIR
 
 
 def load_products(locale: str, nrows: Optional[int] = None) -> pd.DataFrame:

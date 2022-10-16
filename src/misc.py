@@ -1,6 +1,6 @@
 import pandas as pd
 
-DATA_DIR = "data"
+from amazon_product_search.constants import DATA_DIR
 
 
 def _split_products_by_locale():

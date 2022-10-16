@@ -1,12 +1,10 @@
 import pandas as pd
 from annoy import AnnoyIndex
 
+from amazon_product_search.constants import MODELS_DIR
 from amazon_product_search.dense_retrieval.encoder import Encoder
 from amazon_product_search.nlp.normalizer import normalize_doc
 from amazon_product_search.source import load_products
-
-DATA_DIR = "data"
-MODELS_DIR = "models"
 
 
 def preprocess(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
