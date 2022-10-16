@@ -1,7 +1,7 @@
 import logging
 
-from indexer import pipeline
-from indexer.options import IndexerOptions
+from sparse_retrieval.indexer import pipeline
+from sparse_retrieval.indexer.options import IndexerOptions
 
 
 def main():
