@@ -3,11 +3,11 @@ from typing import Optional
 
 import apache_beam as beam
 from apache_beam.transforms.ptransform import PTransform
-
-from amazon_product_search import source
 from sparse_retrieval.indexer.io.elasticsearch_io import WriteToElasticsearch
 from sparse_retrieval.indexer.options import IndexerOptions
 from sparse_retrieval.indexer.transforms import AnalyzeFn
+
+from amazon_product_search import source
 
 
 def get_input_source(locale: str, nrows: Optional[int] = None) -> PTransform:
