@@ -8,6 +8,7 @@ def _split_products_by_locale():
     filepath = f"{DATA_DIR}/{filename}.csv.zip"
     print(f"Load catalog from {filepath}...")
     df = pd.read_csv(filepath)
+    df = df.reset_index()
 
     locales = df["product_locale"].unique()
     print(f"The dataset contains locales: {locales}")
