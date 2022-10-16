@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Dict, Optional, Union
 
 import apache_beam as beam
 from apache_beam import PCollection
@@ -13,7 +13,7 @@ class WriteToElasticsearch(beam.PTransform):
         es_host: str,
         index_name: str,
         max_batch_size: int = 100,
-        id_fn: Optional[Callable[[dict[str, Any]], str]] = None,
+        id_fn: Optional[Callable[[Dict[str, Any]], str]] = None,
     ):
         self.write_fn = BulkWriteFn(
             es_host=es_host,
@@ -22,7 +22,7 @@ class WriteToElasticsearch(beam.PTransform):
             id_fn=id_fn,
         )
 
-    def expand(self, pcoll: PCollection[dict[str, Any]]):
+    def expand(self, pcoll: PCollection[Dict[str, Any]]):
         return pcoll | beam.ParDo(self.write_fn)
 
 
@@ -32,7 +32,7 @@ class BulkWriteFn(beam.DoFn):
         es_host: str,
         index_name: str,
         max_batch_size: int,
-        id_fn: Optional[Callable[[dict[str, Any]], str]] = None,
+        id_fn: Optional[Callable[[Dict[str, Any]], str]] = None,
     ):
         self.es_host = es_host
         self.index_name = index_name
@@ -43,9 +43,9 @@ class BulkWriteFn(beam.DoFn):
         self.es_client = EsClient(self.es_host)
 
     def start_bundle(self):
-        self.batch: list[dict[str, Any]] = []
+        self.batch: list[Dict[str, Any]] = []
 
-    def process(self, doc: dict[str, Any]):
+    def process(self, doc: Dict[str, Any]):
         self.batch.append(doc)
         if len(self.batch) >= self.max_batch_size:
             self.flush_batch()
@@ -53,7 +53,7 @@ class BulkWriteFn(beam.DoFn):
     def finish_bundle(self):
         self.flush_batch()
 
-    def flush_batch(self) -> tuple[int, Union[int, list[dict[str, Any]]]]:
+    def flush_batch(self) -> tuple[int, Union[int, list[Dict[str, Any]]]]:
         """Call Bulk API with the request body consisting of multiple actions.
 
         We can choose whether the Bulk API raises an error (`BulkIndexError`) when one of the action in the batch fails.

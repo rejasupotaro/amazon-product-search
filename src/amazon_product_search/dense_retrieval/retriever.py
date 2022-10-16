@@ -9,7 +9,7 @@ from amazon_product_search.source import load_products
 
 class Retriever:
     def __init__(self):
-        self.encoder = Encoder(model_name="cl-tohoku/bert-base-japanese-v2")
+        self.encoder = Encoder()
         self.t = AnnoyIndex(f=768, metric="dot")
         self.t.load(f"{MODELS_DIR}/products.ann")
 

@@ -21,12 +21,12 @@ def load_dataset(locale: str) -> pd.DataFrame:
     return products_df
 
 
-def index(locale: str, model_name: str):
+def index(locale: str):
     print("Load dataset")
     products_df = load_dataset(locale)
 
     print("Encode products")
-    encoder = Encoder(model_name)
+    encoder = Encoder()
     product_vectors = encoder.encode(products_df["product"].tolist())
 
     print("Index products")
@@ -41,22 +41,4 @@ def index(locale: str, model_name: str):
 
 
 if __name__ == "__main__":
-    # For English
-    # model_name = "cross-encoder/ms-marco-electra-base"
-    # model_name = "cross-encoder/ms-marco-MiniLM-L-12-v2"
-    # model_name = "sentence-transformers/msmarco-roberta-base-v3"
-
-    # For Spanish
-    # model_name = "dccuchile/bert-base-spanish-wwm-uncased"
-    # model_name = "bertin-project/bertin-roberta-base-spanish"
-
-    # For Japanese
-    model_name = "cl-tohoku/bert-base-japanese-v2"
-    # model_name = "cl-tohoku/bert-base-japanese-char-v2"
-    # model_name = "nlp-waseda/roberta-large-japanese"
-
-    # Multi-lingual
-    # model_name = "paraphrase-multilingual-mpnet-base-v2"
-    # model_name = "stsb-xlm-r-multilingual"
-
-    index(locale="jp", model_name=model_name)
+    index(locale="jp")

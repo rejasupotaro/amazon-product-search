@@ -50,7 +50,9 @@ def train(locale: str, base_model_name: str, output_model_name: str, num_example
     train_examples = []
     for row in train_df.to_dict("records"):
         train_examples.append(InputExample(texts=[row["query"], row["product"]], label=float(row["gain"])))
-    train_dataloader: DataLoader = DataLoader(train_examples, shuffle=True, batch_size=4, drop_last=True)
+    train_dataloader: DataLoader = DataLoader(
+        train_examples, shuffle=True, batch_size=4, drop_last=True  # type: ignore
+    )
 
     test_examples = {}
     query_to_id: Dict[str, str] = {}
