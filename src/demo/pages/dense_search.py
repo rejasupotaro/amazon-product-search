@@ -3,8 +3,8 @@ from typing import Any
 import streamlit as st
 from annoy import AnnoyIndex
 
+from amazon_product_search.dense_retrieval.encoder import Encoder
 from amazon_product_search.source import load_products
-from dense_retrieval.encoder import Encoder
 
 MODELS_DIR = "models"
 DATA_DIR = "data"

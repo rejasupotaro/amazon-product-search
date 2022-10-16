@@ -1,9 +1,9 @@
 import pandas as pd
 from annoy import AnnoyIndex
+from dense_retrieval.encoder import Encoder
 
 from amazon_product_search.nlp.normalizer import normalize_doc
 from amazon_product_search.source import load_products
-from dense_retrieval.encoder import Encoder
 
 DATA_DIR = "data"
 MODELS_DIR = "models"
