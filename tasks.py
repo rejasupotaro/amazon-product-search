@@ -2,7 +2,7 @@ import time
 
 from invoke import task
 
-import misc
+from amazon_product_search import source
 from amazon_product_search.constants import IMAGE_URI, PROJECT_ID, REGION
 
 
@@ -80,4 +80,4 @@ def lint(c):
 
 @task
 def split_dataset_by_locale(c):
-    misc.split_dataset_by_locale()
+    source.split_dataset_by_locale()
