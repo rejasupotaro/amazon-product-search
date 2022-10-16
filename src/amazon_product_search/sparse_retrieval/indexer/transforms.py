@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterator
+from typing import Any, Iterator
 
 import apache_beam as beam
 
@@ -13,7 +13,7 @@ class AnalyzeFn(beam.DoFn):
     def setup(self):
         self.tokenizer = Tokenizer()
 
-    def process(self, product: Dict[str, Any]) -> Iterator[Dict[str, Any]]:
+    def process(self, product: dict[str, Any]) -> Iterator[dict[str, Any]]:
         for field in self.text_fields:
             s = product[field]
             s = normalize_doc(s)

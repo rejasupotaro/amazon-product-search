@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 import streamlit as st
 
@@ -11,7 +11,7 @@ es_client = EsClient(
 )
 
 
-def search(es_query: Dict[str, Any], index_name: str) -> Response:
+def search(es_query: dict[str, Any], index_name: str) -> Response:
     es_response = es_client.search(index_name=index_name, es_query=es_query)
     response = Response(
         results=[Result(product=hit["_source"], score=hit["_score"]) for hit in es_response["hits"]["hits"]],
@@ -20,7 +20,7 @@ def search(es_query: Dict[str, Any], index_name: str) -> Response:
     return response
 
 
-def draw_products(results: List[Result]):
+def draw_products(results: list[Result]):
     for result in results:
         st.write(result.product)
         st.write("----")

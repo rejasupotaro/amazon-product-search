@@ -1,9 +1,9 @@
-from typing import Any, Dict
+from typing import Any
 
 from amazon_product_search.models.search import RequestParams
 
 
-def build(params: RequestParams) -> Dict[str, Any]:
+def build(params: RequestParams) -> dict[str, Any]:
     if not params.query:
         return {
             "match_all": {},

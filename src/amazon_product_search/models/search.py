@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Dict, List
+from typing import Any
 
 
 @dataclass
@@ -13,11 +13,11 @@ class RequestParams:
 
 @dataclass
 class Result:
-    product: Dict[str, Any]
+    product: dict[str, Any]
     score: float
 
 
 @dataclass
 class Response:
-    results: List[Result]
+    results: list[Result]
     total_hits: int

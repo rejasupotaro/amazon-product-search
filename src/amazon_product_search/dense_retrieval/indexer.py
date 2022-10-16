@@ -1,7 +1,7 @@
 import pandas as pd
 from annoy import AnnoyIndex
-from dense_retrieval.encoder import Encoder
 
+from amazon_product_search.dense_retrieval.encoder import Encoder
 from amazon_product_search.nlp.normalizer import normalize_doc
 from amazon_product_search.source import load_products
 
