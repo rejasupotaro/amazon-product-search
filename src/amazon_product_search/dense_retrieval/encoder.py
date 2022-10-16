@@ -24,6 +24,6 @@ class Encoder:
 
         self.embedder = SentenceTransformer(model_name)
 
-    def encode(self, texts: list[str], convert_to_tensor=False) -> Tensor:
-        vectors = self.embedder.encode(texts, show_progress_bar=True, convert_to_tensor=convert_to_tensor)
+    def encode(self, texts: list[str], show_progress_bar=True, convert_to_tensor=False) -> Tensor:
+        vectors = self.embedder.encode(texts, show_progress_bar=show_progress_bar, convert_to_tensor=convert_to_tensor)
         return vectors
