@@ -4,6 +4,7 @@ from annoy import AnnoyIndex
 
 from amazon_product_search.constants import MODELS_DIR
 from amazon_product_search.dense_retrieval.encoder import Encoder
+from amazon_product_search.models.search import Response, Result
 from amazon_product_search.source import load_products
 
 
@@ -15,16 +16,23 @@ class Retriever:
 
         products_df = load_products(locale="jp", nrows=1000)
         products_df.fillna("", inplace=True)
-        self.id_to_product: dict[str, Any] = {}
+        self.index_to_product: dict[str, Any] = {}
         for row in products_df.to_dict("records"):
-            self.id_to_product[row["index"]] = row
+            self.index_to_product[row["index"]] = row
 
-    def search(self, query: str) -> list[dict[str, Any]]:
-        vector = self.encoder.encode(query)
-        products = []
-        for product_idx in self.t.get_nns_by_vector(vector, 5):
-            if product_idx not in self.id_to_product:
-                products.append({"id": product_idx, "product_title": "NOT_FOUND"})
-                continue
-            products.append(self.id_to_product[product_idx])
-        return products
+    def search(self, query: str, top_k: int) -> Response:
+        vector = self.encoder.encode(query, show_progress_bar=False)
+        product_indices, distances = self.t.get_nns_by_vector(vector, n=top_k, include_distances=True)
+        results = []
+        for product_index, distance in zip(product_indices, distances):
+            if product_index in self.index_to_product:
+                product = self.index_to_product[product_index]
+            else:
+                product = {"id": product_index, "product_title": "NOT_FOUND"}
+            results.append(
+                Result(
+                    product=product,
+                    score=distance,
+                )
+            )
+        return Response(results=results, total_hits=top_k)

@@ -7,6 +7,7 @@ import plotly.express as px
 import streamlit as st
 
 from amazon_product_search import source
+from amazon_product_search.dense_retrieval.retriever import Retriever
 from amazon_product_search.metrics import compute_ap, compute_ndcg, compute_recall, compute_zero_hit_rate
 from amazon_product_search.models.search import RequestParams, Response, Result
 from amazon_product_search.nlp.normalizer import normalize_query
@@ -16,6 +17,7 @@ from amazon_product_search.sparse_retrieval.es_client import EsClient
 es_client = EsClient(
     es_host="http://localhost:9200",
 )
+retriever = Retriever()
 
 
 @dataclass
@@ -59,10 +61,7 @@ def sparse_search(config: SparseSearchConfig, query: str) -> Response:
 
 
 def dense_search(config: DenseSearchConfig, query: str) -> Response:
-    return Response(
-        results=[],
-        total_hits=100,
-    )
+    return retriever.search(query, config.top_k)
 
 
 def compute_metrics(variant: Variant, query: str, labels_df: pd.DataFrame) -> dict[str, Any]:
@@ -90,7 +89,7 @@ def compute_stats(metrics_df: pd.DataFrame) -> pd.DataFrame:
     stats_df = (
         metrics_df.groupby("variant")
         .agg(
-            total_hits=("total_hits", lambda series: int(np.mean(series))),
+            total_hits=("total_hits", lambda series: np.mean(series)),
             zero_hit_rate=("total_hits", lambda series: compute_zero_hit_rate(series.values)),
             recall=("recall", "mean"),
             map=("ap", "mean"),
@@ -113,7 +112,7 @@ def main():
     st.write("## Offline Experiment")
 
     locale = "jp"
-    nrows = 100
+    nrows = 1000
 
     variants = [
         # SparseSearchConfig(name="title", top_k=100),

@@ -4,6 +4,8 @@ import streamlit as st
 
 from amazon_product_search.dense_retrieval.retriever import Retriever
 
+retriever = Retriever()
+
 
 def draw_products(products: list[Any]):
     for product in products:
@@ -13,14 +15,13 @@ def draw_products(products: list[Any]):
 
 def main():
     st.set_page_config(page_icon="️🔍", layout="wide")
-    retriever = Retriever()
 
     query = st.text_input("Query:")
     if not query:
         return
 
-    products = retriever.search(query)
-    draw_products(products)
+    response = retriever.search(query, top_k=5)
+    draw_products([result.product for result in response.results])
 
 
 if __name__ == "__main__":
