@@ -5,7 +5,7 @@ from elasticsearch import Elasticsearch, helpers
 
 
 class EsClient:
-    def __init__(self, es_host: str):
+    def __init__(self, es_host: str = "http://localhost:9200"):
         self.es = Elasticsearch(es_host)
 
     def list_indices(self) -> list[str]:
@@ -16,9 +16,9 @@ class EsClient:
 
     def create_index(self, index_name: str):
         with open("schema/es/products.json") as file:
-            mappings = json.load(file)
-            print(mappings)
-        self.es.indices.create(index=index_name, mappings=mappings)
+            schema = json.load(file)
+            print(schema)
+        self.es.indices.create(index=index_name, mappings=schema["mappings"])
 
     def count_docs(self, index_name: str) -> Any:
         return self.es.count(index=index_name)

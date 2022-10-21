@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from amazon_product_search.sparse_retrieval.es_client import EsClient
+from amazon_product_search.elasticsearch.es_client import EsClient
 
 
 @patch("amazon_product_search.sparse_retrieval.es_client.Elasticsearch")

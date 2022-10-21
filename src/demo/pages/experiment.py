@@ -8,11 +8,11 @@ import streamlit as st
 
 from amazon_product_search import source
 from amazon_product_search.dense_retrieval.retriever import Retriever
+from amazon_product_search.elasticsearch.es_client import EsClient
 from amazon_product_search.metrics import compute_ap, compute_ndcg, compute_recall, compute_zero_hit_rate
 from amazon_product_search.models.search import RequestParams, Response, Result
 from amazon_product_search.nlp.normalizer import normalize_query
 from amazon_product_search.sparse_retrieval import query_builder
-from amazon_product_search.sparse_retrieval.es_client import EsClient
 
 es_client = EsClient(
     es_host="http://localhost:9200",

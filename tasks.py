@@ -4,6 +4,7 @@ from invoke import task
 
 from amazon_product_search import source
 from amazon_product_search.constants import IMAGE_URI, PROJECT_ID, REGION
+from amazon_product_search.es.es_client import EsClient
 
 
 def get_unix_timestamp() -> int:
@@ -35,6 +36,28 @@ def hello_on_cloud(c):
     """
     c.run(command)
     c.run(f"open https://console.cloud.google.com/vertex-ai/training/custom-jobs?project={PROJECT_ID}")
+
+
+@task
+def delete_index(c, locale="jp"):
+    es_client = EsClient()
+    index_name = f"products_{locale}"
+    es_client.delete_index(index_name=index_name)
+
+
+@task
+def create_index(c, locale="jp"):
+    es_client = EsClient()
+    index_name = f"products_{locale}"
+    es_client.create_index(index_name=index_name)
+
+
+@task
+def recreate_index(c, locale="jp"):
+    es_client = EsClient()
+    index_name = f"products_{locale}"
+    es_client.delete_index(index_name=index_name)
+    es_client.create_index(index_name=index_name)
 
 
 @task

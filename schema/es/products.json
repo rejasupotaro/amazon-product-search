@@ -1,0 +1,12 @@
+{
+    "mappings": {
+        "properties": {
+            "product_vector": {
+                "type": "dense_vector",
+                "dims": 768,
+                "index": true,
+                "similarity": "l2_norm"
+            }
+        }
+    }
+}
