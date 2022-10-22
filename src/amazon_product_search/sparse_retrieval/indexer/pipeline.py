@@ -7,6 +7,7 @@ from amazon_product_search import source
 from amazon_product_search.sparse_retrieval.indexer.io.elasticsearch_io import WriteToElasticsearch
 from amazon_product_search.sparse_retrieval.indexer.options import IndexerOptions
 from amazon_product_search.sparse_retrieval.indexer.transforms.analyzer_fn import AnalyzeFn
+from amazon_product_search.sparse_retrieval.indexer.transforms.encoder_fn import EncoderFn
 
 
 def get_input_source(locale: str, nrows: int = -1) -> PTransform:
@@ -27,7 +28,7 @@ def run(options: IndexerOptions):
     input_source = get_input_source(locale, nrows)
 
     with beam.Pipeline() as pipeline:
-        products = pipeline | input_source | beam.ParDo(AnalyzeFn(text_fields))
+        products = pipeline | input_source | beam.ParDo(AnalyzeFn(text_fields)) | beam.ParDo(EncoderFn())
         if es_host:
             (
                 products
