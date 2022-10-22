@@ -8,11 +8,11 @@ import streamlit as st
 
 from amazon_product_search import source
 from amazon_product_search.dense_retrieval.encoder import Encoder
+from amazon_product_search.es import query_builder
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.metrics import compute_ap, compute_ndcg, compute_recall, compute_zero_hit_rate
-from amazon_product_search.models.search import RequestParams, Response, Result
+from amazon_product_search.models.search import Response, Result
 from amazon_product_search.nlp.normalizer import normalize_query
-from amazon_product_search.sparse_retrieval import query_builder
 
 encoder = Encoder()
 es_client = EsClient(
@@ -45,14 +45,13 @@ def load_labels(locale: str, nrows: int) -> pd.DataFrame:
 
 
 def sparse_search(config: SparseSearchConfig, query: str) -> Response:
-    params = RequestParams(
+    es_query = query_builder.build_search_query(
         query=query,
         use_description=config.use_description,
         use_bullet_point=config.use_bullet_point,
         use_brand=config.use_brand,
         use_color_name=config.use_color_name,
     )
-    es_query = query_builder.build(params)
     es_response = es_client.search(index_name="products_jp", es_query=es_query, size=config.top_k)
     return Response(
         results=[Result(product=hit["_source"], score=hit["_score"]) for hit in es_response["hits"]["hits"]],

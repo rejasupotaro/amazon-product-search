@@ -59,14 +59,8 @@ class EsClient:
     def search(self, index_name: str, es_query: dict[str, Any], size: int = 20) -> Any:
         return self.es.search(index=index_name, query=es_query, size=size)
 
-    def knn_search(self, index_name: str, query_vector: list[float], top_k: int = 20) -> Any:
-        query = {
-            "field": "product_vector",
-            "query_vector": query_vector,
-            "k": top_k,
-            "num_candidates": 100,
-        }
-        return self.es.knn_search(index=index_name, knn=query)
+    def knn_search(self, index_name: str, es_query: dict[str, Any]) -> Any:
+        return self.es.knn_search(index=index_name, knn=es_query)
 
     def close(self):
         self.es.close()

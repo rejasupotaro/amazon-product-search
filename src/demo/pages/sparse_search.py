@@ -2,9 +2,9 @@ from typing import Any
 
 import streamlit as st
 
+from amazon_product_search.es import query_builder
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.models.search import RequestParams, Response, Result
-from amazon_product_search.sparse_retrieval import query_builder
 
 es_client = EsClient(
     es_host="http://localhost:9200",
@@ -54,7 +54,7 @@ def main():
     )
 
     st.write("Elasticsearch Query:")
-    es_query = query_builder.build(params)
+    es_query = query_builder.build_search_query(params)
     st.json(es_query)
 
     st.write("----")
