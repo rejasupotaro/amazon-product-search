@@ -6,7 +6,7 @@ from apache_beam.transforms.ptransform import PTransform
 from amazon_product_search import source
 from amazon_product_search.sparse_retrieval.indexer.io.elasticsearch_io import WriteToElasticsearch
 from amazon_product_search.sparse_retrieval.indexer.options import IndexerOptions
-from amazon_product_search.sparse_retrieval.indexer.transforms import AnalyzeFn
+from amazon_product_search.sparse_retrieval.indexer.transforms.analyzer_fn import AnalyzeFn
 
 
 def get_input_source(locale: str, nrows: int = -1) -> PTransform:
