@@ -1,9 +1,9 @@
 from unittest.mock import patch
 
-from amazon_product_search.elasticsearch.es_client import EsClient
+from amazon_product_search.es.es_client import EsClient
 
 
-@patch("amazon_product_search.sparse_retrieval.es_client.Elasticsearch")
+@patch("amazon_product_search.es.es_client.Elasticsearch")
 def test_doc_to_action(mock_es):
     es_client = EsClient(
         es_host="http://localhost:9200",
