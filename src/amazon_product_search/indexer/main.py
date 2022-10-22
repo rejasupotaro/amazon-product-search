@@ -1,7 +1,7 @@
 import logging
 
-from amazon_product_search.sparse_retrieval.indexer import pipeline
-from amazon_product_search.sparse_retrieval.indexer.options import IndexerOptions
+from amazon_product_search.indexer import pipeline
+from amazon_product_search.indexer.options import IndexerOptions
 
 
 def main():

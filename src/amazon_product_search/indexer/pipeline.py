@@ -2,12 +2,13 @@ import logging
 
 import apache_beam as beam
 from apache_beam.transforms.ptransform import PTransform
+from apache_beam.transforms.util import BatchElements
 
 from amazon_product_search import source
-from amazon_product_search.sparse_retrieval.indexer.io.elasticsearch_io import WriteToElasticsearch
-from amazon_product_search.sparse_retrieval.indexer.options import IndexerOptions
-from amazon_product_search.sparse_retrieval.indexer.transforms.analyzer_fn import AnalyzeFn
-from amazon_product_search.sparse_retrieval.indexer.transforms.encoder_fn import EncoderFn
+from amazon_product_search.indexer.io.elasticsearch_io import WriteToElasticsearch
+from amazon_product_search.indexer.options import IndexerOptions
+from amazon_product_search.indexer.transforms.analyzer_fn import AnalyzeFn
+from amazon_product_search.indexer.transforms.encoder_fn import BatchEncodeFn
 
 
 def get_input_source(locale: str, nrows: int = -1) -> PTransform:
@@ -25,10 +26,14 @@ def run(options: IndexerOptions):
     index_name = f"products_{locale}"
     text_fields = ["product_title", "product_description", "product_bullet_point"]
 
-    input_source = get_input_source(locale, nrows)
-
     with beam.Pipeline() as pipeline:
-        products = pipeline | input_source | beam.ParDo(AnalyzeFn(text_fields)) | beam.ParDo(EncoderFn())
+        products = (
+            pipeline
+            | get_input_source(locale, nrows)
+            | beam.ParDo(AnalyzeFn(text_fields))
+            | BatchElements(min_batch_size=8)
+            | beam.ParDo(BatchEncodeFn())
+        )
         if es_host:
             (
                 products
