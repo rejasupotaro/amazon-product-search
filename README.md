@@ -22,8 +22,9 @@ $ brew install mecab mecab-ipadic
 Download the dataset on the internet. Then run the following command.
 
 ```shell
-$ poetry run inv split-dataset-by-locale
-$ poetry run inv index --locale=jp
+$ poetry run inv data.split--by-locale
+$ poetry run inv es.create_index --locale=jp
+$ poetry run inv es.index_doc --locale=jp
 ```
 
 ## Demo
