@@ -4,7 +4,7 @@ from unittest.mock import patch
 import apache_beam as beam
 from apache_beam.testing.test_pipeline import TestPipeline
 
-from amazon_product_search.sparse_retrieval.indexer.io.elasticsearch_io import WriteToElasticsearch
+from amazon_product_search.indexer.io.elasticsearch_io import WriteToElasticsearch
 
 
 @patch("amazon_product_search.es.es_client.Elasticsearch")
