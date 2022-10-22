@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 import apache_beam as beam
 from apache_beam.transforms.ptransform import PTransform
@@ -10,7 +9,7 @@ from amazon_product_search.sparse_retrieval.indexer.options import IndexerOption
 from amazon_product_search.sparse_retrieval.indexer.transforms import AnalyzeFn
 
 
-def get_input_source(locale: str, nrows: Optional[int] = None) -> PTransform:
+def get_input_source(locale: str, nrows: int = -1) -> PTransform:
     products_df = source.load_products(locale, nrows)
     products_df = products_df.fillna("")
     products = products_df.to_dict("records")

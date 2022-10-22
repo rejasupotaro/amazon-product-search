@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict
 
 from amazon_product_search.nlp.normalizer import normalize_doc
 from amazon_product_search.nlp.tokenizer import Tokenizer
@@ -9,7 +9,7 @@ class Analyzer:
         self.text_fields = text_fields
         self.tokenizer = Tokenizer()
 
-    def analyze(self, product: dict[str, Any]) -> dict[str, Any]:
+    def analyze(self, product: Dict[str, Any]) -> Dict[str, Any]:
         for field in self.text_fields:
             if field not in product:
                 continue

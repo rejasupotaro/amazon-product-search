@@ -18,14 +18,6 @@ toolz = "*"
 dev = ["black", "docutils", "ipython", "flake8", "pytest", "sphinx", "mistune (<2.0.0)", "m2r", "vega-datasets", "recommonmark"]
 
 [[package]]
-name = "annoy"
-version = "1.17.1"
-description = "Approximate Nearest Neighbors in C++/Python optimized for memory usage and loading/saving to disk."
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "anyio"
 version = "3.6.1"
 description = "High level compatibility layer for multiple asynchronous event loop implementations"
@@ -2561,14 +2553,13 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "flake8 
 [metadata]
 lock-version = "1.1"
 python-versions = "3.9.13"
-content-hash = "af287339e4f6dafd8d6cb4a72f6df538ab251b9b70448e4b2a3259baf6b6bc4c"
+content-hash = "906ae6b2811dcccbe6960df89e2f5ce618b38931964ac59400b45767bcd6c6a9"
 
 [metadata.files]
 altair = [
     {file = "altair-4.2.0-py3-none-any.whl", hash = "sha256:0c724848ae53410c13fa28be2b3b9a9dcb7b5caa1a70f7f217bd663bb419935a"},
     {file = "altair-4.2.0.tar.gz", hash = "sha256:d87d9372e63b48cd96b2a6415f0cf9457f50162ab79dc7a31cd7e024dd840026"},
 ]
-annoy = []
 anyio = [
     {file = "anyio-3.6.1-py3-none-any.whl", hash = "sha256:cb29b9c70620506a9a8f87a309591713446953302d7d995344d0d7c6c0c9a7be"},
     {file = "anyio-3.6.1.tar.gz", hash = "sha256:413adf95f93886e442aea925f3ee43baa5a765a64a0f52c6081894f9992fdd0b"},

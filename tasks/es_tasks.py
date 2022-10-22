@@ -28,7 +28,7 @@ def recreate_index(c, locale="jp"):
 @task
 def index_docs(c, runner="DirectRunner", locale="jp", nrows=None):
     command = [
-        "poetry run python src/indexer/main.py",
+        "poetry run python src/amazon_product_search/sparse_retrieval/indexer/main.py",
         f"--runner={runner}",
         f"--locale={locale}",
         "--es_host=http://localhost:9200",
@@ -43,7 +43,7 @@ def index_docs(c, runner="DirectRunner", locale="jp", nrows=None):
 
     if nrows:
         command += [
-            f"--nrows={nrows}",
+            f"--nrows={int(nrows)}",
         ]
 
     c.run(" ".join(command))

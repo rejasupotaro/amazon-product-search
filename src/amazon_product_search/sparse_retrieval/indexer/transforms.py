@@ -1,17 +1,16 @@
-from typing import Any, Iterator
+from typing import Any, Dict, Iterator
 
 import apache_beam as beam
 
 from amazon_product_search.nlp.analyzer import Analyzer
-from amazon_product_search.nlp.tokenizer import Tokenizer
 
 
 class AnalyzeFn(beam.DoFn):
     def __init__(self, text_fields: list[str]):
-        self.analyzer = Analyzer(text_fields)
+        self.text_fields = text_fields
 
     def setup(self):
-        self.tokenizer = Tokenizer()
+        self.analyzer = Analyzer(self.text_fields)
 
-    def process(self, product: dict[str, Any]) -> Iterator[dict[str, Any]]:
+    def process(self, product: Dict[str, Any]) -> Iterator[Dict[str, Any]]:
         yield self.analyzer.analyze(product)

@@ -1,12 +1,78 @@
 {
     "mappings": {
-        "properties": {
-            "product_vector": {
-                "type": "dense_vector",
-                "dims": 768,
-                "index": true,
-                "similarity": "l2_norm"
+      "properties": {
+        "index": {
+          "type": "long"
+        },
+        "product_brand": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
             }
+          }
+        },
+        "product_bullet_point": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "product_color_name": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "product_description": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "product_id": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "product_locale": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "product_title": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "product_vector": {
+          "type": "dense_vector",
+          "dims": 768,
+          "index": true,
+          "similarity": "l2_norm"
         }
+      }
     }
-}
+  }

@@ -7,17 +7,17 @@ import plotly.express as px
 import streamlit as st
 
 from amazon_product_search import source
-from amazon_product_search.dense_retrieval.retriever import Retriever
-from amazon_product_search.elasticsearch.es_client import EsClient
+from amazon_product_search.dense_retrieval.encoder import Encoder
+from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.metrics import compute_ap, compute_ndcg, compute_recall, compute_zero_hit_rate
 from amazon_product_search.models.search import RequestParams, Response, Result
 from amazon_product_search.nlp.normalizer import normalize_query
 from amazon_product_search.sparse_retrieval import query_builder
 
+encoder = Encoder()
 es_client = EsClient(
     es_host="http://localhost:9200",
 )
-retriever = Retriever()
 
 
 @dataclass
@@ -61,7 +61,13 @@ def sparse_search(config: SparseSearchConfig, query: str) -> Response:
 
 
 def dense_search(config: DenseSearchConfig, query: str) -> Response:
-    return retriever.search(query, config.top_k)
+    query_vector = encoder.encode(query, show_progress_bar=False)
+    es_response = es_client.knn_search(index_name="products_jp", query_vector=query_vector, top_k=config.top_k)
+    response = Response(
+        results=[Result(product=hit["_source"], score=hit["_score"]) for hit in es_response["hits"]["hits"]],
+        total_hits=es_response["hits"]["total"]["value"],
+    )
+    return response
 
 
 def compute_metrics(variant: Variant, query: str, labels_df: pd.DataFrame) -> dict[str, Any]:

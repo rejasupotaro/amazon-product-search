@@ -23,8 +23,8 @@ class EsClient:
     def count_docs(self, index_name: str) -> Any:
         return self.es.count(index=index_name)
 
-    def index_doc(self, index_name: str, doc: dict[str, Any]):
-        self.es.index(index=index_name, document=doc)
+    def index_doc(self, index_name: str, doc: dict[str, Any], doc_id: Optional[str] = None):
+        self.es.index(index=index_name, document=doc, id=doc_id)
         self.es.indices.refresh(index=index_name)
 
     def generate_actions(
@@ -57,8 +57,16 @@ class EsClient:
         )
 
     def search(self, index_name: str, es_query: dict[str, Any], size: int = 20) -> Any:
-        response = self.es.search(index=index_name, query=es_query, size=size)
-        return response
+        return self.es.search(index=index_name, query=es_query, size=size)
+
+    def knn_search(self, index_name: str, query_vector: list[float], top_k: int = 20) -> Any:
+        query = {
+            "field": "product_vector",
+            "query_vector": query_vector,
+            "k": top_k,
+            "num_candidates": 100,
+        }
+        return self.es.knn_search(index=index_name, knn=query)
 
     def close(self):
         self.es.close()

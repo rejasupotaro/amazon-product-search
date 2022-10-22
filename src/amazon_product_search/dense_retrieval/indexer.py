@@ -1,10 +1,10 @@
 from typing import Any, Iterator
 
 import pandas as pd
-from annoy import AnnoyIndex
 
-from amazon_product_search.constants import MODELS_DIR
 from amazon_product_search.dense_retrieval.encoder import Encoder
+from amazon_product_search.es.es_client import EsClient
+from amazon_product_search.nlp.analyzer import Analyzer
 from amazon_product_search.nlp.normalizer import normalize_doc
 from amazon_product_search.source import load_products
 
@@ -16,7 +16,7 @@ def preprocess(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
 
 
 def load_dataset(locale: str) -> pd.DataFrame:
-    products_df = load_products(locale, nrows=1000)
+    products_df = load_products(locale, nrows=10)
     products_df.fillna("", inplace=True)
     products_df = preprocess(products_df, columns=["product_title", "product_brand"])
     products_df["product"] = products_df["product_title"] + " " + products_df["product_brand"]
@@ -30,13 +30,14 @@ def encode_docs(docs: list[str]):
 
 
 def index_docs(docs: Iterator[tuple[dict[str, Any], Any]]):
-    t = AnnoyIndex(f=768, metric="dot")
+    analyzer = Analyzer(text_fields=["product_title", "product_description", "product_bullet_point"])
+    es_client = EsClient()
+    index_name = "products_jp"
     for row, vector in docs:
-        t.add_item(row["index"], vector)
-    t.build(n_trees=10)
-
-    print("Save index")
-    t.save(f"{MODELS_DIR}/test.ann")
+        doc = analyzer.analyze(row)
+        doc["product_vector"] = vector
+        doc_id = doc["product_id"]
+        es_client.index_doc(index_name=index_name, doc=doc, doc_id=doc_id)
 
 
 def run(locale: str):
