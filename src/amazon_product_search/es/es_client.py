@@ -25,7 +25,7 @@ class EsClient:
 
     def index_doc(self, index_name: str, doc: dict[str, Any]):
         self.es.index(index=index_name, document=doc)
-        self.es.indices.refresh(index="products_jp")
+        self.es.indices.refresh(index=index_name)
 
     def generate_actions(
         self,

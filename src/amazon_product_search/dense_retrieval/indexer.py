@@ -1,3 +1,5 @@
+from typing import Any, Iterator
+
 import pandas as pd
 from annoy import AnnoyIndex
 
@@ -21,24 +23,34 @@ def load_dataset(locale: str) -> pd.DataFrame:
     return products_df
 
 
-def index(locale: str):
-    print("Load dataset")
-    products_df = load_dataset(locale)
-
-    print("Encode products")
+def encode_docs(docs: list[str]):
     encoder = Encoder()
-    product_vectors = encoder.encode(products_df["product"].tolist())
+    vectors = encoder.encode(docs)
+    return vectors
 
-    print("Index products")
+
+def index_docs(docs: Iterator[tuple[dict[str, Any], Any]]):
     t = AnnoyIndex(f=768, metric="dot")
-    for row, vector in zip(products_df.to_dict("records"), product_vectors):
+    for row, vector in docs:
         t.add_item(row["index"], vector)
     t.build(n_trees=10)
 
     print("Save index")
-    t.save(f"{MODELS_DIR}/products.ann")
+    t.save(f"{MODELS_DIR}/test.ann")
+
+
+def run(locale: str):
+    print("Load dataset")
+    products_df = load_dataset(locale)
+
+    print("Encode products")
+    product_vectors = encode_docs(products_df["product"].tolist())
+
+    print("Index products")
+    index_docs(zip(products_df.to_dict("records"), product_vectors))
+
     print("Done")
 
 
 if __name__ == "__main__":
-    index(locale="jp")
+    run(locale="jp")
