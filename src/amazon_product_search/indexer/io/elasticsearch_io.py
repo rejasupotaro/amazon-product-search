@@ -13,6 +13,7 @@ class WriteToElasticsearch(beam.PTransform):
         self,
         es_host: str,
         index_name: str,
+        min_batch_size: int = 1,
         max_batch_size: int = 100,
         id_fn: Optional[Callable[[Dict[str, Any]], str]] = None,
     ):
@@ -24,9 +25,12 @@ class WriteToElasticsearch(beam.PTransform):
         )
 
     def expand(self, pcoll: PCollection[Dict[str, Any]]):
-        return pcoll | "Batch products for indexing" > BatchElements(
-            min_batch_size=8, max_batch_size=self.max_batch_size
-        ) | "Index products" >> beam.ParDo(self.write_fn)
+        return (
+            pcoll
+            | "Batch products for indexing"
+            >> BatchElements(min_batch_size=self.min_batch_size, max_batch_size=self.max_batch_size)
+            | "Index products" >> beam.ParDo(self.write_fn)
+        )
 
 
 class BulkWriteFn(beam.DoFn):
