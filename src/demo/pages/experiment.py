@@ -61,7 +61,8 @@ def sparse_search(config: SparseSearchConfig, query: str) -> Response:
 
 def dense_search(config: DenseSearchConfig, query: str) -> Response:
     query_vector = encoder.encode(query, show_progress_bar=False)
-    es_response = es_client.knn_search(index_name="products_jp", query_vector=query_vector, top_k=config.top_k)
+    es_query = query_builder.build_knn_search_query(query_vector, top_k=config.top_k)
+    es_response = es_client.knn_search(index_name="products_jp", es_query=es_query)
     response = Response(
         results=[Result(product=hit["_source"], score=hit["_score"]) for hit in es_response["hits"]["hits"]],
         total_hits=es_response["hits"]["total"]["value"],
@@ -120,12 +121,12 @@ def main():
     nrows = 1000
 
     variants = [
-        # SparseSearchConfig(name="title", top_k=100),
+        SparseSearchConfig(name="title", top_k=100),
         # SparseSearchConfig(name="title_description", use_description=True, top_k=100),
         # SparseSearchConfig(name="title_bullet_point", use_bullet_point=True, top_k=100),
         # SparseSearchConfig(name="title_brand", use_brand=True, top_k=100),
         # SparseSearchConfig(name="title_color_name", use_color_name=True, top_k=100),
-        DenseSearchConfig(name="dense", top_k=100)
+        DenseSearchConfig(name="dense", top_k=100),
     ]
     st.write("#### Variants")
     st.write(variants)
