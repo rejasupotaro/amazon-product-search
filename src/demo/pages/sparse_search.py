@@ -4,7 +4,7 @@ import streamlit as st
 
 from amazon_product_search.es import query_builder
 from amazon_product_search.es.es_client import EsClient
-from amazon_product_search.models.search import RequestParams, Response, Result
+from amazon_product_search.models.search import Response, Result
 
 es_client = EsClient(
     es_host="http://localhost:9200",
@@ -45,16 +45,15 @@ def main():
     use_bullet_point = st.checkbox("Use bullet point")
     use_brand = st.checkbox("Use brand")
     use_color_name = st.checkbox("Use color name")
-    params = RequestParams(
+
+    st.write("Elasticsearch Query:")
+    es_query = query_builder.build_search_query(
         query=query,
         use_description=use_description,
         use_bullet_point=use_bullet_point,
         use_brand=use_brand,
         use_color_name=use_color_name,
     )
-
-    st.write("Elasticsearch Query:")
-    es_query = query_builder.build_search_query(params)
     st.json(es_query)
 
     st.write("----")
