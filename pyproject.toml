@@ -20,6 +20,7 @@ torch = "^1.12.1"
 transformers = "^4.23.1"
 sentence-transformers = "^2.2.2"
 unidic-lite = "^1.0.8"
+pingouin = "^0.5.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
