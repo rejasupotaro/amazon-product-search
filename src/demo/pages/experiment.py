@@ -7,14 +7,14 @@ import plotly.express as px
 import streamlit as st
 
 from amazon_product_search import source
-from amazon_product_search.dense_retrieval.encoder import Encoder
+from amazon_product_search.dense_retrieval.encoder import SONOISA, Encoder
 from amazon_product_search.es import query_builder
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.metrics import compute_ap, compute_ndcg, compute_recall, compute_zero_hit_rate
 from amazon_product_search.models.search import Response, Result
 from amazon_product_search.nlp.normalizer import normalize_query
 
-encoder = Encoder()
+encoder = Encoder(SONOISA)
 es_client = EsClient(
     es_host="http://localhost:9200",
 )
@@ -141,18 +141,18 @@ def main():
     for query, query_labels_df in labels_df.groupby("query"):
         query_dict[query] = query_labels_df
 
-    total_examples = len(variants) * len(query_dict)
-    n = 0
+    total_examples = len(query_dict)
+    n = 1
     progress_text = st.empty()
     progress_bar = st.progress(0)
     metrics = []
-    for variant in variants:
-        for query, query_labels_df in query_dict.items():
-            query = normalize_query(query)
-            progress_text.text(f"Query ({n} / {total_examples}): {query}")
-            n += 1
-            progress_bar.progress(n / total_examples)
+    for query, query_labels_df in query_dict.items():
+        query = normalize_query(query)
+        progress_text.text(f"Query ({n} / {total_examples}): {query}")
+        progress_bar.progress(n / total_examples)
+        for variant in variants:
             metrics.append(compute_metrics(variant, query, query_labels_df))
+        n += 1
     progress_text.text(f"Done ({n} / {total_examples})")
 
     st.write("#### Result")

@@ -17,6 +17,7 @@ class WriteToElasticsearch(beam.PTransform):
         max_batch_size: int = 100,
         id_fn: Optional[Callable[[Dict[str, Any]], str]] = None,
     ):
+        self.min_batch_size = min_batch_size
         self.max_batch_size = max_batch_size
         self.write_fn = BulkWriteFn(
             es_host=es_host,

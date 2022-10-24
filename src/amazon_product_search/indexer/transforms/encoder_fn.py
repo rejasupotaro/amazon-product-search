@@ -3,7 +3,7 @@ from typing import Any, Dict, Iterator, List
 
 import apache_beam as beam
 
-from amazon_product_search.dense_retrieval.encoder import Encoder
+from amazon_product_search.dense_retrieval.encoder import SONOISA, Encoder
 
 
 class EncodeFn(beam.DoFn):
@@ -25,7 +25,7 @@ class BatchEncodeFn(beam.DoFn):
         pass
 
     def setup(self):
-        self.encoder = Encoder()
+        self.encoder = Encoder(SONOISA)
 
     def process(self, products: List[Dict[str, Any]]) -> Iterator[Dict[str, Any]]:
         logging.info(f"Encoding products with batch size: {len(products)}")

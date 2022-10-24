@@ -4,6 +4,7 @@ from torch import Tensor
 TOHOKU = "cl-tohoku/bert-base-japanese-v2"
 SONOISA = "sonoisa/sentence-bert-base-ja-mean-tokens-v2"
 
+
 class Encoder:
     def __init__(self, model_name: str = TOHOKU):
         # For English
