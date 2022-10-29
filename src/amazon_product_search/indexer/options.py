@@ -7,3 +7,4 @@ class IndexerOptions(PipelineOptions):
         parser.add_argument("--locale", type=str)
         parser.add_argument("--es_host", type=str)
         parser.add_argument("--nrows", type=int, default=-1)
+        parser.add_argument("--encode_text", action="store_true")

@@ -31,9 +31,15 @@ def run(options: IndexerOptions):
             pipeline
             | get_input_source(locale, nrows)
             | "Analyze products" >> beam.ParDo(AnalyzeFn(text_fields))
-            | "Batch products for encoding" >> BatchElements(min_batch_size=8)
-            | "Encode products" >> beam.ParDo(BatchEncodeFn())
         )
+
+        if options.encode_text:
+            products = (
+                products
+                | "Batch products for encoding" >> BatchElements(min_batch_size=8)
+                | "Encode products" >> beam.ParDo(BatchEncodeFn())
+            )
+
         if es_host:
             (
                 products
