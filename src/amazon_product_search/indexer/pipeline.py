@@ -27,11 +27,7 @@ def run(options: IndexerOptions):
     text_fields = ["product_title", "product_description", "product_bullet_point"]
 
     with beam.Pipeline() as pipeline:
-        products = (
-            pipeline
-            | get_input_source(locale, nrows)
-            | "Analyze products" >> beam.ParDo(AnalyzeFn(text_fields))
-        )
+        products = pipeline | get_input_source(locale, nrows) | "Analyze products" >> beam.ParDo(AnalyzeFn(text_fields))
 
         if options.encode_text:
             products = (

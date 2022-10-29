@@ -8,6 +8,7 @@ def delete_index(c, locale="jp"):
     es_client = EsClient()
     index_name = f"products_{locale}"
     es_client.delete_index(index_name=index_name)
+    print(f"{index_name} was deleted.")
 
 
 @task
@@ -15,6 +16,7 @@ def create_index(c, locale="jp"):
     es_client = EsClient()
     index_name = f"products_{locale}"
     es_client.create_index(index_name=index_name)
+    print(f"{index_name} was created.")
 
 
 @task
@@ -26,7 +28,7 @@ def recreate_index(c, locale="jp"):
 
 
 @task
-def index_docs(c, runner="DirectRunner", locale="jp", es_host="", encode_text = False, nrows=None):
+def index_docs(c, runner="DirectRunner", locale="jp", es_host="", encode_text=False, nrows=None):
     command = [
         "poetry run python src/amazon_product_search/indexer/main.py",
         f"--runner={runner}",

@@ -2,10 +2,10 @@ from typing import Any
 
 import streamlit as st
 
-from amazon_product_search.nlp.encoder import Encoder
 from amazon_product_search.es import query_builder
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.models.search import Response, Result
+from amazon_product_search.nlp.encoder import Encoder
 
 encoder = Encoder()
 es_client = EsClient()
