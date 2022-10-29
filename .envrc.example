@@ -1,0 +1,5 @@
+export PROJECT_ID=<Your GCP Project ID>
+export PROJECT_NAME=<Your GCP Project Name>
+export REGION=asia-northeast1
+export DATA_DIR=data
+export MODELS_DIR=models
