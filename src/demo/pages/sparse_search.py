@@ -47,7 +47,7 @@ def main():
     use_color_name = st.checkbox("Use color name")
 
     st.write("Elasticsearch Query:")
-    es_query = query_builder.build_search_query(
+    es_query = query_builder.build_multimatch_search_query(
         query=query,
         use_description=use_description,
         use_bullet_point=use_bullet_point,

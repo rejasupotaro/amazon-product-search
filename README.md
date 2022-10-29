@@ -24,13 +24,27 @@ $ brew install mecab mecab-ipadic
 Download the dataset on the internet. Then run the following command.
 
 ```shell
-$ poetry run inv data.split--y-locale
+$ poetry run inv data.split-by-locale
 $ poetry run inv es.create_index --locale=jp
-$ poetry run inv es.index_doc --locale=jp
+```
+
+## Index Documents
+
+```shell
+$ docker compose up
+$ poetry run inv es.index-docs --locale=jp --es-host=http://localhost:9200 --encode-text --nrows=100
 ```
 
 ## Demo
 
 ```shell
+$ docker compose up
 $ poetry run streamlit run src/demo/readme.py
+```
+
+## Development
+
+```shell
+$ poetry run inv lint
+$ poetry run pytest -vv
 ```

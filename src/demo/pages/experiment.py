@@ -45,7 +45,7 @@ def load_labels(locale: str, nrows: int) -> pd.DataFrame:
 
 
 def sparse_search(config: SparseSearchConfig, query: str) -> Response:
-    es_query = query_builder.build_search_query(
+    es_query = query_builder.build_multimatch_search_query(
         query=query,
         use_description=config.use_description,
         use_bullet_point=config.use_bullet_point,

@@ -5,6 +5,8 @@ from elasticsearch import Elasticsearch, helpers
 
 
 class EsClient:
+    """A wrapper class of https://elasticsearch-py.readthedocs.io/"""
+
     def __init__(self, es_host: str = "http://localhost:9200"):
         self.es = Elasticsearch(es_host)
 
@@ -27,12 +29,39 @@ class EsClient:
         self.es.index(index=index_name, document=doc, id=doc_id)
         self.es.indices.refresh(index=index_name)
 
-    def generate_actions(
+    def _generate_actions(
         self,
         index_name: str,
         docs: list[dict[str, Any]],
         id_fn: Optional[Callable[[dict[str, Any]], str]] = None,
     ) -> Iterator[dict[str, Any]]:
+        """Convert docs to a bulk action iterator.
+
+        ```
+        {
+            "product_id": "1", "product_title": "product title"
+        }
+        # The above doc will be as follows:
+        {
+            "_op_type": "index",
+            "_index": "your-index-name",
+            "_id": "1",
+            "_source": {
+                "product_id": "1",
+                "product_title": "product title",
+            },
+        }
+        ```
+
+        Args:
+            index_name (str): The Elasticsearch index name to index.
+            docs (list[dict[str, Any]]): Docs to convert
+            id_fn (Optional[Callable[[dict[str, Any]], str]], optional): If given, `id` is extracted and added to `_id`.
+                Defaults to None == `_id` is not added.
+
+        Yields:
+            Iterator[dict[str, Any]]: Generated bulk actions
+        """
         for doc in docs:
             action: dict[str, Any] = {
                 "_op_type": "index",
@@ -51,7 +80,7 @@ class EsClient:
     ) -> tuple[int, Union[int, list[dict[str, Any]]]]:
         return helpers.bulk(
             client=self.es,
-            actions=self.generate_actions(index_name, docs, id_fn),
+            actions=self._generate_actions(index_name, docs, id_fn),
             stats_only=True,
             raise_on_error=False,
         )

@@ -25,7 +25,7 @@ def test_doc_to_action(mock_es):
             },
         },
     ]
-    actual = es_client.generate_actions(
+    actual = es_client._generate_actions(
         index_name="products",
         docs=docs,
         id_fn=lambda doc: doc["product_id"],
