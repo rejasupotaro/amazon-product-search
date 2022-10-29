@@ -3,6 +3,8 @@ from typing import Any, Callable, Iterator, Optional, Union
 
 from elasticsearch import Elasticsearch, helpers
 
+from amazon_product_search.es.response import Response, Result
+
 
 class EsClient:
     """A wrapper class of https://elasticsearch-py.readthedocs.io/"""
@@ -29,8 +31,8 @@ class EsClient:
         self.es.index(index=index_name, document=doc, id=doc_id)
         self.es.indices.refresh(index=index_name)
 
+    @staticmethod
     def _generate_actions(
-        self,
         index_name: str,
         docs: list[dict[str, Any]],
         id_fn: Optional[Callable[[dict[str, Any]], str]] = None,
@@ -85,11 +87,21 @@ class EsClient:
             raise_on_error=False,
         )
 
-    def search(self, index_name: str, es_query: dict[str, Any], size: int = 20) -> Any:
-        return self.es.search(index=index_name, query=es_query, size=size)
+    @staticmethod
+    def _convert_es_response_to_response(es_response: Any) -> Response:
+        print(es_response)
+        return Response(
+            results=[Result(product=hit["_source"], score=hit["_score"]) for hit in es_response["hits"]["hits"]],
+            total_hits=es_response["hits"]["total"]["value"],
+        )
 
-    def knn_search(self, index_name: str, es_query: dict[str, Any]) -> Any:
-        return self.es.knn_search(index=index_name, knn=es_query)
+    def search(self, index_name: str, es_query: dict[str, Any], size: int = 20) -> Response:
+        es_response = self.es.search(index=index_name, query=es_query, size=size)
+        return self._convert_es_response_to_response(es_response)
+
+    def knn_search(self, index_name: str, es_query: dict[str, Any]) -> Response:
+        es_response = self.es.knn_search(index=index_name, knn=es_query)
+        return self._convert_es_response_to_response(es_response)
 
     def close(self):
         self.es.close()

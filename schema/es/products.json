@@ -1,5 +1,10 @@
 {
     "mappings": {
+      "_source": {
+        "excludes": [
+          "product_vector"
+        ]
+      },
       "properties": {
         "index": {
           "type": "long"

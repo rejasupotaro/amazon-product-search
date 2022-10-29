@@ -9,8 +9,8 @@ import streamlit as st
 from amazon_product_search import source
 from amazon_product_search.es import query_builder
 from amazon_product_search.es.es_client import EsClient
+from amazon_product_search.es.response import Response
 from amazon_product_search.metrics import compute_ap, compute_ndcg, compute_recall, compute_zero_hit_rate
-from amazon_product_search.models.search import Response, Result
 from amazon_product_search.nlp.encoder import SONOISA, Encoder
 from amazon_product_search.nlp.normalizer import normalize_query
 
@@ -52,22 +52,13 @@ def sparse_search(config: SparseSearchConfig, query: str) -> Response:
         use_brand=config.use_brand,
         use_color_name=config.use_color_name,
     )
-    es_response = es_client.search(index_name="products_jp", es_query=es_query, size=config.top_k)
-    return Response(
-        results=[Result(product=hit["_source"], score=hit["_score"]) for hit in es_response["hits"]["hits"]],
-        total_hits=es_response["hits"]["total"]["value"],
-    )
+    return es_client.search(index_name="products_jp", es_query=es_query, size=config.top_k)
 
 
 def dense_search(config: DenseSearchConfig, query: str) -> Response:
     query_vector = encoder.encode(query, show_progress_bar=False)
     es_query = query_builder.build_knn_search_query(query_vector, top_k=config.top_k)
-    es_response = es_client.knn_search(index_name="products_jp", es_query=es_query)
-    response = Response(
-        results=[Result(product=hit["_source"], score=hit["_score"]) for hit in es_response["hits"]["hits"]],
-        total_hits=es_response["hits"]["total"]["value"],
-    )
-    return response
+    return es_client.knn_search(index_name="products_jp", es_query=es_query)
 
 
 def compute_metrics(variant: Variant, query: str, labels_df: pd.DataFrame) -> dict[str, Any]:

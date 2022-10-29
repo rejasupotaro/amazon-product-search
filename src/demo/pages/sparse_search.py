@@ -4,7 +4,7 @@ import streamlit as st
 
 from amazon_product_search.es import query_builder
 from amazon_product_search.es.es_client import EsClient
-from amazon_product_search.models.search import Response, Result
+from amazon_product_search.es.response import Response, Result
 
 es_client = EsClient(
     es_host="http://localhost:9200",
@@ -12,12 +12,7 @@ es_client = EsClient(
 
 
 def search(es_query: dict[str, Any], index_name: str) -> Response:
-    es_response = es_client.search(index_name=index_name, es_query=es_query)
-    response = Response(
-        results=[Result(product=hit["_source"], score=hit["_score"]) for hit in es_response["hits"]["hits"]],
-        total_hits=es_response["hits"]["total"]["value"],
-    )
-    return response
+    return es_client.search(index_name=index_name, es_query=es_query)
 
 
 def draw_products(results: list[Result]):
