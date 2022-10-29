@@ -1,4 +1,4 @@
-from amazon_product_search.dense_retrieval.encoder import Encoder
+from amazon_product_search.nlp.encoder import Encoder
 
 
 def test_encode():

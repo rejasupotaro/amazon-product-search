@@ -7,7 +7,7 @@ import plotly.express as px
 import streamlit as st
 
 from amazon_product_search import source
-from amazon_product_search.dense_retrieval.encoder import SONOISA, Encoder
+from amazon_product_search.nlp.encoder import SONOISA, Encoder
 from amazon_product_search.es import query_builder
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.metrics import compute_ap, compute_ndcg, compute_recall, compute_zero_hit_rate

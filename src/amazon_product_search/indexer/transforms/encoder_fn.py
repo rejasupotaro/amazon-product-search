@@ -3,7 +3,7 @@ from typing import Any, Dict, Iterator, List
 
 import apache_beam as beam
 
-from amazon_product_search.dense_retrieval.encoder import SONOISA, Encoder
+from amazon_product_search.nlp.encoder import SONOISA, Encoder
 
 
 class EncodeFn(beam.DoFn):
