@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import Any, Optional
 
 import numpy as np
@@ -56,6 +56,12 @@ def load_labels(experimental_setup: ExperimentalSetup) -> pd.DataFrame:
 
 def count_docs(index_name: str) -> int:
     return es_client.count_docs(index_name)
+
+
+def draw_variants(variants: list[Variant]):
+    variants = [asdict(variant) for variant in variants]
+    variants = pd.DataFrame(variants)
+    st.write(variants)
 
 
 def search(index_name: str, query: str, config: SearchConfig) -> Response:
@@ -161,7 +167,7 @@ def main():
     st.write(content)
 
     st.write("#### Variants")
-    st.write(experimental_setup.variants)
+    draw_variants(experimental_setup.variants)
 
     clicked = st.button("Run")
 
