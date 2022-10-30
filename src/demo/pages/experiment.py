@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 import numpy as np
 import pandas as pd
@@ -15,15 +15,15 @@ from amazon_product_search.nlp.encoder import SONOISA, Encoder
 from amazon_product_search.nlp.normalizer import normalize_query
 from demo.page_config import set_page_config
 
+es_client = EsClient()
 encoder = Encoder(SONOISA)
-es_client = EsClient(
-    es_host="http://localhost:9200",
-)
 
 
 @dataclass
-class SparseSearchConfig:
+class SearchConfig:
     name: str
+    is_sparse_enabled: bool = True
+    is_dense_enabled: bool = False
     use_description: bool = False
     use_bullet_point: bool = False
     use_brand: bool = False
@@ -31,13 +31,7 @@ class SparseSearchConfig:
     top_k: int = 100
 
 
-@dataclass
-class DenseSearchConfig:
-    name: str
-    top_k: int = 100
-
-
-Variant = Union[SparseSearchConfig, DenseSearchConfig]
+Variant = SearchConfig
 
 
 @dataclass
@@ -64,30 +58,27 @@ def count_docs(index_name: str) -> int:
     return es_client.count_docs(index_name)
 
 
-def sparse_search(index_name: str, query: str, config: SparseSearchConfig) -> Response:
-    es_query = query_builder.build_multimatch_search_query(
-        query=query,
-        use_description=config.use_description,
-        use_bullet_point=config.use_bullet_point,
-        use_brand=config.use_brand,
-        use_color_name=config.use_color_name,
-    )
-    return es_client.search(index_name=index_name, es_query=es_query, size=config.top_k)
+def search(index_name: str, query: str, config: SearchConfig) -> Response:
+    es_query = None
+    es_knn_query = None
 
+    if config.is_sparse_enabled:
+        es_query = query_builder.build_multimatch_search_query(
+            query=query,
+            use_description=config.use_description,
+            use_bullet_point=config.use_bullet_point,
+            use_brand=config.use_brand,
+            use_color_name=config.use_color_name,
+        )
+    if config.is_dense_enabled:
+        query_vector = encoder.encode(query, show_progress_bar=False)
+        es_knn_query = query_builder.build_knn_search_query(query_vector, top_k=config.top_k)
 
-def dense_search(index_name: str, query: str, config: DenseSearchConfig) -> Response:
-    query_vector = encoder.encode(query, show_progress_bar=False)
-    es_query = query_builder.build_knn_search_query(query_vector, top_k=config.top_k)
-    return es_client.knn_search(index_name=index_name, es_query=es_query)
+    return es_client.search(index_name=index_name, query=es_query, knn_query=es_knn_query, size=config.top_k)
 
 
 def compute_metrics(index_name: str, query: str, variant: Variant, labels_df: pd.DataFrame) -> dict[str, Any]:
-    if isinstance(variant, SparseSearchConfig):
-        response = sparse_search(index_name, query, variant)
-    elif isinstance(variant, DenseSearchConfig):
-        response = dense_search(index_name, query, variant)
-    else:
-        raise ValueError
+    response = search(index_name, query, variant)
 
     retrieved_ids = [result.product["product_id"] for result in response.results]
     relevant_ids = set(labels_df[labels_df["esci_label"] == "exact"]["product_id"].tolist())
@@ -150,12 +141,9 @@ def main():
         locale="jp",
         num_queries=100,
         variants=[
-            SparseSearchConfig(name="title", top_k=100),
-            SparseSearchConfig(name="title_description", use_description=True, top_k=100),
-            # SparseSearchConfig(name="title_bullet_point", use_bullet_point=True, top_k=100),
-            SparseSearchConfig(name="title_brand", use_brand=True, top_k=100),
-            # SparseSearchConfig(name="title_color_name", use_color_name=True, top_k=100),
-            # DenseSearchConfig(name="dense", top_k=100),
+            SearchConfig(name="sparse", is_sparse_enabled=True, is_dense_enabled=False, top_k=100),
+            SearchConfig(name="dense", is_sparse_enabled=False, is_dense_enabled=True, top_k=100),
+            SearchConfig(name="hybrid", is_sparse_enabled=True, is_dense_enabled=True, top_k=100),
         ],
     )
     num_docs = count_docs(experimental_setup.index_name)
