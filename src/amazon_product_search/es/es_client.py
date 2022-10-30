@@ -24,8 +24,8 @@ class EsClient:
             print(schema)
         self.es.indices.create(index=index_name, mappings=schema["mappings"])
 
-    def count_docs(self, index_name: str) -> Any:
-        return self.es.count(index=index_name)
+    def count_docs(self, index_name: str) -> int:
+        return self.es.count(index=index_name)["count"]
 
     def index_doc(self, index_name: str, doc: dict[str, Any], doc_id: Optional[str] = None):
         self.es.index(index=index_name, document=doc, id=doc_id)
@@ -89,7 +89,6 @@ class EsClient:
 
     @staticmethod
     def _convert_es_response_to_response(es_response: Any) -> Response:
-        print(es_response)
         return Response(
             results=[Result(product=hit["_source"], score=hit["_score"]) for hit in es_response["hits"]["hits"]],
             total_hits=es_response["hits"]["total"]["value"],
