@@ -11,8 +11,8 @@ def main():
 
     - README
     - Dataset
-    - Sparse Search
-    - Offline Experiment
+    - Experiment
+    - Search
     """
     st.write(content)
 
