@@ -1,19 +1,20 @@
 import streamlit as st
 
+from demo.page_config import set_page_config
+
 
 def main():
-    st.set_page_config(page_icon="️🔍", layout="wide")
+    set_page_config()
 
-    st.write(
-        """
-## README
+    content = """
+    ## README
 
-- README
-- Dataset
-- Sparse Search
-- Offline Experiment
+    - README
+    - Dataset
+    - Sparse Search
+    - Offline Experiment
     """
-    )
+    st.write(content)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,8 @@
+[browser]
+# Whether to send usage statistics to Streamlit.
+# Default: true
+gatherUsageStats = false
+
+[theme]
+# Primary accent for interactive elements
+primaryColor = "#FF9900"

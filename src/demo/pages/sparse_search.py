@@ -5,6 +5,7 @@ import streamlit as st
 from amazon_product_search.es import query_builder
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.response import Response, Result
+from demo.page_config import set_page_config
 
 es_client = EsClient(
     es_host="http://localhost:9200",
@@ -22,7 +23,7 @@ def draw_products(results: list[Result]):
 
 
 def main():
-    st.set_page_config(page_icon="️🔍", layout="wide")
+    set_page_config()
 
     st.markdown("## Indices")
     indices = es_client.list_indices()

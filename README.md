@@ -48,11 +48,11 @@ $ docker compose up
 $ poetry run streamlit run src/demo/readme.py
 ```
 
-### Experimentation
+## Experimentation
 
 The demo app provides the ability to run experiments with different experimental settings.
 
-```
+```python
 # src/demo/pages/experiment.py
 variants = [
     SparseSearchConfig(name="title", top_k=100),
@@ -63,6 +63,9 @@ variants = [
     # DenseSearchConfig(name="dense", top_k=100),
 ]
 ```
+
+![](https://user-images.githubusercontent.com/883148/198863889-04ded3bd-3fc0-446a-9bb0-b82b56a5e2bd.png)
+
 
 ## Development
 

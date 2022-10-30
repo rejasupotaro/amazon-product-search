@@ -5,6 +5,7 @@ import streamlit as st
 from amazon_product_search.es import query_builder
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.nlp.encoder import Encoder
+from demo.page_config import set_page_config
 
 encoder = Encoder()
 es_client = EsClient()
@@ -17,7 +18,7 @@ def draw_products(products: list[Any]):
 
 
 def main():
-    st.set_page_config(page_icon="️🔍", layout="wide")
+    set_page_config()
 
     st.markdown("## Indices")
     indices = es_client.list_indices()

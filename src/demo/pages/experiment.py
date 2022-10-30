@@ -13,6 +13,7 @@ from amazon_product_search.es.response import Response
 from amazon_product_search.metrics import compute_ap, compute_ndcg, compute_recall, compute_zero_hit_rate
 from amazon_product_search.nlp.encoder import SONOISA, Encoder
 from amazon_product_search.nlp.normalizer import normalize_query
+from demo.page_config import set_page_config
 
 encoder = Encoder(SONOISA)
 es_client = EsClient(
@@ -140,7 +141,7 @@ def draw_figures(metrics_df: pd.DataFrame):
 
 
 def main():
-    st.set_page_config(page_icon="️🔍", layout="wide")
+    set_page_config()
 
     st.write("## Experiments")
 

@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 
 from amazon_product_search import source
+from demo.page_config import set_page_config
 
 
 @st.cache
@@ -34,7 +35,7 @@ def draw_labels():
 
 
 def main():
-    st.set_page_config(page_icon="️🔍", layout="wide")
+    set_page_config()
 
     datasets_to_funcs = {
         "Products": draw_products,
