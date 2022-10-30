@@ -94,12 +94,14 @@ class EsClient:
             total_hits=es_response["hits"]["total"]["value"],
         )
 
-    def search(self, index_name: str, es_query: dict[str, Any], size: int = 20) -> Response:
-        es_response = self.es.search(index=index_name, query=es_query, size=size)
+    def search(
+        self, index_name: str, query: dict[str, Any], knn_query: Optional[dict[str, Any]] = None, size: int = 20
+    ) -> Response:
+        es_response = self.es.search(index=index_name, query=query, knn=knn_query, size=size)
         return self._convert_es_response_to_response(es_response)
 
-    def knn_search(self, index_name: str, es_query: dict[str, Any]) -> Response:
-        es_response = self.es.knn_search(index=index_name, knn=es_query)
+    def knn_search(self, index_name: str, knn_query: dict[str, Any]) -> Response:
+        es_response = self.es.knn_search(index=index_name, knn=knn_query)
         return self._convert_es_response_to_response(es_response)
 
     def close(self):
