@@ -54,18 +54,14 @@ The demo app provides the ability to run experiments with different experimental
 
 ```python
 # src/demo/pages/experiment.py
-variants = [
-    SparseSearchConfig(name="title", top_k=100),
-    SparseSearchConfig(name="title_description", use_description=True, top_k=100),
-    # SparseSearchConfig(name="title_bullet_point", use_bullet_point=True, top_k=100),
-    SparseSearchConfig(name="title_brand", use_brand=True, top_k=100),
-    # SparseSearchConfig(name="title_color_name", use_color_name=True, top_k=100),
-    # DenseSearchConfig(name="dense", top_k=100),
-]
+variants=[
+    SearchConfig(name="sparse", is_sparse_enabled=True, is_dense_enabled=False, top_k=100),
+    SearchConfig(name="dense", is_sparse_enabled=False, is_dense_enabled=True, top_k=100),
+    SearchConfig(name="hybrid", is_sparse_enabled=True, is_dense_enabled=True, top_k=100),
+],
 ```
 
-![](https://user-images.githubusercontent.com/883148/198863889-04ded3bd-3fc0-446a-9bb0-b82b56a5e2bd.png)
-
+![](https://user-images.githubusercontent.com/883148/198907715-79f2d99d-59fc-4105-b58f-50e6fd120bf6.png)
 
 ## Development
 
