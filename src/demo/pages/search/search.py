@@ -5,11 +5,11 @@ import streamlit as st
 from amazon_product_search.es import query_builder
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.response import Result
-from amazon_product_search.nlp.encoder import SONOISA, Encoder
+from amazon_product_search.nlp.encoder import Encoder
 from demo.page_config import set_page_config
 
 es_client = EsClient()
-encoder = Encoder(SONOISA)
+encoder = Encoder()
 
 
 def draw_es_query(query: Optional[dict[str, Any]], knn_query: Optional[dict[str, Any]], size: int):

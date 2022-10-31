@@ -11,12 +11,12 @@ from amazon_product_search.es import query_builder
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.response import Response
 from amazon_product_search.metrics import compute_ap, compute_ndcg, compute_recall, compute_zero_hit_rate
-from amazon_product_search.nlp.encoder import SONOISA, Encoder
+from amazon_product_search.nlp.encoder import Encoder
 from amazon_product_search.nlp.normalizer import normalize_query
 from demo.page_config import set_page_config
 
 es_client = EsClient()
-encoder = Encoder(SONOISA)
+encoder = Encoder()
 
 
 @dataclass
