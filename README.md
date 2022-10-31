@@ -1,6 +1,8 @@
 # Amazon Product Search
 
-This repo is a collection of search algorithms and models for [Shopping Queries Dataset: A Large-Scale ESCI Benchmark for Improving Product Search](https://github.com/amazon-science/esci-data).
+This repo showcases and compares various search algorithms and models for [Shopping Queries Dataset: A Large-Scale ESCI Benchmark for Improving Product Search](https://github.com/amazon-science/esci-data).
+
+The results of the experiments will be added to the wiki here: https://github.com/rejasupotaro/amazon-product-search/wiki
 
 ## Installation
 
@@ -21,7 +23,7 @@ $ brew install mecab mecab-ipadic
 
 ## Dataset
 
-Download the dataset from [here](https://www.aicrowd.com/challenges/esci-challenge-for-improving-product-search/dataset_files), and run the following command.
+Download the dataset from [this link](https://www.aicrowd.com/challenges/esci-challenge-for-improving-product-search/dataset_files), and run the following command to preprocess the dataset.
 
 ```shell
 $ poetry run inv data.split-by-locale
@@ -37,11 +39,14 @@ $ poetry run inv es.create_index --locale=jp
 $ poetry run inv es.index-docs --locale=jp --es-host=http://localhost:9200 --encode-text --nrows=100
 ```
 
-The mapping file can be found in `schema/es/products.json`. The ingestion pipeline is built on top of [Apache Beam](https://beam.apache.org/documentation/sdks/python/). If `--encode-text` is given, products are encoded into vectors so that KNN searches can be performed.
+
+The ingestion pipeline is built on top of [Apache Beam](https://beam.apache.org/documentation/sdks/python/). If `--encode-text` is given, products are encoded into vectors so that KNN searches can be performed.
+
+The mapping file is located at `schema/es/products.json`. `product_id`, `product_title`, `product_description`, `product_bullet_point`, `product_brand`, `product_color_name`, `product_locale`, and `product_vector` will be indexed.
 
 ## Demo
 
-The following command launches a [Streamlit](https://streamlit.io/) app.
+The following command launches [Streamlit](https://streamlit.io/) apps.
 
 ```shell
 $ docker compose up
@@ -57,8 +62,8 @@ The demo app provides the ability to run experiments with different experimental
 ```python
 # src/demo/pages/experiment.py
 variants=[
-    SearchConfig(name="sparse", is_sparse_enabled=True, is_dense_enabled=False, top_k=100),
-    SearchConfig(name="dense", is_sparse_enabled=False, is_dense_enabled=True, top_k=100),
+    SearchConfig(name="sparse", is_sparse_enabled=True, top_k=100),
+    SearchConfig(name="dense", is_dense_enabled=True, top_k=100),
     SearchConfig(name="hybrid", is_sparse_enabled=True, is_dense_enabled=True, top_k=100),
 ],
 ```

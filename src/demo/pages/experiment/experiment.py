@@ -159,7 +159,7 @@ def main():
         query_dict[query] = query_labels_df
 
     content = f"""
-    The experiment is conducted on `{experimental_setup.index_name}` containing {num_docs} in total.
+    The experiment is conducted on `{experimental_setup.index_name}` containing {num_docs} docs in total.
     We send {len(query_dict)} queries to the index with different parameters shown below.
     Then, we compute Total Hits, Zero Hit Rate, Recall, MAP, and NDCG on each variant.
     """
