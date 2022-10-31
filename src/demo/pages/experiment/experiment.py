@@ -59,9 +59,8 @@ def count_docs(index_name: str) -> int:
 
 
 def draw_variants(variants: list[Variant]):
-    variants = [asdict(variant) for variant in variants]
-    variants = pd.DataFrame(variants)
-    st.write(variants)
+    variants_df = pd.DataFrame([asdict(variant) for variant in variants])
+    st.write(variants_df)
 
 
 def search(index_name: str, query: str, config: SearchConfig) -> Response:

@@ -45,7 +45,9 @@ The following command launches a [Streamlit](https://streamlit.io/) app.
 
 ```shell
 $ docker compose up
-$ poetry run streamlit run src/demo/readme.py
+$ poetry run inv demo.dataset
+$ poetry run inv demo.search
+$ poetry run inv demo.experiment
 ```
 
 ## Experimentation
@@ -64,6 +66,8 @@ variants=[
 ![](https://user-images.githubusercontent.com/883148/198907715-79f2d99d-59fc-4105-b58f-50e6fd120bf6.png)
 
 ## Development
+
+Run the following tasks when you make changes.
 
 ```shell
 $ poetry run inv lint
