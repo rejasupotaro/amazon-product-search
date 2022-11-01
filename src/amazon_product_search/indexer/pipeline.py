@@ -9,6 +9,7 @@ from amazon_product_search.indexer.io.elasticsearch_io import WriteToElasticsear
 from amazon_product_search.indexer.options import IndexerOptions
 from amazon_product_search.indexer.transforms.analyzer_fn import AnalyzeFn
 from amazon_product_search.indexer.transforms.encoder_fn import BatchEncodeFn
+from amazon_product_search.indexer.transforms.filters import is_indexable
 
 
 def get_input_source(locale: str, nrows: int = -1) -> PTransform:
@@ -27,7 +28,12 @@ def run(options: IndexerOptions):
     text_fields = ["product_title", "product_description", "product_bullet_point"]
 
     with beam.Pipeline() as pipeline:
-        products = pipeline | get_input_source(locale, nrows) | "Analyze products" >> beam.ParDo(AnalyzeFn(text_fields))
+        products = (
+            pipeline
+            | get_input_source(locale, nrows)
+            | "Filter products" >> beam.Filter(is_indexable)
+            | "Analyze products" >> beam.ParDo(AnalyzeFn(text_fields))
+        )
 
         if options.encode_text:
             products = (
