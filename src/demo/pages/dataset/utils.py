@@ -16,7 +16,7 @@ def analyze_dataframe(df: pd.DataFrame) -> pd.DataFrame:
             {
                 "column": c,
                 "dtype": series.dtype.name,
-                "isna_rate": series.isna().sum() / len(series),
+                "nan_rate": series.isna().sum() / len(series),
                 "mean_length": length,
             }
         )

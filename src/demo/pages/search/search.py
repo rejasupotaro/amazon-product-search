@@ -46,9 +46,9 @@ def main():
 
     query = st.text_input("Query:")
 
-    cols = st.columns(2)
-    is_sparse_enabled = cols[0].checkbox("Sparse:", value=True)
-    is_dense_enabled = cols[1].checkbox("Dense:", value=False)
+    columns = st.columns(2)
+    is_sparse_enabled = columns[0].checkbox("Sparse:", value=True)
+    is_dense_enabled = columns[1].checkbox("Dense:", value=False)
 
     use_description = False
     use_bullet_point = False
