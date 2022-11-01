@@ -1239,7 +1239,7 @@ test = ["coverage", "ipykernel", "pre-commit", "pytest-console-scripts", "pytest
 
 [[package]]
 name = "jupyterlab"
-version = "3.4.8"
+version = "3.5.0"
 description = "JupyterLab computational environment"
 category = "dev"
 optional = false
@@ -1249,7 +1249,7 @@ python-versions = ">=3.7"
 ipython = "*"
 jinja2 = ">=2.1"
 jupyter-core = "*"
-jupyter-server = ">=1.16,<2.0"
+jupyter-server = ">=1.16.0,<3"
 jupyterlab-server = ">=2.10,<3.0"
 nbclassic = "*"
 notebook = "<7"
@@ -2775,7 +2775,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "flake8 
 [metadata]
 lock-version = "1.1"
 python-versions = "3.9.13"
-content-hash = "5af15122b09bbca7f6dcbde2c7b660fec96a244a644a4ab85c550139b28dd99e"
+content-hash = "2bdd005ddc0d30ee68e1851c28f9012471bc8b925eb98b75f013a0eda909a1b9"
 
 [metadata.files]
 altair = [
