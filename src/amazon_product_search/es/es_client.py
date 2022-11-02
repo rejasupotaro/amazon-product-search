@@ -90,14 +90,29 @@ class EsClient:
     @staticmethod
     def _convert_es_response_to_response(es_response: Any) -> Response:
         return Response(
-            results=[Result(product=hit["_source"], score=hit["_score"]) for hit in es_response["hits"]["hits"]],
+            results=[
+                Result(
+                    product=hit["_source"],
+                    score=hit["_score"],
+                    explanation=hit.get("_explanation", None),
+                )
+                for hit in es_response["hits"]["hits"]
+            ],
             total_hits=es_response["hits"]["total"]["value"],
         )
 
+    def analyze(self, text: str) -> dict[str, Any]:
+        return self.es.indices.analyze(text=text).body
+
     def search(
-        self, index_name: str, query: dict[str, Any], knn_query: Optional[dict[str, Any]] = None, size: int = 20
+        self,
+        index_name: str,
+        query: dict[str, Any],
+        knn_query: Optional[dict[str, Any]] = None,
+        size: int = 20,
+        explain: bool = False,
     ) -> Response:
-        es_response = self.es.search(index=index_name, query=query, knn=knn_query, size=size)
+        es_response = self.es.search(index=index_name, query=query, knn=knn_query, size=size, explain=explain)
         return self._convert_es_response_to_response(es_response)
 
     def knn_search(self, index_name: str, knn_query: dict[str, Any]) -> Response:

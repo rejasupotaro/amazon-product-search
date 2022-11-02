@@ -6,6 +6,7 @@ from amazon_product_search.es import query_builder
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.response import Result
 from amazon_product_search.nlp.encoder import Encoder
+from amazon_product_search.nlp.normalizer import normalize_query
 from demo.page_config import set_page_config
 
 es_client = EsClient()
@@ -31,6 +32,7 @@ def draw_products(results: list[Result]):
     for result in results:
         with st.expander(f"{result.product['product_title']} ({result.score})"):
             st.write(result.product)
+            st.write(result.explanation)
 
 
 def main():
@@ -45,6 +47,7 @@ def main():
     index_name = st.selectbox("Index:", indices)
 
     query = st.text_input("Query:")
+    normalized_query = normalize_query(query)
 
     columns = st.columns(2)
     is_sparse_enabled = columns[0].checkbox("Sparse:", value=True)
@@ -63,21 +66,33 @@ def main():
     es_query = None
     if is_sparse_enabled:
         es_query = query_builder.build_multimatch_search_query(
-            query=query,
+            query=normalized_query,
             use_description=use_description,
             use_bullet_point=use_bullet_point,
             use_brand=use_brand,
             use_color_name=use_color_name,
         )
     es_knn_query = None
-    if query and is_dense_enabled:
-        query_vector = encoder.encode(query, show_progress_bar=False)
+    if normalized_query and is_dense_enabled:
+        query_vector = encoder.encode(normalized_query, show_progress_bar=False)
         es_knn_query = query_builder.build_knn_search_query(query_vector, top_k=size)
 
-    draw_es_query(es_query, es_knn_query, size)
+    st.write("----")
+
+    with st.expander("Query Details", expanded=False):
+        st.write("Normalized Query:")
+        st.write(normalized_query)
+
+        st.write("Analyzed Query")
+        analyzed_query = es_client.analyze(query)
+        st.write(analyzed_query)
+
+        draw_es_query(es_query, es_knn_query, size)
+
+    st.write("----")
 
     st.write("#### Output")
-    response = es_client.search(index_name=index_name, query=es_query, knn_query=es_knn_query, size=size)
+    response = es_client.search(index_name=index_name, query=es_query, knn_query=es_knn_query, size=size, explain=True)
     st.write(f"{response.total_hits} products found")
     draw_products(response.results)
 
