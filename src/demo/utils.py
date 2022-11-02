@@ -1,6 +1,18 @@
 import pandas as pd
+import streamlit as st
 from pandas.api.types import is_string_dtype
 
+from amazon_product_search import source
+
+
+@st.cache
+def load_products(locale: str, nrows: int = -1) -> pd.DataFrame:
+    return source.load_products(locale, nrows)
+
+
+@st.cache
+def load_labels(locale: str, nrows: int = -1) -> pd.DataFrame:
+    return source.load_labels(locale, nrows)
 
 def analyze_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     columns = df.columns.to_list()

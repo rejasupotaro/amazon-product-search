@@ -2,7 +2,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from demo.pages.dataset.utils import analyze_dataframe
+from demo.utils import analyze_dataframe
 
 
 def draw_column_info(products_df: pd.DataFrame):

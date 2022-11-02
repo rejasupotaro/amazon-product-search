@@ -3,13 +3,8 @@ from typing import Any
 import pandas as pd
 import streamlit as st
 
-from amazon_product_search import source
-from demo.pages.dataset.utils import analyze_dataframe
-
-
-@st.cache
-def load_labels(locale: str, nrows: int = -1) -> pd.DataFrame:
-    return source.load_labels(locale, nrows)
+from demo.utils import analyze_dataframe
+from demo.utils import load_labels
 
 
 def draw_column_info(df: pd.DataFrame):
