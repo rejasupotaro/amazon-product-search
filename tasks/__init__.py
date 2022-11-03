@@ -6,13 +6,24 @@ from tasks import data_tasks, demo_tasks, es_tasks
 
 
 @task
-def lint(c):
-    """Run linters (isort and black, flake8, and mypy)."""
+def format(c):
+    """Run formatters (isort and black)."""
     print("Running isort...")
     c.run("poetry run isort .")
 
     print("Running black...")
     c.run("poetry run black .")
+    print("Done")
+
+
+@task
+def lint(c):
+    """Run linters (isort, black, flake8, and mypy)."""
+    print("Running isort...")
+    c.run("poetry run isort . --check")
+
+    print("Running black...")
+    c.run("poetry run black . --check")
 
     print("Running flake8...")
     c.run("poetry run pflake8 src tests tasks")
@@ -51,6 +62,7 @@ def hello_on_cloud(c):
 ns = Collection()
 ns.add_task(build_on_cloud)
 ns.add_task(hello_on_cloud)
+ns.add_task(format)
 ns.add_task(lint)
 ns.add_collection(Collection.from_module(data_tasks, name="data"))
 ns.add_collection(Collection.from_module(es_tasks, name="es"))

@@ -81,6 +81,6 @@ variants=[
 Run the following tasks when you make changes.
 
 ```shell
-$ poetry run inv lint
+$ poetry run inv format lint
 $ poetry run pytest -vv
 ```
