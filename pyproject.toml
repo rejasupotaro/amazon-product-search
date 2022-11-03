@@ -21,6 +21,7 @@ sentence-transformers = "^2.2.2"
 unidic-lite = "^1.0.8"
 pingouin = "^0.5.2"
 watchdog = "^2.1.9"
+streamlit-aggrid = "^0.3.3"
 pke = {git = "https://github.com/boudinfl/pke.git", rev = "2.0.0"}
 
 [tool.poetry.dev-dependencies]
