@@ -6,10 +6,7 @@
         ]
       },
       "properties": {
-        "index": {
-          "type": "long"
-        },
-        "product_brand": {
+        "product_id": {
           "type": "text",
           "fields": {
             "keyword": {
@@ -18,16 +15,7 @@
             }
           }
         },
-        "product_bullet_point": {
-          "type": "text",
-          "fields": {
-            "keyword": {
-              "type": "keyword",
-              "ignore_above": 256
-            }
-          }
-        },
-        "product_color_name": {
+        "product_title": {
           "type": "text",
           "fields": {
             "keyword": {
@@ -45,7 +33,7 @@
             }
           }
         },
-        "product_id": {
+        "product_bullet_point": {
           "type": "text",
           "fields": {
             "keyword": {
@@ -54,7 +42,7 @@
             }
           }
         },
-        "product_locale": {
+        "product_brand": {
           "type": "text",
           "fields": {
             "keyword": {
@@ -63,7 +51,7 @@
             }
           }
         },
-        "product_title": {
+        "product_color_name": {
           "type": "text",
           "fields": {
             "keyword": {
@@ -104,6 +92,10 @@
           "dims": 768,
           "index": true,
           "similarity": "l2_norm"
+        },
+        "product_locale": {
+          "type": "keyword",
+          "ignore_above": 256
         }
       }
     }
