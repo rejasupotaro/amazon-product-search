@@ -2,7 +2,7 @@ import re
 
 import pandas as pd
 import streamlit as st
-from st_aggrid import AgGrid
+from st_aggrid import AgGrid, GridOptionsBuilder
 
 from amazon_product_search.nlp.extractor import KeywordExtractor
 from amazon_product_search.nlp.normalizer import normalize_doc
@@ -33,15 +33,25 @@ def main():
     df = load_products(locale="jp", nrows=100)
     df = df[~df["product_description"].isna() & ~df["product_bullet_point"].isna()]
     df = df.fillna("")
-    st.write(df)
-    data = AgGrid(df)
-    st.write(data)
-    i = st.slider("i:", min_value=0, max_value=len(df))
+
+    product = None
+
+    gb = GridOptionsBuilder.from_dataframe(df)
+    gb.configure_pagination(paginationAutoPageSize=True)
+    gb.configure_side_bar()
+    gb.configure_selection("single", use_checkbox=True)
+    grid_options = gb.build()
+    selected_rows = AgGrid(df, gridOptions=grid_options).selected_rows
+
+    if not selected_rows:
+        return
+
+    product = selected_rows[0]
+    del product["_selectedRowNodeInfo"]
 
     st.write("----")
 
     st.write("### Selected Product")
-    product = df.iloc[i]
 
     st.write("#### Title")
     st.write(product["product_title"])
