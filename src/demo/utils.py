@@ -14,6 +14,7 @@ def load_products(locale: str, nrows: int = -1) -> pd.DataFrame:
 def load_labels(locale: str, nrows: int = -1) -> pd.DataFrame:
     return source.load_labels(locale, nrows)
 
+
 def analyze_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     columns = df.columns.to_list()
     rows = []
