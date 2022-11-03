@@ -1,39 +1,16 @@
 import re
 
 import pandas as pd
-import pke
 import streamlit as st
 
+from amazon_product_search.nlp.extractor import KeywordExtractor
 from amazon_product_search.nlp.normalizer import normalize_doc
 from amazon_product_search.nlp.tokenizer import Tokenizer
 from demo.page_config import set_page_config
 from demo.utils import load_products
 
 tokenizer = Tokenizer()
-yake = pke.unsupervised.YAKE()
-position_rank = pke.unsupervised.PositionRank()
-multipartite_rank = pke.unsupervised.MultipartiteRank()
-
-
-def apply_yake(text: str) -> list[tuple[str, float]]:
-    yake.load_document(input=text)
-    yake.candidate_selection()
-    yake.candidate_weighting()
-    return yake.get_n_best(n=10)
-
-
-def apply_position_rank(text: str) -> list[tuple[str, float]]:
-    position_rank.load_document(input=text)
-    position_rank.candidate_selection()
-    position_rank.candidate_weighting()
-    return position_rank.get_n_best(n=10)
-
-
-def apply_multipartite_rank(text: str) -> list[tuple[str, float]]:
-    multipartite_rank.load_document(input=text)
-    multipartite_rank.candidate_selection(pos={"NOUN", "PROPN", "ADJ", "NUM"})
-    multipartite_rank.candidate_weighting()
-    return multipartite_rank.get_n_best(n=10)
+extractor = KeywordExtractor()
 
 
 def draw_results(results: dict[str, list[tuple[str, float]]]):
@@ -79,9 +56,9 @@ def main():
 
     st.write("## Results")
     results = {
-        "yake": apply_yake(text),
-        "position_rank": apply_position_rank(text),
-        "multipartite_rank": apply_multipartite_rank(text),
+        "yake": extractor.apply_yake(text),
+        "position_rank": extractor.apply_position_rank(text),
+        "multipartite_rank": extractor.apply_multipartite_rank(text),
     }
     draw_results(results)
 
