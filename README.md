@@ -51,6 +51,7 @@ The following command launches [Streamlit](https://streamlit.io/) apps.
 ```shell
 $ docker compose up
 $ poetry run inv demo.dataset
+$ poetry run inv demo.keyword-extraction
 $ poetry run inv demo.search
 $ poetry run inv demo.experiment
 ```

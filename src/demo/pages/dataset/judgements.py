@@ -3,8 +3,7 @@ from typing import Any
 import pandas as pd
 import streamlit as st
 
-from demo.utils import analyze_dataframe
-from demo.utils import load_labels
+from demo.utils import analyze_dataframe, load_labels
 
 
 def draw_column_info(df: pd.DataFrame):
