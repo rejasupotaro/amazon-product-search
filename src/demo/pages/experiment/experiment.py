@@ -15,6 +15,7 @@ from amazon_product_search.nlp.encoder import Encoder
 from amazon_product_search.nlp.normalizer import normalize_query
 from demo.page_config import set_page_config
 from demo.pages.experiment.experiments import EXPERIMENTS, ExperimentalSetup, Variant
+from demo.utils import split_fields
 
 es_client = EsClient()
 encoder = Encoder()
@@ -42,11 +43,13 @@ def search(index_name: str, query: str, variant: Variant) -> Response:
     es_query = None
     es_knn_query = None
 
-    if variant.is_sparse_enabled:
-        es_query = query_builder.build_multimatch_search_query(query=query, fields=variant.fields)
-    if variant.is_dense_enabled:
+    sparse_fields, dense_fields = split_fields(variant.fields)
+    if sparse_fields:
+        es_query = query_builder.build_multimatch_search_query(query=query, fields=sparse_fields)
+    if dense_fields:
         query_vector = encoder.encode(query, show_progress_bar=False)
-        es_knn_query = query_builder.build_knn_search_query(query_vector, top_k=variant.top_k)
+        # TODO: Should we handle multiple vector fields?
+        es_knn_query = query_builder.build_knn_search_query(query_vector, dense_fields[0], top_k=variant.top_k)
 
     return es_client.search(index_name=index_name, query=es_query, knn_query=es_knn_query, size=variant.top_k)
 

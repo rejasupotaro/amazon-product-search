@@ -13,10 +13,10 @@ def test_build_search_query():
 
 
 def test_build_knn_search_query():
-    es_query = build_knn_search_query(query_vector=[0.1, 0.9], top_k=10)
+    es_query = build_knn_search_query(query_vector=[0.1, 0.9], field="product_vector", top_k=10)
     assert es_query == {
+        "query_vector": [0.1, 0.9],
         "field": "product_vector",
         "k": 10,
         "num_candidates": 100,
-        "query_vector": [0.1, 0.9],
     }

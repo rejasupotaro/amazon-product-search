@@ -15,6 +15,14 @@ def load_labels(locale: str, nrows: int = -1) -> pd.DataFrame:
     return source.load_labels(locale, nrows)
 
 
+def split_fields(fields: list[str]) -> tuple[list[str], list[str]]:
+    sparse_fields: list[str] = []
+    dense_fields: list[str] = []
+    for field in fields:
+        (dense_fields if "vector" in field else sparse_fields).append(field)
+    return sparse_fields, dense_fields
+
+
 def analyze_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     columns = df.columns.to_list()
     rows = []

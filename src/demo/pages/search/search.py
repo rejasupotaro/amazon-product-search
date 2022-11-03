@@ -72,7 +72,7 @@ def main():
     es_knn_query = None
     if normalized_query and is_dense_enabled:
         query_vector = encoder.encode(normalized_query, show_progress_bar=False)
-        es_knn_query = query_builder.build_knn_search_query(query_vector, top_k=size)
+        es_knn_query = query_builder.build_knn_search_query(query_vector, field="product_vector", top_k=size)
 
     st.write("----")
 

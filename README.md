@@ -73,9 +73,9 @@ The demo app provides the ability to run experiments with different experimental
     locale="jp",
     num_queries=5000,
     variants=[
-        Variant(name="sparse", is_sparse_enabled=True, is_dense_enabled=False),
-        Variant(name="dense", is_sparse_enabled=False, is_dense_enabled=True),
-        Variant(name="hybrid", is_sparse_enabled=True, is_dense_enabled=True),
+        Variant(name="sparse", fields=["product_title"]),
+        Variant(name="dense", fields=["product_vector"]),
+        Variant(name="hybrid", fields=["product_title", "product_vector"]),
     ],
 ),
 ```

@@ -5,8 +5,6 @@ from typing import Optional
 @dataclass
 class Variant:
     name: str
-    is_sparse_enabled: bool = True
-    is_dense_enabled: bool = False
     fields: list[str] = field(default_factory=lambda: ["product_title"])
     top_k: int = 100
 
@@ -38,9 +36,9 @@ EXPERIMENTS = {
         locale="jp",
         num_queries=5000,
         variants=[
+            Variant(name="title", fields=["product_title"]),  # noqa
             Variant(name="title^1,bullet_point^1", fields=["product_title^1", "product_bullet_point^1"]),  # noqa
             Variant(name="title^2,bullet_point^1", fields=["product_title^2", "product_bullet_point^1"]),  # noqa
-            Variant(name="title^3,bullet_point^1", fields=["product_title^3", "product_bullet_point^1"]),  # noqa
             Variant(name="title^5,bullet_point^1", fields=["product_title^5", "product_bullet_point^1"]),  # noqa
             Variant(name="title^10,bullet_point^1", fields=["product_title^10", "product_bullet_point^1"]),  # noqa
         ],
@@ -61,11 +59,11 @@ EXPERIMENTS = {
     "sparse_vs_dense": ExperimentalSetup(
         index_name="products_dense_jp",
         locale="jp",
-        num_queries=5000,
+        num_queries=50,
         variants=[
-            Variant(name="sparse", is_sparse_enabled=True, is_dense_enabled=False),  # noqa
-            Variant(name="dense", is_sparse_enabled=False, is_dense_enabled=True),  # noqa
-            Variant(name="hybrid", is_sparse_enabled=True, is_dense_enabled=True),  # noqa
+            Variant(name="sparse", fields=["product_title"]),  # noqa
+            Variant(name="dense", fields=["product_vector"]),  # noqa
+            Variant(name="hybrid", fields=["product_title", "product_vector"]),  # noqa
         ],
     ),
 }
