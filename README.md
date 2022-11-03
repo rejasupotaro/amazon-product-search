@@ -67,15 +67,20 @@ $ poetry run inv demo.experiment
 The demo app provides the ability to run experiments with different experimental settings.
 
 ```python
-# src/demo/pages/experiment.py
-variants=[
-    SearchConfig(name="sparse", is_sparse_enabled=True, top_k=100),
-    SearchConfig(name="dense", is_dense_enabled=True, top_k=100),
-    SearchConfig(name="hybrid", is_sparse_enabled=True, is_dense_enabled=True, top_k=100),
-],
+# src/demo/pages/experiment/experiments.py
+"sparse_vs_dense": ExperimentalSetup(
+    index_name="products_jp",
+    locale="jp",
+    num_queries=5000,
+    variants=[
+        Variant(name="sparse", is_sparse_enabled=True, is_dense_enabled=False),
+        Variant(name="dense", is_sparse_enabled=False, is_dense_enabled=True),
+        Variant(name="hybrid", is_sparse_enabled=True, is_dense_enabled=True),
+    ],
+),
 ```
 
-![](https://user-images.githubusercontent.com/883148/198907715-79f2d99d-59fc-4105-b58f-50e6fd120bf6.png)
+![](https://user-images.githubusercontent.com/883148/199724869-f8c51c10-da16-42de-a2fe-bf112864c083.png)
 
 ## Development
 

@@ -24,7 +24,7 @@ encoder = Encoder()
 def load_labels(experimental_setup: ExperimentalSetup) -> pd.DataFrame:
     df = source.load_labels(experimental_setup.locale)
     if experimental_setup.num_queries:
-        queries = df["query"].unique()[: experimental_setup.num_queries]
+        queries = df.sample(frac=1)["query"].unique()[: experimental_setup.num_queries]
         df = df[df["query"].isin(queries)]
     return df
 
@@ -90,9 +90,9 @@ def compute_stats(metrics_df: pd.DataFrame) -> pd.DataFrame:
         .agg(
             total_hits=("total_hits", lambda series: round(np.mean(series))),
             zero_hit_rate=("total_hits", lambda series: compute_zero_hit_rate(series.values)),
-            recall=("recall", "mean"),
-            map=("ap", "mean"),
-            ndcg=("ndcg", "mean"),
+            recall=("recall", lambda series: np.round(np.mean(series), 4)),
+            map=("ap", lambda series: np.round(np.mean(series), 4)),
+            ndcg=("ndcg", lambda series: np.round(np.mean(series), 4)),
         )
         .reset_index()
     )
@@ -121,8 +121,8 @@ def main():
 
     st.write("### Experimental Setup")
     content = f"""
-    The experiment is conducted on `{experimental_setup.index_name}` containing {num_docs} docs in total.
-    We send {len(query_dict)} queries to the index with different parameters shown below.
+    The experiment is conducted on `{experimental_setup.index_name}` containing `{num_docs}` docs in total.
+    We send `{len(query_dict)}` queries to the index with different parameters shown below.
     Then, we compute Total Hits, Zero Hit Rate, Recall, MAP, and NDCG on each variant.
     """
     st.write(content)

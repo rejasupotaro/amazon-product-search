@@ -13,20 +13,18 @@ class Variant:
 
 @dataclass
 class ExperimentalSetup:
+    index_name: str
     locale: str
     variants: list[Variant]
     num_queries: Optional[int] = None
-
-    @property
-    def index_name(self) -> str:
-        return f"products_{self.locale}"
 
 
 # fmt: off
 EXPERIMENTS = {
     "different_fields": ExperimentalSetup(
+        index_name="products_all_jp",
         locale="jp",
-        num_queries=1000,
+        num_queries=5000,
         variants=[
             Variant(name="title", fields=["product_title"]),  # noqa
             Variant(name="title,description", fields=["product_title", "product_description"]),  # noqa
@@ -36,31 +34,34 @@ EXPERIMENTS = {
         ],
     ),
     "different_weights": ExperimentalSetup(
+        index_name="products_all_jp",
         locale="jp",
-        num_queries=1000,
+        num_queries=5000,
         variants=[
-            Variant(name="title", fields=["product_title"]),  # noqa
-            Variant(name="title^2,description", fields=["product_title^2", "product_description"]),  # noqa
-            Variant(name="title^3,description", fields=["product_title^3", "product_description"]),  # noqa
-            Variant(name="title^5,description", fields=["product_title^5", "product_description"]),  # noqa
-            Variant(name="title^10,description", fields=["product_title^10", "product_description"]),  # noqa
+            Variant(name="title^1,bullet_point^1", fields=["product_title^1", "product_bullet_point^1"]),  # noqa
+            Variant(name="title^2,bullet_point^1", fields=["product_title^2", "product_bullet_point^1"]),  # noqa
+            Variant(name="title^3,bullet_point^1", fields=["product_title^3", "product_bullet_point^1"]),  # noqa
+            Variant(name="title^5,bullet_point^1", fields=["product_title^5", "product_bullet_point^1"]),  # noqa
+            Variant(name="title^10,bullet_point^1", fields=["product_title^10", "product_bullet_point^1"]),  # noqa
         ],
     ),
     "keyword_extraction": ExperimentalSetup(
+        index_name="products_jp",
         locale="jp",
-        num_queries=1000,
+        num_queries=5000,
         variants=[
             Variant(name="title", fields=["product_title"]),  # noqa
             Variant(name="title,description", fields=["product_title", "product_description"]),  # noqa
             Variant(name="title,description,bullet_point", fields=["product_title", "product_description", "product_bullet_point"]),  # noqa
-            Variant(name="title,pke(description+bullet_point)", fields=["product_title", "product_description_pke"]),  # noqa
+            Variant(name="title,yake(description+bullet_point)", fields=["product_title", "product_description_yake"]),  # noqa
             Variant(name="title,position_rank(description+bullet_point)", fields=["product_title", "product_description_position_rank"]),  # noqa
             Variant(name="title,multipartite_rank(description+bullet_point)", fields=["product_title", "product_description_multipartite_rank"]),  # noqa
         ],
     ),
     "sparse_vs_dense": ExperimentalSetup(
+        index_name="products_dense_jp",
         locale="jp",
-        num_queries=1000,
+        num_queries=5000,
         variants=[
             Variant(name="sparse", is_sparse_enabled=True, is_dense_enabled=False),  # noqa
             Variant(name="dense", is_sparse_enabled=False, is_dense_enabled=True),  # noqa
