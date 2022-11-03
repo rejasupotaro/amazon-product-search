@@ -6,19 +6,24 @@ from amazon_product_search.nlp.extractor import KeywordExtractor
 
 
 class ExtractFn(beam.DoFn):
-    def __init__(self, text_fields: list[str]):
-        self.text_fields = text_fields
-
     def setup(self):
         self.extractor = KeywordExtractor()
 
-    def process(self, product: Dict[str, Any]) -> Iterator[Dict[str, Any]]:
-        for field in self.text_fields:
-            if field not in product:
-                continue
+    @staticmethod
+    def convert_results_to_text(results: list[tuple[str, float]]) -> str:
+        return " ".join([keyword for keyword, score in results])
 
-            text = product[field]
-            product["product_yake"] = self.extractor.apply_yake(text)
-            product["product_position_rank"] = self.extractor.apply_position_rank(text)
-            product["product_multipartite_rank"] = self.extractor.apply_multipartite_rank(text)
+    def process(self, product: Dict[str, Any]) -> Iterator[Dict[str, Any]]:
+        text = product["product_description"] + " " + product["product_bullet_point"]
+        text = text.strip()
+        if not text:
+            yield product
+
+        product["product_description_yake"] = self.convert_results_to_text(self.extractor.apply_yake(text))
+        product["product_description_position_rank"] = self.convert_results_to_text(
+            self.extractor.apply_position_rank(text)
+        )
+        product["product_description_multipartite_rank"] = self.convert_results_to_text(
+            self.extractor.apply_multipartite_rank(text)
+        )
         yield product

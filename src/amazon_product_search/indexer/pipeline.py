@@ -18,7 +18,7 @@ def get_input_source(locale: str, nrows: int = -1) -> PTransform:
     products_df = products_df.fillna("")
     products = products_df.to_dict("records")
     logging.info(f"We have {len(products)} products to index")
-    return beam.Create(products) | beam.Reshuffle()
+    return beam.Create(products)
 
 
 def run(options: IndexerOptions):
@@ -37,7 +37,7 @@ def run(options: IndexerOptions):
         )
 
         if options.extract_keywords:
-            products = products | "Extract keywrods" >> beam.ParDo(ExtractFn())
+            products |= "Extract keywords" >> beam.ParDo(ExtractFn())
 
         if options.encode_text:
             products = (

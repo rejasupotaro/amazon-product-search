@@ -1,7 +1,7 @@
-from typing import Any
+from typing import Any, Dict
 
 
-def is_indexable(product: dict[str, Any]) -> bool:
+def is_indexable(product: Dict[str, Any]) -> bool:
     """Return True for products to be indexed.
 
     Args:
