@@ -1,5 +1,5 @@
-from dataclasses import asdict, dataclass
-from typing import Any, Optional
+from dataclasses import asdict
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -14,35 +14,10 @@ from amazon_product_search.metrics import compute_ap, compute_ndcg, compute_reca
 from amazon_product_search.nlp.encoder import Encoder
 from amazon_product_search.nlp.normalizer import normalize_query
 from demo.page_config import set_page_config
+from demo.pages.experiment.experiments import EXPERIMENTS, ExperimentalSetup, Variant
 
 es_client = EsClient()
 encoder = Encoder()
-
-
-@dataclass
-class SearchConfig:
-    name: str
-    is_sparse_enabled: bool = True
-    is_dense_enabled: bool = False
-    use_description: bool = False
-    use_bullet_point: bool = False
-    use_brand: bool = False
-    use_color_name: bool = False
-    top_k: int = 100
-
-
-Variant = SearchConfig
-
-
-@dataclass
-class ExperimentalSetup:
-    locale: str
-    variants: list[Variant]
-    num_queries: Optional[int] = None
-
-    @property
-    def index_name(self) -> str:
-        return f"products_{self.locale}"
 
 
 @st.cache
@@ -63,23 +38,17 @@ def draw_variants(variants: list[Variant]):
     st.write(variants_df)
 
 
-def search(index_name: str, query: str, config: SearchConfig) -> Response:
+def search(index_name: str, query: str, variant: Variant) -> Response:
     es_query = None
     es_knn_query = None
 
-    if config.is_sparse_enabled:
-        es_query = query_builder.build_multimatch_search_query(
-            query=query,
-            use_description=config.use_description,
-            use_bullet_point=config.use_bullet_point,
-            use_brand=config.use_brand,
-            use_color_name=config.use_color_name,
-        )
-    if config.is_dense_enabled:
+    if variant.is_sparse_enabled:
+        es_query = query_builder.build_multimatch_search_query(query=query, fields=variant.fields)
+    if variant.is_dense_enabled:
         query_vector = encoder.encode(query, show_progress_bar=False)
-        es_knn_query = query_builder.build_knn_search_query(query_vector, top_k=config.top_k)
+        es_knn_query = query_builder.build_knn_search_query(query_vector, top_k=variant.top_k)
 
-    return es_client.search(index_name=index_name, query=es_query, knn_query=es_knn_query, size=config.top_k)
+    return es_client.search(index_name=index_name, query=es_query, knn_query=es_knn_query, size=variant.top_k)
 
 
 def compute_metrics(index_name: str, query: str, variant: Variant, labels_df: pd.DataFrame) -> dict[str, Any]:
@@ -140,17 +109,9 @@ def main():
     set_page_config()
 
     st.write("## Experiments")
+    experiment_name = st.selectbox("Experiment:", EXPERIMENTS.keys())
+    experimental_setup = EXPERIMENTS[experiment_name]
 
-    st.write("### Experimental Setup")
-    experimental_setup = ExperimentalSetup(
-        locale="jp",
-        num_queries=100,
-        variants=[
-            SearchConfig(name="sparse", is_sparse_enabled=True, is_dense_enabled=False, top_k=100),
-            SearchConfig(name="dense", is_sparse_enabled=False, is_dense_enabled=True, top_k=100),
-            SearchConfig(name="hybrid", is_sparse_enabled=True, is_dense_enabled=True, top_k=100),
-        ],
-    )
     num_docs = count_docs(experimental_setup.index_name)
 
     labels_df = load_labels(experimental_setup)
@@ -158,6 +119,7 @@ def main():
     for query, query_labels_df in labels_df.groupby("query"):
         query_dict[query] = query_labels_df
 
+    st.write("### Experimental Setup")
     content = f"""
     The experiment is conducted on `{experimental_setup.index_name}` containing {num_docs} docs in total.
     We send {len(query_dict)} queries to the index with different parameters shown below.

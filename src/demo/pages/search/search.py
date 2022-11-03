@@ -53,24 +53,21 @@ def main():
     is_sparse_enabled = columns[0].checkbox("Sparse:", value=True)
     is_dense_enabled = columns[1].checkbox("Dense:", value=False)
 
-    use_description = False
-    use_bullet_point = False
-    use_brand = False
-    use_color_name = False
-    if is_sparse_enabled:
-        use_description = st.checkbox("Use description")
-        use_bullet_point = st.checkbox("Use bullet point")
-        use_brand = st.checkbox("Use brand")
-        use_color_name = st.checkbox("Use color name")
+    fields = ["product_title"]
+    if st.checkbox("Use description"):
+        fields.append("product_description")
+    if st.checkbox("Use bullet point"):
+        fields.append("product_bullet_point")
+    if st.checkbox("Use brand"):
+        fields.append("product_brand")
+    if st.checkbox("Use color name"):
+        fields.append("product_color_name")
 
     es_query = None
     if is_sparse_enabled:
         es_query = query_builder.build_multimatch_search_query(
             query=normalized_query,
-            use_description=use_description,
-            use_bullet_point=use_bullet_point,
-            use_brand=use_brand,
-            use_color_name=use_color_name,
+            fields=fields,
         )
     es_knn_query = None
     if normalized_query and is_dense_enabled:
