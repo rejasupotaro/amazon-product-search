@@ -8,6 +8,7 @@ from amazon_product_search.es.response import Result
 from amazon_product_search.nlp.encoder import Encoder
 from amazon_product_search.nlp.normalizer import normalize_query
 from demo.page_config import set_page_config
+from demo.utils import split_fields
 
 es_client = EsClient()
 encoder = Encoder()
@@ -49,30 +50,30 @@ def main():
     query = st.text_input("Query:")
     normalized_query = normalize_query(query)
 
-    columns = st.columns(2)
-    is_sparse_enabled = columns[0].checkbox("Sparse:", value=True)
-    is_dense_enabled = columns[1].checkbox("Dense:", value=False)
-
-    fields = ["product_title"]
-    if st.checkbox("Use description"):
-        fields.append("product_description")
-    if st.checkbox("Use bullet point"):
-        fields.append("product_bullet_point")
-    if st.checkbox("Use brand"):
-        fields.append("product_brand")
-    if st.checkbox("Use color name"):
-        fields.append("product_color_name")
+    selected_fields = st.multiselect(
+        "Fields:",
+        [
+            "product_title",
+            "product_description",
+            "product_bullet_point",
+            "product_brand",
+            "product_color_name",
+            "product_vector",
+        ],
+    )
+    sparse_fields, dense_fields = split_fields(selected_fields)
 
     es_query = None
-    if is_sparse_enabled:
+    if sparse_fields:
         es_query = query_builder.build_multimatch_search_query(
             query=normalized_query,
-            fields=fields,
+            fields=sparse_fields,
         )
     es_knn_query = None
-    if normalized_query and is_dense_enabled:
+    if normalized_query and dense_fields:
         query_vector = encoder.encode(normalized_query, show_progress_bar=False)
-        es_knn_query = query_builder.build_knn_search_query(query_vector, field="product_vector", top_k=size)
+        # TODO: Should we handle multiple vector fields?
+        es_knn_query = query_builder.build_knn_search_query(query_vector, field=dense_fields[0], top_k=size)
 
     st.write("----")
 
