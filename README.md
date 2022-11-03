@@ -26,7 +26,7 @@ $ brew install mecab mecab-ipadic
 Download the dataset from [this link](https://www.aicrowd.com/challenges/esci-challenge-for-improving-product-search/dataset_files), and run the following command to preprocess the dataset.
 
 ```shell
-$ poetry run inv data.split-by-locale
+$ poetry run inv data.merge-and-split
 ```
 
 ## Index Products

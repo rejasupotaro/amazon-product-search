@@ -4,5 +4,5 @@ from amazon_product_search import source
 
 
 @task
-def split_by_locale(c):
-    source.split_dataset_by_locale()
+def merge_and_split(c):
+    source.merge_and_split()
