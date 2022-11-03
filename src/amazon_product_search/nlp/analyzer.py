@@ -1,8 +1,8 @@
 from typing import Any, Dict
 
+from amazon_product_search.nlp.extractor import KeywordExtractor
 from amazon_product_search.nlp.normalizer import normalize_doc
 from amazon_product_search.nlp.tokenizer import Tokenizer
-from amazon_product_search.nlp.extractor import KeywordExtractor
 
 
 class Analyzer:
@@ -23,7 +23,4 @@ class Analyzer:
 
             normalized_text = self._normalize(product[field])
             product[field] = normalized_text
-            product["product_yake"] = self.extractor.apply_yake(normalized_text)
-            product["product_position_rank"] = self.extractor.apply_position_rank(normalized_text)
-            product["product_multipartite_rank"] = self.extractor.apply_multipartite_rank(normalized_text)
         return product

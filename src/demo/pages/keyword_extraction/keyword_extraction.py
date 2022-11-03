@@ -2,6 +2,7 @@ import re
 
 import pandas as pd
 import streamlit as st
+from st_aggrid import AgGrid
 
 from amazon_product_search.nlp.extractor import KeywordExtractor
 from amazon_product_search.nlp.normalizer import normalize_doc
@@ -33,6 +34,8 @@ def main():
     df = df[~df["product_description"].isna() & ~df["product_bullet_point"].isna()]
     df = df.fillna("")
     st.write(df)
+    data = AgGrid(df)
+    st.write(data)
     i = st.slider("i:", min_value=0, max_value=len(df))
 
     st.write("----")

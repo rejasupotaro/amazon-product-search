@@ -28,7 +28,7 @@ def recreate_index(c, locale="jp"):
 
 
 @task
-def index_docs(c, runner="DirectRunner", locale="jp", es_host="", encode_text=False, nrows=None):
+def index_docs(c, runner="DirectRunner", locale="jp", es_host="", extract_keywords=True, encode_text=False, nrows=None):
     command = [
         "poetry run python src/amazon_product_search/indexer/main.py",
         f"--runner={runner}",
@@ -37,6 +37,9 @@ def index_docs(c, runner="DirectRunner", locale="jp", es_host="", encode_text=Fa
 
     if es_host:
         command.append(f"--es_host={es_host}")
+
+    if extract_keywords:
+        command.append("--extract_keywords")
 
     if encode_text:
         command.append("--encode_text")

@@ -36,7 +36,12 @@ This project indexes products to Elasticsearch. If you want to try on your machi
 ```shell
 $ docker compose up
 $ poetry run inv es.create_index --locale=jp
-$ poetry run inv es.index-docs --locale=jp --es-host=http://localhost:9200 --encode-text --nrows=100
+$ poetry run inv es.index-docs \
+  --locale=jp \
+  --es-host=http://localhost:9200 \
+  --extract-keywords \
+  --encode-text \
+  --nrows=100
 ```
 
 
