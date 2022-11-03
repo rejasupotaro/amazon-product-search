@@ -22,10 +22,10 @@ def get_input_source(locale: str, nrows: int = -1) -> PTransform:
 
 
 def run(options: IndexerOptions):
+    index_name = options.index_name
     locale = options.locale
     es_host = options.es_host
     nrows = options.nrows
-    index_name = f"products_{locale}"
     text_fields = ["product_title", "product_description", "product_bullet_point"]
 
     with beam.Pipeline() as pipeline:

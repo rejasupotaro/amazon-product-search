@@ -4,36 +4,34 @@ from amazon_product_search.es.es_client import EsClient
 
 
 @task
-def delete_index(c, locale="jp"):
+def delete_index(c, index_name):
     es_client = EsClient()
-    index_name = f"products_{locale}"
     es_client.delete_index(index_name=index_name)
     print(f"{index_name} was deleted.")
 
 
 @task
-def create_index(c, locale="jp"):
+def create_index(c, index_name):
     es_client = EsClient()
-    index_name = f"products_{locale}"
     es_client.create_index(index_name=index_name)
     print(f"{index_name} was created.")
 
 
 @task
-def recreate_index(c, locale="jp"):
+def recreate_index(c, index_name):
     es_client = EsClient()
-    index_name = f"products_{locale}"
     es_client.delete_index(index_name=index_name)
     es_client.create_index(index_name=index_name)
 
 
 @task
 def index_docs(
-    c, runner="DirectRunner", locale="jp", es_host="", extract_keywords=False, encode_text=False, nrows=None
+    c, index_name, locale="jp", es_host="", extract_keywords=False, encode_text=False, nrows=None, runner="DirectRunner"
 ):
     command = [
         "poetry run python src/amazon_product_search/indexer/main.py",
         f"--runner={runner}",
+        f"--index_name={index_name}",
         f"--locale={locale}",
     ]
 
