@@ -25,7 +25,7 @@ def draw_results(results: dict[str, list[tuple[str, float]]]):
 
 
 def main():
-    set_page_config(layout="wide")
+    set_page_config()
 
     st.write("## Keyword Extraction")
 

@@ -52,14 +52,11 @@ The mapping file is located at `schema/es/products.json`. `product_id`, `product
 
 ## Demo
 
-The following command launches [Streamlit](https://streamlit.io/) apps.
+The following command launches the [Streamlit](https://streamlit.io/) demo app.
 
 ```shell
 $ docker compose up
-$ poetry run inv demo.dataset
-$ poetry run inv demo.keyword-extraction
-$ poetry run inv demo.search
-$ poetry run inv demo.experiment
+$ poetry run inv demo
 ```
 
 ## Experimentation
@@ -67,7 +64,7 @@ $ poetry run inv demo.experiment
 The demo app provides the ability to run experiments with different experimental settings.
 
 ```python
-# src/demo/apps/experiment/experiments.py
+# src/demo/experimental_setup.py
 "sparse_vs_dense": ExperimentalSetup(
     index_name="products_jp",
     locale="jp",

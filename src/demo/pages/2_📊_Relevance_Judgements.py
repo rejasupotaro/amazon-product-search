@@ -3,7 +3,8 @@ from typing import Any
 import pandas as pd
 import streamlit as st
 
-from demo.utils import analyze_dataframe, load_labels
+from demo.page_config import set_page_config
+from demo.utils import analyze_dataframe, load_labels, load_products
 
 
 def draw_column_info(df: pd.DataFrame):
@@ -37,10 +38,18 @@ def draw_products(products: list[dict[str, Any]]):
             st.markdown(product[column], unsafe_allow_html=True)
 
 
-def draw(locale: str, products_df: pd.DataFrame):
+def main():
+    set_page_config()
+
     st.write("## Judgements")
+    locale = st.selectbox("Locale:", ["jp", "us", "es"])
+    products_df = load_products(locale)
     labels_df = load_labels(locale, nrows=100)
     df = labels_df.merge(products_df, on="product_id", how="left")
 
     draw_column_info(df)
     draw_examples(df, ["esci_label"] + products_df.columns.to_list())
+
+
+if __name__ == "__main__":
+    main()

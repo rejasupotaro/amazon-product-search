@@ -2,7 +2,8 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from demo.utils import analyze_dataframe
+from demo.page_config import set_page_config
+from demo.utils import analyze_dataframe, load_products
 
 
 def draw_column_info(products_df: pd.DataFrame):
@@ -36,9 +37,17 @@ def draw_examples(products_df: pd.DataFrame):
     st.write(products_df.head(100))
 
 
-def draw(locale: str, products_df: pd.DataFrame):
+def main():
+    set_page_config()
+
     st.write("## Catalogue")
+    locale = st.selectbox("Locale:", ["jp", "us", "es"])
+    products_df = load_products(locale)
     draw_column_info(products_df)
     draw_brand_info(products_df)
     draw_color_info(products_df)
     draw_examples(products_df)
+
+
+if __name__ == "__main__":
+    main()
