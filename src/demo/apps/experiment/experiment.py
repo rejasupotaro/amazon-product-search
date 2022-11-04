@@ -1,7 +1,6 @@
 from dataclasses import asdict
 from typing import Any
 
-import numpy as np
 import pandas as pd
 import plotly.express as px
 import streamlit as st
@@ -91,11 +90,11 @@ def compute_stats(metrics_df: pd.DataFrame) -> pd.DataFrame:
     stats_df = (
         metrics_df.groupby("variant")
         .agg(
-            total_hits=("total_hits", lambda series: round(np.mean(series))),
+            total_hits=("total_hits", lambda series: int(series.mean())),
             zero_hit_rate=("total_hits", lambda series: compute_zero_hit_rate(series.values)),
-            recall=("recall", lambda series: np.round(np.mean(series), 4)),
-            map=("ap", lambda series: np.round(np.mean(series), 4)),
-            ndcg=("ndcg", lambda series: np.round(np.mean(series), 4)),
+            recall=("recall", lambda series: series.mean().round(4)),
+            map=("ap", lambda series: series.mean().round(4)),
+            ndcg=("ndcg", lambda series: series.mean().round(4)),
         )
         .reset_index()
     )

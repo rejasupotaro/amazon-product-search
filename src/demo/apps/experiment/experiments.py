@@ -44,12 +44,11 @@ EXPERIMENTS = {
         ],
     ),
     "keyword_extraction": ExperimentalSetup(
-        index_name="products_jp",
+        index_name="products_ke_jp",
         locale="jp",
         num_queries=5000,
         variants=[
             Variant(name="title", fields=["product_title"]),  # noqa
-            Variant(name="title,description", fields=["product_title", "product_description"]),  # noqa
             Variant(name="title,description,bullet_point", fields=["product_title", "product_description", "product_bullet_point"]),  # noqa
             Variant(name="title,yake(description+bullet_point)", fields=["product_title", "product_description_yake"]),  # noqa
             Variant(name="title,position_rank(description+bullet_point)", fields=["product_title", "product_description_position_rank"]),  # noqa
