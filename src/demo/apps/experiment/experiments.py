@@ -41,7 +41,7 @@ EXPERIMENTS = {
             Variant(name="title^2,bullet_point^1", fields=["product_title^2", "product_bullet_point^1"]),  # noqa
             Variant(name="title^5,bullet_point^1", fields=["product_title^5", "product_bullet_point^1"]),  # noqa
             Variant(name="title^10,bullet_point^1", fields=["product_title^10", "product_bullet_point^1"]),  # noqa
-    ],
+        ],
     ),
     "keyword_extraction": ExperimentalSetup(
         index_name="products_jp",

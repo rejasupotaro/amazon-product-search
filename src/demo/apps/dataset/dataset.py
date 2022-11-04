@@ -1,7 +1,7 @@
 import streamlit as st
 
+from demo.apps.dataset import catalogue, judgements
 from demo.page_config import set_page_config
-from demo.pages.dataset import catalogue, judgements
 from demo.utils import load_products
 
 

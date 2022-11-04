@@ -67,7 +67,7 @@ $ poetry run inv demo.experiment
 The demo app provides the ability to run experiments with different experimental settings.
 
 ```python
-# src/demo/pages/experiment/experiments.py
+# src/demo/apps/experiment/experiments.py
 "sparse_vs_dense": ExperimentalSetup(
     index_name="products_jp",
     locale="jp",
