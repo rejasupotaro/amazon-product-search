@@ -15,6 +15,11 @@ def load_labels(locale: str, nrows: int = -1) -> pd.DataFrame:
     return source.load_labels(locale, nrows)
 
 
+@st.cache
+def load_merged(locale: str, nrows: int = -1) -> pd.DataFrame:
+    return source.load_merged(locale, nrows)
+
+
 def split_fields(fields: list[str]) -> tuple[list[str], list[str]]:
     sparse_fields: list[str] = []
     dense_fields: list[str] = []

@@ -2,9 +2,10 @@ from typing import Any
 
 import pandas as pd
 import streamlit as st
+from st_aggrid import AgGrid, GridOptionsBuilder
 
 from demo.page_config import set_page_config
-from demo.utils import analyze_dataframe, load_labels, load_products
+from demo.utils import analyze_dataframe, load_merged
 
 
 def draw_column_info(df: pd.DataFrame):
@@ -13,14 +14,22 @@ def draw_column_info(df: pd.DataFrame):
     st.write(analyzed_df)
 
 
-def draw_examples(df: pd.DataFrame, columns_to_show: list[str]):
+def draw_examples(df: pd.DataFrame):
     st.write("### Examples")
-    selected_query = st.selectbox("query:", df["query"].unique())
-    selected_df = df[df["query"] == selected_query][columns_to_show]
 
-    st.write("judgements:")
-    st.write(selected_df)
-    draw_products(selected_df.to_dict("records"))
+    gb = GridOptionsBuilder.from_dataframe(df)
+    gb.configure_pagination(paginationAutoPageSize=True)
+    gb.configure_side_bar()
+    gb.configure_selection("single", use_checkbox=True)
+    grid_options = gb.build()
+    selected_rows = AgGrid(df, gridOptions=grid_options).selected_rows
+
+    if not selected_rows:
+        return
+
+    judgement = selected_rows[0]
+    del judgement["_selectedRowNodeInfo"]
+    st.write(judgement)
 
 
 def draw_products(products: list[dict[str, Any]]):
@@ -43,12 +52,13 @@ def main():
 
     st.write("## Judgements")
     locale = st.selectbox("Locale:", ["jp", "us", "es"])
-    products_df = load_products(locale)
-    labels_df = load_labels(locale, nrows=100)
-    df = labels_df.merge(products_df, on="product_id", how="left")
-
+    df = load_merged(locale)
     draw_column_info(df)
-    draw_examples(df, ["esci_label"] + products_df.columns.to_list())
+
+    queries = df["query"].unique()
+    query = st.selectbox("Query:", queries)
+    filtered_df = df[df["query"] == query]
+    draw_examples(filtered_df)
 
 
 if __name__ == "__main__":

@@ -19,6 +19,11 @@ def load_labels(locale: str = "", nrows: int = -1) -> pd.DataFrame:
     return pd.read_csv(filename, nrows=nrows if nrows > 0 else None, engine="python")
 
 
+def load_merged(locale: str, nrows: int = -1) -> pd.DataFrame:
+    filename = f"{DATA_DIR}/merged-v0.3_{locale}.csv.zip"
+    return pd.read_csv(filename, nrows=nrows if nrows > 0 else None, engine="python")
+
+
 def merge_and_split():
     """Load raw dataset and split it by locale for convenience."""
     print("Load catalogue dataset")
