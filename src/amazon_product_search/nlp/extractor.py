@@ -30,4 +30,4 @@ class KeywordExtractor:
         return self.multipartite_rank.get_n_best(n=10)
 
     def apply_keybert(self, text: str) -> list[tuple[str, float]]:
-        return self.keybert.extract_keywords(text)
+        return self.keybert.extract_keywords(text, top_n=10)

@@ -26,4 +26,5 @@ class ExtractFn(beam.DoFn):
         product["product_description_multipartite_rank"] = self.convert_results_to_text(
             self.extractor.apply_multipartite_rank(text)
         )
+        product["product_description_keybert"] = self.convert_results_to_text(self.extractor.apply_keybert(text))
         yield product
