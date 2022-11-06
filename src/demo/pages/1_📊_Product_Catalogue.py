@@ -1,6 +1,7 @@
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+from st_aggrid import AgGrid, GridOptionsBuilder
 
 from demo.page_config import set_page_config
 from demo.utils import analyze_dataframe, load_products
@@ -34,7 +35,20 @@ def draw_color_info(products_df: pd.DataFrame):
 
 def draw_examples(products_df: pd.DataFrame):
     st.write("### Examples")
-    st.write(products_df.head(100))
+
+    gb = GridOptionsBuilder.from_dataframe(products_df)
+    gb.configure_pagination(paginationAutoPageSize=True)
+    gb.configure_side_bar()
+    gb.configure_selection("single", use_checkbox=True)
+    grid_options = gb.build()
+    selected_rows = AgGrid(products_df, gridOptions=grid_options).selected_rows
+
+    if not selected_rows:
+        return
+
+    judgement = selected_rows[0]
+    del judgement["_selectedRowNodeInfo"]
+    st.write(judgement)
 
 
 def main():
@@ -46,7 +60,7 @@ def main():
     draw_column_info(products_df)
     draw_brand_info(products_df)
     draw_color_info(products_df)
-    draw_examples(products_df)
+    draw_examples(products_df.head(1000))
 
 
 if __name__ == "__main__":

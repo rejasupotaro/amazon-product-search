@@ -30,7 +30,7 @@ def main():
     st.write("## Keyword Extraction")
 
     st.write("### Catalogue")
-    df = load_products(locale="jp", nrows=100)
+    df = load_products(locale="jp", nrows=1000)
     df = df[~df["product_description"].isna() & ~df["product_bullet_point"].isna()]
     df = df.fillna("")
 
