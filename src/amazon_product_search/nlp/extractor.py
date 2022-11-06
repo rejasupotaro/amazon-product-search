@@ -1,4 +1,7 @@
 import pke
+from keybert import KeyBERT
+
+from amazon_product_search.nlp.encoder import JA_SBERT
 
 
 class KeywordExtractor:
@@ -6,6 +9,7 @@ class KeywordExtractor:
         self.yake = pke.unsupervised.YAKE()
         self.position_rank = pke.unsupervised.PositionRank()
         self.multipartite_rank = pke.unsupervised.MultipartiteRank()
+        self.keybert = KeyBERT(JA_SBERT)
 
     def apply_yake(self, text: str) -> list[tuple[str, float]]:
         self.yake.load_document(input=text)
@@ -24,3 +28,6 @@ class KeywordExtractor:
         self.multipartite_rank.candidate_selection(pos={"NOUN", "PROPN", "ADJ", "NUM"})
         self.multipartite_rank.candidate_weighting()
         return self.multipartite_rank.get_n_best(n=10)
+
+    def apply_keybert(self, text: str) -> list[tuple[str, float]]:
+        return self.keybert.extract_keywords(text)

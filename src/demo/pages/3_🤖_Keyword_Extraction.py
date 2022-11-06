@@ -72,6 +72,7 @@ def main():
         "yake": extractor.apply_yake(text),
         "position_rank": extractor.apply_position_rank(text),
         "multipartite_rank": extractor.apply_multipartite_rank(text),
+        "keybert": extractor.apply_keybert(text),
     }
     draw_results(results)
 
