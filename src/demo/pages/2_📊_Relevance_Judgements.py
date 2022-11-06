@@ -1,6 +1,7 @@
 from typing import Any
 
 import pandas as pd
+import plotly.express as px
 import streamlit as st
 from st_aggrid import AgGrid, GridOptionsBuilder
 
@@ -12,6 +13,14 @@ def draw_column_info(df: pd.DataFrame):
     st.write("### Columns")
     analyzed_df = analyze_dataframe(df)
     st.write(analyzed_df)
+
+
+def draw_label_distribution(df: pd.DataFrame):
+    count_df = df.groupby("esci_label").size().reset_index(name="count")
+    count_df = count_df.sort_values("count", ascending=False)
+    fig = px.bar(count_df, x="esci_label", y="count")
+    fig.update_layout(title="The number of labels")
+    st.plotly_chart(fig)
 
 
 def draw_examples(df: pd.DataFrame):
@@ -54,6 +63,7 @@ def main():
     locale = st.selectbox("Locale:", ["jp", "us", "es"])
     df = load_merged(locale)
     draw_column_info(df)
+    draw_label_distribution(df)
 
     queries = df["query"].unique()
     query = st.selectbox("Query:", queries)
