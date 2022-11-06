@@ -1342,6 +1342,29 @@ openapi = ["openapi-core (>=0.14.2)", "ruamel-yaml"]
 test = ["codecov", "ipykernel", "jupyter-server", "openapi-core (>=0.14.2,<0.15.0)", "openapi-spec-validator (<0.5)", "pytest-console-scripts", "pytest-cov", "pytest (>=7.0)", "ruamel-yaml", "strict-rfc3339"]
 
 [[package]]
+name = "keybert"
+version = "0.7.0"
+description = "KeyBERT performs keyword extraction with state-of-the-art transformer models."
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+numpy = ">=1.18.5"
+rich = ">=10.4.0"
+scikit-learn = ">=0.22.2"
+sentence-transformers = ">=0.3.8"
+
+[package.extras]
+dev = ["mkdocs (>=1.1)", "mkdocs-material (>=4.6.3)", "mkdocstrings (>=0.8.0)", "pytest (>=5.4.3)", "pytest-cov (>=2.6.1)", "flake8 (>=3.6.0)", "pre-commit (>=2.2.0)", "black (>=19.3b0)"]
+docs = ["mkdocs (>=1.1)", "mkdocs-material (>=4.6.3)", "mkdocstrings (>=0.8.0)"]
+flair = ["transformers (>=3.5.1)", "torch (>=1.4.0)", "flair (>=0.7)"]
+gensim = ["gensim (>=3.6.0)"]
+spacy = ["spacy (>=3.0.1)"]
+test = ["pytest (>=5.4.3)", "pytest-cov (>=2.6.1)", "flake8 (>=3.6.0)", "pre-commit (>=2.2.0)", "black (>=19.3b0)"]
+use = ["tensorflow", "tensorflow-hub", "tensorflow-text"]
+
+[[package]]
 name = "kiwisolver"
 version = "1.4.4"
 description = "A fast implementation of the Cassowary constraint solver"
@@ -3123,7 +3146,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "flake8 
 [metadata]
 lock-version = "1.1"
 python-versions = "3.9.13"
-content-hash = "9cc3526c4c30b9835a728a212ace0cf940fed20b9abc8dd9a02c81312ff33f83"
+content-hash = "446f64bb109813fe14f6388a916c475da975c0b68ba2371217b4ba3df072d10c"
 
 [metadata.files]
 altair = [
@@ -3326,6 +3349,7 @@ jupyterlab-pygments = [
     {file = "jupyterlab_pygments-0.2.2.tar.gz", hash = "sha256:7405d7fde60819d905a9fa8ce89e4cd830e318cdad22a0030f7a901da705585d"},
 ]
 jupyterlab-server = []
+keybert = []
 kiwisolver = []
 langcodes = [
     {file = "langcodes-3.3.0-py3-none-any.whl", hash = "sha256:4d89fc9acb6e9c8fdef70bcdf376113a3db09b67285d9e1d534de6d8818e7e69"},
