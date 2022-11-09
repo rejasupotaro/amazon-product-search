@@ -2,7 +2,7 @@ from invoke import Collection, task
 
 from amazon_product_search.constants import IMAGE_URI, PROJECT_ID, REGION
 from amazon_product_search.timestamp import get_unix_timestamp
-from tasks import data_tasks, es_tasks
+from tasks import data_tasks, es_tasks, synonyms_tasks
 
 
 @task
@@ -72,3 +72,4 @@ ns.add_task(build_on_cloud)
 ns.add_task(hello_on_cloud)
 ns.add_collection(Collection.from_module(data_tasks, name="data"))
 ns.add_collection(Collection.from_module(es_tasks, name="es"))
+ns.add_collection(Collection.from_module(synonyms_tasks, name="synonyms"))
