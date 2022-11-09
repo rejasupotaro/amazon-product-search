@@ -16,6 +16,14 @@ class QueryBuilder:
 
     @staticmethod
     def load_synonym_dict(threshold: float = 0.6) -> dict[str, list[str]]:
+        """Load the synonym file and convert it into a dict for lookup.
+
+        Args:
+            threshold (float, optional): A threshold for the confidence (similarity) of synonyms. Defaults to 0.6.
+
+        Returns:
+            dict[str, list[str]]: The converted synonym dict.
+        """
         df = pd.read_csv(f"{DATA_DIR}/synonyms.csv")
         df = df[df["similarity"] > threshold]
         queries = df["query"].tolist()
@@ -26,6 +34,14 @@ class QueryBuilder:
         return synonym_dict
 
     def find_synonyms(self, query: str) -> list[str]:
+        """Return a list of synonyms for a given query.
+
+        Args:
+            query (str): A query to expand.
+
+        Returns:
+            list[str]: A list of synonyms.
+        """
         synonyms = []
         tokens = self.tokenizer.tokenize(query)
         for token in tokens:
@@ -37,7 +53,11 @@ class QueryBuilder:
     def build_multimatch_search_query(
         self, query: str, fields: list[str], is_synonym_expansion_enabled: bool = False
     ) -> dict[str, Any]:
-        """Build a multimatch ES query.
+        """Build a multi-match ES query.
+
+        Args:
+            fields (list[str]): A list of fields to search.
+            is_synonym_expansion_enabled: Expand the given query if True.
 
         Returns:
             dict[str, Any]: The constructed ES query.
