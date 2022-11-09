@@ -80,7 +80,15 @@ def generate_candidates(pairs: list[list[str]], min_cooccurrence: int = 10, min_
 
 
 def generate():
-    """Generate synonyms from query title pairs."""
+    """Generate synonyms from query title pairs.
+
+    1. Load the relevance judgement file.
+    2. Filter rows with ESCI label: "exact".
+    3. Extract query title pairs.
+    4. Calculate word cooccurrence and npmi and filter out those with low scores.
+    5. The filtered candidates are further filtered by cosine similarity.
+    6. Save the generated synonyms to `{DATA_DIR}/synonyms.csv`.
+    """
     pairs = load_query_title_pairs(locale="jp", nrows=100)
     print(f"{len(pairs)} title pairs will be processed")
 

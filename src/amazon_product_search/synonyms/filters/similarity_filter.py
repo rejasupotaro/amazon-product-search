@@ -12,6 +12,15 @@ class SimilarityFilter:
         self.batch_size = batch_size
 
     def calculate_score(self, left: list[str], right: list[str]) -> list[float]:
+        """Calculate the cosine similarity of the given two inputs.
+
+        Args:
+            left (list[str]): A list of input texts.
+            right (list[str]): Another list of input texts.
+
+        Returns:
+            list[float]: A list of scores.
+        """
         left_tensor = self.encoder.encode(left, convert_to_tensor=True)
         right_tensor = self.encoder.encode(right, convert_to_tensor=True)
         return F.cosine_similarity(left_tensor, right_tensor, dim=1).tolist()
