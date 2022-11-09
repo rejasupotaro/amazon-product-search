@@ -6,6 +6,7 @@ from typing import Optional
 class Variant:
     name: str
     fields: list[str] = field(default_factory=lambda: ["product_title"])
+    enable_synonym_expansion: bool = False
     top_k: int = 100
 
 
@@ -41,6 +42,23 @@ EXPERIMENTS = {
             Variant(name="title^2,bullet_point^1", fields=["product_title^2", "product_bullet_point^1"]),  # noqa
             Variant(name="title^5,bullet_point^1", fields=["product_title^5", "product_bullet_point^1"]),  # noqa
             Variant(name="title^10,bullet_point^1", fields=["product_title^10", "product_bullet_point^1"]),  # noqa
+        ],
+    ),
+    "synonym_expansion": ExperimentalSetup(
+        index_name="products_all_jp",
+        locale="jp",
+        num_queries=5000,
+        variants=[
+            Variant(name="title", fields=["product_title"], enable_synonym_expansion=False),  # noqa
+            Variant(name="title,description", fields=["product_title", "product_description"], enable_synonym_expansion=False),  # noqa
+            Variant(name="title,bullet_point", fields=["product_title", "product_bullet_point"], enable_synonym_expansion=False),  # noqa
+            Variant(name="title,brand", fields=["product_title", "product_brand"]),  # noqa
+            Variant(name="title,color", fields=["product_title", "product_color_name"]),  # noqa
+            Variant(name="query expansion + title", fields=["product_title"], enable_synonym_expansion=True),  # noqa
+            Variant(name="query expansion + title,description", fields=["product_title", "product_description"], enable_synonym_expansion=True),  # noqa
+            Variant(name="query expansion + title,bullet_point", fields=["product_title", "product_bullet_point"], enable_synonym_expansion=True),  # noqa
+            Variant(name="query expansion + title,brand", fields=["product_title", "product_brand"], enable_synonym_expansion=True),  # noqa
+            Variant(name="query expansion + title,color", fields=["product_title", "product_color_name"], enable_synonym_expansion=True),  # noqa
         ],
     ),
     "keyword_extraction": ExperimentalSetup(

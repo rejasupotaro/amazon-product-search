@@ -24,7 +24,7 @@ class Encoder:
     def __init__(self, model_name: str = JA_SBERT):
         self.embedder = SentenceTransformer(model_name)
 
-    def encode(self, texts: list[str], show_progress_bar: bool = True, convert_to_tensor: bool = False) -> Tensor:
+    def encode(self, texts: list[str], show_progress_bar: bool = False, convert_to_tensor: bool = False) -> Tensor:
         return self.embedder.encode(
             texts,
             show_progress_bar=show_progress_bar,

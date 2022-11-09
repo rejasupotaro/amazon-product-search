@@ -6,18 +6,17 @@ import plotly.express as px
 import streamlit as st
 
 from amazon_product_search import source
-from amazon_product_search.es import query_builder
 from amazon_product_search.es.es_client import EsClient
+from amazon_product_search.es.query_builder import QueryBuilder
 from amazon_product_search.es.response import Response
 from amazon_product_search.metrics import compute_ap, compute_ndcg, compute_recall, compute_zero_hit_rate
-from amazon_product_search.nlp.encoder import Encoder
 from amazon_product_search.nlp.normalizer import normalize_query
 from demo.experimental_setup import EXPERIMENTS, ExperimentalSetup, Variant
 from demo.page_config import set_page_config
 from demo.utils import split_fields
 
 es_client = EsClient()
-encoder = Encoder()
+query_builder = QueryBuilder()
 
 
 @st.cache
@@ -44,11 +43,12 @@ def search(index_name: str, query: str, variant: Variant) -> Response:
 
     sparse_fields, dense_fields = split_fields(variant.fields)
     if sparse_fields:
-        es_query = query_builder.build_multimatch_search_query(query=query, fields=sparse_fields)
+        es_query = query_builder.build_multimatch_search_query(
+            query=query, fields=sparse_fields, is_synonym_expansion_enabled=variant.enable_synonym_expansion
+        )
     if dense_fields:
-        query_vector = encoder.encode(query, show_progress_bar=False)
-        # TODO: Should we handle multiple vector fields?
-        es_knn_query = query_builder.build_knn_search_query(query_vector, dense_fields[0], top_k=variant.top_k)
+        # TODO: Should multiple vector fields be handled?
+        es_knn_query = query_builder.build_knn_search_query(query, dense_fields[0], top_k=variant.top_k)
 
     return es_client.search(index_name=index_name, query=es_query, knn_query=es_knn_query, size=variant.top_k)
 
