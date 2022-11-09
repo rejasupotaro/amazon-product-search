@@ -5,13 +5,11 @@ import streamlit as st
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.query_builder import QueryBuilder
 from amazon_product_search.es.response import Result
-from amazon_product_search.nlp.encoder import Encoder
 from amazon_product_search.nlp.normalizer import normalize_query
 from demo.page_config import set_page_config
 from demo.utils import split_fields
 
 es_client = EsClient()
-encoder = Encoder()
 query_builder = QueryBuilder()
 
 
@@ -76,9 +74,8 @@ def main():
         )
     es_knn_query = None
     if normalized_query and dense_fields:
-        query_vector = encoder.encode(normalized_query, show_progress_bar=False)
-        # TODO: Should we handle multiple vector fields?
-        es_knn_query = query_builder.build_knn_search_query(query_vector, field=dense_fields[0], top_k=size)
+        # TODO: Should multiple vector fields be handled?
+        es_knn_query = query_builder.build_knn_search_query(normalized_query, field=dense_fields[0], top_k=size)
 
     st.write("----")
 
