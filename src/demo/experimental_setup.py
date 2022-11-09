@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
+from amazon_product_search.reranking.reranker import NoOpReranker, Reranker
+
 
 @dataclass
 class Variant:
@@ -8,6 +10,7 @@ class Variant:
     fields: list[str] = field(default_factory=lambda: ["product_title"])
     enable_synonym_expansion: bool = False
     top_k: int = 100
+    reranker: Reranker = field(default_factory=lambda: NoOpReranker())
 
 
 @dataclass

@@ -6,11 +6,16 @@ from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.query_builder import QueryBuilder
 from amazon_product_search.es.response import Result
 from amazon_product_search.nlp.normalizer import normalize_query
+from amazon_product_search.reranking.reranker import NoOpReranker, RandomReranker
 from demo.page_config import set_page_config
 from demo.utils import split_fields
 
 es_client = EsClient()
 query_builder = QueryBuilder()
+reranker_dict = {
+    "NoOpReranker": NoOpReranker(),
+    "RandomReranker": RandomReranker(),
+}
 
 
 def draw_es_query(query: Optional[dict[str, Any]], knn_query: Optional[dict[str, Any]], size: int):
@@ -65,6 +70,8 @@ def main():
 
     is_synonym_expansion_enabled = st.checkbox("enable_synonym_expansion")
 
+    reranker = reranker_dict[st.selectbox("reranker:", reranker_dict.keys())]
+
     es_query = None
     if sparse_fields:
         es_query = query_builder.build_multimatch_search_query(
@@ -93,6 +100,7 @@ def main():
 
     st.write("#### Output")
     response = es_client.search(index_name=index_name, query=es_query, knn_query=es_knn_query, size=size, explain=True)
+    response.results = reranker.rerank(normalize_query, response.results)
     st.write(f"{response.total_hits} products found")
     draw_products(response.results)
 
