@@ -11,6 +11,7 @@ from amazon_product_search.es.query_builder import QueryBuilder
 from amazon_product_search.es.response import Response
 from amazon_product_search.metrics import compute_ap, compute_ndcg, compute_recall, compute_zero_hit_rate
 from amazon_product_search.nlp.normalizer import normalize_query
+from amazon_product_search.reranking import reranker
 from demo.experimental_setup import EXPERIMENTS, ExperimentalSetup, Variant
 from demo.page_config import set_page_config
 from demo.utils import split_fields
@@ -34,6 +35,7 @@ def count_docs(index_name: str) -> int:
 
 def draw_variants(variants: list[Variant]):
     variants_df = pd.DataFrame([asdict(variant) for variant in variants])
+    variants_df["reranker"] = variants_df["reranker"].apply(reranker.to_string)
     st.write(variants_df)
 
 
@@ -55,6 +57,7 @@ def search(index_name: str, query: str, variant: Variant) -> Response:
 
 def compute_metrics(index_name: str, query: str, variant: Variant, labels_df: pd.DataFrame) -> dict[str, Any]:
     response = search(index_name, query, variant)
+    response.results = variant.reranker.rerank(query, response.results)
 
     retrieved_ids = [result.product["product_id"] for result in response.results]
     relevant_ids = set(labels_df[labels_df["esci_label"] == "exact"]["product_id"].tolist())
