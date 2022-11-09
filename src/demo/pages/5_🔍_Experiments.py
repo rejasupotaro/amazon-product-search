@@ -57,6 +57,7 @@ def search(index_name: str, query: str, variant: Variant) -> Response:
 
 def compute_metrics(index_name: str, query: str, variant: Variant, labels_df: pd.DataFrame) -> dict[str, Any]:
     response = search(index_name, query, variant)
+    response.results = variant.reranker.rerank(query, response.results)
 
     retrieved_ids = [result.product["product_id"] for result in response.results]
     relevant_ids = set(labels_df[labels_df["esci_label"] == "exact"]["product_id"].tolist())

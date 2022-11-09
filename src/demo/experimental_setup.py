@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
-from amazon_product_search.reranking.reranker import NoOpReranker, Reranker
+from amazon_product_search.reranking.reranker import NoOpReranker, RandomReranker, Reranker
 
 
 @dataclass
@@ -74,6 +74,17 @@ EXPERIMENTS = {
             Variant(name="title,yake(description+bullet_point)", fields=["product_title", "product_description_yake"]),  # noqa
             Variant(name="title,position_rank(description+bullet_point)", fields=["product_title", "product_description_position_rank"]),  # noqa
             Variant(name="title,multipartite_rank(description+bullet_point)", fields=["product_title", "product_description_multipartite_rank"]),  # noqa
+        ],
+    ),
+    "reranking": ExperimentalSetup(
+        index_name="products_all_jp",
+        locale="jp",
+        num_queries=5000,
+        variants=[
+            Variant(name="title", fields=["product_title"]),  # noqa
+            Variant(name="title,bullet_point", fields=["product_title", "product_description"]),  # noqa
+            Variant(name="title + random reranker", fields=["product_title"], reranker=RandomReranker()),  # noqa
+            Variant(name="title,bullet_point + random reranker", fields=["product_title", "product_description"], reranker=RandomReranker()),  # noqa
         ],
     ),
     "sparse_vs_dense": ExperimentalSetup(
