@@ -1,3 +1,4 @@
+import logging
 import re
 import unicodedata
 
@@ -45,16 +46,24 @@ def remove_extra_spaces(s: str) -> str:
 
 
 def normalize_doc(s: str) -> str:
-    s = remove_html_tags(s)
-    s = unicodedata.normalize("NFKC", s)
-    s = s.lower()
-    s = remove_punctuations(s)
-    s = remove_extra_spaces(s)
+    try:
+        s = remove_html_tags(s)
+        s = unicodedata.normalize("NFKC", s)
+        s = s.lower()
+        s = remove_punctuations(s)
+        s = remove_extra_spaces(s)
+    except Exception as e:
+        logging.error(f"Received an unknown exception: {e} when processing {s}")
+        raise
     return s
 
 
 def normalize_query(s: str) -> str:
-    s = unicodedata.normalize("NFKC", s)
-    s = s.lower()
-    s = remove_extra_spaces(s)
+    try:
+        s = unicodedata.normalize("NFKC", s)
+        s = s.lower()
+        s = remove_extra_spaces(s)
+    except Exception as e:
+        logging.error(f"Received an unknown exception: {e} when processing {s}")
+        raise
     return s
