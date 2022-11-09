@@ -2,8 +2,8 @@ from typing import Any, Optional
 
 import streamlit as st
 
-from amazon_product_search.es import query_builder
 from amazon_product_search.es.es_client import EsClient
+from amazon_product_search.es.query_builder import QueryBuilder
 from amazon_product_search.es.response import Result
 from amazon_product_search.nlp.encoder import Encoder
 from amazon_product_search.nlp.normalizer import normalize_query
@@ -12,6 +12,7 @@ from demo.utils import split_fields
 
 es_client = EsClient()
 encoder = Encoder()
+query_builder = QueryBuilder()
 
 
 def draw_es_query(query: Optional[dict[str, Any]], knn_query: Optional[dict[str, Any]], size: int):
@@ -52,7 +53,7 @@ def main():
 
     selected_fields = st.multiselect(
         "Fields:",
-        [
+        options=[
             "product_title",
             "product_description",
             "product_bullet_point",
@@ -60,14 +61,18 @@ def main():
             "product_color_name",
             "product_vector",
         ],
+        default=["product_title"],
     )
     sparse_fields, dense_fields = split_fields(selected_fields)
+
+    is_synonym_expansion_enabled = st.checkbox("enable_synonym_expansion")
 
     es_query = None
     if sparse_fields:
         es_query = query_builder.build_multimatch_search_query(
             query=normalized_query,
             fields=sparse_fields,
+            is_synonym_expansion_enabled=is_synonym_expansion_enabled,
         )
     es_knn_query = None
     if normalized_query and dense_fields:
