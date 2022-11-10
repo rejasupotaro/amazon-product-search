@@ -1,5 +1,5 @@
 from amazon_product_search.es.response import Result
-from amazon_product_search.reranking.reranker import NoOpReranker
+from amazon_product_search.reranking.reranker import NoOpReranker, SentenceBERTReranker
 
 
 def test_no_op_reranker():
@@ -10,5 +10,19 @@ def test_no_op_reranker():
     reranked_results = reranker.rerank("query", results)
 
     expected = [result.product["id"] for result in results]
+    actual = [result.product["id"] for result in reranked_results]
+    assert actual == expected
+
+
+def test_sentence_bert_reranker():
+    results = [
+        Result(product={"id": "1", "product_title": "xxxxx"}, score=10),
+        Result(product={"id": "2", "product_title": "query"}, score=1),
+    ]
+
+    reranker = SentenceBERTReranker()
+    reranked_results = reranker.rerank("query", results)
+
+    expected = ["2", "1"]
     actual = [result.product["id"] for result in reranked_results]
     assert actual == expected
