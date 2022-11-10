@@ -1,9 +1,11 @@
+from typing import Any, Optional
+
 import pandas as pd
 import streamlit as st
 
+from amazon_product_search import metrics
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.response import Result
-from amazon_product_search.metrics import compute_ndcg
 from amazon_product_search.reranking.reranker import RandomReranker, SentenceBERTReranker
 from demo.page_config import set_page_config
 from demo.utils import load_merged
@@ -47,14 +49,19 @@ def search(query: str, doc_ids: list[str], all_judgements: dict[str, str]) -> li
     return response.results
 
 
+def compute_ndcg(products: list[dict[str, Any]]) -> Optional[float]:
+    retrieved_ids = [product["product_id"] for product in products]
+    judgements: dict[str, str] = {product["product_id"]: product["esci_label"] for product in products}
+    ndcg = metrics.compute_ndcg(retrieved_ids, judgements)
+    if ndcg:
+        ndcg = round(ndcg, 4)
+    return ndcg
+
+
 def draw_results(results: list[Result]):
     products = [result.product for result in results]
 
-    retrieved_ids = [product["product_id"] for product in products]
-    judgements: dict[str, str] = {product["product_id"]: product["esci_label"] for product in products}
-    ndcg = compute_ndcg(retrieved_ids, judgements)
-    if ndcg:
-        ndcg = round(ndcg, 4)
+    ndcg = compute_ndcg(products)
     st.write(f"NDCG: {ndcg}")
 
     df = pd.DataFrame(products)
