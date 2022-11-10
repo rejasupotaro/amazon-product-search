@@ -53,8 +53,8 @@ def draw_examples(products_df: pd.DataFrame):
 
 def main():
     set_page_config()
+    st.write("## Product Catalogue")
 
-    st.write("## Catalogue")
     locale = st.selectbox("Locale:", ["jp", "us", "es"])
     products_df = load_products(locale)
     draw_column_info(products_df)

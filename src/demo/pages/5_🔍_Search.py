@@ -38,10 +38,9 @@ def draw_products(results: list[Result]):
 
 def main():
     set_page_config()
+    st.write("## Search")
 
     size = 20
-
-    st.write("## Search")
 
     st.write("#### Input")
     indices = es_client.list_indices()

@@ -63,8 +63,8 @@ def draw_results(results: list[Result]):
 
 def main():
     set_page_config()
+    st.write("## Reranking")
 
-    st.write("## Reranking Experiments")
     df = load_merged(locale="jp")
     all_judgements = extract_judgements(df)
 

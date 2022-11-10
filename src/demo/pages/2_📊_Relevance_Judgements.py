@@ -58,8 +58,8 @@ def draw_products(products: list[dict[str, Any]]):
 
 def main():
     set_page_config()
+    st.write("## Relevance Judgements")
 
-    st.write("## Judgements")
     locale = st.selectbox("Locale:", ["jp", "us", "es"])
     df = load_merged(locale)
     draw_column_info(df)

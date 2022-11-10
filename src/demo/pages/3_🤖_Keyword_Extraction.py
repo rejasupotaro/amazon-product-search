@@ -26,10 +26,9 @@ def draw_results(results: dict[str, list[tuple[str, float]]]):
 
 def main():
     set_page_config()
-
     st.write("## Keyword Extraction")
 
-    st.write("### Catalogue")
+    st.write("### Product Catalogue")
     df = load_products(locale="jp", nrows=1000)
     df = df[~df["product_description"].isna() & ~df["product_bullet_point"].isna()]
     df = df.fillna("")
