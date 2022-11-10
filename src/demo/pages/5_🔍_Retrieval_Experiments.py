@@ -113,7 +113,7 @@ def draw_figures(metrics_df: pd.DataFrame):
 def main():
     set_page_config()
 
-    st.write("## Experiments")
+    st.write("## Retrieval Experiments")
     experiment_name = st.selectbox("Experiment:", EXPERIMENTS.keys())
     experimental_setup = EXPERIMENTS[experiment_name]
 
