@@ -32,7 +32,7 @@ EXPERIMENTS = {
             Variant(name="title,description", fields=["product_title", "product_description"]),  # noqa
             Variant(name="title,bullet_point", fields=["product_title", "product_bullet_point"]),  # noqa
             Variant(name="title,brand", fields=["product_title", "product_brand"]),  # noqa
-            Variant(name="title,color", fields=["product_title", "product_color_name"]),  # noqa
+            Variant(name="title,color", fields=["product_title", "product_color"]),  # noqa
         ],
     ),
     "different_weights": ExperimentalSetup(
@@ -56,12 +56,12 @@ EXPERIMENTS = {
             Variant(name="title,description", fields=["product_title", "product_description"], enable_synonym_expansion=False),  # noqa
             Variant(name="title,bullet_point", fields=["product_title", "product_bullet_point"], enable_synonym_expansion=False),  # noqa
             Variant(name="title,brand", fields=["product_title", "product_brand"]),  # noqa
-            Variant(name="title,color", fields=["product_title", "product_color_name"]),  # noqa
+            Variant(name="title,color", fields=["product_title", "product_color"]),  # noqa
             Variant(name="query expansion + title", fields=["product_title"], enable_synonym_expansion=True),  # noqa
             Variant(name="query expansion + title,description", fields=["product_title", "product_description"], enable_synonym_expansion=True),  # noqa
             Variant(name="query expansion + title,bullet_point", fields=["product_title", "product_bullet_point"], enable_synonym_expansion=True),  # noqa
             Variant(name="query expansion + title,brand", fields=["product_title", "product_brand"], enable_synonym_expansion=True),  # noqa
-            Variant(name="query expansion + title,color", fields=["product_title", "product_color_name"], enable_synonym_expansion=True),  # noqa
+            Variant(name="query expansion + title,color", fields=["product_title", "product_color"], enable_synonym_expansion=True),  # noqa
         ],
     ),
     "keyword_extraction": ExperimentalSetup(

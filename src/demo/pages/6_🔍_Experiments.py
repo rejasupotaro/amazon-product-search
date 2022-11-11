@@ -60,7 +60,7 @@ def compute_metrics(index_name: str, query: str, variant: Variant, labels_df: pd
     response.results = variant.reranker.rerank(query, response.results)
 
     retrieved_ids = [result.product["product_id"] for result in response.results]
-    relevant_ids = set(labels_df[labels_df["esci_label"] == "exact"]["product_id"].tolist())
+    relevant_ids = set(labels_df[labels_df["esci_label"] == "E"]["product_id"].tolist())
     judgements: dict[str, str] = {row["product_id"]: row["esci_label"] for row in labels_df.to_dict("records")}
     return {
         "variant": variant.name,

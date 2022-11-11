@@ -15,7 +15,7 @@ from amazon_product_search.synonyms.filters.similarity_filter import SimilarityF
 def load_query_title_pairs(locale: str, nrows: int = -1) -> list[list[str]]:
     """Load query title pairs."""
     df = load_merged(locale, nrows)
-    df = df[df["esci_label"] == "exact"]
+    df = df[df["esci_label"] == "E"]
     df = df[(~df["query"].isna()) & (~df["product_title"].isna())]
     pairs = df[["query", "product_title"]].values.tolist()
     return pairs

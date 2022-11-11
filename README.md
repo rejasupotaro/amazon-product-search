@@ -48,7 +48,7 @@ $ poetry run inv es.index-docs \
 
 The ingestion pipeline is built on top of [Apache Beam](https://beam.apache.org/documentation/sdks/python/). If `--encode-text` is given, products are encoded into vectors so that KNN searches can be performed.
 
-The mapping file is located at `schema/es/products.json`. `product_id`, `product_title`, `product_description`, `product_bullet_point`, `product_brand`, `product_color_name`, `product_locale`, and `product_vector` will be indexed.
+The mapping file is located at `schema/es/products.json`. `product_id`, `product_title`, `product_description`, `product_bullet_point`, `product_brand`, `product_color`, `product_locale`, and `product_vector` will be indexed.
 
 ## Demo
 

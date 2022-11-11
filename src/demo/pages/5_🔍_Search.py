@@ -56,7 +56,7 @@ def main():
             "product_description",
             "product_bullet_point",
             "product_brand",
-            "product_color_name",
+            "product_color",
             "product_vector",
         ],
         default=["product_title"],
