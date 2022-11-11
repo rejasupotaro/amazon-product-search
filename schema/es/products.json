@@ -45,7 +45,7 @@
             }
           }
         },
-        "product_color_name": {
+        "product_color": {
           "type": "text",
           "fields": {
             "keyword": {

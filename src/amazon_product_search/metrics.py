@@ -3,10 +3,10 @@ from typing import Optional
 import numpy as np
 
 LABEL_TO_GAIN: dict[str, float] = {
-    "exact": 1.0,
-    "substitute": 0.1,
-    "complement": 0.01,
-    "irrelevant": 0.0,
+    "E": 1.0,
+    "S": 0.1,
+    "C": 0.01,
+    "I": 0.0,
 }
 
 

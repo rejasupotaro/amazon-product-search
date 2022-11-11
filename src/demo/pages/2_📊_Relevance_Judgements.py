@@ -50,7 +50,7 @@ def draw_products(products: list[dict[str, Any]]):
             "product_description",
             "product_bullet_point",
             "product_brand",
-            "product_color_name",
+            "product_color",
         ]:
             st.write(f"##### {column}")
             st.markdown(product[column], unsafe_allow_html=True)
