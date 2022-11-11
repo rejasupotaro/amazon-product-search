@@ -23,7 +23,7 @@ $ brew install mecab mecab-ipadic
 
 ## Dataset
 
-Download the dataset from [this link](https://www.aicrowd.com/challenges/esci-challenge-for-improving-product-search/dataset_files), and run the following command to preprocess the dataset.
+Download the dataset from https://github.com/amazon-science/esci-data and put them in `data/raw`. Then, run the following command to preprocess the dataset.
 
 ```shell
 $ poetry run inv data.merge-and-split
