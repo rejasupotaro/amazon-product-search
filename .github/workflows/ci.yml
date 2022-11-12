@@ -31,4 +31,4 @@ jobs:
         poetry run inv lint
     - name: Test
       run: |
-        poetry run pytest
+        poetry run pytest --cov
