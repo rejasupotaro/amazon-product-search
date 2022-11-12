@@ -5,7 +5,7 @@ import apache_beam as beam
 from amazon_product_search.nlp.extractor import KeywordExtractor
 
 
-class ExtractFn(beam.DoFn):
+class ExtractKeywordsFn(beam.DoFn):
     def setup(self):
         self.extractor = KeywordExtractor()
 

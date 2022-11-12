@@ -9,7 +9,7 @@ from amazon_product_search.indexer.io.elasticsearch_io import WriteToElasticsear
 from amazon_product_search.indexer.options import IndexerOptions
 from amazon_product_search.indexer.transforms.analyze_fn import AnalyzeFn
 from amazon_product_search.indexer.transforms.encode_fn import BatchEncodeFn
-from amazon_product_search.indexer.transforms.extract_fn import ExtractFn
+from amazon_product_search.indexer.transforms.extract_keywords_fn import ExtractKeywordsFn
 from amazon_product_search.indexer.transforms.filters import is_indexable
 
 
@@ -37,7 +37,7 @@ def run(options: IndexerOptions):
         )
 
         if options.extract_keywords:
-            products |= "Extract keywords" >> beam.ParDo(ExtractFn())
+            products |= "Extract keywords" >> beam.ParDo(ExtractKeywordsFn())
 
         if options.encode_text:
             products = (
