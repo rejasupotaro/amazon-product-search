@@ -25,6 +25,7 @@ streamlit-aggrid = "^0.3.3"
 pke = {git = "https://github.com/boudinfl/pke.git", rev = "2.0.0"}
 keybert = "^0.7.0"
 pytest-cov = "^4.0.0"
+more-itertools = "^9.0.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

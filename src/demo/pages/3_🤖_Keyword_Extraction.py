@@ -2,6 +2,7 @@ import re
 
 import pandas as pd
 import streamlit as st
+from more_itertools import chunked
 from st_aggrid import AgGrid, GridOptionsBuilder
 
 from amazon_product_search.nlp.extractor import KeywordExtractor
@@ -76,10 +77,14 @@ def main():
     draw_results(results)
 
     st.write("### Highlight")
-    method = st.selectbox("Method:", results.keys())
-    for keyword, score in results[method]:
-        text = re.sub(keyword, f"<mark style='background-color:#FF9900'>{keyword}</mark>", text)
-    st.markdown(text, unsafe_allow_html=True)
+    for methods in chunked(list(results.keys()), 2):
+        columns = st.columns(2)
+        for i, method in enumerate(methods):
+            with columns[i]:
+                st.write(f"#### {method}")
+                for keyword, score in results[method]:
+                    text = re.sub(keyword, f"<mark style='background-color:#FF9900'>{keyword}</mark>", text)
+                st.markdown(text, unsafe_allow_html=True)
 
 
 if __name__ == "__main__":

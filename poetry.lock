@@ -1474,11 +1474,11 @@ python-versions = "*"
 
 [[package]]
 name = "more-itertools"
-version = "8.14.0"
+version = "9.0.0"
 description = "More routines for operating on iterables, beyond itertools"
 category = "main"
 optional = false
-python-versions = ">=3.5"
+python-versions = ">=3.7"
 
 [[package]]
 name = "murmurhash"
@@ -3175,7 +3175,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "flake8 
 [metadata]
 lock-version = "1.1"
 python-versions = "3.9.13"
-content-hash = "6b170787ac1552cc2458e84ed1c4c10876d25d415dc7dd31fbab89f9d29c0910"
+content-hash = "5e1ec1cc5b7af71fc3e63ceda841620d345f3a04464e8d9d27fcd62da3495d54"
 
 [metadata.files]
 altair = [
