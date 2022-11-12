@@ -126,5 +126,6 @@ dmypy.json
 # My configuration
 data/*
 !data/includes
+!data/raw
 .envrc
 google_application_credentials.json
