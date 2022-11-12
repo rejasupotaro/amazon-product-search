@@ -8,5 +8,5 @@ gatherUsageStats = false
 primaryColor = "#FF9900"
 backgroundColor="#FFFFFF"
 textColor="#000000"
-font = "sans-serif"
+font = "sans serif"
 # font = "serif"
