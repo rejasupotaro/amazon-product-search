@@ -49,10 +49,14 @@ def run(options: IndexerOptions):
         if es_host:
             (
                 products
-                | WriteToElasticsearch(
-                    es_host=es_host,
-                    index_name=index_name,
-                    id_fn=lambda doc: doc["product_id"],
+                | "Batch products for indexing" >> BatchElements()
+                | "Index products"
+                >> beam.ParDo(
+                    WriteToElasticsearch(
+                        es_host=es_host,
+                        index_name=index_name,
+                        id_fn=lambda doc: doc["product_id"],
+                    )
                 )
             )
         else:

@@ -2,39 +2,11 @@ import logging
 from typing import Any, Callable, Dict, List, Optional
 
 import apache_beam as beam
-from apache_beam import PCollection
-from apache_beam.transforms.util import BatchElements
 
 from amazon_product_search.es.es_client import EsClient
 
 
-class WriteToElasticsearch(beam.PTransform):
-    def __init__(
-        self,
-        es_host: str,
-        index_name: str,
-        min_batch_size: int = 1,
-        max_batch_size: int = 100,
-        id_fn: Optional[Callable[[Dict[str, Any]], str]] = None,
-    ):
-        self.min_batch_size = min_batch_size
-        self.max_batch_size = max_batch_size
-        self.write_fn = BulkWriteFn(
-            es_host=es_host,
-            index_name=index_name,
-            id_fn=id_fn,
-        )
-
-    def expand(self, pcoll: PCollection[Dict[str, Any]]):
-        return (
-            pcoll
-            | "Batch products for indexing"
-            >> BatchElements(min_batch_size=self.min_batch_size, max_batch_size=self.max_batch_size)
-            | "Index products" >> beam.ParDo(self.write_fn)
-        )
-
-
-class BulkWriteFn(beam.DoFn):
+class WriteToElasticsearch(beam.DoFn):
     def __init__(
         self,
         es_host: str,
