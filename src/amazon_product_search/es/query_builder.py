@@ -24,7 +24,7 @@ class QueryBuilder:
         Returns:
             dict[str, list[str]]: The converted synonym dict.
         """
-        df = pd.read_csv(f"{DATA_DIR}/synonyms.csv")
+        df = pd.read_csv(f"{DATA_DIR}/includes/synonyms.csv")
         df = df[df["similarity"] > threshold]
         queries = df["query"].tolist()
         synonyms = df["title"].tolist()

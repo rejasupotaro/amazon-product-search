@@ -123,6 +123,8 @@ dmypy.json
 
 # End of https://www.gitignore.io/api/python,pycharm+all
 
-# our configuration
+# My configuration
+data/*
+!data/includes
 .envrc
 google_application_credentials.json

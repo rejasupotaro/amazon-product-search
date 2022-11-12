@@ -87,7 +87,7 @@ def generate():
     3. Extract query title pairs.
     4. Calculate word cooccurrence and npmi and filter out those with low scores.
     5. The filtered candidates are further filtered by cosine similarity.
-    6. Save the generated synonyms to `{DATA_DIR}/synonyms.csv`.
+    6. Save the generated synonyms to `{DATA_DIR}/includes/synonyms.csv`.
     """
     pairs = load_query_title_pairs(locale="jp", nrows=100)
     print(f"{len(pairs)} title pairs will be processed")
@@ -99,5 +99,5 @@ def generate():
     synonyms_df = filter.apply(candidates_df)
     print(f"{len(synonyms_df)} synonyms were generated")
 
-    filepath = f"{DATA_DIR}/synonyms.csv"
+    filepath = f"{DATA_DIR}/includes/synonyms.csv"
     synonyms_df.to_csv(filepath, index=False)
