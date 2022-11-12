@@ -1,5 +1,7 @@
 # Amazon Product Search
 
+![](https://github.com/rejasupotaro/amazon-product-search/actions/workflows/ci.yml/badge.svg)
+
 This repo showcases and compares various search algorithms and models for [Shopping Queries Dataset: A Large-Scale ESCI Benchmark for Improving Product Search](https://github.com/amazon-science/esci-data).
 
 The results of the experiments will be added to the wiki here: https://github.com/rejasupotaro/amazon-product-search/wiki
