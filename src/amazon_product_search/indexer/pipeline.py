@@ -3,6 +3,7 @@ import logging
 import apache_beam as beam
 from apache_beam.transforms.ptransform import PTransform
 from apache_beam.transforms.util import BatchElements
+from apache_beam.utils.shared import Shared
 
 from amazon_product_search import source
 from amazon_product_search.indexer.io.elasticsearch_io import WriteToElasticsearch
@@ -29,6 +30,7 @@ def run(options: IndexerOptions):
     text_fields = ["product_title", "product_description", "product_bullet_point"]
 
     with beam.Pipeline() as pipeline:
+        shared_handle = Shared()
         products = (
             pipeline
             | get_input_source(locale, nrows)
@@ -43,7 +45,7 @@ def run(options: IndexerOptions):
             products = (
                 products
                 | "Batch products for encoding" >> BatchElements(min_batch_size=8)
-                | "Encode products" >> beam.ParDo(BatchEncodeFn())
+                | "Encode products" >> beam.ParDo(BatchEncodeFn(shared_handle=shared_handle))
             )
 
         if es_host:
