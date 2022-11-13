@@ -19,6 +19,11 @@ class EsClient:
         self.es.indices.delete(index=index_name)
 
     def create_index(self, index_name: str):
+        """Create a new index using a mapping file (`schema/es/products.json`).
+
+        Args:
+            index_name (str): An index name to create.
+        """
         with open("schema/es/products.json") as file:
             schema = json.load(file)
             print(schema)
@@ -89,6 +94,14 @@ class EsClient:
 
     @staticmethod
     def _convert_es_response_to_response(es_response: Any) -> Response:
+        """Map a raw Elasticsearch response to our Response class for convenience.
+
+        Args:
+            es_response (Any): An Elasticsearch response to convert.
+
+        Returns:
+            Response: Our Response object.
+        """
         return Response(
             results=[
                 Result(
@@ -112,6 +125,19 @@ class EsClient:
         size: int = 20,
         explain: bool = False,
     ) -> Response:
+        """Perform a search and return a Response object.
+
+        Args:
+            index_name (str): An index name to perform a search.
+            query (dict[str, Any]): an Elasticsearch query represented as a dict.
+            knn_query (Optional[dict[str, Any]], optional): A knn clause to perform a KNN search. Defaults to None.
+            size (int, optional): The number of hits to return. Defaults to 20.
+            explain (bool, optional): If True, returns detailed information about score computation
+                as part of a hit if True. Defaults to False.
+
+        Returns:
+            Response: A Response object.
+        """
         es_response = self.es.search(index=index_name, query=query, knn=knn_query, size=size, explain=explain)
         return self._convert_es_response_to_response(es_response)
 
