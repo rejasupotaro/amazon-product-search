@@ -57,7 +57,7 @@ def run(options: IndexerOptions):
         }
 
         if options.extract_keywords:
-            branches["extracted_keywords"] = products | beam.ParDo(ExtractKeywordsFn())
+            branches["extracted_keywords"] = products | "Extract keywords" >> beam.ParDo(ExtractKeywordsFn())
 
         if options.encode_text:
             branches["product_vector"] = (
