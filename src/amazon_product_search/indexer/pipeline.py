@@ -1,4 +1,5 @@
 import logging
+from typing import Any, Dict, Tuple
 
 import apache_beam as beam
 from apache_beam.transforms.ptransform import PTransform
@@ -22,6 +23,19 @@ def get_input_source(locale: str, nrows: int = -1) -> PTransform:
     return beam.Create(products)
 
 
+def join_branches(kv: Tuple[str, Dict[str, Any]]):
+    (product_id, group) = kv
+    product = group["product"][0]
+
+    if "extracted_keywords" in group:
+        product |= group["extracted_keywords"][0]
+
+    if "product_vector" in group:
+        product["product_vector"] = group["product_vector"][0]
+
+    return product
+
+
 def run(options: IndexerOptions):
     index_name = options.index_name
     locale = options.locale
@@ -38,15 +52,21 @@ def run(options: IndexerOptions):
             | "Analyze products" >> beam.ParDo(AnalyzeFn(text_fields))
         )
 
+        branches = {
+            "product": products | beam.WithKeys(lambda product: product["product_id"]),
+        }
+
         if options.extract_keywords:
-            products |= "Extract keywords" >> beam.ParDo(ExtractKeywordsFn())
+            branches["extracted_keywords"] = products | beam.ParDo(ExtractKeywordsFn())
 
         if options.encode_text:
-            products = (
+            branches["product_vector"] = (
                 products
                 | "Batch products for encoding" >> BatchElements(min_batch_size=8)
                 | "Encode products" >> beam.ParDo(BatchEncodeFn(shared_handle=shared_handle))
             )
+
+        products = branches | beam.CoGroupByKey() | beam.Map(join_branches)
 
         if es_host:
             (

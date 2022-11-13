@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterator
+from typing import Any, Dict, Iterator, Tuple
 
 import apache_beam as beam
 
@@ -13,18 +13,21 @@ class ExtractKeywordsFn(beam.DoFn):
     def convert_results_to_text(results: list[tuple[str, float]]) -> str:
         return " ".join([keyword for keyword, score in results])
 
-    def process(self, product: Dict[str, Any]) -> Iterator[Dict[str, Any]]:
+    def process(self, product: Dict[str, Any]) -> Iterator[Tuple[str, Dict[str, str]]]:
+        result: Dict[str, str] = {}
+
         text = product["product_description"] + " " + product["product_bullet_point"]
         text = text.strip()
         if not text:
-            yield product
+            yield product["product_id"], result
+            return
 
-        product["product_description_yake"] = self.convert_results_to_text(self.extractor.apply_yake(text))
-        product["product_description_position_rank"] = self.convert_results_to_text(
+        result["product_description_yake"] = self.convert_results_to_text(self.extractor.apply_yake(text))
+        result["product_description_position_rank"] = self.convert_results_to_text(
             self.extractor.apply_position_rank(text)
         )
-        product["product_description_multipartite_rank"] = self.convert_results_to_text(
+        result["product_description_multipartite_rank"] = self.convert_results_to_text(
             self.extractor.apply_multipartite_rank(text)
         )
-        product["product_description_keybert"] = self.convert_results_to_text(self.extractor.apply_keybert(text))
-        yield product
+        result["product_description_keybert"] = self.convert_results_to_text(self.extractor.apply_keybert(text))
+        yield product["product_id"], result
