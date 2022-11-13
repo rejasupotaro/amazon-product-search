@@ -44,7 +44,9 @@ def run(options: IndexerOptions):
     text_fields = ["product_title", "product_description", "product_bullet_point"]
 
     with beam.Pipeline(options=options) as pipeline:
-        shared_handle = Shared()
+        extractor_shared_handle = Shared()
+        encoder_shared_handle = Shared()
+
         products = (
             pipeline
             | get_input_source(locale, nrows)
@@ -57,13 +59,15 @@ def run(options: IndexerOptions):
         }
 
         if options.extract_keywords:
-            branches["extracted_keywords"] = products | "Extract keywords" >> beam.ParDo(ExtractKeywordsFn())
+            branches["extracted_keywords"] = products | "Extract keywords" >> beam.ParDo(
+                ExtractKeywordsFn(shared_handle=extractor_shared_handle)
+            )
 
         if options.encode_text:
             branches["product_vector"] = (
                 products
                 | "Batch products for encoding" >> BatchElements(min_batch_size=8)
-                | "Encode products" >> beam.ParDo(BatchEncodeFn(shared_handle=shared_handle))
+                | "Encode products" >> beam.ParDo(BatchEncodeFn(shared_handle=encoder_shared_handle))
             )
 
         products = branches | beam.CoGroupByKey() | beam.Map(join_branches)
