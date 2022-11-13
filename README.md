@@ -13,6 +13,8 @@ Copy `.envrc.example` and fill in the required environment variables. Then, inst
 ```shell
 $ pyenv install 3.9.13
 $ pyenv local 3.9.13
+$ pip install poetry
+$ poetry env use 3.9.13
 $ poetry install
 ```
 
