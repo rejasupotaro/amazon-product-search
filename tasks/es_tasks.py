@@ -1,5 +1,6 @@
 from invoke import task
 
+from amazon_product_search.constants import PROJECT_ID, REGION
 from amazon_product_search.es.es_client import EsClient
 
 
@@ -49,6 +50,13 @@ def index_docs(
             # https://github.com/apache/beam/blob/master/sdks/python/apache_beam/options/pipeline_options.py#L617-L621
             "--direct_num_workers=0",
             "--direct_running_mode=multi_processing",
+        ]
+    if runner == "DataflowRunner":
+        command += [
+            f"--project={PROJECT_ID}",
+            f"--region={REGION}",
+            f"--temp_location=gs://{PROJECT_ID}/temp",
+            f"--staging_location=gs://{PROJECT_ID}/staging",
         ]
 
     if nrows:

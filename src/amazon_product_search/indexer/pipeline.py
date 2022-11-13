@@ -43,7 +43,7 @@ def run(options: IndexerOptions):
     nrows = options.nrows
     text_fields = ["product_title", "product_description", "product_bullet_point"]
 
-    with beam.Pipeline() as pipeline:
+    with beam.Pipeline(options=options) as pipeline:
         shared_handle = Shared()
         products = (
             pipeline
