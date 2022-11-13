@@ -1,6 +1,6 @@
 from invoke import task
 
-from amazon_product_search.constants import PROJECT_ID, REGION
+from amazon_product_search.constants import PROJECT_ID, PROJECT_NAME, REGION
 from amazon_product_search.es.es_client import EsClient
 
 
@@ -55,8 +55,8 @@ def index_docs(
         command += [
             f"--project={PROJECT_ID}",
             f"--region={REGION}",
-            f"--temp_location=gs://{PROJECT_ID}/temp",
-            f"--staging_location=gs://{PROJECT_ID}/staging",
+            f"--temp_location=gs://{PROJECT_NAME}/temp",
+            f"--staging_location=gs://{PROJECT_NAME}/staging",
         ]
 
     if nrows:
