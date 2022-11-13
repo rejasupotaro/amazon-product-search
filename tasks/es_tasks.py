@@ -49,9 +49,8 @@ def index_docs(
         command += [
             # https://github.com/apache/beam/blob/master/sdks/python/apache_beam/options/pipeline_options.py#L617-L621
             "--direct_num_workers=0",
-            "--direct_running_mode=multi_processing",
         ]
-    if runner == "DataflowRunner":
+    elif runner == "DataflowRunner":
         command += [
             f"--project={PROJECT_ID}",
             f"--region={REGION}",
