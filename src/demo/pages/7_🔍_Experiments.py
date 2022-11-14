@@ -9,7 +9,7 @@ from amazon_product_search import source
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.query_builder import QueryBuilder
 from amazon_product_search.es.response import Response
-from amazon_product_search.metrics import compute_ap, compute_ndcg, compute_recall, compute_zero_hit_rate
+from amazon_product_search.metrics import compute_ndcg, compute_recall, compute_zero_hit_rate
 from amazon_product_search.nlp.normalizer import normalize_query
 from amazon_product_search.reranking import reranker
 from demo.experimental_setup import EXPERIMENTS, ExperimentalSetup, Variant
@@ -67,7 +67,6 @@ def compute_metrics(index_name: str, query: str, variant: Variant, labels_df: pd
         "query": query,
         "total_hits": response.total_hits,
         "recall": compute_recall(retrieved_ids, relevant_ids),
-        "ap": compute_ap(retrieved_ids, relevant_ids),
         "ndcg": compute_ndcg(retrieved_ids, judgements),
     }
 
@@ -96,7 +95,6 @@ def compute_stats(metrics_df: pd.DataFrame) -> pd.DataFrame:
             total_hits=("total_hits", lambda series: int(series.mean())),
             zero_hit_rate=("total_hits", lambda series: compute_zero_hit_rate(series.values)),
             recall=("recall", lambda series: series.mean().round(4)),
-            map=("ap", lambda series: series.mean().round(4)),
             ndcg=("ndcg", lambda series: series.mean().round(4)),
         )
         .reset_index()
@@ -105,7 +103,7 @@ def compute_stats(metrics_df: pd.DataFrame) -> pd.DataFrame:
 
 
 def draw_figures(metrics_df: pd.DataFrame):
-    for metric in ["total_hits", "recall", "ap", "ndcg"]:
+    for metric in ["total_hits", "recall", "ndcg"]:
         fig = px.box(metrics_df, y=metric, color="variant")
         st.plotly_chart(fig)
 
@@ -128,7 +126,7 @@ def main():
     content = f"""
     The experiment is conducted on `{experimental_setup.index_name}` containing `{num_docs}` docs in total.
     We send `{len(query_dict)}` queries to the index with different parameters shown below.
-    Then, we compute Total Hits, Zero Hit Rate, Recall, MAP, and NDCG on each variant.
+    Then, we compute Total Hits, Zero Hit Rate, Recall, and NDCG on each variant.
     """
     st.write(content)
 
