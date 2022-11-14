@@ -4,7 +4,7 @@
 
 This repo showcases and compares various search algorithms and models for [Shopping Queries Dataset: A Large-Scale ESCI Benchmark for Improving Product Search](https://github.com/amazon-science/esci-data).
 
-The results of the experiments will be added to the wiki here: https://github.com/rejasupotaro/amazon-product-search/wiki
+The results of experiments will be added to the wiki: https://github.com/rejasupotaro/amazon-product-search/wiki
 
 ## Installation
 
@@ -14,7 +14,7 @@ Copy `.envrc.example` and fill in the required environment variables. Then, inst
 $ pyenv install 3.9.13
 $ pyenv local 3.9.13
 $ pip install poetry
-$ poetry env use 3.9.13
+$ poetry env use python
 $ poetry install
 ```
 
@@ -27,7 +27,7 @@ $ brew install mecab mecab-ipadic
 
 ## Dataset
 
-Download the dataset from https://github.com/amazon-science/esci-data and put them in `data/raw`. Then, run the following command to preprocess the dataset.
+Clone https://github.com/amazon-science/esci-data and copy `esci-data/shopping_queries_dataset/*` into `amazon-product/search/data/raw/`. Then, run the following command to preprocess the dataset.
 
 ```shell
 $ poetry run inv data.merge-and-split
@@ -35,7 +35,7 @@ $ poetry run inv data.merge-and-split
 
 ## Index Products
 
-This project indexes products to Elasticsearch. If you want to try on your machine, launch Elasticsearch locally and run the document ingestion pipeline against the index you created.
+This project indexes products to Elasticsearch. If you want to try on your machine, launch Elasticsearch locally and run the document indexing pipeline against the index you created.
 
 ```shell
 $ docker compose up
@@ -50,9 +50,7 @@ $ poetry run inv es.index-docs \
 ```
 
 
-The ingestion pipeline is built on top of [Apache Beam](https://beam.apache.org/documentation/sdks/python/). If `--encode-text` is given, products are encoded into vectors so that KNN searches can be performed.
-
-The mapping file is located at `schema/es/products.json`. `product_id`, `product_title`, `product_description`, `product_bullet_point`, `product_brand`, `product_color`, `product_locale`, and `product_vector` will be indexed.
+See https://github.com/rejasupotaro/amazon-product-search/wiki/Indexing for more details.
 
 ## Demo
 
