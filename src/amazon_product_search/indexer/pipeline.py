@@ -25,13 +25,13 @@ def get_input_source(locale: str, nrows: int = -1) -> PTransform:
 
 def join_branches(kv: Tuple[str, Dict[str, Any]]):
     (product_id, group) = kv
-    product = group["product"][0]
+    product = group["product"][-1]
 
     if "extracted_keywords" in group:
-        product |= group["extracted_keywords"][0]
+        product |= group["extracted_keywords"][-1]
 
     if "product_vector" in group:
-        product["product_vector"] = group["product_vector"][0]
+        product["product_vector"] = group["product_vector"][-1]
 
     return product
 
