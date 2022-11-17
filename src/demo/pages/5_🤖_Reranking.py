@@ -22,7 +22,7 @@ def extract_judgements(df: pd.DataFrame) -> dict[str, str]:
 
 
 def search(query: str, doc_ids: list[str], all_judgements: dict[str, str]) -> list[Result]:
-    doc_id_filter_clauses = [{"term": {"product_id.keyword": doc_id}} for doc_id in doc_ids]
+    doc_id_filter_clauses = [{"term": {"product_id": doc_id}} for doc_id in doc_ids]
     es_query = {
         "bool": {
             "filter": [
@@ -158,7 +158,8 @@ def main():
         draw_results(sbert_results)
 
     st.write("### Comparison")
-    run_comparison(df, all_judgements)
+    if st.button("Run"):
+        run_comparison(df, all_judgements)
 
 
 if __name__ == "__main__":
