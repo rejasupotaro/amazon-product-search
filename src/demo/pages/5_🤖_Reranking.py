@@ -87,6 +87,13 @@ def run_comparison(df: pd.DataFrame, all_judgements: dict[str, str], num_queries
         rows.append(
             {
                 "query": query,
+                "variant": "original",
+                "ndcg": compute_ndcg([result.product for result in results]),
+            }
+        )
+        rows.append(
+            {
+                "query": query,
                 "variant": "random",
                 "ndcg": compute_ndcg([result.product for result in random_reranker.rerank(query, results)]),
             }
@@ -141,18 +148,22 @@ def main():
     products = filtered_df.to_dict("records")
     results = [Result(product=product, score=1) for product in products]
 
-    columns = st.columns(3)
+    columns = st.columns(2)
     with columns[0]:
+        st.write("#### Original Results")
+        draw_results(results)
+    with columns[1]:
         st.write("#### Random Results")
         random_results = random_reranker.rerank(query, results)
         draw_results(random_results)
-    with columns[1]:
+    columns = st.columns(2)
+    with columns[0]:
         st.write("#### Search Results")
         search_results = search(
             query, doc_ids=[result.product["product_id"] for result in results], all_judgements=all_judgements
         )
         draw_results(search_results)
-    with columns[2]:
+    with columns[1]:
         st.write("#### SBERT Results")
         sbert_results = sbert_reranker.rerank(query, results)
         draw_results(sbert_results)
