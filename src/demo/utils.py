@@ -21,6 +21,16 @@ def load_merged(locale: str, nrows: int = -1) -> pd.DataFrame:
 
 
 def split_fields(fields: list[str]) -> tuple[list[str], list[str]]:
+    """Convert a given list of fields into a tuple of (sparse_fields, dense_fields)
+
+    Field names containing "vector" will be considered dense_fields.
+
+    Args:
+        fields (list[str]): A list of fields.
+
+    Returns:
+        tuple[list[str], list[str]]: A tuple of (sparse_fields, dense_fields)
+    """
     sparse_fields: list[str] = []
     dense_fields: list[str] = []
     for field in fields:
@@ -29,6 +39,14 @@ def split_fields(fields: list[str]) -> tuple[list[str], list[str]]:
 
 
 def analyze_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+    """Calculate the basic statistics for a given DataFrame.
+
+    Args:
+        df (pd.DataFrame): A DataFrame to analyze.
+
+    Returns:
+        pd.DataFrame: The resulting DataFrame containing column, dtype, nan_rate, and mean_length.
+    """
     columns = df.columns.to_list()
     rows = []
     for c in columns:
