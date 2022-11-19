@@ -1,6 +1,8 @@
 from sentence_transformers import SentenceTransformer
 from torch import Tensor
 
+from amazon_product_search.constants import MODELS_DIR
+
 # For English
 # EN_ELECTRA = "cross-encoder/ms-marco-electra-base"
 # EN_MSMARCO = "cross-encoder/ms-marco-MiniLM-L-12-v2"
@@ -13,6 +15,7 @@ from torch import Tensor
 # For Japanese
 JA_BERT = "cl-tohoku/bert-base-japanese-v2"
 JA_SBERT = "sonoisa/sentence-bert-base-ja-mean-tokens-v2"
+JA_FINE_TUNED_SBERT = f"{MODELS_DIR}/jp_fine_tuned_sbert"
 # JA_ROBERTA = "nlp-waseda/roberta-large-japanese"
 
 # Multi-lingual
