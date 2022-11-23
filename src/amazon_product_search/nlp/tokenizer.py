@@ -12,6 +12,11 @@ class TokenizerType(Enum):
     IPADIC = auto()
 
 
+class OutputFormat(Enum):
+    WAKATI = "wakati"
+    DUMP = "dump"
+
+
 # https://hayashibe.jp/tr/mecab/dictionary/unidic/pos (UniDic)
 # What is "形状詞" in English?
 class POSTag(Enum):
@@ -33,14 +38,18 @@ class POSTag(Enum):
 
 
 class Tokenizer:
-    def __init__(self, tokenizer_type: TokenizerType = TokenizerType.UNIDIC):
+    def __init__(
+        self, tokenizer_type: TokenizerType = TokenizerType.UNIDIC, output_format: OutputFormat = OutputFormat.WAKATI
+    ):
         self.tagger: Tagger
         if tokenizer_type == TokenizerType.UNIDIC:
-            self.tagger = Tagger("-Owakati")
+            self.tagger = Tagger(f"-O{output_format.value}")
         elif tokenizer_type == TokenizerType.IPADIC:
-            self.tagger = GenericTagger(f"-Owakati {ipadic.MECAB_ARGS}")
+            self.tagger = GenericTagger(f"-O{output_format.value} {ipadic.MECAB_ARGS}")
         else:
             raise ValueError(f"Unsupported tokenizer_type was given: {tokenizer_type}")
+
+        self.output_format: OutputFormat = output_format
 
     def tokenize(self, s: str) -> list[str]:
         """Tokenize a given string into tokens.
@@ -51,4 +60,12 @@ class Tokenizer:
         Returns:
             List[str]: A resulting of tokens.
         """
-        return self.tagger.parse(s).split()
+        if self.output_format == OutputFormat.WAKATI:
+            return self.tagger.parse(s).split()
+
+        tokens = []
+        pos_tags = []
+        for result in self.tagger(s):
+            tokens.append(str(result))
+            pos_tags.append(result.pos)
+        return list(zip(tokens, pos_tags))
