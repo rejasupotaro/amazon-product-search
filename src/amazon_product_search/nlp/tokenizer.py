@@ -4,19 +4,19 @@ import ipadic
 from fugashi import GenericTagger, Tagger
 
 
-class DicType(Enum):
+class TokenizerType(Enum):
     IPADIC = auto()
     UNIDIC = auto()
 
 
 class Tokenizer:
-    def __init__(self, dic_type: DicType = DicType.IPADIC):
-        if dic_type == DicType.IPADIC:
+    def __init__(self, tokenizer_type: TokenizerType = TokenizerType.IPADIC):
+        if tokenizer_type == TokenizerType.IPADIC:
             self.tagger = GenericTagger(f"-Owakati {ipadic.MECAB_ARGS}")
-        elif dic_type == DicType.UNIDIC:
-            self.tagger = Tagger(f"-Owakati")
+        elif tokenizer_type == TokenizerType.UNIDIC:
+            self.tagger = Tagger("-Owakati")
         else:
-            raise ValueError(f"Unsupported dic_type was given: {dic_type}")
+            raise ValueError(f"Unsupported tokenizer_type was given: {tokenizer_type}")
 
     def tokenize(self, s: str) -> list[str]:
         """Tokenize a given string into tokens.
