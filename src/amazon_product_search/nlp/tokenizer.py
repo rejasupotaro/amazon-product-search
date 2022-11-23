@@ -49,14 +49,16 @@ class Tokenizer:
 
         self.output_format: OutputFormat = output_format
 
-    def tokenize(self, s: str) -> list[str]:
+    def tokenize(self, s: str) -> list[Union[str, tuple[str, str]]]:
         """Tokenize a given string into tokens.
 
         Args:
             s (str): A string to tokenize.
 
         Returns:
-            List[str]: A resulting of tokens.
+            list[Union[str, tuple[str, str]]]: A resulting of tokens.
+                If output_format is WAKATI, return a list of tokens.
+                If output_format is DUMP, return a list of tuples of (token, POS tags).
         """
         if self.output_format == OutputFormat.WAKATI:
             return self.tagger.parse(s).split()
