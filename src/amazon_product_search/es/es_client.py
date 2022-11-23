@@ -1,5 +1,5 @@
 import json
-from typing import Any, Callable, Iterator, Optional, Union
+from typing import Any, Callable, Iterator, Optional
 
 from elasticsearch import Elasticsearch, helpers
 
@@ -84,7 +84,7 @@ class EsClient:
         index_name: str,
         docs: list[dict[str, Any]],
         id_fn: Optional[Callable[[dict[str, Any]], str]] = None,
-    ) -> tuple[int, Union[int, list[dict[str, Any]]]]:
+    ) -> tuple[int, int | list[dict[str, Any]]]:
         return helpers.bulk(
             client=self.es,
             actions=self._generate_actions(index_name, docs, id_fn),

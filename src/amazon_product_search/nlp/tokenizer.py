@@ -1,10 +1,10 @@
 from enum import Enum, auto
-from typing import Union
+from typing import TypeAlias
 
 import ipadic
 from fugashi import GenericTagger, Tagger
 
-TAGGER = Union[Tagger, GenericTagger]
+TAGGER: TypeAlias = Tagger | GenericTagger
 
 
 class DicType(Enum):
@@ -56,14 +56,14 @@ class Tokenizer:
         else:
             raise ValueError(f"Unsupported dic_type was given: {dic_type}")
 
-    def tokenize(self, s: str) -> list[Union[str, tuple[str, str]]]:
+    def tokenize(self, s: str) -> list[str | tuple[str, str]]:
         """Tokenize a given string into tokens.
 
         Args:
             s (str): A string to tokenize.
 
         Returns:
-            list[Union[str, tuple[str, str]]]: A resulting of tokens.
+            list[str | tuple[str, str]]: A resulting of tokens.
                 If output_format is WAKATI, return a list of tokens.
                 If output_format is DUMP, return a list of tuples of (token, POS tags).
         """
