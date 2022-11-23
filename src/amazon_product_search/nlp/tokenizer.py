@@ -7,7 +7,7 @@ from fugashi import GenericTagger, Tagger
 TAGGER = Union[Tagger, GenericTagger]
 
 
-class TokenizerType(Enum):
+class DicType(Enum):
     UNIDIC = auto()
     IPADIC = auto()
 
@@ -38,16 +38,14 @@ class POSTag(Enum):
 
 
 class Tokenizer:
-    def __init__(
-        self, tokenizer_type: TokenizerType = TokenizerType.UNIDIC, output_format: OutputFormat = OutputFormat.WAKATI
-    ):
+    def __init__(self, dic_type: DicType = DicType.UNIDIC, output_format: OutputFormat = OutputFormat.WAKATI):
         self.tagger: Tagger
-        if tokenizer_type == TokenizerType.UNIDIC:
+        if dic_type == DicType.UNIDIC:
             self.tagger = Tagger(f"-O{output_format.value}")
-        elif tokenizer_type == TokenizerType.IPADIC:
+        elif dic_type == DicType.IPADIC:
             self.tagger = GenericTagger(f"-O{output_format.value} {ipadic.MECAB_ARGS}")
         else:
-            raise ValueError(f"Unsupported tokenizer_type was given: {tokenizer_type}")
+            raise ValueError(f"Unsupported dic_type was given: {dic_type}")
 
         self.output_format: OutputFormat = output_format
 

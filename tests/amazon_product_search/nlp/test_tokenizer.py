@@ -1,6 +1,6 @@
 import pytest
 
-from amazon_product_search.nlp.tokenizer import OutputFormat, Tokenizer, TokenizerType
+from amazon_product_search.nlp.tokenizer import DicType, OutputFormat, Tokenizer
 
 
 @pytest.mark.parametrize(
@@ -16,7 +16,7 @@ from amazon_product_search.nlp.tokenizer import OutputFormat, Tokenizer, Tokeniz
     ],
 )
 def test_tokenize_with_unidic(s, expected):
-    t = Tokenizer(TokenizerType.UNIDIC)
+    t = Tokenizer(DicType.UNIDIC)
     actual = t.tokenize(s)
     assert actual == expected
 
@@ -34,7 +34,7 @@ def test_tokenize_with_unidic(s, expected):
     ],
 )
 def test_tokenize_with_ipadic(s, expected):
-    t = Tokenizer(TokenizerType.IPADIC)
+    t = Tokenizer(DicType.IPADIC)
     actual = t.tokenize(s)
     assert actual == expected
 
@@ -47,6 +47,6 @@ def test_tokenize_with_ipadic(s, expected):
     ],
 )
 def test_analyze_with_unidic(s, expected):
-    t = Tokenizer(TokenizerType.UNIDIC, output_format=OutputFormat.DUMP)
+    t = Tokenizer(DicType.UNIDIC, output_format=OutputFormat.DUMP)
     actual = t.tokenize(s)
     assert actual == expected
