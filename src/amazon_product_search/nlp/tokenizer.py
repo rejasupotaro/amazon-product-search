@@ -12,6 +12,26 @@ class TokenizerType(Enum):
     IPADIC = auto()
 
 
+# https://hayashibe.jp/tr/mecab/dictionary/unidic/pos (UniDic)
+# What is "形状詞" in English?
+class POSTag(Enum):
+    NOUN = "名詞"
+    PRONOUN = "代名詞"
+    ADNOMINAL = "連体詞"
+    ADVERB = "副詞"
+    CONJUNCTION = "接続詞"
+    INTERJECTION = "感動詞"
+    VERB = "動詞"
+    ADJECTIVE = "形容詞"
+    AUXILIARY_VERB = "助動詞"
+    PARTICLE = "助詞"
+    PREFIX = "接頭辞"
+    SUFFIX = "接尾辞"
+    SYNBOL = "記号"
+    AUXILIARY_SYMBOL = "補助記号"
+    WHITESPACE = "空白"
+
+
 class Tokenizer:
     def __init__(self, tokenizer_type: TokenizerType = TokenizerType.UNIDIC):
         self.tagger: Tagger
