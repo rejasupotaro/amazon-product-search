@@ -8,11 +8,11 @@ from tqdm import tqdm
 from amazon_product_search.constants import DATA_DIR
 from amazon_product_search.nlp.normalizer import normalize_doc
 from amazon_product_search.nlp.tokenizer import Tokenizer
-from amazon_product_search.source import load_merged
+from amazon_product_search.source import Locale, load_merged
 from amazon_product_search.synonyms.filters.similarity_filter import SimilarityFilter
 
 
-def load_query_title_pairs(locale: str, nrows: int = -1) -> list[list[str]]:
+def load_query_title_pairs(locale: Locale, nrows: int = -1) -> list[list[str]]:
     """Load query title pairs."""
     df = load_merged(locale, nrows)
     df = df[df["esci_label"] == "E"]

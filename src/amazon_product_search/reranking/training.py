@@ -12,6 +12,7 @@ from torch.utils.data import DataLoader
 from amazon_product_search.constants import DATA_DIR, MODELS_DIR
 from amazon_product_search.metrics import LABEL_TO_GAIN
 from amazon_product_search.nlp.normalizer import normalize_doc
+from amazon_product_search.source import Locale
 
 
 def preprocess(df: pd.DataFrame, columns: List[str]) -> pd.DataFrame:
@@ -20,7 +21,7 @@ def preprocess(df: pd.DataFrame, columns: List[str]) -> pd.DataFrame:
     return df
 
 
-def load_dataset(locale: str, num_examples: int) -> pd.DataFrame:
+def load_dataset(locale: Locale, num_examples: int) -> pd.DataFrame:
     queries_filepath = f"{DATA_DIR}/train-v0.3_{locale}.csv.zip"
     queries_df = pd.read_csv(queries_filepath, nrows=num_examples)
     queries_df.fillna("", inplace=True)
@@ -40,7 +41,7 @@ def load_dataset(locale: str, num_examples: int) -> pd.DataFrame:
     return df[["query", "product", "gain"]]
 
 
-def train(locale: str, base_model_name: str, output_model_name: str, num_examples: int, test_size: float):
+def train(locale: Locale, base_model_name: str, output_model_name: str, num_examples: int, test_size: float):
     print("1. Load data")
     df = load_dataset(locale, num_examples=num_examples)
 

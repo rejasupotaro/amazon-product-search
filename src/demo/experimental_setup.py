@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from amazon_product_search.reranking.reranker import NoOpReranker, RandomReranker, Reranker, SentenceBERTReranker
+from amazon_product_search.source import Locale
 
 
 @dataclass
@@ -16,7 +17,7 @@ class Variant:
 @dataclass
 class ExperimentalSetup:
     index_name: str
-    locale: str
+    locale: Locale
     variants: list[Variant]
     num_queries: Optional[int] = None
 

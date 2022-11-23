@@ -1,9 +1,13 @@
+from typing import Literal
+
 import pandas as pd
 
 from amazon_product_search.constants import DATA_DIR
 
+Locale = Literal["jp", "us", "es"]
 
-def load_products(locale: str = "", nrows: int = -1) -> pd.DataFrame:
+
+def load_products(locale: Locale, nrows: int = -1) -> pd.DataFrame:
     if locale:
         filename = f"{DATA_DIR}/products_{locale}.parquet"
     else:
@@ -14,7 +18,7 @@ def load_products(locale: str = "", nrows: int = -1) -> pd.DataFrame:
         return pd.read_parquet(filename)
 
 
-def load_labels(locale: str = "", nrows: int = -1) -> pd.DataFrame:
+def load_labels(locale: Locale, nrows: int = -1) -> pd.DataFrame:
     if locale:
         filename = f"{DATA_DIR}/examples_{locale}.parquet"
     else:
@@ -30,7 +34,7 @@ def load_sources() -> pd.DataFrame:
     return pd.read_parquet(filename)
 
 
-def load_merged(locale: str, nrows: int = -1) -> pd.DataFrame:
+def load_merged(locale: Locale, nrows: int = -1) -> pd.DataFrame:
     filename = f"{DATA_DIR}/merged_{locale}.parquet"
     if nrows > 0:
         return pd.read_parquet(filename).head(nrows)

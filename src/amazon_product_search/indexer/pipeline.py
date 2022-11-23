@@ -13,9 +13,10 @@ from amazon_product_search.indexer.transforms.analyze_fn import AnalyzeFn
 from amazon_product_search.indexer.transforms.encode_fn import BatchEncodeFn
 from amazon_product_search.indexer.transforms.extract_keywords_fn import ExtractKeywordsFn
 from amazon_product_search.indexer.transforms.filters import is_indexable
+from amazon_product_search.source import Locale
 
 
-def get_input_source(locale: str, nrows: int = -1) -> PTransform:
+def get_input_source(locale: Locale, nrows: int = -1) -> PTransform:
     products_df = source.load_products(locale, nrows)
     products_df = products_df.fillna("")
     products = products_df.to_dict("records")
