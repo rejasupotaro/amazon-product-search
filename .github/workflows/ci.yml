@@ -26,6 +26,7 @@ jobs:
       run: |
         pip install poetry
         poetry install
+        poetry run python -m unidic download
     - name: Lint
       run: |
         poetry run inv lint
