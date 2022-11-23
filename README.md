@@ -23,6 +23,7 @@ The following libraries are necessary to process Japanese.
 ```shell
 # For macOS
 $ brew install mecab mecab-ipadic
+$ poetry run python -m unidic download
 ```
 
 ## Dataset

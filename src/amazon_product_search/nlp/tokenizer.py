@@ -1,7 +1,7 @@
 from enum import Enum, auto
 
 import ipadic
-from fugashi import GenericTagger
+from fugashi import GenericTagger, Tagger
 
 
 class DicType(Enum):
@@ -13,6 +13,8 @@ class Tokenizer:
     def __init__(self, dic_type: DicType = DicType.IPADIC):
         if dic_type == DicType.IPADIC:
             self.tagger = GenericTagger(f"-Owakati {ipadic.MECAB_ARGS}")
+        elif dic_type == DicType.UNIDIC:
+            self.tagger = Tagger(f"-Owakati")
         else:
             raise ValueError(f"Unsupported dic_type was given: {dic_type}")
 
