@@ -39,15 +39,22 @@ class POSTag(Enum):
 
 class Tokenizer:
     def __init__(self, dic_type: DicType = DicType.UNIDIC, output_format: OutputFormat = OutputFormat.WAKATI):
+        self.dic_type = dic_type
+        self.output_format = output_format
+
+        tagger_options = []
+        if dic_type == DicType.IPADIC:
+            tagger_options.append(ipadic.MECAB_ARGS)
+        if output_format == OutputFormat.WAKATI:
+            tagger_options.append(f"-O{output_format.value}")
+
         self.tagger: Tagger
         if dic_type == DicType.UNIDIC:
-            self.tagger = Tagger(f"-O{output_format.value}")
+            self.tagger = Tagger(" ".join(tagger_options))
         elif dic_type == DicType.IPADIC:
-            self.tagger = GenericTagger(f"-O{output_format.value} {ipadic.MECAB_ARGS}")
+            self.tagger = GenericTagger(" ".join(tagger_options))
         else:
             raise ValueError(f"Unsupported dic_type was given: {dic_type}")
-
-        self.output_format: OutputFormat = output_format
 
     def tokenize(self, s: str) -> list[Union[str, tuple[str, str]]]:
         """Tokenize a given string into tokens.
@@ -67,5 +74,8 @@ class Tokenizer:
         pos_tags = []
         for result in self.tagger(s):
             tokens.append(str(result))
-            pos_tags.append(result.pos)
+            if self.dic_type == DicType.UNIDIC:
+                pos_tags.append(result.pos)
+            elif self.dic_type == DicType.IPADIC:
+                pos_tags.append(result.feature)
         return list(zip(tokens, pos_tags))
