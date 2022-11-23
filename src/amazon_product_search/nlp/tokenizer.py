@@ -77,7 +77,7 @@ class Tokenizer:
             tokens.append(str(result))
             match self.dic_type:
                 case DicType.UNIDIC:
-                    pos_tags.append(result.pos)
+                    pos_tags.append(result.pos.split(","))
                 case DicType.IPADIC:
                     pos_tags.append(result.feature)
         return list(zip(tokens, pos_tags))
