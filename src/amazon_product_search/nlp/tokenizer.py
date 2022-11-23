@@ -49,12 +49,13 @@ class Tokenizer:
             tagger_options.append(f"-O{output_format.value}")
 
         self.tagger: Tagger
-        if dic_type == DicType.UNIDIC:
-            self.tagger = Tagger(" ".join(tagger_options))
-        elif dic_type == DicType.IPADIC:
-            self.tagger = GenericTagger(" ".join(tagger_options))
-        else:
-            raise ValueError(f"Unsupported dic_type was given: {dic_type}")
+        match dic_type:
+            case DicType.UNIDIC:
+                self.tagger = Tagger(" ".join(tagger_options))
+            case DicType.IPADIC:
+                self.tagger = GenericTagger(" ".join(tagger_options))
+            case _:
+                raise ValueError(f"Unsupported dic_type was given: {dic_type}")
 
     def tokenize(self, s: str) -> list[str | tuple[str, str]]:
         """Tokenize a given string into tokens.
@@ -74,8 +75,9 @@ class Tokenizer:
         pos_tags = []
         for result in self.tagger(s):
             tokens.append(str(result))
-            if self.dic_type == DicType.UNIDIC:
-                pos_tags.append(result.pos)
-            elif self.dic_type == DicType.IPADIC:
-                pos_tags.append(result.feature)
+            match self.dic_type:
+                case DicType.UNIDIC:
+                    pos_tags.append(result.pos)
+                case DicType.IPADIC:
+                    pos_tags.append(result.feature)
         return list(zip(tokens, pos_tags))
