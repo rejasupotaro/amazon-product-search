@@ -592,6 +592,9 @@ category = "main"
 optional = false
 python-versions = ">=3.7"
 
+[package.dependencies]
+unidic = {version = "*", optional = true, markers = "extra == \"unidic\""}
+
 [package.extras]
 unidic-lite = ["unidic-lite"]
 unidic = ["unidic"]
@@ -1937,6 +1940,14 @@ reference = "2.0.0"
 resolved_reference = "b17d42458b608bf9cf62fae1bc5420f584c3998a"
 
 [[package]]
+name = "plac"
+version = "1.3.5"
+description = "The smartest command line arguments parser in the world"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "platformdirs"
 version = "2.5.2"
 description = "A small Python module for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
@@ -3057,12 +3068,18 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
-name = "unidic-lite"
-version = "1.0.8"
-description = "A small version of UniDic packaged for Python"
+name = "unidic"
+version = "1.1.0"
+description = "UniDic packaged for Python"
 category = "main"
 optional = false
-python-versions = "*"
+python-versions = ">=3.5"
+
+[package.dependencies]
+plac = ">=1.1.3,<2.0.0"
+requests = ">=2.22.0,<3.0.0"
+tqdm = ">=4.41.1,<5.0.0"
+wasabi = ">=0.6.0,<1.0.0"
 
 [[package]]
 name = "urllib3"
@@ -3175,7 +3192,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "flake8 
 [metadata]
 lock-version = "1.1"
 python-versions = "3.9.13"
-content-hash = "5e1ec1cc5b7af71fc3e63ceda841620d345f3a04464e8d9d27fcd62da3495d54"
+content-hash = "8cc2c74f5691ce62cd29057c3273ccee0964fb38ffc65dd80c873ca175ac0e82"
 
 [metadata.files]
 altair = [
@@ -3519,6 +3536,7 @@ pickleshare = [
 pillow = []
 pingouin = []
 pke = []
+plac = []
 platformdirs = [
     {file = "platformdirs-2.5.2-py3-none-any.whl", hash = "sha256:027d8e83a2d7de06bbac4e5ef7e023c02b863d7ea5d079477e722bb41ab25788"},
     {file = "platformdirs-2.5.2.tar.gz", hash = "sha256:58c8abb07dcb441e6ee4b11d8df0ac856038f944ab98b7be6b27b2a3c7feef19"},
@@ -4009,9 +4027,7 @@ tzlocal = [
     {file = "tzlocal-4.2.tar.gz", hash = "sha256:ee5842fa3a795f023514ac2d801c4a81d1743bbe642e3940143326b3a00addd7"},
 ]
 unidecode = []
-unidic-lite = [
-    {file = "unidic-lite-1.0.8.tar.gz", hash = "sha256:db9d4572d9fdd4d00a97949d4b0741ec480ee05a7e7e2e32f547500dae27b245"},
-]
+unidic = []
 urllib3 = []
 validators = []
 wasabi = []
