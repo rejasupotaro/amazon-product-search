@@ -11,7 +11,7 @@ jobs:
   build:
     strategy:
       matrix:
-        python-version: ["3.9.13"]
+        python-version: ["3.10.8"]
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:

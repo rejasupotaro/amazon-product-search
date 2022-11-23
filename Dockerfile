@@ -7,7 +7,7 @@ RUN apt-get install -y \
     libbz2-dev libreadline-dev libsqlite3-dev libopencv-dev \
     build-essential git
 
-ENV PYTHON_VERSION 3.9.13
+ENV PYTHON_VERSION 3.10.8
 ENV HOME /root
 ENV PYENV_ROOT $HOME/.pyenv
 ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
