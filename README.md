@@ -62,6 +62,8 @@ $ docker compose up
 $ poetry run inv demo
 ```
 
+![](https://user-images.githubusercontent.com/883148/203654537-8b495c9c-f8af-4c3f-90f9-60edacf647b9.png)
+
 ## Experimentation
 
 The demo app provides the ability to run experiments with different experimental settings.
