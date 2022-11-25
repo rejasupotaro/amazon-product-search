@@ -21,7 +21,7 @@ def get_input_source(locale: Locale, nrows: int = -1) -> PTransform:
     products_df = products_df.fillna("")
     products = products_df.to_dict("records")
     logging.info(f"We have {len(products)} products to index")
-    return beam.Create(products)
+    return beam.Create(products) | beam.Reshuffle()
 
 
 def join_branches(kv: Tuple[str, Dict[str, Any]]):
