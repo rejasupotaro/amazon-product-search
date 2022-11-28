@@ -44,8 +44,23 @@ def compute_dcg(gains: list[float]) -> float:
     return result
 
 
-def compute_ndcg(retrieved_ids: list[str], judgements: dict[str, str]) -> Optional[float]:
-    y_pred = [LABEL_TO_GAIN[judgements[doc_id]] if doc_id in judgements else 0 for doc_id in retrieved_ids]
+def compute_ndcg(retrieved_ids: list[str], judgements: dict[str, str], prime: bool = False) -> Optional[float]:
+    """Compute Normalized Discounted Cumulative Gain (NDCG) based on the given relevance judgements.
+
+    NDCG' is a variant of NDCG that calculates the score using only annotated documents.
+
+    Args:
+        retrieved_ids (list[str]): Document IDs retrieved from a search engine.
+        judgements (dict[str, str]): An annotation set for the query.
+        prime (bool, optional): True to skip unseen documents. Defaults to False.
+
+    Returns:
+        Optional[float]: The computed score or None.
+    """
+    if prime:
+        y_pred = [LABEL_TO_GAIN[judgements[doc_id]] for doc_id in retrieved_ids if doc_id in judgements]
+    else:
+        y_pred = [LABEL_TO_GAIN[judgements[doc_id]] if doc_id in judgements else 0 for doc_id in retrieved_ids]
     y_true = sorted(y_pred, reverse=True)
     idcg_val = compute_dcg(y_true)
     dcg_val = compute_dcg(y_pred)
