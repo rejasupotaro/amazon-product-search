@@ -64,7 +64,7 @@ def run(options: IndexerOptions):
                 | "Encode products" >> beam.ParDo(BatchEncodeFn(shared_handle=Shared()))
             )
         if branches:
-            branches["product"] = (products | beam.WithKeys(lambda product: product["product_id"]),)
+            branches["product"] = products | beam.WithKeys(lambda product: product["product_id"])
             products = branches | beam.CoGroupByKey() | beam.Map(join_branches)
 
         if es_host:
