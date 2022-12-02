@@ -68,6 +68,7 @@ def compute_metrics(index_name: str, query: str, variant: Variant, labels_df: pd
         "total_hits": response.total_hits,
         "recall": compute_recall(retrieved_ids, relevant_ids),
         "ndcg": compute_ndcg(retrieved_ids, judgements),
+        "ndcg_prime": compute_ndcg(retrieved_ids, judgements, prime=True),
     }
 
 
@@ -96,6 +97,7 @@ def compute_stats(metrics_df: pd.DataFrame) -> pd.DataFrame:
             zero_hit_rate=("total_hits", lambda series: compute_zero_hit_rate(series.values)),
             recall=("recall", lambda series: series.mean().round(4)),
             ndcg=("ndcg", lambda series: series.mean().round(4)),
+            ndcg_prime=("ndcg_prime", lambda series: series.mean().round(4)),
         )
         .reset_index()
     )
