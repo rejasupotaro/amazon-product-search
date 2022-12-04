@@ -3,16 +3,6 @@ from unittest.mock import patch
 from amazon_product_search.es.query_builder import QueryBuilder
 
 
-@patch("amazon_product_search.es.query_builder.QueryBuilder.load_synonym_dict")
-def test_find_synonyms(mock_method):
-    mock_method.return_value = {"query": ["synonym"]}
-
-    query_builder = QueryBuilder()
-    actual = query_builder.find_synonyms("query")
-
-    assert actual == ["synonym"]
-
-
 def test_build_search_query():
     query_builder = QueryBuilder()
     es_query = query_builder.build_multimatch_search_query(query="query", fields=["product_title"])
@@ -25,7 +15,7 @@ def test_build_search_query():
     }
 
 
-@patch("amazon_product_search.es.query_builder.QueryBuilder.load_synonym_dict")
+@patch("amazon_product_search.synonyms.synonym_dict.SynonymDict.load_synonym_dict")
 def test_build_search_query_with_synonym_expansion_enabled(mock_method):
     mock_method.return_value = {"query": ["synonym"]}
 
