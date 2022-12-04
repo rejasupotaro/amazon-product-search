@@ -15,7 +15,9 @@ class QueryBuilder:
         self.encoder = Encoder()
 
     @staticmethod
-    def load_synonym_dict(threshold: float = 0.6) -> dict[str, list[str]]:
+    def load_synonym_dict(
+        synonym_filename: str = "synonyms_jp_sbert.csv", threshold: float = 0.6
+    ) -> dict[str, list[str]]:
         """Load the synonym file and convert it into a dict for lookup.
 
         Args:
@@ -24,7 +26,7 @@ class QueryBuilder:
         Returns:
             dict[str, list[str]]: The converted synonym dict.
         """
-        df = pd.read_csv(f"{DATA_DIR}/includes/synonyms.csv")
+        df = pd.read_csv(f"{DATA_DIR}/includes/{synonym_filename}")
         df = df[df["similarity"] > threshold]
         queries = df["query"].tolist()
         synonyms = df["title"].tolist()
