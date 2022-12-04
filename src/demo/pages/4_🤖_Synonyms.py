@@ -23,29 +23,30 @@ def main():
 
     rows = []
     for query in queries:
-        rows.append(
-            {
-                "query": query,
-                "variant": "sbert",
-                "synonyms": SBERT_SYNONYM_DICT.find_synonyms(query),
-            }
-        )
-        rows.append(
-            {
-                "query": query,
-                "variant": "fine_tuned_sbert",
-                "synonyms": FINE_TUNED_SBERT_SYNONYM_DICT.find_synonyms(query),
-            }
-        )
+        for synonym_source, synonym_dict in [
+            ("sbert", SBERT_SYNONYM_DICT),
+            ("fine_tuned_sbert", FINE_TUNED_SBERT_SYNONYM_DICT),
+        ]:
+            for threshold in [0.6, 0.7, 0.8, 0.9]:
+                rows.append(
+                    {
+                        "query": query,
+                        "variant": f"{synonym_source} ({threshold})",
+                        "synonyms": synonym_dict.find_synonyms(query, threshold),
+                    }
+                )
     df = pd.DataFrame(rows)
     st.dataframe(df.head(100), use_container_width=True)
 
     df["num_synonyms"] = df["synonyms"].apply(len)
+    df["found"] = df["synonyms"].apply(lambda synonyms: int(len(synonyms) > 0))
 
     stats_df = (
         df.groupby("variant")
         .agg(
-            num_synonyms=("num_synonyms", lambda series: series.mean().round(4)),
+            num_synonyms_mean=("num_synonyms", lambda series: series.mean().round(4)),
+            num_synonyms_max=("num_synonyms", lambda series: series.max().round(4)),
+            query_coverage=("found", lambda series: series.mean().round(4)),
         )
         .reset_index()
     )
