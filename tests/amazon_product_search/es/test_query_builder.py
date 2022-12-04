@@ -17,7 +17,7 @@ def test_build_search_query():
 
 @patch("amazon_product_search.synonyms.synonym_dict.SynonymDict.load_synonym_dict")
 def test_build_search_query_with_synonym_expansion_enabled(mock_method):
-    mock_method.return_value = {"query": ["synonym"]}
+    mock_method.return_value = {"query": [("synonym", 1.0), ("antonym", 0.1)]}
 
     query_builder = QueryBuilder()
     es_query = query_builder.build_multimatch_search_query(
