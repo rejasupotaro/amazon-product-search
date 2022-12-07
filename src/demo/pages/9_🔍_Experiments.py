@@ -23,6 +23,7 @@ query_builder = QueryBuilder()
 @st.cache
 def load_labels(experimental_setup: ExperimentalSetup) -> pd.DataFrame:
     df = source.load_labels(experimental_setup.locale)
+    df = df[df["split"] == "test"]
     if experimental_setup.num_queries:
         queries = df.sample(frac=1)["query"].unique()[: experimental_setup.num_queries]
         df = df[df["query"].isin(queries)]
