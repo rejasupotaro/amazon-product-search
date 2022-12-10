@@ -1,5 +1,5 @@
 import random
-from abc import ABC, abstractmethod
+from typing import Protocol
 
 import torch
 from torch import Tensor
@@ -10,23 +10,22 @@ from amazon_product_search.es.response import Result
 from amazon_product_search.nlp.encoder import JA_SBERT
 
 
-class Reranker(ABC):
-    @abstractmethod
+class Reranker(Protocol):
     def rerank(self, query: str, results: list[Result]) -> list[Result]:
-        pass
+        ...
 
 
-class NoOpReranker(Reranker):
+class NoOpReranker:
     def rerank(self, query: str, results: list[Result]) -> list[Result]:
         return results
 
 
-class RandomReranker(Reranker):
+class RandomReranker:
     def rerank(self, query: str, results: list[Result]) -> list[Result]:
         return random.sample(results, len(results))
 
 
-class DotReranker(Reranker):
+class DotReranker:
     def __init__(self, model_name: str = JA_SBERT, batch_size: int = 8):
         self.model = AutoModel.from_pretrained(model_name)
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
