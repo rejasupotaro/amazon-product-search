@@ -2521,7 +2521,7 @@ tests = ["pytest", "typeguard", "pygments", "littleutils", "cython"]
 
 [[package]]
 name = "streamlit"
-version = "1.15.1"
+version = "1.15.2"
 description = "The fastest way to build data apps in Python"
 category = "main"
 optional = false
