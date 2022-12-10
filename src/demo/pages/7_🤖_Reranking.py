@@ -9,16 +9,16 @@ from amazon_product_search import metrics
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.response import Result
 from amazon_product_search.nlp.encoder import JA_FINE_TUNED_SBERT
-from amazon_product_search.reranking.reranker import RandomReranker, SentenceBERTReranker
+from amazon_product_search.reranking.reranker import DotReranker, RandomReranker
 from demo.page_config import set_page_config
 from demo.utils import load_merged
 
 es_client = EsClient()
 random_reranker = RandomReranker()
-sbert_reranker = SentenceBERTReranker()
-fine_tuned_sbert_reranker: Optional[SentenceBERTReranker] = None
+dot_reranker = DotReranker()
+fine_tuned_dot_reranker: Optional[DotReranker] = None
 if path.exists(JA_FINE_TUNED_SBERT):
-    fine_tuned_sbert_reranker = SentenceBERTReranker(JA_FINE_TUNED_SBERT)
+    fine_tuned_dot_reranker = DotReranker(JA_FINE_TUNED_SBERT)
 
 
 @st.cache
@@ -123,7 +123,7 @@ def run_comparison(df: pd.DataFrame, all_judgements: dict[str, str], num_queries
             {
                 "query": query,
                 "variant": "sbert",
-                "ndcg": compute_ndcg([result.product for result in sbert_reranker.rerank(query, results)]),
+                "ndcg": compute_ndcg([result.product for result in dot_reranker.rerank(query, results)]),
             }
         )
     metrics_df = pd.DataFrame(rows)
@@ -170,13 +170,13 @@ def main():
         draw_results(search_results)
     with columns[1]:
         st.write("#### SBERT Results")
-        sbert_results = sbert_reranker.rerank(query, results)
+        sbert_results = dot_reranker.rerank(query, results)
         draw_results(sbert_results)
-    if fine_tuned_sbert_reranker:
+    if fine_tuned_dot_reranker:
         columns = st.columns(2)
         with columns[0]:
             st.write("#### Fine-Tuned SBERT Results")
-            sbert_results = fine_tuned_sbert_reranker.rerank(query, results)
+            sbert_results = fine_tuned_dot_reranker.rerank(query, results)
             draw_results(sbert_results)
 
     st.write("### Comparison")

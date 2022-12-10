@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
-from amazon_product_search.reranking.reranker import NoOpReranker, RandomReranker, Reranker, SentenceBERTReranker
+from amazon_product_search.reranking.reranker import DotReranker, NoOpReranker, RandomReranker, Reranker
 from amazon_product_search.source import Locale
 
 
@@ -78,7 +78,7 @@ EXPERIMENTS = {
         variants=[
             Variant(name="title,bullet_point", fields=["product_title", "product_description"], reranker=NoOpReranker()),  # noqa
             Variant(name="title,bullet_point + random reranker", fields=["product_title", "product_description"], reranker=RandomReranker()),  # noqa
-            Variant(name="title,bullet_point + sbert reranker", fields=["product_title", "product_description"], reranker=SentenceBERTReranker()),  # noqa
+            Variant(name="title,bullet_point + sbert reranker", fields=["product_title", "product_description"], reranker=DotReranker()),  # noqa
         ],
     ),
     "sparse_vs_dense": ExperimentalSetup(

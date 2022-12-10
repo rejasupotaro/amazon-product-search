@@ -65,7 +65,7 @@ def main():
 
     is_synonym_expansion_enabled = st.checkbox("enable_synonym_expansion")
 
-    reranker = from_string(st.selectbox("reranker:", ["NoOpReranker", "RandomReranker", "SentenceBERTReranker"]))
+    reranker = from_string(st.selectbox("reranker:", ["NoOpReranker", "RandomReranker", "DotReranker"]))
 
     es_query = None
     if sparse_fields:

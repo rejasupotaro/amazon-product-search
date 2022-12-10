@@ -1,5 +1,5 @@
 from amazon_product_search.es.response import Result
-from amazon_product_search.reranking.reranker import NoOpReranker, SentenceBERTReranker
+from amazon_product_search.reranking.reranker import DotReranker, NoOpReranker
 
 
 def test_no_op_reranker():
@@ -20,7 +20,7 @@ def test_sentence_bert_reranker():
         Result(product={"id": "2", "product_title": "query"}, score=1),
     ]
 
-    reranker = SentenceBERTReranker()
+    reranker = DotReranker()
     reranked_results = reranker.rerank("query", results)
 
     expected = ["2", "1"]

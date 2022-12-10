@@ -26,7 +26,7 @@ class RandomReranker(Reranker):
         return random.sample(results, len(results))
 
 
-class SentenceBERTReranker(Reranker):
+class DotReranker(Reranker):
     def __init__(self, model_name: str = JA_SBERT, batch_size: int = 8):
         self.model = AutoModel.from_pretrained(model_name)
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -65,5 +65,5 @@ def from_string(reranker_str: str) -> Reranker:
     return {
         "NoOpReranker": NoOpReranker,
         "RandomReranker": RandomReranker,
-        "SentenceBERTReranker": SentenceBERTReranker,
+        "DotReranker": DotReranker,
     }[reranker_str]()
