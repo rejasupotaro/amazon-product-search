@@ -10,8 +10,18 @@ def build_training(c):
     command = f"""
     gcloud builds submit . \
         --config=cloudbuild.yaml \
-        --substitutions=_IMAGE={image_uri} \
-        --timeout=60m
+        --substitutions=_DOCKERFILE=Dockerfile.training,_IMAGE={image_uri} \
+    """
+    c.run(command)
+
+
+@task
+def build_indexing(c):
+    image_uri = f"gcr.io/{PROJECT_ID}/{PROJECT_NAME}/pipeline"
+    command = f"""
+    gcloud builds submit . \
+        --config=cloudbuild.yaml \
+        --substitutions=_DOCKERFILE=Dockerfile.indexing,_IMAGE={image_uri} \
     """
     c.run(command)
 

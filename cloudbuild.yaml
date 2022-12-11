@@ -3,7 +3,7 @@ steps:
     args:
       - build
       - -f
-      - Dockerfile.training
+      - $_DOCKERFILE
       - -t
       - $_IMAGE
       - .

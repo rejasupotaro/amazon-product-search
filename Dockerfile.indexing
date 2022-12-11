@@ -1,0 +1,15 @@
+FROM apache/beam_python3.10_sdk:2.43.0
+
+ENV PYTHONPATH src:
+ENV WORKDIR /app/
+
+WORKDIR $WORKDIR
+
+COPY pyproject.toml poetry.lock $WORKDIR
+COPY src src
+
+RUN pip install --upgrade pip && \
+    pip install -U poetry --no-cache-dir
+RUN poetry config virtualenvs.create false && \
+    poetry install --without dev --no-interaction --no-ansi
+RUN python -m unidic download
