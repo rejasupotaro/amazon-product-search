@@ -17,21 +17,18 @@ RUN pyenv install $PYTHON_VERSION
 RUN pyenv global $PYTHON_VERSION
 RUN pyenv rehash
 
-ENV PYTHONPATH src:
 ENV WORKDIR /app/
 
 WORKDIR $WORKDIR
 
 COPY pyproject.toml poetry.lock $WORKDIR
 
-RUN pip install poetry --no-cache-dir
-RUN poetry config virtualenvs.create false
-RUN poetry install --no-dev --no-ansi
+RUN pip install poetry --no-cache-dir && \
+    poetry config virtualenvs.create false && \
+    poetry install --without dev --no-interaction --no-ansi
 
 COPY src .
-COPY tasks tasks
-
-RUN pip install -U poetry
+COPY tasks .
 
 COPY google_application_credentials.json .
 ENV GOOGLE_APPLICATION_CREDENTIALS google_application_credentials.json
