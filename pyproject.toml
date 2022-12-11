@@ -6,6 +6,7 @@ authors = ["rejasupotaro"]
 
 [tool.poetry.dependencies]
 python = "3.10.8"
+invoke = "^1.7.3"
 streamlit = "^1.15.2"
 pandas = "^1.5.0"
 apache-beam = {version = "2.43.0", extras = ["gcp"]}
@@ -29,7 +30,6 @@ tabulate = "^0.9.0"
 pytest = "^7.2"
 pytest-cov = "^4.0.0"
 black = "^22.12.0"
-invoke = "^1.7.3"
 isort = "^5.10.1"
 mypy = "^0.982"
 pyproject-flake8 = "^5.0.4"
