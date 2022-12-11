@@ -1,6 +1,8 @@
 FROM docker.io/tensorflow/tensorflow:2.8.0-gpu
 # FROM gcr.io/deeplearning-platform-release/tf-cpu.2-8
 
+RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub
+
 RUN apt-get update
 RUN apt-get install -y \
     libffi-dev libssl-dev zlib1g-dev liblzma-dev tk-dev \
@@ -23,12 +25,13 @@ WORKDIR $WORKDIR
 
 COPY pyproject.toml poetry.lock $WORKDIR
 
-RUN pip install poetry --no-cache-dir && \
-    poetry config virtualenvs.create false && \
+RUN pip install --upgrade pip && \
+    pip install -U poetry --no-cache-dir
+RUN poetry config virtualenvs.create false && \
     poetry install --without dev --no-interaction --no-ansi
 
-COPY src .
-COPY tasks .
+COPY src src
+COPY tasks tasks
 
 COPY google_application_credentials.json .
 ENV GOOGLE_APPLICATION_CREDENTIALS google_application_credentials.json
