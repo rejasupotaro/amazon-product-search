@@ -2683,6 +2683,17 @@ python-decouple = ">=3.6,<4.0"
 streamlit = ">=0.87.0"
 
 [[package]]
+name = "tabulate"
+version = "0.9.0"
+description = "Pretty-print tabular data"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.extras]
+widechars = ["wcwidth"]
+
+[[package]]
 name = "tenacity"
 version = "8.1.0"
 description = "Retry code until it succeeds"
@@ -3133,7 +3144,7 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.8"
-content-hash = "8dddc05bce4c921c61f55970a80d4bb44ff0b4eed16e4b760f7a8225248bc021"
+content-hash = "9fcb7277abdcb76b2298305aef6a2a0b0b435c828cc10c806ec1e16b8cf302e1"
 
 [metadata.files]
 altair = [
@@ -3690,6 +3701,7 @@ srsly = []
 stack-data = []
 streamlit = []
 streamlit-aggrid = []
+tabulate = []
 tenacity = []
 terminado = []
 thinc = []
