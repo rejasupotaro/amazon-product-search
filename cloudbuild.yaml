@@ -2,6 +2,8 @@ steps:
   - name: gcr.io/cloud-builders/docker
     args:
       - build
+      - -f
+      - Dockerfile.training
       - -t
       - $_IMAGE
       - .
