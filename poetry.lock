@@ -1,4 +1,43 @@
 [[package]]
+name = "absl-py"
+version = "1.3.0"
+description = "Abseil Python Common Libraries, see https://github.com/abseil/abseil-py."
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[[package]]
+name = "aiohttp"
+version = "3.8.3"
+description = "Async http client/server framework (asyncio)"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+aiosignal = ">=1.1.2"
+async-timeout = ">=4.0.0a3,<5.0"
+attrs = ">=17.3.0"
+charset-normalizer = ">=2.0,<3.0"
+frozenlist = ">=1.1.1"
+multidict = ">=4.5,<7.0"
+yarl = ">=1.0,<2.0"
+
+[package.extras]
+speedups = ["aiodns", "brotli", "cchardet"]
+
+[[package]]
+name = "aiosignal"
+version = "1.3.1"
+description = "aiosignal: a list of registered asynchronous callbacks"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+frozenlist = ">=1.1.0"
+
+[[package]]
 name = "altair"
 version = "4.2.0"
 description = "Altair: A declarative statistical visualization library for Python."
@@ -156,6 +195,14 @@ six = "*"
 
 [package.extras]
 test = ["astroid", "pytest"]
+
+[[package]]
+name = "async-timeout"
+version = "4.0.2"
+description = "Timeout context manager for asyncio programs"
+category = "main"
+optional = false
+python-versions = ">=3.6"
 
 [[package]]
 name = "attrs"
@@ -379,7 +426,7 @@ test-no-codebase = ["pytest", "matplotlib", "pillow"]
 
 [[package]]
 name = "coverage"
-version = "7.0.0"
+version = "7.0.1"
 description = "Code coverage measurement for Python"
 category = "dev"
 optional = false
@@ -622,6 +669,49 @@ optional = false
 python-versions = ">=2.7, !=3.0, !=3.1, !=3.2, !=3.3, !=3.4, <4"
 
 [[package]]
+name = "frozenlist"
+version = "1.3.3"
+description = "A list-like structure which implements collections.abc.MutableSequence"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[[package]]
+name = "fsspec"
+version = "2022.11.0"
+description = "File-system specification"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+aiohttp = {version = "<4.0.0a0 || >4.0.0a0,<4.0.0a1 || >4.0.0a1", optional = true, markers = "extra == \"http\""}
+requests = {version = "*", optional = true, markers = "extra == \"http\""}
+
+[package.extras]
+abfs = ["adlfs"]
+adl = ["adlfs"]
+arrow = ["pyarrow (>=1)"]
+dask = ["dask", "distributed"]
+dropbox = ["dropboxdrivefs", "requests", "dropbox"]
+entrypoints = ["importlib-metadata"]
+fuse = ["fusepy"]
+gcs = ["gcsfs"]
+git = ["pygit2"]
+github = ["requests"]
+gs = ["gcsfs"]
+gui = ["panel"]
+hdfs = ["pyarrow (>=1)"]
+http = ["requests", "aiohttp (!=4.0.0a0,!=4.0.0a1)"]
+libarchive = ["libarchive-c"]
+oci = ["ocifs"]
+s3 = ["s3fs"]
+sftp = ["paramiko"]
+smb = ["smbprotocol"]
+ssh = ["paramiko"]
+tqdm = ["tqdm"]
+
+[[package]]
 name = "fugashi"
 version = "1.2.1"
 description = "A Cython MeCab wrapper for fast, pythonic Japanese tokenization."
@@ -735,6 +825,21 @@ python-versions = "*"
 google-auth = "*"
 httplib2 = ">=0.15.0"
 six = "*"
+
+[[package]]
+name = "google-auth-oauthlib"
+version = "0.4.6"
+description = "Google Authentication Library"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+google-auth = ">=1.0.0"
+requests-oauthlib = ">=0.7.0"
+
+[package.extras]
+tool = ["click (>=6.0.0)"]
 
 [[package]]
 name = "google-cloud-bigquery"
@@ -1510,6 +1615,34 @@ python-versions = ">=3.6"
 data = ["language-data (>=1.1,<2.0)"]
 
 [[package]]
+name = "lightning-utilities"
+version = "0.5.0"
+description = "PyTorch Lightning Sample project."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+packaging = ">=20.0"
+typing-extensions = "*"
+
+[package.extras]
+cli = ["fire"]
+docs = ["sphinx (>=4.0,<5.0)"]
+test = ["coverage (==6.5.0)"]
+
+[[package]]
+name = "markdown"
+version = "3.4.1"
+description = "Python implementation of Markdown."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.extras]
+testing = ["coverage", "pyyaml"]
+
+[[package]]
 name = "markupsafe"
 version = "2.1.1"
 description = "Safely add untrusted strings to HTML/XML markup."
@@ -1568,6 +1701,14 @@ python-versions = "*"
 name = "more-itertools"
 version = "9.0.0"
 description = "More routines for operating on iterables, beyond itertools"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[[package]]
+name = "multidict"
+version = "6.0.3"
+description = "multidict implementation"
 category = "main"
 optional = false
 python-versions = ">=3.7"
@@ -1820,6 +1961,19 @@ pyasn1 = ">=0.1.7"
 pyasn1-modules = ">=0.0.5"
 rsa = ">=3.1.4"
 six = ">=1.6.1"
+
+[[package]]
+name = "oauthlib"
+version = "3.2.2"
+description = "A generic, spec-compliant, thorough implementation of the OAuth request-signing logic"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.extras]
+rsa = ["cryptography (>=3.0.0)"]
+signals = ["blinker (>=1.4.0)"]
+signedtoken = ["cryptography (>=3.0.0)", "pyjwt (>=2.0.0,<3)"]
 
 [[package]]
 name = "objsize"
@@ -2341,6 +2495,38 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
+name = "pytorch-lightning"
+version = "1.8.6"
+description = "PyTorch Lightning is the lightweight PyTorch wrapper for ML researchers. Scale your models. Write less boilerplate."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+fsspec = {version = ">2021.06.0", extras = ["http"]}
+lightning-utilities = ">=0.3.0,<0.4.0 || >0.4.0"
+numpy = ">=1.17.2"
+packaging = ">=17.0"
+PyYAML = ">=5.4"
+tensorboardX = ">=2.2"
+torch = ">=1.9.0"
+torchmetrics = ">=0.7.0"
+tqdm = ">=4.57.0"
+typing-extensions = ">=4.0.0"
+
+[package.extras]
+all = ["matplotlib (>3.1)", "omegaconf (>=2.0.5)", "hydra-core (>=1.0.5)", "jsonargparse[signatures] (>=4.15.2)", "rich (>=10.14.0,!=10.15.0.a)", "coverage (==6.5.0)", "codecov (==2.1.12)", "pytest (==7.2.0)", "pytest-cov (==4.0.0)", "pytest-forked (==1.4.0)", "pytest-rerunfailures (==10.2)", "pre-commit (==2.20.0)", "cloudpickle (>=1.3)", "scikit-learn (>0.22.1)", "onnxruntime", "psutil", "pandas (>1.0)", "fastapi", "uvicorn", "tensorboard (>=2.9.1)", "protobuf (<=3.20.1)", "torchvision (>=0.10.0)", "gym[classic_control] (>=0.17.0)", "ipython", "fairscale (>=0.4.5)", "deepspeed (>=0.6.0)", "horovod (>=0.21.2,!=0.24.0)", "hivemind (==1.1.2)"]
+deepspeed = ["deepspeed (>=0.6.0)"]
+dev = ["matplotlib (>3.1)", "omegaconf (>=2.0.5)", "hydra-core (>=1.0.5)", "jsonargparse[signatures] (>=4.15.2)", "rich (>=10.14.0,!=10.15.0.a)", "coverage (==6.5.0)", "codecov (==2.1.12)", "pytest (==7.2.0)", "pytest-cov (==4.0.0)", "pytest-forked (==1.4.0)", "pytest-rerunfailures (==10.2)", "pre-commit (==2.20.0)", "cloudpickle (>=1.3)", "scikit-learn (>0.22.1)", "onnxruntime", "psutil", "pandas (>1.0)", "fastapi", "uvicorn", "tensorboard (>=2.9.1)", "protobuf (<=3.20.1)"]
+examples = ["torchvision (>=0.10.0)", "gym[classic_control] (>=0.17.0)", "ipython"]
+extra = ["matplotlib (>3.1)", "omegaconf (>=2.0.5)", "hydra-core (>=1.0.5)", "jsonargparse[signatures] (>=4.15.2)", "rich (>=10.14.0,!=10.15.0.a)"]
+fairscale = ["fairscale (>=0.4.5)"]
+hivemind = ["hivemind (==1.1.2)"]
+horovod = ["horovod (>=0.21.2,!=0.24.0)"]
+strategies = ["fairscale (>=0.4.5)", "deepspeed (>=0.6.0)", "horovod (>=0.21.2,!=0.24.0)", "hivemind (==1.1.2)"]
+test = ["coverage (==6.5.0)", "codecov (==2.1.12)", "pytest (==7.2.0)", "pytest-cov (==4.0.0)", "pytest-forked (==1.4.0)", "pytest-rerunfailures (==10.2)", "pre-commit (==2.20.0)", "cloudpickle (>=1.3)", "scikit-learn (>0.22.1)", "onnxruntime", "psutil", "pandas (>1.0)", "fastapi", "uvicorn", "tensorboard (>=2.9.1)", "protobuf (<=3.20.1)"]
+
+[[package]]
 name = "pytz"
 version = "2022.7"
 description = "World timezone definitions, modern and historical"
@@ -2420,6 +2606,21 @@ urllib3 = ">=1.21.1,<1.27"
 [package.extras]
 socks = ["PySocks (>=1.5.6,!=1.5.7)"]
 use_chardet_on_py3 = ["chardet (>=3.0.2,<6)"]
+
+[[package]]
+name = "requests-oauthlib"
+version = "1.3.1"
+description = "OAuthlib authentication support for Requests."
+category = "main"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+
+[package.dependencies]
+oauthlib = ">=3.0.0"
+requests = ">=2.0.0"
+
+[package.extras]
+rsa = ["oauthlib[signedtoken] (>=3.0.0)"]
 
 [[package]]
 name = "rfc3339-validator"
@@ -2818,6 +3019,55 @@ python-versions = ">=3.6"
 doc = ["reno", "sphinx", "tornado (>=4.5)"]
 
 [[package]]
+name = "tensorboard"
+version = "2.11.0"
+description = "TensorBoard lets you watch Tensors Flow"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+absl-py = ">=0.4"
+google-auth = ">=1.6.3,<3"
+google-auth-oauthlib = ">=0.4.1,<0.5"
+grpcio = ">=1.24.3"
+markdown = ">=2.6.8"
+numpy = ">=1.12.0"
+protobuf = ">=3.9.2,<4"
+requests = ">=2.21.0,<3"
+tensorboard-data-server = ">=0.6.0,<0.7.0"
+tensorboard-plugin-wit = ">=1.6.0"
+werkzeug = ">=1.0.1"
+
+[[package]]
+name = "tensorboard-data-server"
+version = "0.6.1"
+description = "Fast data loading for TensorBoard"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[[package]]
+name = "tensorboard-plugin-wit"
+version = "1.8.1"
+description = "What-If Tool TensorBoard plugin."
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
+name = "tensorboardx"
+version = "2.5.1"
+description = "TensorBoardX lets you watch Tensors Flow without Tensorflow"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+numpy = "*"
+protobuf = ">=3.8.0,<=3.20.1"
+
+[[package]]
 name = "terminado"
 version = "0.17.1"
 description = "Tornado websocket backend for the Xterm.js Javascript terminal emulator library."
@@ -2943,6 +3193,30 @@ python-versions = ">=3.7.0"
 
 [package.dependencies]
 typing-extensions = "*"
+
+[[package]]
+name = "torchmetrics"
+version = "0.11.0"
+description = "PyTorch native Metrics"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+numpy = ">=1.17.2"
+packaging = "*"
+torch = ">=1.8.1"
+
+[package.extras]
+all = ["pystoi", "torchvision (>=0.8)", "pycocotools", "scipy", "torch-fidelity", "torchvision", "lpips", "pytorch-lightning (>=1.5)", "transformers (>=4.10.0)", "regex (>=2021.9.24)", "nltk (>=3.6)", "tqdm (>=4.41.0)"]
+audio = ["pystoi"]
+detection = ["torchvision (>=0.8)", "pycocotools"]
+docs = ["sphinx-autodoc-typehints (>=1.0)", "nbsphinx (>=0.8)", "docutils (>=0.16)", "sphinx-togglebutton (>=0.2)", "pandoc (>=1.0)", "myst-parser", "sphinx-paramlinks (>=0.5.1)", "sphinxcontrib-fulltoc (>=1.0)", "sphinxcontrib-mockautodoc", "sphinx-copybutton (>=0.3)", "sphinx (>=4.0,<5.0)"]
+image = ["scipy", "torch-fidelity", "torchvision", "lpips"]
+integrate = ["pytorch-lightning (>=1.5)"]
+multimodal = ["transformers (>=4.10.0)"]
+test = ["types-protobuf", "rouge-score (>=0.0.4)", "bert-score (==0.3.10)", "requests", "mir-eval (>=0.6)", "jiwer (>=2.3.0)", "scikit-learn (>1.0,<1.1.1)", "check-manifest", "types-tabulate", "pytest-timeout", "types-emoji", "pycocotools", "coverage (>5.2)", "pytest (>=6.0.0,<7.0.0)", "types-six", "kornia (>=0.6.7)", "phmdoctest (>=1.1.1)", "pandas", "pytest-cov (>2.10)", "cloudpickle (>=1.3)", "pre-commit (>=1.0)", "scipy", "psutil", "mypy (==0.982)", "types-requests", "pytest-rerunfailures (>=10.0)", "types-pyyaml", "types-setuptools", "sacrebleu (>=2.0.0)", "netcal", "pytorch-msssim (==0.2.1)", "transformers (>4.4.0)", "fast-bss-eval (>=0.1.0)", "fire", "scikit-image (>0.17.1)", "dython", "torch-complex", "pytest-doctestplus (>=0.9.0)", "huggingface-hub (<0.7)", "pypesq (>1.2)"]
+text = ["regex (>=2021.9.24)", "nltk (>=3.6)", "tqdm (>=4.41.0)"]
 
 [[package]]
 name = "torchvision"
@@ -3229,6 +3503,32 @@ optional = ["python-socks", "wsaccel"]
 test = ["websockets"]
 
 [[package]]
+name = "werkzeug"
+version = "2.2.2"
+description = "The comprehensive WSGI web application library."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+MarkupSafe = ">=2.1.1"
+
+[package.extras]
+watchdog = ["watchdog"]
+
+[[package]]
+name = "yarl"
+version = "1.8.2"
+description = "Yet another URL library"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+idna = ">=2.0"
+multidict = ">=4.0"
+
+[[package]]
 name = "zipp"
 version = "3.11.0"
 description = "Backport of pathlib-compatible object wrapper for zip files"
@@ -3257,9 +3557,12 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.8"
-content-hash = "17149059f72541386cc6acdafac73d615b49c8785098dbff6825f825e7665410"
+content-hash = "21b1af1c3f97b27175f678dd58d3cf369bdf69b1c3867554f823b33040897a06"
 
 [metadata.files]
+absl-py = []
+aiohttp = []
+aiosignal = []
 altair = [
     {file = "altair-4.2.0-py3-none-any.whl", hash = "sha256:0c724848ae53410c13fa28be2b3b9a9dcb7b5caa1a70f7f217bd663bb419935a"},
     {file = "altair-4.2.0.tar.gz", hash = "sha256:d87d9372e63b48cd96b2a6415f0cf9457f50162ab79dc7a31cd7e024dd840026"},
@@ -3299,6 +3602,10 @@ argon2-cffi-bindings = [
 ]
 arrow = []
 asttokens = []
+async-timeout = [
+    {file = "async-timeout-4.0.2.tar.gz", hash = "sha256:2163e1640ddb52b7a8c80d0a67a08587e5d245cc9c553a74a847056bc2976b15"},
+    {file = "async_timeout-4.0.2-py3-none-any.whl", hash = "sha256:8ca1e4fcf50d07413d66d1a5e416e42cfdf5851c981d679a09851a6853383b3c"},
+]
 attrs = []
 babel = []
 backcall = [
@@ -3373,6 +3680,8 @@ filelock = []
 flake8 = []
 fonttools = []
 fqdn = []
+frozenlist = []
+fsspec = []
 fugashi = []
 future = []
 gitdb = []
@@ -3386,6 +3695,10 @@ google-auth = []
 google-auth-httplib2 = [
     {file = "google-auth-httplib2-0.1.0.tar.gz", hash = "sha256:a07c39fd632becacd3f07718dfd6021bf396978f03ad3ce4321d060015cc30ac"},
     {file = "google_auth_httplib2-0.1.0-py2.py3-none-any.whl", hash = "sha256:31e49c36c6b5643b57e82617cb3e021e3e1d2df9da63af67252c02fa9c1f4a10"},
+]
+google-auth-oauthlib = [
+    {file = "google-auth-oauthlib-0.4.6.tar.gz", hash = "sha256:a90a072f6993f2c327067bf65270046384cda5a8ecb20b94ea9a687f1f233a7a"},
+    {file = "google_auth_oauthlib-0.4.6-py2.py3-none-any.whl", hash = "sha256:3f2a6e802eebbb6fb736a370fbf3b055edcb6b52878bf2f26330b5e041316c73"},
 ]
 google-cloud-bigquery = [
     {file = "google-cloud-bigquery-2.34.3.tar.gz", hash = "sha256:0ab6362a86a29f17e379e886b49544bc0b75626902a48d12c13a0b47f821bf4a"},
@@ -3462,6 +3775,8 @@ langcodes = [
     {file = "langcodes-3.3.0-py3-none-any.whl", hash = "sha256:4d89fc9acb6e9c8fdef70bcdf376113a3db09b67285d9e1d534de6d8818e7e69"},
     {file = "langcodes-3.3.0.tar.gz", hash = "sha256:794d07d5a28781231ac335a1561b8442f8648ca07cd518310aeb45d6f0807ef6"},
 ]
+lightning-utilities = []
+markdown = []
 markupsafe = [
     {file = "MarkupSafe-2.1.1-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:86b1f75c4e7c2ac2ccdaec2b9022845dbb81880ca318bb7a0a01fbf7813e3812"},
     {file = "MarkupSafe-2.1.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:f121a1420d4e173a5d96e47e9a0c0dcff965afdf1626d28de1460815f7c4ee7a"},
@@ -3509,6 +3824,7 @@ matplotlib-inline = []
 mccabe = []
 mistune = []
 more-itertools = []
+multidict = []
 murmurhash = []
 mypy = []
 mypy-extensions = [
@@ -3552,6 +3868,7 @@ oauth2client = [
     {file = "oauth2client-4.1.3-py2.py3-none-any.whl", hash = "sha256:b8a81cc5d60e2d364f0b1b98f958dbd472887acaf1a5b05e21c28c31a2d6d3ac"},
     {file = "oauth2client-4.1.3.tar.gz", hash = "sha256:d486741e451287f69568a4d26d70d9acd73a2bbfa275746c535b4209891cccc6"},
 ]
+oauthlib = []
 objsize = []
 orjson = []
 overrides = []
@@ -3715,6 +4032,7 @@ python-dateutil = [
 ]
 python-decouple = []
 python-json-logger = []
+pytorch-lightning = []
 pytz = []
 pytz-deprecation-shim = [
     {file = "pytz_deprecation_shim-0.1.0.post0-py2.py3-none-any.whl", hash = "sha256:8314c9692a636c8eb3bda879b9f119e350e93223ae83e70e80c31675a0fdc1a6"},
@@ -3760,6 +4078,10 @@ pyyaml = [
 pyzmq = []
 regex = []
 requests = []
+requests-oauthlib = [
+    {file = "requests-oauthlib-1.3.1.tar.gz", hash = "sha256:75beac4a47881eeb94d5ea5d6ad31ef88856affe2332b9aafb52c6452ccf0d7a"},
+    {file = "requests_oauthlib-1.3.1-py2.py3-none-any.whl", hash = "sha256:2577c501a2fb8d05a304c09d090d6e47c306fef15809d102b327cf8364bddab5"},
+]
 rfc3339-validator = []
 rfc3986-validator = []
 rich = []
@@ -3803,6 +4125,16 @@ streamlit = []
 streamlit-aggrid = []
 tabulate = []
 tenacity = []
+tensorboard = []
+tensorboard-data-server = [
+    {file = "tensorboard_data_server-0.6.1-py3-none-any.whl", hash = "sha256:809fe9887682d35c1f7d1f54f0f40f98bb1f771b14265b453ca051e2ce58fca7"},
+    {file = "tensorboard_data_server-0.6.1-py3-none-macosx_10_9_x86_64.whl", hash = "sha256:fa8cef9be4fcae2f2363c88176638baf2da19c5ec90addb49b1cde05c95c88ee"},
+    {file = "tensorboard_data_server-0.6.1-py3-none-manylinux2010_x86_64.whl", hash = "sha256:d8237580755e58eff68d1f3abefb5b1e39ae5c8b127cc40920f9c4fb33f4b98a"},
+]
+tensorboard-plugin-wit = [
+    {file = "tensorboard_plugin_wit-1.8.1-py3-none-any.whl", hash = "sha256:ff26bdd583d155aa951ee3b152b3d0cffae8005dc697f72b44a8e8c2a77a8cbe"},
+]
+tensorboardx = []
 terminado = []
 thinc = []
 threadpoolctl = [
@@ -3821,6 +4153,7 @@ tomli = [
 ]
 toolz = []
 torch = []
+torchmetrics = []
 torchvision = []
 tornado = []
 tqdm = []
@@ -3850,5 +4183,7 @@ webencodings = [
     {file = "webencodings-0.5.1.tar.gz", hash = "sha256:b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923"},
 ]
 websocket-client = []
+werkzeug = []
+yarl = []
 zipp = []
 zstandard = []
