@@ -3467,6 +3467,14 @@ tqdm = ">=4.41.1,<5.0.0"
 wasabi = ">=0.6.0,<1.0.0"
 
 [[package]]
+name = "unidic-lite"
+version = "1.0.8"
+description = "A small version of UniDic packaged for Python"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "uri-template"
 version = "1.2.0"
 description = "RFC 6570 URI Template Processor"
@@ -3615,7 +3623,7 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.8"
-content-hash = "544dc4e54de601052c68d0a97329a0424fa8ab116f20ce7f2c0cdb5c219983a1"
+content-hash = "16fa0b04f781bf560d0c368db381963f49c7c9f8e80bd9b122c41253565de07f"
 
 [metadata.files]
 absl-py = []
@@ -4229,6 +4237,9 @@ tzlocal = [
 ]
 unidecode = []
 unidic = []
+unidic-lite = [
+    {file = "unidic-lite-1.0.8.tar.gz", hash = "sha256:db9d4572d9fdd4d00a97949d4b0741ec480ee05a7e7e2e32f547500dae27b245"},
+]
 uri-template = []
 urllib3 = []
 validators = []
