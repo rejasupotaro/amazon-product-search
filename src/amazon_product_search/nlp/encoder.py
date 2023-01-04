@@ -16,6 +16,7 @@ from amazon_product_search.constants import MODELS_DIR
 JA_BERT = "cl-tohoku/bert-base-japanese-v2"
 JA_SBERT = "sonoisa/sentence-bert-base-ja-mean-tokens-v2"
 JA_FINE_TUNED_SBERT = f"{MODELS_DIR}/jp_fine_tuned_sbert"
+JA_COLBERT = f"{MODELS_DIR}/jp_colberter.pt"
 # JA_ROBERTA = "nlp-waseda/roberta-large-japanese"
 
 # Multi-lingual

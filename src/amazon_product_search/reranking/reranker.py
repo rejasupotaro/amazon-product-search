@@ -76,7 +76,7 @@ class ColBERTReranker:
 
     def rerank(self, query: str, results: list[Result]) -> list[Result]:
         with torch.no_grad():
-            encoded_queries = self.tokenize([query])
+            encoded_queries = self.tokenize([query] * len(results))
             products = [result.product["product_title"] for result in results]
             encoded_products = self.tokenize(products)
             scores, _, _ = self.colberter(encoded_queries, encoded_products)
@@ -94,5 +94,4 @@ def from_string(reranker_str: str) -> Reranker:
         "NoOpReranker": NoOpReranker,
         "RandomReranker": RandomReranker,
         "DotReranker": DotReranker,
-        "ColBERTReranker": ColBERTReranker,
     }[reranker_str]()

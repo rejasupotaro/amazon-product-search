@@ -4,21 +4,35 @@ from typing import Any, Optional
 
 import pandas as pd
 import streamlit as st
+from more_itertools import chunked
 
 from amazon_product_search import metrics
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.response import Result
-from amazon_product_search.nlp.encoder import JA_FINE_TUNED_SBERT
-from amazon_product_search.reranking.reranker import DotReranker, RandomReranker
+from amazon_product_search.nlp.encoder import JA_COLBERT
+from amazon_product_search.reranking.reranker import (
+    ColBERTReranker,
+    DotReranker,
+    NoOpReranker,
+    RandomReranker,
+    Reranker,
+)
 from demo.page_config import set_page_config
 from demo.utils import load_merged
 
+
+def init_rerankers() -> dict[str, Reranker]:
+    rerankers: dict[str, Reranker] = {}
+    rerankers["Elasticsearch Results"] = NoOpReranker()
+    rerankers["Random Reranker"] = RandomReranker()
+    rerankers["Dot Reranker"] = DotReranker()
+    if path.exists(JA_COLBERT):
+        rerankers["ColBERT Reranker"] = ColBERTReranker(model_filepath=JA_COLBERT)
+    return rerankers
+
+
 es_client = EsClient()
-random_reranker = RandomReranker()
-dot_reranker = DotReranker()
-fine_tuned_dot_reranker: Optional[DotReranker] = None
-if path.exists(JA_FINE_TUNED_SBERT):
-    fine_tuned_dot_reranker = DotReranker(JA_FINE_TUNED_SBERT)
+rerankers = init_rerankers()
 
 
 @st.cache
@@ -48,7 +62,7 @@ def search(query: str, doc_ids: list[str], all_judgements: dict[str, str]) -> li
             ],
         }
     }
-    response = es_client.search(index_name="products_all_jp", query=es_query)
+    response = es_client.search(index_name="products_jp", query=es_query)
     for result in response.results:
         result.product["query"] = query
         result.product["esci_label"] = all_judgements[result.product["product_id"]]
@@ -74,7 +88,17 @@ def draw_results(results: list[Result]):
     st.write(df[["esci_label", "query", "product_title", "product_id"]])
 
 
-def run_comparison(df: pd.DataFrame, all_judgements: dict[str, str], num_queries: int = 10):
+def draw_examples(query: str, results: list[Result]):
+    for reranker_names in chunked(rerankers, 2):
+        columns = st.columns(2)
+        for i, reranker_name in enumerate(reranker_names):
+            with columns[i]:
+                st.write(f"#### {reranker_name}")
+                random_results = rerankers[reranker_name].rerank(query, results)
+                draw_results(random_results)
+
+
+def run_comparison(df: pd.DataFrame, all_judgements: dict[str, str], num_queries: int):
     queries = list(df["query"].unique())
     n = 0
     progress_text = st.empty()
@@ -92,15 +116,10 @@ def run_comparison(df: pd.DataFrame, all_judgements: dict[str, str], num_queries
         rows.append(
             {
                 "query": query,
-                "variant": "original",
-                "ndcg": compute_ndcg([result.product for result in results]),
-            }
-        )
-        rows.append(
-            {
-                "query": query,
                 "variant": "random",
-                "ndcg": compute_ndcg([result.product for result in random_reranker.rerank(query, results)]),
+                "ndcg": compute_ndcg(
+                    [result.product for result in rerankers["Random Reranker"].rerank(query, results)]
+                ),
             }
         )
         rows.append(
@@ -122,8 +141,17 @@ def run_comparison(df: pd.DataFrame, all_judgements: dict[str, str], num_queries
         rows.append(
             {
                 "query": query,
-                "variant": "sbert",
-                "ndcg": compute_ndcg([result.product for result in dot_reranker.rerank(query, results)]),
+                "variant": "dot",
+                "ndcg": compute_ndcg([result.product for result in rerankers["Dot Reranker"].rerank(query, results)]),
+            }
+        )
+        rows.append(
+            {
+                "query": query,
+                "variant": "colbert",
+                "ndcg": compute_ndcg(
+                    [result.product for result in rerankers["ColBERT Reranker"].rerank(query, results)]
+                ),
             }
         )
     metrics_df = pd.DataFrame(rows)
@@ -153,35 +181,11 @@ def main():
     products = filtered_df.to_dict("records")
     results = [Result(product=product, score=1) for product in products]
 
-    columns = st.columns(2)
-    with columns[0]:
-        st.write("#### Original Results")
-        draw_results(results)
-    with columns[1]:
-        st.write("#### Random Results")
-        random_results = random_reranker.rerank(query, results)
-        draw_results(random_results)
-    columns = st.columns(2)
-    with columns[0]:
-        st.write("#### Search Results")
-        search_results = search(
-            query, doc_ids=[result.product["product_id"] for result in results], all_judgements=all_judgements
-        )
-        draw_results(search_results)
-    with columns[1]:
-        st.write("#### SBERT Results")
-        sbert_results = dot_reranker.rerank(query, results)
-        draw_results(sbert_results)
-    if fine_tuned_dot_reranker:
-        columns = st.columns(2)
-        with columns[0]:
-            st.write("#### Fine-Tuned SBERT Results")
-            sbert_results = fine_tuned_dot_reranker.rerank(query, results)
-            draw_results(sbert_results)
+    draw_examples(query, results)
 
     st.write("### Comparison")
     if st.button("Run"):
-        run_comparison(df, all_judgements)
+        run_comparison(df, all_judgements, num_queries=10)
 
 
 if __name__ == "__main__":
