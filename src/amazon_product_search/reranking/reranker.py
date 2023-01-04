@@ -7,7 +7,7 @@ from transformers import AutoModel, AutoTokenizer
 from transformers.modeling_outputs import BaseModelOutput
 
 from amazon_product_search.es.response import Result
-from amazon_product_search.modules.colberter import ColBERTer
+from amazon_product_search.modules.colbert import ColBERTWrapper
 from amazon_product_search.nlp.encoder import JA_SBERT
 
 
@@ -56,24 +56,7 @@ class DotReranker:
         return results
 
 
-class ColBERTReranker:
-    def __init__(self, model_filepath: str, bert_model_name: str = "cl-tohoku/bert-base-japanese-v2"):
-        self.colberter = ColBERTer(bert_model_name)
-        self.colberter.load_state_dict(torch.load(model_filepath))
-        self.colberter.eval()
-        self.tokenizer = AutoTokenizer.from_pretrained(bert_model_name)
-
-    def tokenize(self, texts: list[str]) -> dict[str, torch.Tensor]:
-        return self.tokenizer(
-            texts,
-            add_special_tokens=True,
-            padding="longest",
-            truncation="longest_first",
-            # max_length=self.max_length,
-            return_attention_mask=True,
-            return_tensors="pt",
-        )
-
+class ColBERTReranker(ColBERTWrapper):
     def rerank(self, query: str, results: list[Result]) -> list[Result]:
         with torch.no_grad():
             encoded_queries = self.tokenize([query] * len(results))
