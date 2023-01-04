@@ -7,8 +7,8 @@ from transformers import AutoModel, AutoTokenizer
 from transformers.modeling_outputs import BaseModelOutput
 
 from amazon_product_search.es.response import Result
+from amazon_product_search.modules.colberter import ColBERTer
 from amazon_product_search.nlp.encoder import JA_SBERT
-from amazon_product_search.reranking.models.colberter import ColBERTer
 
 
 class Reranker(Protocol):
