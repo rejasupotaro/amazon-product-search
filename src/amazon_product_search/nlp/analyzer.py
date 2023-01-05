@@ -1,8 +1,8 @@
 from typing import Any, Dict
 
-from amazon_product_search.keyword_extractor import KeywordExtractor
 from amazon_product_search.nlp.normalizer import normalize_doc
 from amazon_product_search.nlp.tokenizer import Tokenizer
+from amazon_product_search.retrieval.keyword_extractor import KeywordExtractor
 
 
 class Analyzer:

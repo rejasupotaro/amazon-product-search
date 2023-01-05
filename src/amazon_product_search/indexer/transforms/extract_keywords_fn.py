@@ -2,7 +2,7 @@ from typing import Any, Dict, Iterator, Tuple
 
 import apache_beam as beam
 
-from amazon_product_search.keyword_extractor import KeywordExtractor
+from amazon_product_search.retrieval.keyword_extractor import KeywordExtractor
 
 
 class ExtractKeywordsFn(beam.DoFn):

@@ -1,6 +1,6 @@
 import pytest
 
-from amazon_product_search.keyword_extractor import KeywordExtractor
+from amazon_product_search.retrieval.keyword_extractor import KeywordExtractor
 
 
 @pytest.mark.parametrize(
