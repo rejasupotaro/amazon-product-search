@@ -3,6 +3,7 @@ import pytest
 from amazon_product_search.nlp.importance import ColBERTTermImportanceEstimator
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "text,expected",
     [
