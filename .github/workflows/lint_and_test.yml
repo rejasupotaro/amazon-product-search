@@ -1,14 +1,12 @@
-name: CI
+name: lint_and_test
 on:
   push:
     branches: ["main"]
   pull_request:
-
-permissions:
-  contents: read
-
 jobs:
   build:
+    permissions:
+      contents: read
     strategy:
       matrix:
         python-version: ["3.10.8"]
