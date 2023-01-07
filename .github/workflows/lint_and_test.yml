@@ -1,8 +1,6 @@
 name: lint_and_test
 on:
   push:
-    branches: ["main"]
-  pull_request:
 jobs:
   build:
     permissions:
