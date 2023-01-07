@@ -7,8 +7,8 @@ from amazon_product_search.modules.colbert import ColBERTWrapper
 class ColBERTTermImportanceEstimator(ColBERTWrapper):
     def estimate(self, text: str) -> list[tuple[str, float]]:
         with torch.no_grad():
-            encoded_text = self.tokenize([text])
-            _, _, _, stopword_importance = self.colberter.encode_doc(encoded_text)
+            tokenized_text = self.tokenize([text])
+            _, _, _, stopword_importance = self.colberter.encode_doc(tokenized_text)
 
             results = list(zip(self.tokenizer.tokenize(text), stopword_importance[0]))
 

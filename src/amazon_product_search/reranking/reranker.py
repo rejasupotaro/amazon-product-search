@@ -35,35 +35,49 @@ class DotReranker:
         self.batch_size = batch_size
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+    def tokenize(self, texts: list[str]) -> dict[str, Tensor]:
+        return self.tokenizer(
+            texts,
+            add_special_tokens=True,
+            padding="longest",
+            truncation="longest_first",
+            # max_length=self.max_length,
+            return_attention_mask=True,
+            return_tensors="pt",
+        )
+
     def cls_pooling(self, model_output: BaseModelOutput) -> Tensor:
         return model_output.last_hidden_state[:, 0]
 
-    def encode(self, texts: list[str]):
-        encoded_input = self.tokenizer(texts, padding=True, truncation=True, return_tensors="pt").to(self.device)
+    def encode(self, texts: list[str]) -> Tensor:
+        tokenized_texts = self.tokenize(texts)
         with torch.no_grad():
-            model_output = self.model(**encoded_input, return_dict=True)
-        embeddings = self.cls_pooling(model_output)
-        return embeddings
+            tokens = self.model(**tokenized_texts, return_dict=True)
+        cls_vecs = self.cls_pooling(tokens)
+        return cls_vecs
 
     def rerank(self, query: str, results: list[Result]) -> list[Result]:
         if not query or not results:
             return results
 
         with torch.no_grad():
-            query_emb = self.encode([query]).repeat(len(results), 1)
-            product_emb = self.encode([result.product["product_title"] for result in results])
-            scores = torch.diagonal(torch.mm(query_emb, product_emb.transpose(0, 1)).to("cpu"))
+            query_cls_vec = self.encode([query]).repeat(len(results), 1)
+            product_cls_vec = self.encode([result.product["product_title"] for result in results])
+            scores = torch.diagonal(torch.mm(query_cls_vec, product_cls_vec.transpose(0, 1)))
         results = [result for result, score in sorted(zip(results, scores), key=lambda e: e[1], reverse=True)]
         return results
 
 
 class ColBERTReranker(ColBERTWrapper):
     def rerank(self, query: str, results: list[Result]) -> list[Result]:
+        if not query or not results:
+            return results
+
         with torch.no_grad():
-            encoded_queries = self.tokenize([query] * len(results))
+            tokenized_queries = self.tokenize([query] * len(results))
             products = [result.product["product_title"] for result in results]
-            encoded_products = self.tokenize(products)
-            scores, _, _ = self.colberter(encoded_queries, encoded_products)
+            tokenized_products = self.tokenize(products)
+            scores, _, _ = self.colberter(tokenized_queries, tokenized_products)
             scores = scores.numpy()
         results = [result for result, score in sorted(zip(results, scores), key=lambda e: e[1], reverse=True)]
         return results
@@ -88,11 +102,14 @@ class SpladeReranker:
         )
 
     def rerank(self, query: str, results: list[Result]) -> list[Result]:
+        if not query or not results:
+            return results
+
         with torch.no_grad():
-            encoded_queries = self.tokenize([query] * len(results))
+            tokenized_queries = self.tokenize([query] * len(results))
             products = [result.product["product_title"] for result in results]
-            encoded_products = self.tokenize(products)
-            scores = self.splade(encoded_queries, encoded_products).numpy()
+            tokenized_products = self.tokenize(products)
+            scores = self.splade(tokenized_queries, tokenized_products).numpy()
         results = [result for result, score in sorted(zip(results, scores), key=lambda e: e[1], reverse=True)]
         return results
 

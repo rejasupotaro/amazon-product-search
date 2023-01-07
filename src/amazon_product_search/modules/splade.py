@@ -17,9 +17,9 @@ class Splade(nn.Module):
     @staticmethod
     def generate_bow(input_ids: Tensor, output_dim: int) -> Tensor:
         """from a batch of input ids, generates batch of bow rep"""
-        bs = input_ids.shape[0]
-        bow = torch.zeros(bs, output_dim)
-        bow[torch.arange(bs).unsqueeze(-1), input_ids] = 1
+        batch_size = input_ids.shape[0]
+        bow = torch.zeros(batch_size, output_dim)
+        bow[torch.arange(batch_size).unsqueeze(-1), input_ids] = 1
         return bow
 
     def encode_query(self, tokens: dict[str, Tensor]) -> Tensor:
@@ -32,11 +32,11 @@ class Splade(nn.Module):
         logits = self.model(**tokens).logits
         logits = torch.log(1 + torch.relu(logits))
         attention_mask = tokens["attention_mask"].unsqueeze(-1)
-        bow = torch.sum(logits * attention_mask, dim=1)
-        return bow
+        vecs = torch.sum(logits * attention_mask, dim=1)
+        return vecs
 
-    def forward(self, query: dict[str, Tensor], doc: dict[str, Tensor]) -> Tensor:
-        encoded_doc = self.encode_doc(doc)
-        encoded_query = self.encode_query(query).to(encoded_doc.device)
-        score = torch.sum(encoded_query * encoded_doc, dim=1, keepdim=True)
+    def forward(self, queries: dict[str, Tensor], docs: dict[str, Tensor]) -> Tensor:
+        doc_vecs = self.encode_doc(docs)
+        query_vecs = self.encode_query(queries).to(doc_vecs.device)
+        score = torch.sum(query_vecs * doc_vecs, dim=1, keepdim=True)
         return score
