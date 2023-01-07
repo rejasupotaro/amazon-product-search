@@ -8,6 +8,7 @@ from transformers.modeling_outputs import BaseModelOutput
 
 from amazon_product_search.es.response import Result
 from amazon_product_search.modules.colbert import ColBERTWrapper
+from amazon_product_search.modules.splade import Splade
 from amazon_product_search.nlp.encoder import JA_SBERT
 
 
@@ -64,6 +65,34 @@ class ColBERTReranker(ColBERTWrapper):
             encoded_products = self.tokenize(products)
             scores, _, _ = self.colberter(encoded_queries, encoded_products)
             scores = scores.numpy()
+        results = [result for result, score in sorted(zip(results, scores), key=lambda e: e[1], reverse=True)]
+        return results
+
+
+class SpladeReranker:
+    def __init__(self, model_filepath: str, bert_model_name: str = "cl-tohoku/bert-base-japanese-v2"):
+        self.splade = Splade(bert_model_name)
+        self.splade.load_state_dict(torch.load(model_filepath))
+        self.splade.eval()
+        self.tokenizer = AutoTokenizer.from_pretrained(bert_model_name)
+
+    def tokenize(self, texts: list[str]) -> dict[str, Tensor]:
+        return self.tokenizer(
+            texts,
+            add_special_tokens=True,
+            padding="longest",
+            truncation="longest_first",
+            # max_length=self.max_length,
+            return_attention_mask=True,
+            return_tensors="pt",
+        )
+
+    def rerank(self, query: str, results: list[Result]) -> list[Result]:
+        with torch.no_grad():
+            encoded_queries = self.tokenize([query] * len(results))
+            products = [result.product["product_title"] for result in results]
+            encoded_products = self.tokenize(products)
+            scores = self.splade(encoded_queries, encoded_products).numpy()
         results = [result for result, score in sorted(zip(results, scores), key=lambda e: e[1], reverse=True)]
         return results
 
