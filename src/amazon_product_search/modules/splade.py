@@ -22,21 +22,29 @@ class Splade(nn.Module):
         bow[torch.arange(batch_size).unsqueeze(-1), input_ids] = 1
         return bow
 
-    def encode_query(self, tokens: dict[str, Tensor]) -> Tensor:
+    def encode_bow(self, tokens: dict[str, Tensor]) -> Tensor:
         bow = self.generate_bow(tokens["input_ids"], self.tokenizer.vocab_size)
         for token_id_to_skip in self.token_ids_to_skip:
             bow[:, token_id_to_skip] = 0
         return bow
 
-    def encode_doc(self, tokens: dict[str, Tensor]) -> Tensor:
+    def encode_logits(self, tokens: dict[str, Tensor]) -> Tensor:
         logits = self.model(**tokens).logits
         logits = torch.log(1 + torch.relu(logits))
         attention_mask = tokens["attention_mask"].unsqueeze(-1)
-        vecs = torch.sum(logits * attention_mask, dim=1)
+        # SPLADE-sum
+        # vecs = torch.sum(logits * attention_mask, dim=1)
+        # SPLADE-max
+        vecs, _ = torch.max(logits * attention_mask, dim=1)
         return vecs
 
-    def forward(self, queries: dict[str, Tensor], docs: dict[str, Tensor]) -> Tensor:
-        doc_vecs = self.encode_doc(docs)
-        query_vecs = self.encode_query(queries).to(doc_vecs.device)
-        score = torch.sum(query_vecs * doc_vecs, dim=1, keepdim=True)
-        return score
+    def forward(self, queries: dict[str, Tensor], docs: dict[str, Tensor]) -> tuple[Tensor, Tensor, Tensor]:
+        doc_vecs = self.encode_logits(docs)
+        query_vecs = self.encode_logits(queries).to(doc_vecs.device)
+
+        enable_in_batch_negatives = False
+        if enable_in_batch_negatives:
+            score = torch.matmul(query_vecs, doc_vecs.T)
+        else:
+            score = torch.sum(query_vecs * doc_vecs, dim=1, keepdim=True)
+        return score, query_vecs, doc_vecs

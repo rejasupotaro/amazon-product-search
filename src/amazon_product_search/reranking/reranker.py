@@ -109,7 +109,8 @@ class SpladeReranker:
             tokenized_queries = self.tokenize([query] * len(results))
             products = [result.product["product_title"] for result in results]
             tokenized_products = self.tokenize(products)
-            scores = self.splade(tokenized_queries, tokenized_products).numpy()
+            scores, _, _ = self.splade(tokenized_queries, tokenized_products)
+            scores = scores.squeeze(-1).numpy()
         results = [result for result, score in sorted(zip(results, scores), key=lambda e: e[1], reverse=True)]
         return results
 
