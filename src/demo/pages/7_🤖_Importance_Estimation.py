@@ -1,5 +1,7 @@
 from typing import Optional
 
+import pandas as pd
+import plotly.express as px
 import streamlit as st
 from st_aggrid import AgGrid, GridOptionsBuilder
 
@@ -14,6 +16,16 @@ def estimate_importance(text: Optional[str]):
     if not text:
         return
     results = estimator.estimate(text)
+
+    weights_df = pd.DataFrame.from_dict(
+        {
+            "token": [r[0] for r in results],
+            "weight": [r[1] for r in results],
+        }
+    )
+    fig = px.bar(weights_df, x="token", y="weight")
+    st.plotly_chart(fig)
+
     results = sorted(results, key=lambda result: result[1], reverse=True)
     st.write([f"{result[0]} ({result[1]})" for result in results])
 
