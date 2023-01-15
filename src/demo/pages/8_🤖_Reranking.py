@@ -7,9 +7,9 @@ import streamlit as st
 from more_itertools import chunked
 
 from amazon_product_search import metrics
+from amazon_product_search.constants import HF
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.response import Result
-from amazon_product_search.nlp.encoder import JA_COLBERT
 from amazon_product_search.reranking.reranker import (
     ColBERTReranker,
     DotReranker,
@@ -26,8 +26,8 @@ def init_rerankers() -> dict[str, Reranker]:
     rerankers["Elasticsearch Results"] = NoOpReranker()
     rerankers["Random Reranker"] = RandomReranker()
     rerankers["Dot Reranker"] = DotReranker()
-    if path.exists(JA_COLBERT):
-        rerankers["ColBERT Reranker"] = ColBERTReranker(model_filepath=JA_COLBERT)
+    if path.exists(HF.JP_COLBERT):
+        rerankers["ColBERT Reranker"] = ColBERTReranker(model_filepath=HF.JP_COLBERT)
     return rerankers
 
 

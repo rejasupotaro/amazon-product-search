@@ -1,7 +1,7 @@
 import pke
 from keybert import KeyBERT
 
-from amazon_product_search.nlp.encoder import JA_SBERT
+from amazon_product_search.constants import HF
 
 
 class KeywordExtractor:
@@ -9,7 +9,7 @@ class KeywordExtractor:
         self._yake = pke.unsupervised.YAKE()
         self._position_rank = pke.unsupervised.PositionRank()
         self._multipartite_rank = pke.unsupervised.MultipartiteRank()
-        self._keybert = KeyBERT(JA_SBERT)
+        self._keybert = KeyBERT(HF.JA_SBERT)
 
     def apply_yake(self, text: str) -> list[tuple[str, float]]:
         self._yake.load_document(input=text)

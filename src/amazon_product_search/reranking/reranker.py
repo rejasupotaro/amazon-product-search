@@ -6,10 +6,10 @@ from torch import Tensor
 from transformers import AutoModel, AutoTokenizer
 from transformers.modeling_outputs import BaseModelOutput
 
+from amazon_product_search.constants import HF
 from amazon_product_search.es.response import Result
 from amazon_product_search.modules.colbert import ColBERTWrapper
 from amazon_product_search.modules.splade import Splade
-from amazon_product_search.nlp.encoder import JA_SBERT
 
 
 class Reranker(Protocol):
@@ -28,7 +28,7 @@ class RandomReranker:
 
 
 class DotReranker:
-    def __init__(self, model_name: str = JA_SBERT, batch_size: int = 8):
+    def __init__(self, model_name: str = HF.JA_SBERT, batch_size: int = 8):
         self.model = AutoModel.from_pretrained(model_name)
         self.model.eval()
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -84,7 +84,7 @@ class ColBERTReranker(ColBERTWrapper):
 
 
 class SpladeReranker:
-    def __init__(self, model_filepath: str, bert_model_name: str = "cl-tohoku/bert-base-japanese-v2"):
+    def __init__(self, model_filepath: str = HF.JP_SPLADE, bert_model_name: str = "cl-tohoku/bert-base-japanese-v2"):
         self.splade = Splade(bert_model_name)
         self.splade.load_state_dict(torch.load(model_filepath))
         self.splade.eval()

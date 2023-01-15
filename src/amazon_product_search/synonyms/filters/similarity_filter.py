@@ -3,11 +3,12 @@ import pandas as pd
 import torch.nn.functional as F
 from tqdm import tqdm
 
-from amazon_product_search.nlp.encoder import JA_SBERT, Encoder
+from amazon_product_search.constants import HF
+from amazon_product_search.nlp.encoder import Encoder
 
 
 class SimilarityFilter:
-    def __init__(self, model_name: str = JA_SBERT, batch_size: int = 8):
+    def __init__(self, model_name: str = HF.JA_SBERT, batch_size: int = 8):
         self.encoder = Encoder(model_name)
         self.batch_size = batch_size
 

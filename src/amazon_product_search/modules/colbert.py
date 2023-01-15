@@ -4,7 +4,7 @@ import torch
 from torch import Tensor, nn
 from transformers import AutoModel, AutoTokenizer
 
-from amazon_product_search.nlp.encoder import JA_COLBERT
+from amazon_product_search.constants import HF
 
 
 class ColBERTer(nn.Module):
@@ -79,7 +79,7 @@ class ColBERTer(nn.Module):
 
 
 class ColBERTWrapper:
-    def __init__(self, model_filepath: str = JA_COLBERT, bert_model_name: str = "cl-tohoku/bert-base-japanese-v2"):
+    def __init__(self, model_filepath: str = HF.JP_COLBERT, bert_model_name: str = "cl-tohoku/bert-base-japanese-v2"):
         self.colberter = ColBERTer(bert_model_name)
         self.colberter.load_state_dict(torch.load(model_filepath))
         self.colberter.eval()
