@@ -15,8 +15,13 @@ class ColBERTer(nn.Module):
         for p in self.bert_model.parameters():
             p.requires_grad = trainable
         self.score_merger = nn.Parameter(torch.zeros(1))
-        self.compression_dim = 128
+
+        self.cls_compression_dim = 32
+        self.cls_compressor = nn.Linear(self.bert_model.config.hidden_size, self.cls_compression_dim)
+
+        self.compression_dim = 32
         self.compressor = nn.Linear(self.bert_model.config.hidden_size, self.compression_dim)
+
         self.stopword_reducer = nn.Linear(self.compression_dim, 1, bias=True)
         nn.init.constant_(self.stopword_reducer.bias, 1)
 
@@ -51,6 +56,7 @@ class ColBERTer(nn.Module):
         token_mask = tokens["attention_mask"].bool()
         vecs = self.bert_model(input_ids=tokens["input_ids"], attention_mask=tokens["attention_mask"])[0]
         cls_vecs = vecs[:, 0, :]
+        cls_vecs = self.cls_compressor(cls_vecs)
         token_vecs = self.compressor(vecs)
         return cls_vecs, token_vecs, token_mask
 
@@ -67,10 +73,6 @@ class ColBERTer(nn.Module):
         exact_scoring_mask: Optional[Tensor] = None,
     ) -> Tensor:
         score_per_term = torch.bmm(query_vecs, doc_vecs.transpose(2, 1))
-
-        if exact_scoring_mask is not None:
-            score_per_term[~exact_scoring_mask] = 0
-
         score_per_term[~(doc_mask).unsqueeze(1).expand(-1, score_per_term.shape[1], -1)] = -1000
         term_score = score_per_term.max(-1).values
         term_score[~query_mask] = 0
