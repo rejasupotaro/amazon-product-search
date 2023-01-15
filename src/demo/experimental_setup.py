@@ -1,7 +1,14 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
-from amazon_product_search.reranking.reranker import DotReranker, NoOpReranker, RandomReranker, Reranker
+from amazon_product_search.reranking.reranker import (
+    ColBERTReranker,
+    DotReranker,
+    NoOpReranker,
+    RandomReranker,
+    Reranker,
+    SpladeReranker,
+)
 from amazon_product_search.source import Locale
 
 
@@ -72,13 +79,15 @@ EXPERIMENTS = {
         ],
     ),
     "reranking": ExperimentalSetup(
-        index_name="products_all_jp",
+        index_name="products_jp",
         locale="jp",
         num_queries=500,
         variants=[
             Variant(name="title,bullet_point", fields=["product_title", "product_description"], reranker=NoOpReranker()),  # noqa
-            Variant(name="title,bullet_point + random reranker", fields=["product_title", "product_description"], reranker=RandomReranker()),  # noqa
-            Variant(name="title,bullet_point + sbert reranker", fields=["product_title", "product_description"], reranker=DotReranker()),  # noqa
+            Variant(name="title,bullet_point + Random", fields=["product_title", "product_description"], reranker=RandomReranker()),  # noqa
+            Variant(name="title,bullet_point + SBERT", fields=["product_title", "product_description"], reranker=DotReranker()),  # noqa
+            Variant(name="title,bullet_point + ColBERT", fields=["product_title", "product_description"], reranker=ColBERTReranker()),  # noqa
+            Variant(name="title,bullet_point + SPLADE", fields=["product_title", "product_description"], reranker=SpladeReranker()),  # noqa
         ],
     ),
     "sparse_vs_dense": ExperimentalSetup(

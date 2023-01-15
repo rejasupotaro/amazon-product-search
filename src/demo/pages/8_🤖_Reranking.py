@@ -16,6 +16,7 @@ from amazon_product_search.reranking.reranker import (
     NoOpReranker,
     RandomReranker,
     Reranker,
+    SpladeReranker,
 )
 from demo.page_config import set_page_config
 from demo.utils import load_merged
@@ -28,6 +29,8 @@ def init_rerankers() -> dict[str, Reranker]:
     rerankers["Dot Reranker"] = DotReranker()
     if path.exists(HF.JP_COLBERT):
         rerankers["ColBERT Reranker"] = ColBERTReranker(model_filepath=HF.JP_COLBERT)
+    if path.exists(HF.JP_SPLADE):
+        rerankers["SPLADE Reranker"] = SpladeReranker(model_filepath=HF.JP_SPLADE)
     return rerankers
 
 
