@@ -83,11 +83,11 @@ EXPERIMENTS = {
         locale="jp",
         num_queries=500,
         variants=[
-            Variant(name="title,bullet_point", fields=["product_title", "product_description"], reranker=NoOpReranker()),  # noqa
-            Variant(name="title,bullet_point + Random", fields=["product_title", "product_description"], reranker=RandomReranker()),  # noqa
-            Variant(name="title,bullet_point + SBERT", fields=["product_title", "product_description"], reranker=DotReranker()),  # noqa
-            Variant(name="title,bullet_point + ColBERT", fields=["product_title", "product_description"], reranker=ColBERTReranker()),  # noqa
-            Variant(name="title,bullet_point + SPLADE", fields=["product_title", "product_description"], reranker=SpladeReranker()),  # noqa
+            Variant(name="title,bullet_point", fields=["product_title", "product_description", "product_bullet_point"], reranker=NoOpReranker()),  # noqa
+            Variant(name="title,bullet_point + Random", fields=["product_title", "product_description", "product_bullet_point"], reranker=RandomReranker()),  # noqa
+            Variant(name="title,bullet_point + SBERT", fields=["product_title", "product_description", "product_bullet_point"], reranker=DotReranker()),  # noqa
+            Variant(name="title,bullet_point + ColBERT", fields=["product_title", "product_description", "product_bullet_point"], reranker=ColBERTReranker()),  # noqa
+            Variant(name="title,bullet_point + SPLADE", fields=["product_title", "product_description", "product_bullet_point"], reranker=SpladeReranker()),  # noqa
         ],
     ),
     "sparse_vs_dense": ExperimentalSetup(
