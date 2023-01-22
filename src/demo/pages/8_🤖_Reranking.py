@@ -172,7 +172,13 @@ def main():
     set_page_config()
     st.write("## Reranking")
 
-    df = load_merged(locale="jp")
+    merged_df = load_merged(locale="jp")
+    split = st.selectbox("split", ["-", "train", "test"], index=2)
+    if split == "-":
+        df = merged_df
+    else:
+        df = merged_df[merged_df["split"] == split]
+
     all_judgements = extract_judgements(df)
 
     st.write("### Example")
