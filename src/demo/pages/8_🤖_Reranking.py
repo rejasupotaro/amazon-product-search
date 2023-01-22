@@ -21,6 +21,8 @@ from amazon_product_search.reranking.reranker import (
 from demo.page_config import set_page_config
 from demo.utils import load_merged
 
+RERANKER_NAMES = ["Random Reranker", "Dot Reranker", "ColBERT Reranker", "SPLADE Reranker"]
+
 
 def init_rerankers() -> dict[str, Reranker]:
     rerankers: dict[str, Reranker] = {}
@@ -101,7 +103,7 @@ def draw_examples(query: str, results: list[Result]):
                 draw_results(random_results)
 
 
-def run_comparison(df: pd.DataFrame, all_judgements: dict[str, str], num_queries: int):
+def run_comparison(df: pd.DataFrame, all_judgements: dict[str, str], num_queries: int, reranker_names: list[str]):
     queries = list(df["query"].unique())
     n = 0
     progress_text = st.empty()
@@ -132,7 +134,7 @@ def run_comparison(df: pd.DataFrame, all_judgements: dict[str, str], num_queries
                 ),
             }
         )
-        for reranker_name in ["Random Reranker", "Dot Reranker", "ColBERT Reranker", "SPLADE Reranker"]:
+        for reranker_name in reranker_names:
             rows.append(
                 {
                     "query": query,
@@ -151,7 +153,12 @@ def run_comparison(df: pd.DataFrame, all_judgements: dict[str, str], num_queries
         )
         .reset_index()
     )
+
+    st.write("### Overall")
     st.write(stats_df)
+
+    st.write("### Metrics by Query")
+    st.write(metrics_df)
 
 
 def main():
@@ -179,8 +186,12 @@ def main():
     draw_examples(query, results)
 
     st.write("### Comparison")
-    if st.button("Run"):
-        run_comparison(df, all_judgements, num_queries=10)
+    with st.form("experimental_setup"):
+        num_queries = st.number_input("Num Queries:", value=100, min_value=1, max_value=1000)
+        reranker_names = st.multiselect("Rerankers:", RERANKER_NAMES, default=RERANKER_NAMES)
+        if not st.form_submit_button("Run"):
+            return
+    run_comparison(df, all_judgements, num_queries, reranker_names)
 
 
 if __name__ == "__main__":
