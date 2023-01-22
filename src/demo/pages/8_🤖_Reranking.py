@@ -119,16 +119,7 @@ def run_comparison(df: pd.DataFrame, all_judgements: dict[str, str], num_queries
         rows.append(
             {
                 "query": query,
-                "variant": "random",
-                "ndcg": compute_ndcg(
-                    [result.product for result in rerankers["Random Reranker"].rerank(query, results)]
-                ),
-            }
-        )
-        rows.append(
-            {
-                "query": query,
-                "variant": "search",
+                "variant": "Elassticsearch",
                 "ndcg": compute_ndcg(
                     [
                         result.product
@@ -141,22 +132,17 @@ def run_comparison(df: pd.DataFrame, all_judgements: dict[str, str], num_queries
                 ),
             }
         )
-        rows.append(
-            {
-                "query": query,
-                "variant": "dot",
-                "ndcg": compute_ndcg([result.product for result in rerankers["Dot Reranker"].rerank(query, results)]),
-            }
-        )
-        rows.append(
-            {
-                "query": query,
-                "variant": "colbert",
-                "ndcg": compute_ndcg(
-                    [result.product for result in rerankers["ColBERT Reranker"].rerank(query, results)]
-                ),
-            }
-        )
+        for reranker_name in ["Random Reranker", "Dot Reranker", "ColBERT Reranker", "SPLADE Reranker"]:
+            rows.append(
+                {
+                    "query": query,
+                    "variant": reranker_name,
+                    "ndcg": compute_ndcg(
+                        [result.product for result in rerankers[reranker_name].rerank(query, results)]
+                    ),
+                }
+            )
+
     metrics_df = pd.DataFrame(rows)
     stats_df = (
         metrics_df.groupby("variant")
