@@ -1,13 +1,14 @@
-from typing import Literal
+from typing import Literal, Optional
 
 import pandas as pd
+import polars as pl
 
 from amazon_product_search.constants import DATA_DIR
 
 Locale = Literal["jp", "us", "es"]
 
 
-def load_products(locale: Locale, nrows: int = -1) -> pd.DataFrame:
+def load_products(locale: Optional[Locale] = None, nrows: int = -1) -> pd.DataFrame:
     if locale:
         filename = f"{DATA_DIR}/products_{locale}.parquet"
     else:
@@ -18,7 +19,7 @@ def load_products(locale: Locale, nrows: int = -1) -> pd.DataFrame:
         return pd.read_parquet(filename)
 
 
-def load_labels(locale: Locale, nrows: int = -1) -> pd.DataFrame:
+def load_labels(locale: Optional[Locale] = None, nrows: int = -1) -> pd.DataFrame:
     if locale:
         filename = f"{DATA_DIR}/examples_{locale}.parquet"
     else:
@@ -30,16 +31,16 @@ def load_labels(locale: Locale, nrows: int = -1) -> pd.DataFrame:
 
 
 def load_sources() -> pd.DataFrame:
-    filename = f"{DATA_DIR}/raw/shopping_queries_dataset_sources.parquet"
-    return pd.read_parquet(filename)
+    filename = f"{DATA_DIR}/raw/shopping_queries_dataset_sources.csv"
+    return pl.read_csv(filename).to_pandas()
 
 
 def load_merged(locale: Locale, nrows: int = -1) -> pd.DataFrame:
     filename = f"{DATA_DIR}/merged_{locale}.parquet"
     if nrows > 0:
-        return pd.read_parquet(filename).head(nrows)
+        return pl.read_parquet(filename).head(nrows).to_pandas()
     else:
-        return pd.read_parquet(filename)
+        return pl.read_parquet(filename).to_pandas()
 
 
 def merge_and_split():
@@ -62,36 +63,36 @@ def merge_and_split():
     - data/merged_us.parquet
     """
     print("Load product catalogue")
-    products_df = load_products()
+    products_df = pl.from_pandas(load_products())
     print("Load relevance judgements")
-    labels_df = load_labels()
+    labels_df = pl.from_pandas(load_labels())
     print("Load sources")
-    sources_df = load_sources()
+    sources_df = pl.from_pandas(load_sources())
     print("Merge datasets")
-    merged_df = labels_df.merge(products_df, how="left", on=["product_id", "product_locale"]).merge(
+    merged_df = labels_df.join(products_df, how="left", on=["product_id", "product_locale"]).join(
         sources_df, how="left", on=["query_id"]
     )
 
-    locales = labels_df["product_locale"].unique()
+    locales = labels_df["product_locale"].unique().to_list()
     print(f"The dataset contains locales: {locales}")
 
     print("Split catalogue dataset by locale")
     for locale in locales:
-        filtered_df = products_df[products_df["product_locale"] == locale]
+        filtered_df = products_df.filter(pl.col("product_locale") == locale)
         filepath = f"{DATA_DIR}/products_{locale}.parquet"
-        filtered_df.to_parquet(filepath, index=False)
-        print(f"A catalog dataset (locale: {locale}) containing {len(filtered_df)} rows was saved to {filepath}")
+        filtered_df.write_parquet(filepath)
+        print(f"Catalog dataset (locale: {locale}) containing {len(filtered_df)} rows was saved to {filepath}")
 
     print("Split judgement dataset by locale")
     for locale in locales:
-        filtered_df = labels_df[labels_df["product_locale"] == locale]
+        filtered_df = labels_df.filter(pl.col("product_locale") == locale)
         filepath = f"{DATA_DIR}/examples_{locale}.parquet"
-        filtered_df.to_parquet(filepath, index=False)
-        print(f"A label dataset (locale: {locale}) containing {len(filtered_df)} rows was saved to {filepath}")
+        filtered_df.write_parquet(filepath)
+        print(f"Label dataset (locale: {locale}) containing {len(filtered_df)} rows was saved to {filepath}")
 
     print("Split merged dataset by locale")
     for locale in locales:
-        filtered_df = merged_df[merged_df["product_locale"] == locale]
+        filtered_df = merged_df.filter(pl.col("product_locale") == locale)
         filepath = f"{DATA_DIR}/merged_{locale}.parquet"
-        filtered_df.to_parquet(filepath, index=False)
-        print(f"A merged dataset (locale: {locale}) containing {len(filtered_df)} rows was saved to {filepath}")
+        filtered_df.write_parquet(filepath)
+        print(f"Merged dataset (locale: {locale}) containing {len(filtered_df)} rows was saved to {filepath}")
