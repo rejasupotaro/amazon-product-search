@@ -3862,18 +3862,18 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "polars"
-version = "0.15.16"
+version = "0.16.1"
 description = "Blazingly fast DataFrame library"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "polars-0.15.16-cp37-abi3-macosx_10_7_x86_64.whl", hash = "sha256:833524a5ec8da84aad2828a23a23441bcb73ac280f883129ec075c05d1d1d13e"},
-    {file = "polars-0.15.16-cp37-abi3-macosx_11_0_arm64.whl", hash = "sha256:80238aae55b502b673e0e0c9bf0652697221b5af63ab34beb03ba626d55bc3e5"},
-    {file = "polars-0.15.16-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:7dbacba17140a73a6c22908654987178930e329f2ac5faebfd42fff820adfd49"},
-    {file = "polars-0.15.16-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:564ac6c116df24b3d71baccf8756c2ca60406327b0dd6153de4067507a0fc6fb"},
-    {file = "polars-0.15.16-cp37-abi3-win_amd64.whl", hash = "sha256:558d3d51dbdf4e0eaed6acc8b51a8ebf99a54ce8f7db3526de8e98adcb6f8f8f"},
-    {file = "polars-0.15.16.tar.gz", hash = "sha256:41457f817cd80a3326bb77dc0636cb019d41bba3f27aa60a1d15ef5855ac2016"},
+    {file = "polars-0.16.1-cp37-abi3-macosx_10_7_x86_64.whl", hash = "sha256:180172c8db33f950b3f2ff7793d2cf3de9d3ad9b13c5f0181cda0ac3e7db5977"},
+    {file = "polars-0.16.1-cp37-abi3-macosx_11_0_arm64.whl", hash = "sha256:6c391546a158233172589ce810fcafd71a60d776add8421364bdd5ff05af2cd9"},
+    {file = "polars-0.16.1-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:e2096a1384a5fecf003bb3915264212c63d1c43e8790126ee8fcdd682f1782ac"},
+    {file = "polars-0.16.1-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:934bca853a0086a30800c40ac615578894531b378afc1ba4c1a7e15855218c64"},
+    {file = "polars-0.16.1-cp37-abi3-win_amd64.whl", hash = "sha256:a670586eee6fad98a2daafbe3f6dfc845b35a22e44bc4daaca93d4f0f4d05229"},
+    {file = "polars-0.16.1.tar.gz", hash = "sha256:ebba7a51581084adb85dde10579b1dd8b648f7c5ca38a6839eee64d2e4827612"},
 ]
 
 [package.dependencies]
@@ -3884,7 +3884,7 @@ pyarrow = {version = ">=4.0.0", optional = true, markers = "extra == \"pandas\""
 [package.extras]
 all = ["polars[connectorx,deltalake,fsspec,matplotlib,numpy,pandas,pyarrow,timezone,xlsx2csv]"]
 connectorx = ["connectorx"]
-deltalake = ["deltalake"]
+deltalake = ["deltalake (>=0.6.2)"]
 fsspec = ["fsspec"]
 matplotlib = ["matplotlib"]
 numpy = ["numpy (>=1.16.0)"]
@@ -6557,4 +6557,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "3.10.8"
-content-hash = "6f4ef7cbddf9007a9735d5dff8df2a6553e602e49eea71a7c7cda003e8c7e9e1"
+content-hash = "472b20c61f29e40a98a373fe1ab8a7a87432400348311d8d3a36b47cfc45d31c"
