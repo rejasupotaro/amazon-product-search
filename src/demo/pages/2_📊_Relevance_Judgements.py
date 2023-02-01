@@ -1,7 +1,5 @@
-from typing import Any
-
-import pandas as pd
 import plotly.express as px
+import polars as pl
 import streamlit as st
 from st_aggrid import AgGrid, GridOptionsBuilder
 
@@ -9,29 +7,28 @@ from demo.page_config import set_page_config
 from demo.utils import analyze_dataframe, load_merged
 
 
-def draw_column_info(df: pd.DataFrame):
+def draw_column_info(df: pl.DataFrame):
     st.write("### Columns")
     analyzed_df = analyze_dataframe(df)
-    st.write(analyzed_df)
+    st.write(analyzed_df.to_pandas())
 
 
-def draw_label_distribution(df: pd.DataFrame):
-    count_df = df.groupby("esci_label").size().reset_index(name="count")
-    count_df = count_df.sort_values("count", ascending=False)
-    fig = px.bar(count_df, x="esci_label", y="count")
+def draw_label_distribution(df: pl.DataFrame):
+    count_df = df.groupby("esci_label").count().sort("count", reverse=True)
+    fig = px.bar(count_df.to_pandas(), x="esci_label", y="count")
     fig.update_layout(title="The number of labels")
     st.plotly_chart(fig)
 
 
-def draw_examples(df: pd.DataFrame):
+def draw_examples(df: pl.DataFrame):
     st.write("### Examples")
 
-    gb = GridOptionsBuilder.from_dataframe(df)
+    gb = GridOptionsBuilder.from_dataframe(df.to_pandas())
     gb.configure_pagination(paginationAutoPageSize=True)
     gb.configure_side_bar()
     gb.configure_selection("single", use_checkbox=True)
     grid_options = gb.build()
-    selected_rows = AgGrid(df, gridOptions=grid_options).selected_rows
+    selected_rows = AgGrid(df.to_pandas(), gridOptions=grid_options).selected_rows
 
     if not selected_rows:
         return
@@ -39,21 +36,6 @@ def draw_examples(df: pd.DataFrame):
     judgement = selected_rows[0]
     del judgement["_selectedRowNodeInfo"]
     st.write(judgement)
-
-
-def draw_products(products: list[dict[str, Any]]):
-    for product in products:
-        st.write("----")
-        st.write(f'[{product["esci_label"]}]')
-        for column in [
-            "product_title",
-            "product_description",
-            "product_bullet_point",
-            "product_brand",
-            "product_color",
-        ]:
-            st.write(f"##### {column}")
-            st.markdown(product[column], unsafe_allow_html=True)
 
 
 def main():
@@ -65,9 +47,9 @@ def main():
     draw_column_info(df)
     draw_label_distribution(df)
 
-    queries = df["query"].unique()
+    queries = df.get_column("query").unique().to_list()
     query = st.selectbox("Query:", queries)
-    filtered_df = df[df["query"] == query]
+    filtered_df = df.filter(pl.col("query") == query)
     draw_examples(filtered_df)
 
 

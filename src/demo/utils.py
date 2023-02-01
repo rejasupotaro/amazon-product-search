@@ -1,24 +1,23 @@
-import pandas as pd
+import polars as pl
 import streamlit as st
-from pandas.api.types import is_string_dtype
 
 from amazon_product_search import source
 from amazon_product_search.source import Locale
 
 
 @st.cache
-def load_products(locale: Locale, nrows: int = -1) -> pd.DataFrame:
-    return source.load_products(locale, nrows).to_pandas()
+def load_products(locale: Locale, nrows: int = -1) -> pl.DataFrame:
+    return source.load_products(locale, nrows)
 
 
 @st.cache
-def load_labels(locale: Locale, nrows: int = -1) -> pd.DataFrame:
-    return source.load_labels(locale, nrows).to_pandas()
+def load_labels(locale: Locale, nrows: int = -1) -> pl.DataFrame:
+    return source.load_labels(locale, nrows)
 
 
 @st.cache
-def load_merged(locale: Locale, nrows: int = -1) -> pd.DataFrame:
-    return source.load_merged(locale, nrows).to_pandas()
+def load_merged(locale: Locale, nrows: int = -1) -> pl.DataFrame:
+    return source.load_merged(locale, nrows)
 
 
 def split_fields(fields: list[str]) -> tuple[list[str], list[str]]:
@@ -39,7 +38,7 @@ def split_fields(fields: list[str]) -> tuple[list[str], list[str]]:
     return sparse_fields, dense_fields
 
 
-def analyze_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+def analyze_dataframe(df: pl.DataFrame) -> pl.DataFrame:
     """Calculate the basic statistics for a given DataFrame.
 
     Args:
@@ -48,21 +47,15 @@ def analyze_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: The resulting DataFrame containing column, dtype, nan_rate, and mean_length.
     """
-    columns = df.columns.to_list()
     rows = []
-    for c in columns:
-        series = df[c]
-
-        length = None
-        if is_string_dtype(series):
-            length = series.fillna("").apply(len).mean()
-
+    for column in df.columns:
+        series = df.get_column(column)
         rows.append(
             {
-                "column": c,
-                "dtype": series.dtype.name,
-                "nan_rate": series.isna().sum() / len(series),
-                "mean_length": length,
+                "column": column,
+                "dtype": str(series.dtype),
+                "nan_rate": series.is_null().sum() / len(series),
+                "mean_length": series.fill_null("").apply(len).mean() if series.dtype == pl.Utf8 else None,
             }
         )
-    return pd.DataFrame(rows)
+    return pl.from_dicts(rows)

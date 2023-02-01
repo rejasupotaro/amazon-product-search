@@ -1,7 +1,7 @@
 from typing import Optional
 
-import pandas as pd
 import plotly.express as px
+import polars as pl
 import streamlit as st
 from st_aggrid import AgGrid, GridOptionsBuilder
 
@@ -17,13 +17,13 @@ def estimate_importance(text: Optional[str]):
         return
     results = estimator.estimate(text)
 
-    weights_df = pd.DataFrame.from_dict(
+    weights_df = pl.from_dict(
         {
             "token": [r[0] for r in results],
             "weight": [r[1] for r in results],
         }
     )
-    fig = px.bar(weights_df, x="token", y="weight")
+    fig = px.bar(weights_df.to_pandas(), x="token", y="weight")
     st.plotly_chart(fig)
 
     results = sorted(results, key=lambda result: result[1], reverse=True)
@@ -38,12 +38,12 @@ def main():
 
     st.write("### Products")
 
-    gb = GridOptionsBuilder.from_dataframe(products_df)
+    gb = GridOptionsBuilder.from_dataframe(products_df.to_pandas())
     gb.configure_pagination(paginationAutoPageSize=True)
     gb.configure_side_bar()
     gb.configure_selection("single", use_checkbox=True)
     grid_options = gb.build()
-    selected_rows = AgGrid(products_df, gridOptions=grid_options).selected_rows
+    selected_rows = AgGrid(products_df.to_pandas(), gridOptions=grid_options).selected_rows
 
     if not selected_rows:
         return

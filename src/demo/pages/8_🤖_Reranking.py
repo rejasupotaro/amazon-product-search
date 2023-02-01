@@ -2,7 +2,7 @@ import random
 from os import path
 from typing import Any, Optional
 
-import pandas as pd
+import polars as pl
 import streamlit as st
 from more_itertools import chunked
 
@@ -41,8 +41,8 @@ rerankers = init_rerankers()
 
 
 @st.cache
-def extract_judgements(df: pd.DataFrame) -> dict[str, str]:
-    return {row["product_id"]: row["esci_label"] for row in df[["product_id", "esci_label"]].to_dict("records")}
+def extract_judgements(df: pl.DataFrame) -> dict[str, str]:
+    return {row["product_id"]: row["esci_label"] for row in df.select(["product_id", "esci_label"]).to_dicts()}
 
 
 def search(query: str, doc_ids: list[str], all_judgements: dict[str, str]) -> list[Result]:
@@ -89,8 +89,8 @@ def draw_results(results: list[Result]):
     ndcg = compute_ndcg(products)
     st.write(f"NDCG: {ndcg}")
 
-    df = pd.DataFrame(products)
-    st.write(df[["esci_label", "query", "product_title", "product_id"]])
+    df = pl.from_dicts(products)
+    st.write(df.select(["esci_label", "query", "product_title", "product_id"]).to_pandas())
 
 
 def draw_examples(query: str, results: list[Result]):
@@ -103,8 +103,8 @@ def draw_examples(query: str, results: list[Result]):
                 draw_results(random_results)
 
 
-def run_comparison(df: pd.DataFrame, all_judgements: dict[str, str], num_queries: int, reranker_names: list[str]):
-    queries = list(df["query"].unique())
+def run_comparison(df: pl.DataFrame, all_judgements: dict[str, str], num_queries: int, reranker_names: list[str]):
+    queries = df.get_column("query").unique().to_list()
     n = 0
     progress_text = st.empty()
     progress_bar = st.progress(0)
@@ -114,8 +114,7 @@ def run_comparison(df: pd.DataFrame, all_judgements: dict[str, str], num_queries
         progress_text.text(f"Query ({n} / {num_queries}): {query}")
         progress_bar.progress(n / num_queries)
 
-        filtered_df = df[df["query"] == query]
-        products = filtered_df.to_dict("records")
+        products = df.filter(pl.col("query") == query).to_dicts()
         results = [Result(product=product, score=1) for product in products]
 
         rows.append(
@@ -145,20 +144,14 @@ def run_comparison(df: pd.DataFrame, all_judgements: dict[str, str], num_queries
                 }
             )
 
-    metrics_df = pd.DataFrame(rows)
-    stats_df = (
-        metrics_df.groupby("variant")
-        .agg(
-            ndcg=("ndcg", lambda series: series.mean().round(4)),
-        )
-        .reset_index()
-    )
+    metrics_df = pl.from_dicts(rows)
+    stats_df = metrics_df.groupby("variant").agg([pl.col("ndcg").mean().round(4)])
 
     st.write("### Overall")
-    st.write(stats_df)
+    st.write(stats_df.to_pandas())
 
     st.write("### Metrics by Query")
-    st.write(metrics_df)
+    st.write(metrics_df.to_pandas())
 
 
 def main():
@@ -170,7 +163,7 @@ def main():
     if split == "-":
         df = merged_df
     else:
-        df = merged_df[merged_df["split"] == split]
+        df = merged_df.filter(pl.col("split") == split)
 
     all_judgements = extract_judgements(df)
 
@@ -178,9 +171,9 @@ def main():
 
     queries = df["query"].unique()
     query = st.selectbox("Query:", queries)
-    filtered_df = df[df["query"] == query]
+    filtered_df = df.filter(pl.col("query") == query)
 
-    products = filtered_df.to_dict("records")
+    products = filtered_df.to_dicts()
     results = [Result(product=product, score=1) for product in products]
 
     draw_examples(query, results)

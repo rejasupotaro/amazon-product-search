@@ -1,8 +1,8 @@
 from dataclasses import asdict
 from typing import Any
 
-import pandas as pd
 import plotly.express as px
+import polars as pl
 import streamlit as st
 
 from amazon_product_search.es.es_client import EsClient
@@ -20,12 +20,12 @@ query_builder = QueryBuilder()
 
 
 @st.cache
-def load_labels(experimental_setup: ExperimentalSetup) -> pd.DataFrame:
+def load_labels(experimental_setup: ExperimentalSetup) -> pl.DataFrame:
     df = utils.load_labels(experimental_setup.locale)
-    df = df[df["split"] == "test"]
+    df = df.filter(pl.col("split") == "test")
     if experimental_setup.num_queries:
-        queries = df.sample(frac=1)["query"].unique()[: experimental_setup.num_queries]
-        df = df[df["query"].isin(queries)]
+        queries = df.get_column("query").sample(frac=1).unique()[: experimental_setup.num_queries]
+        df = df.filter(pl.col("query").is_in(queries))
     return df
 
 
@@ -34,9 +34,13 @@ def count_docs(index_name: str) -> int:
 
 
 def draw_variants(variants: list[Variant]):
-    variants_df = pd.DataFrame([asdict(variant) for variant in variants])
-    variants_df["reranker"] = variants_df["reranker"].apply(reranker.to_string)
-    st.write(variants_df)
+    rows = []
+    for variant in variants:
+        row = asdict(variant)
+        row["reranker"] = reranker.to_string(row["reranker"])
+        rows.append(row)
+    variants_df = pl.from_dicts(rows)
+    st.write(variants_df.to_pandas())
 
 
 def search(index_name: str, query: str, variant: Variant) -> Response:
@@ -55,13 +59,13 @@ def search(index_name: str, query: str, variant: Variant) -> Response:
     return es_client.search(index_name=index_name, query=es_query, knn_query=es_knn_query, size=variant.top_k)
 
 
-def compute_metrics(index_name: str, query: str, variant: Variant, labels_df: pd.DataFrame) -> dict[str, Any]:
+def compute_metrics(index_name: str, query: str, variant: Variant, labels_df: pl.DataFrame) -> dict[str, Any]:
     response = search(index_name, query, variant)
     response.results = variant.reranker.rerank(query, response.results)
 
     retrieved_ids = [result.product["product_id"] for result in response.results]
-    relevant_ids = set(labels_df[labels_df["esci_label"] == "E"]["product_id"].tolist())
-    judgements: dict[str, str] = {row["product_id"]: row["esci_label"] for row in labels_df.to_dict("records")}
+    relevant_ids = set(labels_df.filter(pl.col("esci_label") == "E").get_column("product_id").to_list())
+    judgements: dict[str, str] = {row["product_id"]: row["esci_label"] for row in labels_df.to_dicts()}
     return {
         "variant": variant.name,
         "query": query,
@@ -72,7 +76,7 @@ def compute_metrics(index_name: str, query: str, variant: Variant, labels_df: pd
     }
 
 
-def perform_search(experimental_setup: ExperimentalSetup, query_dict: dict[str, pd.DataFrame]) -> list[dict[str, Any]]:
+def perform_search(experimental_setup: ExperimentalSetup, query_dict: dict[str, pl.DataFrame]) -> list[dict[str, Any]]:
     total_examples = len(query_dict)
     n = 0
     progress_text = st.empty()
@@ -89,24 +93,22 @@ def perform_search(experimental_setup: ExperimentalSetup, query_dict: dict[str, 
     return metrics
 
 
-def compute_stats(metrics_df: pd.DataFrame) -> pd.DataFrame:
-    stats_df = (
-        metrics_df.groupby("variant")
-        .agg(
-            total_hits=("total_hits", lambda series: int(series.mean())),
-            zero_hit_rate=("total_hits", lambda series: compute_zero_hit_rate(series.values)),
-            recall=("recall", lambda series: series.mean().round(4)),
-            ndcg=("ndcg", lambda series: series.mean().round(4)),
-            ndcg_prime=("ndcg_prime", lambda series: series.mean().round(4)),
-        )
-        .reset_index()
+def compute_stats(metrics_df: pl.DataFrame) -> pl.DataFrame:
+    stats_df = metrics_df.groupby("variant").agg(
+        [
+            pl.col("total_hits").mean().cast(int),
+            pl.col("tota_hits").apply(lambda series: compute_zero_hit_rate(series.to_list())).alias("zero_hit_rate"),
+            pl.col("recall").mean().round(4),
+            pl.col("ndcg").mean().round(4),
+            pl.col("ndcg_prime").mean().round(4),
+        ]
     )
     return stats_df
 
 
-def draw_figures(metrics_df: pd.DataFrame):
+def draw_figures(metrics_df: pl.DataFrame):
     for metric in ["total_hits", "recall", "ndcg"]:
-        fig = px.box(metrics_df, y=metric, color="variant")
+        fig = px.box(metrics_df.to_pandas(), y=metric, color="variant")
         st.plotly_chart(fig)
 
 
@@ -120,7 +122,7 @@ def main():
     num_docs = count_docs(experimental_setup.index_name)
 
     labels_df = load_labels(experimental_setup)
-    query_dict: dict[str, pd.DataFrame] = {}
+    query_dict: dict[str, pl.DataFrame] = {}
     for query, query_labels_df in labels_df.groupby("query"):
         query_dict[query] = query_labels_df
 
@@ -145,7 +147,7 @@ def main():
     st.write("----")
 
     st.write("### Experimental Results")
-    metrics_df = pd.DataFrame(metrics)
+    metrics_df = pl.from_dicts(metrics)
 
     st.write("#### Metrics by query")
     with st.expander("click to expand"):

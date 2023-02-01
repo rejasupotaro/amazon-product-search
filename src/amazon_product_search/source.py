@@ -37,9 +37,9 @@ def load_sources() -> pl.DataFrame:
 def load_merged(locale: Locale, nrows: int = -1) -> pl.DataFrame:
     filename = f"{DATA_DIR}/merged_{locale}.parquet"
     if nrows > 0:
-        return pl.read_parquet(filename).head(nrows).to_pandas()
+        return pl.read_parquet(filename).head(nrows)
     else:
-        return pl.read_parquet(filename).to_pandas()
+        return pl.read_parquet(filename)
 
 
 def merge_and_split():

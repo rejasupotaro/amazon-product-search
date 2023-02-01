@@ -1,4 +1,4 @@
-import pandas as pd
+import polars as pl
 import streamlit as st
 
 from amazon_product_search.synonyms.synonym_dict import SynonymDict
@@ -11,7 +11,7 @@ FINE_TUNED_SBERT_SYNONYM_DICT = SynonymDict(synonym_filename="synonyms_jp_fine_t
 
 def load_queries() -> list[str]:
     labels_df = load_labels(locale="jp")
-    queries = labels_df.sample(frac=1)["query"].unique().tolist()
+    queries = labels_df.get_column("query").sample(frac=1).unique().to_list()
     return queries
 
 
@@ -35,22 +35,28 @@ def main():
                         "synonyms": synonym_dict.find_synonyms(query, threshold),
                     }
                 )
-    df = pd.DataFrame(rows)
-    st.dataframe(df.head(100), use_container_width=True)
+    df = pl.from_dicts(rows)
+    st.write(df.head(100).to_pandas(), use_container_width=True)
 
-    df["num_synonyms"] = df["synonyms"].apply(len)
-    df["found"] = df["synonyms"].apply(lambda synonyms: int(len(synonyms) > 0))
+    df = df.with_columns(
+        [
+            pl.col("synonyms").apply(len).alias("num_synonyms"),
+            pl.col("synonyms").apply(lambda synonyms: int(len(synonyms) > 0)).alias("found"),
+        ]
+    )
 
     stats_df = (
         df.groupby("variant")
         .agg(
-            num_synonyms_mean=("num_synonyms", lambda series: series.mean().round(4)),
-            num_synonyms_max=("num_synonyms", lambda series: series.max().round(4)),
-            query_coverage=("found", lambda series: series.mean().round(4)),
+            [
+                pl.col("num_synonyms").mean().round(4).alias("num_synonyms_mean"),
+                pl.col("num_synonyms").max().alias("num_synonyms_max"),
+                pl.col("found").mean().round(4).alias("query_coverage"),
+            ]
         )
-        .reset_index()
+        .sort("variant")
     )
-    st.write(stats_df)
+    st.write(stats_df.to_pandas())
 
 
 if __name__ == "__main__":

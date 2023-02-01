@@ -1,4 +1,5 @@
 import pandas as pd
+import polars as pl
 import streamlit as st
 from st_aggrid import AgGrid, GridOptionsBuilder
 
@@ -16,17 +17,17 @@ def main():
 
     st.write("### Product Catalogue")
     df = load_products(locale="jp", nrows=1000)
-    df = df[~df["product_description"].isna() & ~df["product_bullet_point"].isna()]
-    df = df.fillna("")
+    df = df.filter((pl.col("product_description").is_not_null()) & pl.col("product_bullet_point").is_not_null())
+    df = df.fill_null("")
 
     product = None
 
-    gb = GridOptionsBuilder.from_dataframe(df)
+    gb = GridOptionsBuilder.from_dataframe(df.to_pandas())
     gb.configure_pagination(paginationAutoPageSize=True)
     gb.configure_side_bar()
     gb.configure_selection("single", use_checkbox=True)
     grid_options = gb.build()
-    selected_rows = AgGrid(df, gridOptions=grid_options).selected_rows
+    selected_rows = AgGrid(df.to_pandas(), gridOptions=grid_options).selected_rows
 
     if not selected_rows:
         return
