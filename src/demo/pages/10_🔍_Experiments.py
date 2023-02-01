@@ -5,16 +5,15 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from amazon_product_search import source
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.query_builder import QueryBuilder
 from amazon_product_search.es.response import Response
 from amazon_product_search.metrics import compute_ndcg, compute_recall, compute_zero_hit_rate
 from amazon_product_search.nlp.normalizer import normalize_query
 from amazon_product_search.reranking import reranker
+from demo import utils
 from demo.experimental_setup import EXPERIMENTS, ExperimentalSetup, Variant
 from demo.page_config import set_page_config
-from demo.utils import split_fields
 
 es_client = EsClient()
 query_builder = QueryBuilder()
@@ -22,7 +21,7 @@ query_builder = QueryBuilder()
 
 @st.cache
 def load_labels(experimental_setup: ExperimentalSetup) -> pd.DataFrame:
-    df = source.load_labels(experimental_setup.locale)
+    df = utils.load_labels(experimental_setup.locale)
     df = df[df["split"] == "test"]
     if experimental_setup.num_queries:
         queries = df.sample(frac=1)["query"].unique()[: experimental_setup.num_queries]
@@ -44,7 +43,7 @@ def search(index_name: str, query: str, variant: Variant) -> Response:
     es_query = None
     es_knn_query = None
 
-    sparse_fields, dense_fields = split_fields(variant.fields)
+    sparse_fields, dense_fields = utils.split_fields(variant.fields)
     if sparse_fields:
         es_query = query_builder.build_multimatch_search_query(
             query=query, fields=sparse_fields, is_synonym_expansion_enabled=variant.enable_synonym_expansion

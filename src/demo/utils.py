@@ -8,17 +8,17 @@ from amazon_product_search.source import Locale
 
 @st.cache
 def load_products(locale: Locale, nrows: int = -1) -> pd.DataFrame:
-    return source.load_products(locale, nrows)
+    return source.load_products(locale, nrows).to_pandas()
 
 
 @st.cache
 def load_labels(locale: Locale, nrows: int = -1) -> pd.DataFrame:
-    return source.load_labels(locale, nrows)
+    return source.load_labels(locale, nrows).to_pandas()
 
 
 @st.cache
 def load_merged(locale: Locale, nrows: int = -1) -> pd.DataFrame:
-    return source.load_merged(locale, nrows)
+    return source.load_merged(locale, nrows).to_pandas()
 
 
 def split_fields(fields: list[str]) -> tuple[list[str], list[str]]:

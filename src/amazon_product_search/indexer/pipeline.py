@@ -2,6 +2,7 @@ import logging
 from typing import Any, Dict, Tuple
 
 import apache_beam as beam
+import polars as pl
 from apache_beam.transforms.ptransform import PTransform
 from apache_beam.transforms.util import BatchElements
 from apache_beam.utils.shared import Shared
@@ -18,8 +19,8 @@ from amazon_product_search.source import Locale
 
 def get_input_source(locale: Locale, nrows: int = -1) -> PTransform:
     products_df = source.load_products(locale, nrows)
-    products_df = products_df.fillna("")
-    products = products_df.to_dict("records")
+    products_df = products_df.with_columns(pl.col("*").fill_null(pl.lit("")))
+    products = products_df.to_dicts()
     logging.info(f"We have {len(products)} products to index")
     return beam.Create(products)
 

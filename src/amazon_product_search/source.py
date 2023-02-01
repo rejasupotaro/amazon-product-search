@@ -1,6 +1,5 @@
 from typing import Literal, Optional
 
-import pandas as pd
 import polars as pl
 
 from amazon_product_search.constants import DATA_DIR
@@ -8,34 +7,34 @@ from amazon_product_search.constants import DATA_DIR
 Locale = Literal["jp", "us", "es"]
 
 
-def load_products(locale: Optional[Locale] = None, nrows: int = -1) -> pd.DataFrame:
+def load_products(locale: Optional[Locale] = None, nrows: int = -1) -> pl.DataFrame:
     if locale:
         filename = f"{DATA_DIR}/products_{locale}.parquet"
     else:
         filename = f"{DATA_DIR}/raw/shopping_queries_dataset_products.parquet"
     if nrows > 0:
-        return pd.read_parquet(filename).head(nrows)
+        return pl.read_parquet(filename).head(nrows)
     else:
-        return pd.read_parquet(filename)
+        return pl.read_parquet(filename)
 
 
-def load_labels(locale: Optional[Locale] = None, nrows: int = -1) -> pd.DataFrame:
+def load_labels(locale: Optional[Locale] = None, nrows: int = -1) -> pl.DataFrame:
     if locale:
         filename = f"{DATA_DIR}/examples_{locale}.parquet"
     else:
         filename = f"{DATA_DIR}/raw/shopping_queries_dataset_examples.parquet"
     if nrows > 0:
-        return pd.read_parquet(filename).head(nrows)
+        return pl.read_parquet(filename).head(nrows)
     else:
-        return pd.read_parquet(filename)
+        return pl.read_parquet(filename)
 
 
-def load_sources() -> pd.DataFrame:
+def load_sources() -> pl.DataFrame:
     filename = f"{DATA_DIR}/raw/shopping_queries_dataset_sources.csv"
     return pl.read_csv(filename).to_pandas()
 
 
-def load_merged(locale: Locale, nrows: int = -1) -> pd.DataFrame:
+def load_merged(locale: Locale, nrows: int = -1) -> pl.DataFrame:
     filename = f"{DATA_DIR}/merged_{locale}.parquet"
     if nrows > 0:
         return pl.read_parquet(filename).head(nrows).to_pandas()
