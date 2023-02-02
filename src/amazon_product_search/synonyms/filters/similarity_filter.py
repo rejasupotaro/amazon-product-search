@@ -1,6 +1,6 @@
-import numpy as np
-import pandas as pd
+import polars as pl
 import torch.nn.functional as F
+from more_itertools import chunked
 from tqdm import tqdm
 
 from amazon_product_search.constants import HF
@@ -26,7 +26,7 @@ class SimilarityFilter:
         right_tensor = self.encoder.encode(right, convert_to_tensor=True)
         return F.cosine_similarity(left_tensor, right_tensor, dim=1).tolist()
 
-    def apply(self, synonyms_df: pd.DataFrame, threshold: float = 0.5) -> pd.DataFrame:
+    def apply(self, synonyms_df: pl.DataFrame, threshold: float = 0.5) -> pl.DataFrame:
         """Filter out synonyms based on the similarity between terms.
 
         Args:
@@ -36,11 +36,15 @@ class SimilarityFilter:
             The filtered dataframe.
         """
         scores = []
-        for batch in tqdm(np.array_split(synonyms_df, len(synonyms_df) // self.batch_size)):
-            queries = batch["query"].tolist()
-            titles = batch["title"].tolist()
+        chunks = chunked(synonyms_df.to_dicts(), len(synonyms_df) // self.batch_size)
+        for batch in tqdm(list(chunks)):
+            queries = [row["query"] for row in batch]
+            titles = [row["title"] for row in batch]
             scores.extend(self.calculate_score(queries, titles))
 
-        synonyms_df["similarity"] = scores
-        synonyms_df = synonyms_df[synonyms_df["similarity"] > threshold]
-        return synonyms_df.sort_values("similarity", ascending=False)
+        synonyms_df = (
+            synonyms_df.with_column(pl.Series(name="similarity", values=scores))
+            .filter(pl.col("similarity") > threshold)
+            .sort("similarity", reverse=True)
+        )
+        return synonyms_df

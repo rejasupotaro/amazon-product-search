@@ -1,8 +1,7 @@
 from collections import Counter
 from math import log
 
-import pandas as pd
-from pandas import DataFrame
+import polars as pl
 from tqdm import tqdm
 
 from amazon_product_search.constants import DATA_DIR
@@ -12,21 +11,24 @@ from amazon_product_search.source import Locale, load_merged
 from amazon_product_search.synonyms.filters.similarity_filter import SimilarityFilter
 
 
-def load_query_title_pairs(locale: Locale, nrows: int = -1) -> pd.DataFrame:
+def load_query_title_pairs(locale: Locale, nrows: int = -1) -> pl.DataFrame:
     """Load query title pairs."""
     df = load_merged(locale, nrows)
-    df = df[df["esci_label"] == "E"]
+    df = df.filter(pl.col("esci_label") == "E")
     return df
 
 
-def preprocess_query_title_pairs(df: pd.DataFrame) -> pd.DataFrame:
-    df = df[(~df["query"].isna()) & (~df["product_title"].isna())]
-    df["query"] = df["query"].apply(normalize_doc)
-    df["product_title"] = df["product_title"].apply(normalize_doc)
-    return df
+def preprocess_query_title_pairs(df: pl.DataFrame) -> pl.DataFrame:
+    df = df.filter((pl.col("query").is_not_null() & pl.col("product_title").is_not_null()))
+    return df.with_columns(
+        [
+            pl.col("query").apply(normalize_doc),
+            pl.col("product_title").apply(normalize_doc),
+        ]
+    )
 
 
-def generate_candidates(pairs: list[list[str]]) -> pd.DataFrame:
+def generate_candidates(pairs: list[list[str]]) -> pl.DataFrame:
     """Generate synonyms based on cooccurrence."""
     tokenizer = Tokenizer()
     word_counter: Counter = Counter()
@@ -76,7 +78,7 @@ def generate_candidates(pairs: list[list[str]]) -> pd.DataFrame:
             }
         )
 
-    candidates_df = DataFrame(rows)
+    candidates_df = pl.from_dicts(rows)
     return candidates_df
 
 
@@ -102,18 +104,19 @@ def generate(model_name: str, output_filename: str, min_cooccurrence: int = 10, 
     pairs_df = preprocess_query_title_pairs(pairs_df)
 
     print("Generate candidates from query-title pairs")
-    pairs = pairs_df[["query", "product_title"]].values.tolist()
+    pairs = pairs_df.select(["query", "product_title"]).to_numpy().tolist()
     candidates_df = generate_candidates(pairs)
     print(f"{len(candidates_df)} candidates were generated")
 
     print("Filter synonyms by Mutual Information")
-    candidates_df = candidates_df[candidates_df["cooccurrence"] >= min_cooccurrence]
-    candidates_df = candidates_df[candidates_df["npmi"].abs() >= min_npmi]
+    candidates_df = candidates_df.filter(
+        (pl.col("cooccurrence") >= min_cooccurrence) & (pl.col("npmi").abs() >= min_npmi)
+    )
 
     print("Filter synonyms by Semantic Similarity")
     filter = SimilarityFilter(model_name)
     synonyms_df = filter.apply(candidates_df)
 
     filepath = f"{DATA_DIR}/includes/{output_filename}"
-    synonyms_df.to_csv(filepath, index=False)
+    synonyms_df.write_csv(filepath)
     print(f"{len(synonyms_df)} synonyms were saved to {filepath}")
