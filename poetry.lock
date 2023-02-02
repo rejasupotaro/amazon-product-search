@@ -3879,7 +3879,7 @@ files = [
 [package.dependencies]
 numpy = {version = ">=1.16.0", optional = true, markers = "extra == \"numpy\""}
 pandas = {version = "*", optional = true, markers = "extra == \"pandas\""}
-pyarrow = {version = ">=4.0.0", optional = true, markers = "extra == \"pandas\""}
+pyarrow = {version = ">=4.0.0", optional = true, markers = "extra == \"pyarrow\""}
 
 [package.extras]
 all = ["polars[connectorx,deltalake,fsspec,matplotlib,numpy,pandas,pyarrow,timezone,xlsx2csv]"]
@@ -6557,4 +6557,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "3.10.8"
-content-hash = "472b20c61f29e40a98a373fe1ab8a7a87432400348311d8d3a36b47cfc45d31c"
+content-hash = "ee142c50426464ef4a5eb31aa3d4995fa8b9b8c896be785f593772407f9c121f"
