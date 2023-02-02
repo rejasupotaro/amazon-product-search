@@ -1,4 +1,3 @@
-import pandas as pd
 import polars as pl
 import streamlit as st
 from st_aggrid import AgGrid, GridOptionsBuilder
@@ -41,10 +40,14 @@ def main():
     columns = st.columns(2)
     with columns[0]:
         st.write("### Fugashi (UniDic)")
-        st.write(pd.DataFrame([{"token": token, "pos": pos} for token, pos in unidic_tokenizer.tokenize(s)]))
+        st.write(
+            pl.from_dicts([{"token": token, "pos": pos} for token, pos in unidic_tokenizer.tokenize(s)]).to_pandas()
+        )
     with columns[1]:
         st.write("### Fugashi (IPADIC)")
-        st.write(pd.DataFrame([{"token": token, "pos": pos} for token, pos in ipadic_tokenizer.tokenize(s)]))
+        st.write(
+            pl.from_dicts([{"token": token, "pos": pos} for token, pos in ipadic_tokenizer.tokenize(s)]).to_pandas()
+        )
 
 
 if __name__ == "__main__":

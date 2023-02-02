@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-import pandas as pd
+import polars as pl
 
 from amazon_product_search.constants import DATA_DIR
 from amazon_product_search.nlp.tokenizer import Tokenizer
@@ -21,9 +21,9 @@ class SynonymDict:
         Returns:
             dict[str, list[str]]: The converted synonym dict.
         """
-        df = pd.read_csv(f"{DATA_DIR}/includes/{synonym_filename}")
+        df = pl.read_csv(f"{DATA_DIR}/includes/{synonym_filename}")
         entry_dict = defaultdict(list)
-        for row in df.to_dict("records"):
+        for row in df.to_dicts():
             query = row["query"]
             title = row["title"]
             similarity = row["similarity"]
