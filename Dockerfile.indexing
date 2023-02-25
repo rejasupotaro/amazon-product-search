@@ -1,4 +1,4 @@
-FROM apache/beam_python3.10_sdk:2.43.0
+FROM apache/beam_python3.10_sdk:2.45.0
 
 ENV PYTHONPATH src:
 ENV WORKDIR /app/
