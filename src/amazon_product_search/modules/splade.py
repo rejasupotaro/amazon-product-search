@@ -4,7 +4,7 @@ from transformers import AutoModelForMaskedLM, AutoTokenizer
 
 
 class Splade(nn.Module):
-    def __init__(self, bert_model_name):
+    def __init__(self, bert_model_name: str):
         super().__init__()
         self.tokenizer = AutoTokenizer.from_pretrained(bert_model_name)
         self.model = AutoModelForMaskedLM.from_pretrained(bert_model_name)

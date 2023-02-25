@@ -15,7 +15,7 @@ class EsClient:
     def list_indices(self) -> list[str]:
         return [alias for alias in self.es.indices.get_alias().keys() if not alias.startswith(".")]
 
-    def delete_index(self, index_name):
+    def delete_index(self, index_name: str):
         self.es.indices.delete(index=index_name)
 
     def create_index(self, index_name: str):
