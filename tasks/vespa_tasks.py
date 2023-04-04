@@ -1,6 +1,7 @@
 from invoke import task
 
 import amazon_product_search.vespa.service as vespa_service
+from amazon_product_search.constants import PROJECT_ID, PROJECT_NAME, REGION
 from amazon_product_search.vespa.vespa_client import VespaClient
 
 
@@ -15,30 +16,63 @@ def stop(c):
 
 
 @task
-def delete_docs(c):
+def delete_all_docs(c, schema):
     client = VespaClient()
-    res = client.delete_all_docs(content_cluster_name="amazon", schema="product")
-    print(res)
+    res = client.delete_all_docs(content_cluster_name="amazon", schema=schema)
+    print(res.json)
+    print(res.raw)
+    print(res.reason)
 
 
 @task
-def index(c):
+def search(c, query):
     client = VespaClient()
-    products = [
-        {
-            "product_id": "1",
-            "product_title": "product title",
-            "product_description": "product description",
-            "product_brand": "product brand",
-        }
+    res = client.search(query)
+    print(res.json)
+
+
+@task
+def index(
+    c,
+    schema,
+    locale="jp",
+    dest_host="",
+    extract_keywords=False,
+    encode_text=False,
+    nrows=None,
+    runner="DirectRunner",
+):
+    command = [
+        "poetry run python src/amazon_product_search/indexer/main.py",
+        f"--runner={runner}",
+        f"--index_name={schema}",
+        f"--locale={locale}",
     ]
-    batch = [{"id": product["product_id"], "fields": product} for product in products]
-    res = client.feed(schema="product", batch=batch)
-    print(res.json)
 
+    if dest_host:
+        command.append("--dest=vespa")
+        command.append(f"--dest_host={dest_host}")
 
-@task
-def search(c):
-    client = VespaClient()
-    res = client.search("title")
-    print(res.json)
+    if extract_keywords:
+        command.append("--extract_keywords")
+
+    if encode_text:
+        command.append("--encode_text")
+
+    if runner == "DirectRunner":
+        command += [
+            # https://github.com/apache/beam/blob/master/sdks/python/apache_beam/options/pipeline_options.py#L617-L621
+            "--direct_num_workers=0",
+        ]
+    elif runner == "DataflowRunner":
+        command += [
+            f"--project={PROJECT_ID}",
+            f"--region={REGION}",
+            f"--temp_location=gs://{PROJECT_NAME}/temp",
+            f"--staging_location=gs://{PROJECT_NAME}/staging",
+        ]
+
+    if nrows:
+        command.append(f"--nrows={int(nrows)}")
+
+    c.run(" ".join(command))
