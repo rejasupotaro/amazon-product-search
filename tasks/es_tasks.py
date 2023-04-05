@@ -26,7 +26,7 @@ def recreate_index(c, index_name):
 
 
 @task
-def index_docs(
+def index(
     c,
     index_name,
     locale="jp",
