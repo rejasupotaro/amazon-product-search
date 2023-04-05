@@ -91,6 +91,7 @@ def run(options: IndexerOptions):
                         WriteToVespa(
                             host=options.dest_host,
                             schema=index_name,
+                            id_fn=lambda doc: doc["product_id"],
                         )
                     )
                 )

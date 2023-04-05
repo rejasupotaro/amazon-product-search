@@ -2,12 +2,14 @@ from invoke import task
 
 import amazon_product_search.vespa.service as vespa_service
 from amazon_product_search.constants import PROJECT_ID, PROJECT_NAME, REGION
+from amazon_product_search.vespa.package import dump_config
 from amazon_product_search.vespa.vespa_client import VespaClient
 
 
 @task
 def start(c):
-    vespa_service.start()
+    vespa_app = vespa_service.start()
+    dump_config(vespa_app.application_package)
 
 
 @task
@@ -16,17 +18,29 @@ def stop(c):
 
 
 @task
+def restart(c):
+    vespa_service.stop()
+    vespa_app = vespa_service.start()
+    dump_config(vespa_app.application_package)
+
+
+@task
 def delete_all_docs(c, schema):
     client = VespaClient()
-    res = client.delete_all_docs(content_cluster_name="amazon", schema=schema)
+    res = client.delete_all_docs(content_cluster_name="amazon_content", schema=schema)
     print(res.json)
-    print(res.raw)
-    print(res.reason)
 
 
 @task
 def search(c, query):
     client = VespaClient()
+    query = {
+        "yql": "select * from sources * where userQuery()",
+        "query": query,
+        "type": "any",
+        "ranking": "random",
+        "hits": 10,
+    }
     res = client.search(query)
     print(res.json)
 

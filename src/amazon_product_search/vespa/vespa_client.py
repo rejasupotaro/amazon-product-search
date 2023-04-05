@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Callable, Dict, Optional
 
 from requests.models import Response
 from vespa.application import ApplicationPackage
@@ -11,37 +11,37 @@ class VespaClient:
     def __init__(self, host: Optional[str] = None, app_package: Optional[ApplicationPackage] = None):
         self.vespa_app = vespa_service.connect(host, app_package)
 
-    def feed(self, schema: str, batch: list[dict[str, Any]]) -> list[VespaResponse]:
+    def feed(
+        self,
+        schema: str,
+        docs: list[dict[str, Any]],
+        id_fn: Callable[[Dict[str, Any]], str],
+    ) -> list[VespaResponse]:
         """Feed a batch of data to Vespa.
 
         Args:
             schema (str): The name of the target schema.
-            batch (list[dict[str, Any]]): A list of dicts containing data.
-                The expected format of a dict is `{"id": doc_id, "fields": doc}`.
+            docs (list[dict[str, Any]]): A list of documents to index.
+            id_fn (Callable[[Dict[str, Any]], str]): A function to convert docs to
+                the expected format: `[{"id": doc_id, "fields": doc}]`.
 
         Returns:
             list[VespaResponse]: A list of VespaResponses.
         """
+        batch = [{"id": id_fn(doc), "fields": doc} for doc in docs]
+        print(batch)
         return self.vespa_app.feed_batch(schema=schema, batch=batch)
 
-    def search(self, query: str, hits: int = 10) -> VespaQueryResponse:
+    def search(self, query: Optional[dict[str, Any]] = None) -> VespaQueryResponse:
         """Send a search request to Vespa.
 
         Args:
-            query (str): A string query.
-            hits (int, optional): The max number of docs to return. Defaults to 10.
+            query (Optional[str], optional): A dict containing all the request params.
 
         Returns:
-            VespaQueryResponse: _description_
+            VespaQueryResponse: A response from Vespa.
         """
-        return self.vespa_app.query(
-            body={
-                "yql": "select * from sources * where userQuery()",
-                "query": query,
-                "type": "any",
-                "hits": hits,
-            }
-        )
+        return self.vespa_app.query(query)
 
     def delete_all_docs(self, content_cluster_name: str, schema: str) -> Response:
         """Delete all docs associated with the given schema.
