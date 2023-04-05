@@ -1,34 +1,54 @@
 from invoke import task
 
+import amazon_product_search.vespa.service as vespa_service
 from amazon_product_search.constants import PROJECT_ID, PROJECT_NAME, REGION
-from amazon_product_search.es.es_client import EsClient
+from amazon_product_search.vespa.package import dump_config
+from amazon_product_search.vespa.vespa_client import VespaClient
 
 
 @task
-def delete_index(c, index_name):
-    es_client = EsClient()
-    es_client.delete_index(index_name=index_name)
-    print(f"{index_name} was deleted.")
+def start(c):
+    vespa_app = vespa_service.start()
+    dump_config(vespa_app.application_package)
 
 
 @task
-def create_index(c, index_name):
-    es_client = EsClient()
-    es_client.create_index(index_name=index_name)
-    print(f"{index_name} was created.")
+def stop(c):
+    vespa_service.stop()
 
 
 @task
-def recreate_index(c, index_name):
-    es_client = EsClient()
-    es_client.delete_index(index_name=index_name)
-    es_client.create_index(index_name=index_name)
+def restart(c):
+    vespa_service.stop()
+    vespa_app = vespa_service.start()
+    dump_config(vespa_app.application_package)
 
 
 @task
-def index_docs(
+def delete_all_docs(c, schema):
+    client = VespaClient()
+    res = client.delete_all_docs(content_cluster_name="amazon_content", schema=schema)
+    print(res.json)
+
+
+@task
+def search(c, query):
+    client = VespaClient()
+    query = {
+        "yql": "select * from sources * where userQuery()",
+        "query": query,
+        "type": "any",
+        "ranking": "random",
+        "hits": 10,
+    }
+    res = client.search(query)
+    print(res.json)
+
+
+@task
+def index(
     c,
-    index_name,
+    schema,
     locale="jp",
     dest_host="",
     extract_keywords=False,
@@ -39,12 +59,12 @@ def index_docs(
     command = [
         "poetry run python src/amazon_product_search/indexer/main.py",
         f"--runner={runner}",
-        f"--index_name={index_name}",
+        f"--index_name={schema}",
         f"--locale={locale}",
     ]
 
     if dest_host:
-        command.append("--dest=es")
+        command.append("--dest=vespa")
         command.append(f"--dest_host={dest_host}")
 
     if extract_keywords:

@@ -9,6 +9,7 @@ from apache_beam.utils.shared import Shared
 
 from amazon_product_search import source
 from amazon_product_search.indexer.io.elasticsearch_io import WriteToElasticsearch
+from amazon_product_search.indexer.io.vespa_io import WriteToVespa
 from amazon_product_search.indexer.options import IndexerOptions
 from amazon_product_search.indexer.transforms.analyze_fn import AnalyzeFn
 from amazon_product_search.indexer.transforms.encode_fn import BatchEncodeFn
@@ -41,7 +42,6 @@ def join_branches(kv: Tuple[str, Dict[str, Any]]):
 def run(options: IndexerOptions):
     index_name = options.index_name
     locale = options.locale
-    es_host = options.es_host
     nrows = options.nrows
     text_fields = ["product_title", "product_description", "product_bullet_point"]
 
@@ -66,18 +66,32 @@ def run(options: IndexerOptions):
             branches["product"] = products | beam.WithKeys(lambda product: product["product_id"])
             products = branches | beam.CoGroupByKey() | beam.Map(join_branches)
 
-        if es_host:
-            (
-                products
-                | "Batch products for indexing" >> BatchElements()
-                | "Index products"
-                >> beam.ParDo(
-                    WriteToElasticsearch(
-                        es_host=es_host,
-                        index_name=index_name,
-                        id_fn=lambda doc: doc["product_id"],
+        batched_products = products | "Batch products for indexing" >> BatchElements()
+
+        match options.dest:
+            case "stdout":
+                products | beam.Map(lambda batched_products: logging.info(batched_products))
+            case "es":
+                (
+                    batched_products
+                    | "Index products"
+                    >> beam.ParDo(
+                        WriteToElasticsearch(
+                            es_host=options.dest_host,
+                            index_name=index_name,
+                            id_fn=lambda doc: doc["product_id"],
+                        )
                     )
                 )
-            )
-        else:
-            products | beam.Map(lambda product: logging.info(product))
+            case "vespa":
+                (
+                    batched_products
+                    | "Index products"
+                    >> beam.ParDo(
+                        WriteToVespa(
+                            host=options.dest_host,
+                            schema=index_name,
+                            id_fn=lambda doc: doc["product_id"],
+                        )
+                    )
+                )

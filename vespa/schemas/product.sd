@@ -1,0 +1,48 @@
+schema product {
+    document product {
+        field product_id type string {
+            indexing: attribute | summary
+        }
+        field product_title type string {
+            indexing: index | summary
+            index: enable-bm25
+        }
+        field product_bullet_point type string {
+            indexing: index | summary
+            index: enable-bm25
+        }
+        field product_description type string {
+            indexing: index | summary
+            index: enable-bm25
+        }
+        field product_brand type string {
+            indexing: attribute | index | summary
+            index: enable-bm25
+        }
+        field product_color type string {
+            indexing: attribute | index | summary
+            index: enable-bm25
+        }
+        field product_locale type string {
+            indexing: attribute | index | summary
+        }
+    }
+    fieldset default {
+        fields: product_title, product_brand, product_description, product_brand, product_color
+    }
+    rank-profile random inherits default {
+        first-phase {
+            expression: random
+        }
+    }
+    rank-profile bm25 inherits default {
+        first-phase {
+            expression: bm25(product_title) + bm25(product_description)
+        }
+    }
+    rank-profile native_rank inherits default {
+        first-phase {
+            expression: nativeRank(product_title, product_description)
+        }
+    }
+}
