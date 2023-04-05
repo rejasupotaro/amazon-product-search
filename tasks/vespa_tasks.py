@@ -32,11 +32,11 @@ def delete_all_docs(c, schema):
 
 
 @task
-def search(c, query):
+def search(c):
     client = VespaClient()
     query = {
         "yql": "select * from sources * where userQuery()",
-        "query": query,
+        "query": input("query: "),
         "type": "any",
         "ranking": "random",
         "hits": 10,
