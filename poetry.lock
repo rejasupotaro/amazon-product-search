@@ -4104,14 +4104,14 @@ tzdata = {version = "*", markers = "python_version >= \"3.6\""}
 
 [[package]]
 name = "pyvespa"
-version = "0.31.0"
+version = "0.33.0"
 description = "Python API for vespa.ai"
 category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "pyvespa-0.31.0-py3-none-any.whl", hash = "sha256:0eafe21391bb6526e31832c6b16539fd09704fee6705913ead01b4dede188b1e"},
-    {file = "pyvespa-0.31.0.tar.gz", hash = "sha256:905c99491da4985b6853ecfd218d9211b62238b222119014f768a215f835fbae"},
+    {file = "pyvespa-0.33.0-py3-none-any.whl", hash = "sha256:2681910b3ac5f0259a9e41e6e2649caba2801e836b4c295cc2e48ab25b09672c"},
+    {file = "pyvespa-0.33.0.tar.gz", hash = "sha256:be3da9022276555b6b25c40b6e846db6e9dbf617486001ba92235ccfab6c9353"},
 ]
 
 [package.dependencies]
@@ -6049,4 +6049,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "3.10.8"
-content-hash = "1f6639fd782c927c879c0f7c4ceeee795a144488caec3e74d5b9426aec5aa245"
+content-hash = "59b56de7dda4e42aef3b153463dfe7bb62d5381fac70eaee06e45d3c6815ad69"
