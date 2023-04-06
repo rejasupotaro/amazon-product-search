@@ -26,23 +26,50 @@ schema product {
         field product_locale type string {
             indexing: attribute | index | summary
         }
+        field product_vector type tensor<float>(x[768]) {
+            indexing: attribute | index
+            attribute {
+                distance-metric: euclidean
+            }
+            index {
+                hnsw {
+                    max-links-per-node: 16
+                    neighbors-to-explore-at-insert: 500
+                }
+            }
+        }
     }
     fieldset default {
         fields: product_title, product_brand, product_description, product_brand, product_color
     }
     rank-profile random inherits default {
         first-phase {
-            expression: random
+            expression {
+                random
+            }
         }
     }
     rank-profile bm25 inherits default {
         first-phase {
-            expression: bm25(product_title) + bm25(product_description)
+            expression {
+                bm25(product_title) + bm25(product_description)
+            }
         }
     }
     rank-profile native_rank inherits default {
         first-phase {
-            expression: nativeRank(product_title, product_description)
+            expression {
+                nativeRank(product_title, product_description)
+            }
+        }
+    }
+    rank-profile semantic-similarity inherits default {
+        inputs {
+            query(query_vector) tensor<float>(x[768])         }
+        first-phase {
+            expression {
+                closeness(product_vector)
+            }
         }
     }
 }

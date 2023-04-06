@@ -17,4 +17,11 @@ class WriteToVespa(beam.DoFn):
 
     def process(self, docs: List[Dict[str, Any]]):
         logging.info(f"Index {len(docs)} docs in a batch")
-        self.client.feed(self.schema, docs, self.id_fn)
+        for doc in docs:
+            for key, value in doc.items():
+                if "vector" in key:
+                    doc[key] = [float(v) for v in list(value)]
+        responses = self.client.feed(self.schema, docs, self.id_fn)
+        for response in responses:
+            if response.status_code != 200:
+                logging.error(response.json)
