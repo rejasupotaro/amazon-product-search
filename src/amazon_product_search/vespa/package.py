@@ -1,8 +1,6 @@
 from vespa.application import ApplicationPackage
 from vespa.package import HNSW, Document, Field, FieldSet, RankProfile, Schema
 
-from amazon_product_search.constants import VESPA_DIR
-
 
 def create_package() -> ApplicationPackage:
     product_document = Document(
@@ -43,6 +41,7 @@ def create_package() -> ApplicationPackage:
     product_schema = Schema(
         name="product",
         document=product_document,
+        models=[],
         fieldsets=[
             FieldSet(
                 name="default",
@@ -66,11 +65,3 @@ def create_package() -> ApplicationPackage:
 
     app_package = ApplicationPackage(name="amazon", schema=[product_schema])
     return app_package
-
-
-def dump_config(app_package: ApplicationPackage):
-    with open(f"{VESPA_DIR}/services.xml", "w") as f:
-        print(app_package.services_to_text, file=f)
-    for schema in app_package.schemas:
-        with open(f"{VESPA_DIR}/schemas/{schema.name}.sd", "w") as f:
-            print(schema.schema_to_text, file=f)

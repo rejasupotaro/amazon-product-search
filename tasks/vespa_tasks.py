@@ -1,16 +1,15 @@
 from invoke import task
 
 import amazon_product_search.vespa.service as vespa_service
-from amazon_product_search.constants import PROJECT_ID, PROJECT_NAME, REGION
+from amazon_product_search.constants import PROJECT_ID, PROJECT_NAME, REGION, VESPA_DIR
 from amazon_product_search.nlp.encoder import Encoder
-from amazon_product_search.vespa.package import dump_config
 from amazon_product_search.vespa.vespa_client import VespaClient
 
 
 @task
 def start(c):
     vespa_app = vespa_service.start()
-    dump_config(vespa_app.application_package)
+    vespa_app.application_package.to_files(VESPA_DIR)
 
 
 @task
@@ -22,7 +21,7 @@ def stop(c):
 def restart(c):
     vespa_service.stop()
     vespa_app = vespa_service.start()
-    dump_config(vespa_app.application_package)
+    vespa_app.application_package.to_files(VESPA_DIR)
 
 
 @task
