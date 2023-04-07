@@ -20,6 +20,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - run: python -m pip install --upgrade pip
     - name: Install dependencies
+      env:
+        SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL: True
       run: |
         pip install poetry
         poetry install
