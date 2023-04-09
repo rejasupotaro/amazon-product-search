@@ -12,7 +12,7 @@ from amazon_product_search.metrics import compute_ndcg, compute_recall, compute_
 from amazon_product_search.nlp.normalizer import normalize_query
 from amazon_product_search.reranking import reranker
 from demo import utils
-from demo.experimental_setup import EXPERIMENTS, ExperimentalSetup, Variant
+from demo.apps.search.experimental_setup import EXPERIMENTS, ExperimentalSetup, Variant
 from demo.page_config import set_page_config
 
 es_client = EsClient()
