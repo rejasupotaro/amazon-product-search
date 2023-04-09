@@ -1,5 +1,5 @@
 from vespa.application import ApplicationPackage
-from vespa.package import HNSW, Document, Field, FieldSet, RankProfile, Schema
+from vespa.package import HNSW, Document, Field, FieldSet, OnnxModel, RankProfile, Schema
 
 
 def create_package() -> ApplicationPackage:
@@ -41,12 +41,23 @@ def create_package() -> ApplicationPackage:
     product_schema = Schema(
         name="product",
         document=product_document,
-        models=[],
         fieldsets=[
             FieldSet(
                 name="default",
                 fields=["product_title", "product_brand", "product_description", "product_brand", "product_color"],
             )
+        ],
+        models=[
+            OnnxModel(
+                model_name="sbert",
+                model_file_path="./models/sbert.onnx",
+                inputs={
+                    "input_ids": "input_ids",
+                    "token_type_ids": "token_type_ids",
+                    "attention_mask": "attention_mask",
+                },
+                outputs={"output_0": "output_0", "output_1": "output_1"},
+            ),
         ],
         rank_profiles=[
             RankProfile(name="random", inherits="default", first_phase="random"),
@@ -63,5 +74,8 @@ def create_package() -> ApplicationPackage:
         ],
     )
 
-    app_package = ApplicationPackage(name="amazon", schema=[product_schema])
+    app_package = ApplicationPackage(
+        name="amazon",
+        schema=[product_schema],
+    )
     return app_package
