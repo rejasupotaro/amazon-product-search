@@ -5,17 +5,17 @@ from amazon_product_search import source
 from amazon_product_search.source import Locale
 
 
-@st.cache
+@st.cache_data
 def load_products(locale: Locale, nrows: int = -1) -> pl.DataFrame:
     return source.load_products(locale, nrows)
 
 
-@st.cache
+@st.cache_data
 def load_labels(locale: Locale, nrows: int = -1) -> pl.DataFrame:
     return source.load_labels(locale, nrows)
 
 
-@st.cache
+@st.cache_data
 def load_merged(locale: Locale, nrows: int = -1) -> pl.DataFrame:
     return source.load_merged(locale, nrows)
 
