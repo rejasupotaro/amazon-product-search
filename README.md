@@ -54,11 +54,14 @@ See https://github.com/rejasupotaro/amazon-product-search/wiki/Indexing for more
 
 ## Demo
 
-The following command launches the [Streamlit](https://streamlit.io/) demo app.
+The command below launches the [Streamlit](https://streamlit.io/) demo app.
 
 ```shell
+# Launch Elasticsearch beforehand
 $ docker compose up
-$ poetry run inv demo
+
+$ poetry run inv demo.eda
+$ poetry run inv demo.search
 ```
 
 ![](https://user-images.githubusercontent.com/883148/203654537-8b495c9c-f8af-4c3f-90f9-60edacf647b9.png)
