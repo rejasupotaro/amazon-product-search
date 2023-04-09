@@ -4,7 +4,7 @@
 
 This repo showcases and compares various search algorithms and models for [Shopping Queries Dataset: A Large-Scale ESCI Benchmark for Improving Product Search](https://github.com/amazon-science/esci-data).
 
-The results of experiments will be added to the wiki: https://github.com/rejasupotaro/amazon-product-search/wiki
+The details and results of experiments will be added to this wiki: https://github.com/rejasupotaro/amazon-product-search/wiki
 
 ## Installation
 
@@ -36,7 +36,7 @@ $ poetry run inv data.merge-and-split
 
 ## Index Products
 
-This project indexes products to Elasticsearch. If you want to try on your machine, launch Elasticsearch locally and run the document indexing pipeline against the index you created.
+This project indexes products into Elasticsearch. If you want to try it on your own machine, launch Elasticsearch locally and run the document indexing pipeline against the index you created.
 
 ```shell
 $ docker compose up
@@ -49,7 +49,6 @@ $ poetry run inv es.index \
   --encode-text \
   --nrows=100
 ```
-
 
 See https://github.com/rejasupotaro/amazon-product-search/wiki/Indexing for more details.
 
