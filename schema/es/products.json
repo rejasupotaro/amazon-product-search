@@ -36,15 +36,6 @@
             }
           }
         },
-        "product_yake": {
-          "type": "text"
-        },
-        "product_position_rank": {
-          "type": "text"
-        },
-        "product_multipartite_rank": {
-          "type": "text"
-        },
         "product_keybert": {
           "type": "text"
         },

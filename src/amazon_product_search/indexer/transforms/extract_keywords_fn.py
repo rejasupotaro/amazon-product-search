@@ -22,12 +22,5 @@ class ExtractKeywordsFn(beam.DoFn):
             yield product["product_id"], result
             return
 
-        result["product_description_yake"] = self.convert_results_to_text(self._extractor.apply_yake(text))
-        result["product_description_position_rank"] = self.convert_results_to_text(
-            self._extractor.apply_position_rank(text)
-        )
-        result["product_description_multipartite_rank"] = self.convert_results_to_text(
-            self._extractor.apply_multipartite_rank(text)
-        )
         result["product_description_keybert"] = self.convert_results_to_text(self._extractor.apply_keybert(text))
         yield product["product_id"], result

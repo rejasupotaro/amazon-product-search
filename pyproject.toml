@@ -20,7 +20,6 @@ transformers = "^4.25.1"
 sentence-transformers = "^2.2.2"
 watchdog = "^2.1.9"
 streamlit-aggrid = "^0.3.3"
-pke = {git = "https://github.com/boudinfl/pke.git", rev = "2.0.0"}
 keybert = "^0.7.0"
 more-itertools = "^9.0.0"
 scikit-learn = "^1.2.0"
