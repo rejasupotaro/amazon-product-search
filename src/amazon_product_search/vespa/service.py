@@ -35,7 +35,6 @@ def stop(name_or_id: str = "amazon"):
         name_or_id (str, optional): The container name or ID. Defaults to "amazon".
     """
     vespa_docker = VespaDocker.from_container_name_or_id(name_or_id)
-    vespa_docker.container
     vespa_docker.stop_services()
 
 
