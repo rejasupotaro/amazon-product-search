@@ -58,7 +58,7 @@ def main():
     draw_column_info(products_df)
     draw_brand_info(products_df)
     draw_color_info(products_df)
-    draw_examples(products_df.head(1000).to_pandas())
+    draw_examples(products_df.head(1000))
 
 
 if __name__ == "__main__":

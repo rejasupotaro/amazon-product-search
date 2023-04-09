@@ -46,7 +46,9 @@ def main():
     with columns[1]:
         st.write("### Fugashi (IPADIC)")
         st.write(
-            pl.from_dicts([{"token": token, "pos": pos} for token, pos in ipadic_tokenizer.tokenize(s)]).to_pandas()
+            pl.from_dicts(
+                [{"token": token, "pos": list(pos)} for token, pos in ipadic_tokenizer.tokenize(s)]
+            ).to_pandas()
         )
 
 
