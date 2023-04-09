@@ -36,6 +36,7 @@ def stop(name_or_id: str = "amazon"):
     """
     vespa_docker = VespaDocker.from_container_name_or_id(name_or_id)
     vespa_docker.stop_services()
+    vespa_docker.container.stop()
 
 
 def connect(host: str, app_package: Optional[ApplicationPackage] = None) -> Vespa:
