@@ -20,7 +20,7 @@ def draw_results(results: dict[str, list[tuple[str, float]]]):
     for result in list(zip(*results.values())):
         row = {}
         for method, (keyword, score) in zip(results.keys(), result):
-            row[method] = (keyword, round(score, 4))
+            row[method] = f"{keyword} ({round(score, 4)})"
         rows.append(row)
     st.write(pl.from_dicts(rows).to_pandas())
 
@@ -69,9 +69,6 @@ def main():
 
     st.write("## Results")
     results = {
-        "yake": extractor.apply_yake(text),
-        "position_rank": extractor.apply_position_rank(text),
-        "multipartite_rank": extractor.apply_multipartite_rank(text),
         "keybert": extractor.apply_keybert(text),
     }
     draw_results(results)
