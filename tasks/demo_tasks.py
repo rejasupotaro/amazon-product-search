@@ -9,3 +9,8 @@ def eda(c):
 @task
 def search(c):
     c.run("poetry run streamlit run src/demo/apps/search/🏠_Home.py")
+
+
+@task
+def vespa(c):
+    c.run("poetry run streamlit run src/demo/apps/vespa/dev_tools.py")
