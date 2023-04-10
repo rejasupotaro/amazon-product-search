@@ -1,5 +1,6 @@
 from typing import Optional
 
+from docker.models.containers import Container
 from vespa.application import ApplicationPackage
 from vespa.deployment import Vespa, VespaDocker
 
@@ -36,7 +37,9 @@ def stop(name_or_id: str = "amazon"):
     """
     vespa_docker = VespaDocker.from_container_name_or_id(name_or_id)
     vespa_docker.stop_services()
-    vespa_docker.container.stop()
+    container = vespa_docker.container
+    if isinstance(container, Container):
+        container.stop()
 
 
 def connect(host: str, app_package: Optional[ApplicationPackage] = None) -> Vespa:
