@@ -7,42 +7,42 @@ from amazon_product_search.constants import DATA_DIR
 Locale = Literal["jp", "us", "es"]
 
 
-def load_products(locale: Optional[Locale] = None, nrows: int = -1) -> pl.DataFrame:
+def load_products(locale: Optional[Locale] = None, nrows: int = -1, data_dir: str = DATA_DIR) -> pl.DataFrame:
     if locale:
-        filename = f"{DATA_DIR}/products_{locale}.parquet"
+        filename = f"{data_dir}/products_{locale}.parquet"
     else:
-        filename = f"{DATA_DIR}/raw/shopping_queries_dataset_products.parquet"
+        filename = f"{data_dir}/raw/shopping_queries_dataset_products.parquet"
     if nrows > 0:
         return pl.read_parquet(filename).head(nrows)
     else:
         return pl.read_parquet(filename)
 
 
-def load_labels(locale: Optional[Locale] = None, nrows: int = -1) -> pl.DataFrame:
+def load_labels(locale: Optional[Locale] = None, nrows: int = -1, data_dir: str = DATA_DIR) -> pl.DataFrame:
     if locale:
-        filename = f"{DATA_DIR}/examples_{locale}.parquet"
+        filename = f"{data_dir}/examples_{locale}.parquet"
     else:
-        filename = f"{DATA_DIR}/raw/shopping_queries_dataset_examples.parquet"
+        filename = f"{data_dir}/raw/shopping_queries_dataset_examples.parquet"
     if nrows > 0:
         return pl.read_parquet(filename).head(nrows)
     else:
         return pl.read_parquet(filename)
 
 
-def load_sources() -> pl.DataFrame:
-    filename = f"{DATA_DIR}/raw/shopping_queries_dataset_sources.csv"
+def load_sources(data_dir: str = DATA_DIR) -> pl.DataFrame:
+    filename = f"{data_dir}/raw/shopping_queries_dataset_sources.csv"
     return pl.read_csv(filename).to_pandas()
 
 
-def load_merged(locale: Locale, nrows: int = -1) -> pl.DataFrame:
-    filename = f"{DATA_DIR}/merged_{locale}.parquet"
+def load_merged(locale: Locale, nrows: int = -1, data_dir: str = DATA_DIR) -> pl.DataFrame:
+    filename = f"{data_dir}/merged_{locale}.parquet"
     if nrows > 0:
         return pl.read_parquet(filename).head(nrows)
     else:
         return pl.read_parquet(filename)
 
 
-def merge_and_split():
+def merge_and_split(data_dir: str = DATA_DIR):
     """Load raw dataset and split it by locale for convenience.
 
     Raw data files need to be downloaded in the appropriate location in advance.
@@ -78,20 +78,20 @@ def merge_and_split():
     print("Split catalogue dataset by locale")
     for locale in locales:
         filtered_df = products_df.filter(pl.col("product_locale") == locale)
-        filepath = f"{DATA_DIR}/products_{locale}.parquet"
+        filepath = f"{data_dir}/products_{locale}.parquet"
         filtered_df.write_parquet(filepath)
         print(f"Catalog dataset (locale: {locale}) containing {len(filtered_df)} rows was saved to {filepath}")
 
     print("Split judgement dataset by locale")
     for locale in locales:
         filtered_df = labels_df.filter(pl.col("product_locale") == locale)
-        filepath = f"{DATA_DIR}/examples_{locale}.parquet"
+        filepath = f"{data_dir}/examples_{locale}.parquet"
         filtered_df.write_parquet(filepath)
         print(f"Label dataset (locale: {locale}) containing {len(filtered_df)} rows was saved to {filepath}")
 
     print("Split merged dataset by locale")
     for locale in locales:
         filtered_df = merged_df.filter(pl.col("product_locale") == locale)
-        filepath = f"{DATA_DIR}/merged_{locale}.parquet"
+        filepath = f"{data_dir}/merged_{locale}.parquet"
         filtered_df.write_parquet(filepath)
         print(f"Merged dataset (locale: {locale}) containing {len(filtered_df)} rows was saved to {filepath}")
