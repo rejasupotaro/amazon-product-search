@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Tuple
 
 import apache_beam as beam
 import polars as pl
@@ -18,12 +18,8 @@ from amazon_product_search.indexer.transforms.filters import is_indexable
 from amazon_product_search.source import Locale
 
 
-def get_input_source(locale: Locale, nrows: int = -1, data_dir: Optional[str] = None) -> PTransform:
-    if data_dir:
-        products_df = source.load_products(locale, nrows, data_dir)
-    else:
-        products_df = source.load_products(locale, nrows)
-
+def get_input_source(data_dir: str, locale: Locale, nrows: int = -1) -> PTransform:
+    products_df = source.load_products(locale, nrows, data_dir)
     products_df = products_df.with_columns(pl.col("*").fill_null(pl.lit("")))
     products = products_df.to_dicts()
     logging.info(f"We have {len(products)} products to index")
@@ -46,14 +42,14 @@ def join_branches(kv: Tuple[str, Dict[str, Any]]):
 def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
     index_name = options.index_name
     locale = options.locale
-    data_dir: Optional[str] = options.data_dir
+    data_dir = options.data_dir
     nrows = options.nrows
     text_fields = ["product_title", "product_description", "product_bullet_point"]
 
     pipeline = beam.Pipeline(options=options)
     products = (
         pipeline
-        | get_input_source(locale, nrows, data_dir)
+        | get_input_source(data_dir, locale, nrows)
         | "Filter products" >> beam.Filter(is_indexable)
         | "Analyze products" >> beam.ParDo(AnalyzeFn(text_fields))
     )
