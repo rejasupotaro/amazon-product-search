@@ -92,5 +92,6 @@ Run the following tasks when you make changes.
 
 ```shell
 $ poetry run inv format lint
-$ poetry run pytest -vv
+$ poetry run pytest tests/unit -vv
+$ poetry run pytest tests/integration -vv
 ```
