@@ -40,7 +40,7 @@ This project indexes products into Elasticsearch. If you want to try it on your 
 
 ```shell
 $ docker compose up
-$ poetry run inv es.create_index --index-name=products_jp
+$ poetry run inv es.create-index --index-name=products_jp
 $ poetry run inv es.index \
   --index-name=products_jp \
   --locale=jp \
