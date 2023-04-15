@@ -5,7 +5,7 @@ from amazon_product_search.constants import HF
 
 
 class Encoder:
-    def __init__(self, model_name: str = HF.JA_SBERT):
+    def __init__(self, model_name: str = HF.JP_SBERT):
         self.embedder = SentenceTransformer(model_name)
 
     def encode(self, texts: list[str], show_progress_bar: bool = False, convert_to_tensor: bool = False) -> Tensor:
