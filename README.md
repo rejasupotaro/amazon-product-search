@@ -8,7 +8,7 @@ The details and results of experiments will be added to this wiki: https://githu
 
 ## Installation
 
-Copy `.envrc.example` and fill in the required environment variables. Then, install the dependencies.
+Copy `.envrc.example` and fill in the necessary environment variables. Afterwards, proceed to installing the dependencies.
 
 ```shell
 $ pyenv install 3.10.8
@@ -18,7 +18,7 @@ $ poetry env use python
 $ poetry install
 ```
 
-The following libraries are necessary to process Japanese.
+The following libraries are necessary for Japanese text processing.
 
 ```shell
 # For macOS
@@ -36,7 +36,7 @@ $ poetry run inv data.merge-and-split
 
 ## Index Products
 
-This project indexes products into Elasticsearch. If you want to try it on your own machine, launch Elasticsearch locally and run the document indexing pipeline against the index you created.
+This project indexes products into Elasticsearch. If you want to try it on your own machine, launch Elasticsearch locally and execute the document indexing pipeline against the created index.
 
 ```shell
 $ docker compose up
@@ -68,7 +68,7 @@ $ poetry run inv demo.search
 
 ## Experimentation
 
-The demo app provides the ability to run experiments with different experimental settings.
+The demo application allows for the execution of experiments with different experimental settings.
 
 ```python
 # src/demo/experimental_setup.py
@@ -88,7 +88,7 @@ The demo app provides the ability to run experiments with different experimental
 
 ## Development
 
-Run the following tasks when you make changes.
+Run the following tasks after adding any modifications.
 
 ```shell
 $ poetry run inv format lint
