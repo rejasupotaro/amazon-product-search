@@ -75,6 +75,7 @@ class EsClient:
 
         ptm = PyTorchModel(self.es, tm.elasticsearch_model_id())
         ptm.import_model(model_path=model_path, config_path=None, vocab_path=vocab_path, config=config)
+        ptm.start()
 
     def count_docs(self, index_name: str) -> int:
         return self.es.count(index=index_name)["count"]
