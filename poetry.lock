@@ -688,7 +688,7 @@ test = ["flake8 (==3.7.8)", "hypothesis (==3.55.3)"]
 name = "contourpy"
 version = "1.0.6"
 description = "Python library for calculating contours of 2D quadrilateral grids"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -902,7 +902,7 @@ test = ["hypothesis (>=1.11.4,!=3.79.2)", "iso8601", "pretend", "pytest (>=6.2.0
 name = "cycler"
 version = "0.11.0"
 description = "Composable style cycles"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
@@ -1008,6 +1008,31 @@ python-versions = "*"
 files = [
     {file = "docopt-0.6.2.tar.gz", hash = "sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491"},
 ]
+
+[[package]]
+name = "eland"
+version = "8.7.0"
+description = "Python Client and Toolkit for DataFrames, Big Data, Machine Learning and ETL in Elasticsearch"
+category = "main"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "eland-8.7.0-py3-none-any.whl", hash = "sha256:55f5203ffbcc24be4fcb212c4cec2dca3f8c642f5aa2dc5e03ed8e2cc0f2fd88"},
+    {file = "eland-8.7.0.tar.gz", hash = "sha256:33401274cbe1f2bd1a2823d7949d8a84d2fa7373462308ed6b2041c028090406"},
+]
+
+[package.dependencies]
+elasticsearch = ">=8.3,<9"
+matplotlib = ">=3.6"
+numpy = "<2"
+pandas = ">=1.5"
+
+[package.extras]
+all = ["lightgbm (>=2,<4)", "scikit-learn (>=0.22.1,<2)", "sentence-transformers (>=2.1.0,<=2.2.2)", "torch (>=1.11.0,<1.12.0)", "transformers[torch] (>=4.12.0,<=4.20.1)", "xgboost (>=0.90,<2)"]
+lightgbm = ["lightgbm (>=2,<4)"]
+pytorch = ["sentence-transformers (>=2.1.0,<=2.2.2)", "torch (>=1.11.0,<1.12.0)", "transformers[torch] (>=4.12.0,<=4.20.1)"]
+scikit-learn = ["scikit-learn (>=0.22.1,<2)"]
+xgboost = ["xgboost (>=0.90,<2)"]
 
 [[package]]
 name = "elastic-transport"
@@ -1190,7 +1215,7 @@ pyflakes = ">=2.5.0,<2.6.0"
 name = "fonttools"
 version = "4.38.0"
 description = "Tools to manipulate font files"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -2098,7 +2123,7 @@ use = ["tensorflow", "tensorflow_hub", "tensorflow_text"]
 name = "kiwisolver"
 version = "1.4.4"
 description = "A fast implementation of the Cassowary constraint solver"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -2262,7 +2287,7 @@ files = [
 name = "matplotlib"
 version = "3.6.2"
 description = "Python plotting package"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.8"
 files = [
@@ -5515,4 +5540,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "3.10.8"
-content-hash = "9fa74d3ef1110162725163263e18b8552b896b29a548abbcc4d3a60c1e6fb47b"
+content-hash = "c9bd7e3923150ee967e0ee99278fa6077f61981f15123537f6134ac9ee2374dc"

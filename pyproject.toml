@@ -31,6 +31,7 @@ unidic-lite = "^1.0.8"
 polars = {version = "^0.16.0", extras = ["numpy", "pandas", "pyarrow"]}
 types-requests = "^2.28.11.17"
 docker = "^6.0.1"
+eland = "8.7.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2"
