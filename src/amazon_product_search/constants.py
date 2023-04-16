@@ -7,6 +7,7 @@ PROJECT_ID = os.getenv("PROJECT_ID", "")
 PROJECT_NAME = os.getenv("PROJECT_NAME", "")
 REGION = os.getenv("REGION", "asia-northeast1")
 
+
 class HF:
     # For English
     EN_ELECTRA = "cross-encoder/ms-marco-electra-base"
