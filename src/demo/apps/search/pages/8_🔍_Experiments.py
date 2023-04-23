@@ -19,7 +19,7 @@ es_client = EsClient()
 query_builder = QueryBuilder()
 
 
-@st.cache
+@st.cache_data
 def load_labels(experimental_setup: ExperimentalSetup) -> pl.DataFrame:
     df = utils.load_labels(experimental_setup.locale)
     df = df.filter(pl.col("split") == "test")
