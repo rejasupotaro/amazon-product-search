@@ -7,7 +7,7 @@ from transformers import AutoModel, AutoTokenizer
 from amazon_product_search.constants import MODELS_DIR
 
 
-class BertEncoder(nn.Module):
+class BERTEncoder(nn.Module):
     def __init__(self, bert_model_name: str, num_hidden: int = 768, num_proj: int = 128, trainable: bool = True):
         super().__init__()
 
@@ -23,9 +23,9 @@ class BertEncoder(nn.Module):
         )
 
     @staticmethod
-    def from_state(bert_model_name: str, model_name: str, models_dir: str = MODELS_DIR) -> "BertEncoder":
+    def from_state(bert_model_name: str, model_name: str, models_dir: str = MODELS_DIR) -> "BERTEncoder":
         model_filepath = f"{models_dir}/{model_name}"
-        encoder = BertEncoder(bert_model_name)
+        encoder = BERTEncoder(bert_model_name)
         encoder.load_state_dict(torch.load(model_filepath))
         return encoder
 
