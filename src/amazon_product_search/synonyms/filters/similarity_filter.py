@@ -1,15 +1,17 @@
 import polars as pl
+import torch
 import torch.nn.functional as F
 from more_itertools import chunked
 from tqdm import tqdm
 
 from amazon_product_search.constants import HF
-from amazon_product_search.nlp.encoder import Encoder
+from amazon_product_search.encoders.encoder import Encoder
+from amazon_product_search.encoders.sbert_encoder import SBERTEncoder
 
 
 class SimilarityFilter:
     def __init__(self, model_name: str = HF.JP_SBERT, batch_size: int = 8):
-        self.encoder = Encoder(model_name)
+        self.encoder: Encoder = SBERTEncoder(model_name)
         self.batch_size = batch_size
 
     def calculate_score(self, left: list[str], right: list[str]) -> list[float]:
@@ -22,8 +24,8 @@ class SimilarityFilter:
         Returns:
             list[float]: A list of scores.
         """
-        left_tensor = self.encoder.encode(left, convert_to_tensor=True)
-        right_tensor = self.encoder.encode(right, convert_to_tensor=True)
+        left_tensor = torch.from_numpy(self.encoder.encode(left))
+        right_tensor = torch.from_numpy(self.encoder.encode(right))
         return F.cosine_similarity(left_tensor, right_tensor, dim=1).tolist()
 
     def apply(self, synonyms_df: pl.DataFrame, threshold: float = 0.5) -> pl.DataFrame:

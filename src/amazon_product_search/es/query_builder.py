@@ -1,13 +1,14 @@
 from typing import Any
 
-from amazon_product_search.nlp.encoder import Encoder
+from amazon_product_search.encoders.encoder import Encoder
+from amazon_product_search.encoders.sbert_encoder import SBERTEncoder
 from amazon_product_search.synonyms.synonym_dict import SynonymDict
 
 
 class QueryBuilder:
     def __init__(self):
         self.synonym_dict = SynonymDict()
-        self.encoder = Encoder()
+        self.encoder: Encoder = SBERTEncoder()
 
     def build_multimatch_search_query(
         self, query: str, fields: list[str], is_synonym_expansion_enabled: bool = False
@@ -69,7 +70,7 @@ class QueryBuilder:
         Returns:
             dict[str, Any]: The constructed ES query.
         """
-        query_vector = self.encoder.encode(query, show_progress_bar=False)
+        query_vector = self.encoder.encode(query)
         return {
             "query_vector": query_vector,
             "field": field,

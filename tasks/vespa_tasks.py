@@ -2,7 +2,7 @@ from invoke import task
 
 import amazon_product_search.vespa.service as vespa_service
 from amazon_product_search.constants import PROJECT_ID, PROJECT_NAME, REGION, VESPA_DIR
-from amazon_product_search.nlp.encoder import Encoder
+from amazon_product_search.encoders.sbert_encoder import SBERTEncoder
 from amazon_product_search.vespa.vespa_client import VespaClient
 
 
@@ -34,7 +34,7 @@ def delete_all_docs(c, schema):
 @task
 def search(c):
     client = VespaClient()
-    query_vector = Encoder().encode(input("query: "), show_progress_bar=False)
+    query_vector = SBERTEncoder().encode(input("query: "))
     query_vector = [float(v) for v in query_vector]
     query = {
         "yql": "select * from sources * where ({targetHits:10}nearestNeighbor(product_vector,query_vector))",

@@ -1,7 +1,7 @@
-from amazon_product_search.nlp.encoder import Encoder
+from amazon_product_search.encoders.sbert_encoder import SBERTEncoder
 
 
 def test_encode():
-    encoder = Encoder()
+    encoder = SBERTEncoder()
     embeddings = encoder.encode(["hello"])
     assert embeddings.shape == (1, 768)

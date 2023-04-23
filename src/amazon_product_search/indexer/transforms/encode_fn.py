@@ -5,8 +5,9 @@ import apache_beam as beam
 from apache_beam.utils.shared import Shared
 from torch import Tensor
 
+from amazon_product_search.encoders.encoder import Encoder
+from amazon_product_search.encoders.sbert_encoder import SBERTEncoder
 from amazon_product_search.indexer.transforms.weak_reference import WeakReference
-from amazon_product_search.nlp.encoder import Encoder
 
 
 class EncodeFn(beam.DoFn):
@@ -14,11 +15,11 @@ class EncodeFn(beam.DoFn):
         pass
 
     def setup(self):
-        self.encoder = Encoder()
+        self.encoder: Encoder = SBERTEncoder()
 
     def process(self, product: Dict[str, Any]) -> Iterator[Dict[str, Any]]:
         text = product["product_title"] + " " + product["product_brand"]
-        product_vectors = self.encoder.encode([text], show_progress_bar=False)
+        product_vectors = self.encoder.encode([text])
         product["product_vector"] = product_vectors[0]
         yield product
 
@@ -30,12 +31,12 @@ class BatchEncodeFn(beam.DoFn):
     def setup(self):
         def initialize_encoder():
             # Load a potentially large model in memory. Executed once per process.
-            return WeakReference[Encoder](Encoder())
+            return WeakReference[Encoder](SBERTEncoder())
 
         self._weak_reference: WeakReference[Encoder] = self._shared_handle.acquire(initialize_encoder)
 
     def _encode(self, texts: list[str]) -> Tensor:
-        return self._weak_reference.ref.encode(texts, show_progress_bar=False)
+        return self._weak_reference.ref.encode(texts)
 
     def process(self, products: List[Dict[str, Any]]) -> Iterator[Tuple[str, Tensor]]:
         logging.info(f"Encode {len(products)} products in a batch")
