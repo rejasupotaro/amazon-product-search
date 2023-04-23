@@ -3,3 +3,4 @@ export PROJECT_NAME=<Your GCP Project Name>
 export REGION=asia-northeast1
 export DATA_DIR=data
 export MODELS_DIR=models
+export CLOUDSDK_ACTIVE_CONFIG_NAME=<Your Config Name>
