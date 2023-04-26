@@ -27,6 +27,19 @@ def build_indexing(c):
 
 
 @task
+def train_encoder(c):
+    now = get_unix_timestamp()
+    display_name = f"train-encoder-{now}"
+    command = f"""
+    gcloud ai custom-jobs create \
+        --region={REGION} \
+        --display-name={display_name} \
+        --config=vertex_ai/train_encoder.yaml
+    """
+    c.run(command)
+
+
+@task
 def hello(c):
     now = get_unix_timestamp()
     display_name = f"hello-{now}"
@@ -37,4 +50,3 @@ def hello(c):
         --config=vertex_ai/hello.yaml
     """
     c.run(command)
-    c.run(f"open https://console.cloud.google.com/vertex-ai/training/custom-jobs?project={PROJECT_ID}")
