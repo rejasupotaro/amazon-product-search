@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Literal
 
 import torch
 from torch import Tensor, nn
@@ -8,17 +8,21 @@ from amazon_product_search.constants import MODELS_DIR
 
 
 class BERTEncoder(nn.Module):
-    def __init__(self, bert_model_name: str, num_hidden: int = 768, num_proj: int = 128, trainable: bool = True):
+    def __init__(
+        self,
+        bert_model_name: str,
+        bert_model_trainable: bool = False,
+        rep_mode: Literal["mean", "max", "cls"] = "mean",
+        num_hidden: int = 768,
+        num_proj: int = 128,
+    ):
         super().__init__()
-
         self.tokenizer = AutoTokenizer.from_pretrained(bert_model_name, trust_remote_code=True)
         self.bert_model = AutoModel.from_pretrained(bert_model_name)
         for param in self.bert_model.parameters():
-            param.requires_grad = trainable
-
+            param.requires_grad = bert_model_trainable
+        self.rep_mode = rep_mode
         self.projection = nn.Sequential(
-            nn.Linear(num_hidden, num_hidden),
-            nn.ReLU(),
             nn.Linear(num_hidden, num_proj),
         )
 
@@ -39,11 +43,21 @@ class BERTEncoder(nn.Module):
             return_tensors="pt",
         )
 
+    def convert_to_single_vector(self, vec: Tensor, attention_mask: Tensor) -> Tensor:
+        match self.rep_mode:
+            case "mean":
+                vec, _ = (vec * attention_mask.unsqueeze(-1)).max(dim=1)
+            case "max":
+                vec = (vec * attention_mask.unsqueeze(-1)).mean(dim=1)
+            case "cls":
+                vec = vec[:, 0]
+            case _:
+                raise ValueError(f"Unexpected rep_mode is given: {self.rep_mode}")
+        return vec
+
     def forward(self, tokens: Dict[str, Tensor]) -> Tensor:
-        input_ids = tokens["input_ids"]
-        attention_mask = tokens["attention_mask"]
-        vec = self.bert_model(input_ids=input_ids, attention_mask=attention_mask).last_hidden_state
-        vec, _ = torch.max(vec * attention_mask.unsqueeze(-1), dim=1)
+        vec = self.bert_model(**tokens).last_hidden_state
+        vec = self.convert_to_single_vector(vec, tokens["attention_mask"])
         vec = self.projection(vec)
         return torch.nn.functional.normalize(vec, p=2, dim=1)
 
