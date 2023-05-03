@@ -1,12 +1,11 @@
 import polars as pl
 import torch
 import torch.nn.functional as F
+from amazon_product_search_dense_retrieval.encoders import Encoder, SBERTEncoder
 from more_itertools import chunked
 from tqdm import tqdm
 
 from amazon_product_search.constants import HF
-from amazon_product_search.encoders.encoder import Encoder
-from amazon_product_search.encoders.sbert_encoder import SBERTEncoder
 
 
 class SimilarityFilter:
