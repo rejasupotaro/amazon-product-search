@@ -1,14 +1,15 @@
 from typing import Any
 
-from amazon_product_search.encoders.encoder import Encoder
-from amazon_product_search.encoders.sbert_encoder import SBERTEncoder
+from amazon_product_search_dense_retrieval.encoders import Encoder, SBERTEncoder
+
+from amazon_product_search.constants import HF
 from amazon_product_search.synonyms.synonym_dict import SynonymDict
 
 
 class QueryBuilder:
     def __init__(self):
         self.synonym_dict = SynonymDict()
-        self.encoder: Encoder = SBERTEncoder()
+        self.encoder: Encoder = SBERTEncoder(HF.JP_SBERT)
 
     def build_multimatch_search_query(
         self, query: str, fields: list[str], is_synonym_expansion_enabled: bool = False

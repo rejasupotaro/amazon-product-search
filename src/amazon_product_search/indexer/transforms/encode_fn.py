@@ -2,11 +2,11 @@ import logging
 from typing import Any, Dict, Iterator, List, Tuple
 
 import apache_beam as beam
+from amazon_product_search_dense_retrieval.encoders import Encoder, SBERTEncoder
 from apache_beam.utils.shared import Shared
 from torch import Tensor
 
-from amazon_product_search.encoders.encoder import Encoder
-from amazon_product_search.encoders.sbert_encoder import SBERTEncoder
+from amazon_product_search.constants import HF
 from amazon_product_search.indexer.transforms.weak_reference import WeakReference
 
 
@@ -15,7 +15,7 @@ class EncodeFn(beam.DoFn):
         pass
 
     def setup(self):
-        self.encoder: Encoder = SBERTEncoder()
+        self.encoder: Encoder = SBERTEncoder(HF.JP_SBERT)
 
     def process(self, product: Dict[str, Any]) -> Iterator[Dict[str, Any]]:
         text = product["product_title"] + " " + product["product_brand"]
@@ -31,7 +31,7 @@ class BatchEncodeFn(beam.DoFn):
     def setup(self):
         def initialize_encoder():
             # Load a potentially large model in memory. Executed once per process.
-            return WeakReference[Encoder](SBERTEncoder())
+            return WeakReference[Encoder](SBERTEncoder(HF.JP_SBERT))
 
         self._weak_reference: WeakReference[Encoder] = self._shared_handle.acquire(initialize_encoder)
 
