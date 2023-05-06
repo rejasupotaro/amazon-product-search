@@ -11,7 +11,9 @@ def generate(c, model_name, output_filename):
 
     ```
     $ inv synonyms.generate --output-filename=synonyms_jp_sbert.csv
-    $ inv synonyms.generate --model-name=./models/jp_fine_tuned_sbert --output-filename=synonyms_jp_fine_tuned_sbert.csv # noqa
+    $ inv synonyms.generate \
+        --model-name=./models/jp_fine_tuned_sbert \
+        --output-filename=synonyms_jp_fine_tuned_sbert.csv
     ```
     """
     generator.generate(model_name, output_filename)

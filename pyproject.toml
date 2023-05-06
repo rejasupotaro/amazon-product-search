@@ -49,6 +49,11 @@ ruff = "^0.0.265"
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.ruff]
+# For available rules, see https://beta.ruff.rs/docs/rules/
+select = ["E", "F"]
+line-length = 120
+
 [tool.black]
 line-length = 120
 
