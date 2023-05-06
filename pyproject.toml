@@ -51,7 +51,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
 # For available rules, see https://beta.ruff.rs/docs/rules/
-select = ["E", "F"]
+select = ["E", "F", "W"]
 line-length = 120
 
 [tool.black]
