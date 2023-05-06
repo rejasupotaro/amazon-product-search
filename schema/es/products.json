@@ -43,7 +43,7 @@
           "type": "dense_vector",
           "dims": 768,
           "index": true,
-          "similarity": "l2_norm"
+          "similarity": "cosine"
         },
         "product_locale": {
           "type": "keyword"
