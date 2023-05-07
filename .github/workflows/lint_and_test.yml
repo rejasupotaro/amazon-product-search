@@ -26,7 +26,6 @@ jobs:
         pip install poetry
         poetry install
         poetry run python -m unidic download
-    - run: poetry run inv format && git diff --exit-code .
-    - run: poetry run inv lint
+    - run: poetry run ruff .
     - run: poetry run pytest tests/unit -vv --cov
     - run: poetry run pytest tests/integration -vv
