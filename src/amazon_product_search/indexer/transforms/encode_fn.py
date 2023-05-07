@@ -2,12 +2,12 @@ import logging
 from typing import Any, Dict, Iterator, List, Tuple
 
 import apache_beam as beam
-from amazon_product_search_dense_retrieval.encoders import Encoder, SBERTEncoder
 from apache_beam.utils.shared import Shared
 from torch import Tensor
 
 from amazon_product_search.constants import HF
 from amazon_product_search.indexer.transforms.weak_reference import WeakReference
+from amazon_product_search_dense_retrieval.encoders import Encoder, SBERTEncoder
 
 
 class EncodeFn(beam.DoFn):

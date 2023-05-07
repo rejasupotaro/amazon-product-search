@@ -52,8 +52,14 @@ build-backend = "poetry.core.masonry.api"
 [tool.ruff]
 # For available rules, see https://beta.ruff.rs/docs/rules/
 select = ["E", "F", "W", "C90", "I", "N", "B", "C4", "SIM", "RUF", "TID", "TCH", "YTT", "Q", "ISC", "PT"]
-src = ["src", "tests"]
 line-length = 120
+
+[tool.ruff.isort]
+known-first-party = [
+    "amazon_product_search",
+    "amazon_product_search_dense_retrieval",
+    "demo",
+]
 
 [tool.black]
 line-length = 120

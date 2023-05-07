@@ -1,10 +1,10 @@
 from typing import Any, Callable, Dict, Optional
 
 from requests.models import Response
-from vespa.application import ApplicationPackage
-from vespa.io import VespaQueryResponse, VespaResponse
 
 import amazon_product_search.vespa.service as vespa_service
+from vespa.application import ApplicationPackage
+from vespa.io import VespaQueryResponse, VespaResponse
 
 
 class VespaClient:

@@ -1,9 +1,8 @@
 from typing import Any
 
-from amazon_product_search_dense_retrieval.encoders import Encoder, SBERTEncoder
-
 from amazon_product_search.constants import HF
 from amazon_product_search.synonyms.synonym_dict import SynonymDict
+from amazon_product_search_dense_retrieval.encoders import Encoder, SBERTEncoder
 
 
 class QueryBuilder:
