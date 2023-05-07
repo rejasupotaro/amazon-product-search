@@ -17,7 +17,7 @@ class EsClient:
         self.es = Elasticsearch(es_host)
 
     def list_indices(self) -> list[str]:
-        return [alias for alias in self.es.indices.get_alias().keys() if not alias.startswith(".")]
+        return [alias for alias in self.es.indices.get_alias() if not alias.startswith(".")]
 
     def delete_index(self, index_name: str):
         self.es.indices.delete(index=index_name)

@@ -4,7 +4,7 @@ from amazon_product_search.indexer.transforms.filters import is_indexable
 
 
 @pytest.mark.parametrize(
-    "product,expected",
+    ("product", "expected"),
     [
         ({}, False),
         ({"product_title": None}, False),

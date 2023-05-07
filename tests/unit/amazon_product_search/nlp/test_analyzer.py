@@ -4,7 +4,7 @@ from amazon_product_search.nlp.analyzer import Analyzer
 
 
 @pytest.mark.parametrize(
-    "text_fields,expected",
+    ("text_fields", "expected"),
     [
         (["field"], {"field": "hello world"}),
         (["unknown_field"], {"field": "HELLO WORLD"}),

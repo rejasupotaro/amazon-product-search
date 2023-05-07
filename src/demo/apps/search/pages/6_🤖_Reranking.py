@@ -160,11 +160,7 @@ def main():
 
     merged_df = load_merged(locale="jp")
     split = st.selectbox("split", ["-", "train", "test"], index=2)
-    if split == "-":
-        df = merged_df
-    else:
-        df = merged_df.filter(pl.col("split") == split)
-
+    df = merged_df if split == "-" else merged_df.filter(pl.col("split") == split)
     all_judgements = extract_judgements(df)
 
     st.write("### Example")

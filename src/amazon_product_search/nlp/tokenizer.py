@@ -80,4 +80,4 @@ class Tokenizer:
                     pos_tags.append(result.pos.split(","))
                 case DicType.IPADIC:
                     pos_tags.append(result.feature)
-        return list(zip(tokens, pos_tags))
+        return list(zip(tokens, pos_tags, strict=True))

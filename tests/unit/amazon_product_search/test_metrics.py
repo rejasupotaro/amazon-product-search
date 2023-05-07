@@ -5,7 +5,7 @@ from amazon_product_search.metrics import compute_ap, compute_ndcg, compute_reca
 
 
 @pytest.mark.parametrize(
-    "xs,expected",
+    ("xs", "expected"),
     [
         ([], None),
         ([1], 0),
@@ -20,7 +20,7 @@ def test_compute_zero_hit_rate(xs, expected):
 
 
 @pytest.mark.parametrize(
-    "retrieved_ids,relevant_ids,expected",
+    ("retrieved_ids", "relevant_ids", "expected"),
     [
         ([], {}, None),
         ([1, 2], {}, None),
@@ -38,7 +38,7 @@ def test_compute_recall(retrieved_ids, relevant_ids, expected):
 
 
 @pytest.mark.parametrize(
-    "retrieved_ids,relevant_ids,expected",
+    ("retrieved_ids", "relevant_ids", "expected"),
     [
         ([], {}, None),
         ([1, 2, 3, 4], {}, None),
@@ -56,7 +56,7 @@ def test_compute_ap(retrieved_ids, relevant_ids, expected):
 
 
 @pytest.mark.parametrize(
-    "retrieved_ids,relevant_ids,expected",
+    ("retrieved_ids", "relevant_ids", "expected"),
     [
         ([], {}, None),
         ([1, 2, 3, 4], {}, None),
@@ -76,7 +76,7 @@ def test_compute_ndcg(retrieved_ids, relevant_ids, expected):
 
 
 @pytest.mark.parametrize(
-    "retrieved_ids,relevant_ids,expected",
+    ("retrieved_ids", "relevant_ids", "expected"),
     [
         ([], {}, None),
         ([1, 2, 3, 4], {1: "E"}, 1),

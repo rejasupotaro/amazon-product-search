@@ -14,9 +14,9 @@ generator = KeywordGenerator()
 
 def draw_results(results: dict[str, list[tuple[str, float]]]):
     rows = []
-    for result in list(zip(*results.values())):
+    for result in list(zip(*results.values(), strict=True)):
         row = {}
-        for method, (keyword, score) in zip(results.keys(), result):
+        for method, (keyword, score) in zip(results.keys(), result, strict=True):
             row[method] = (keyword, round(score, 4))
         rows.append(row)
     st.write(pl.from_dicts(rows).to_pandas())

@@ -4,7 +4,7 @@ from amazon_product_search.retrieval.keyword_extractor import KeywordExtractor
 
 
 @pytest.mark.parametrize(
-    "s,expected",
+    ("s" ,"expected"),
     [
         ("", set()),
         ("Hello World", {"hello", "world"}),

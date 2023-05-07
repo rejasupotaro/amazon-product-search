@@ -2,12 +2,12 @@ import logging
 from typing import Any, Dict, Iterator, List, Tuple
 
 import apache_beam as beam
-from amazon_product_search_dense_retrieval.encoders import Encoder, SBERTEncoder
 from apache_beam.utils.shared import Shared
 from torch import Tensor
 
 from amazon_product_search.constants import HF
 from amazon_product_search.indexer.transforms.weak_reference import WeakReference
+from amazon_product_search_dense_retrieval.encoders import Encoder, SBERTEncoder
 
 
 class EncodeFn(beam.DoFn):
@@ -42,5 +42,5 @@ class BatchEncodeFn(beam.DoFn):
         logging.info(f"Encode {len(products)} products in a batch")
         texts = [product["product_title"] + " " + product["product_brand"] for product in products]
         product_vectors = self._encode(texts)
-        for product, product_vector in zip(products, product_vectors):
+        for product, product_vector in zip(products, product_vectors, strict=True):
             yield product["product_id"], product_vector

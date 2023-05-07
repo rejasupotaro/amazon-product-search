@@ -1,9 +1,8 @@
 from typing import Any
 
-from amazon_product_search_dense_retrieval.encoders import Encoder, SBERTEncoder
-
 from amazon_product_search.constants import HF
 from amazon_product_search.synonyms.synonym_dict import SynonymDict
+from amazon_product_search_dense_retrieval.encoders import Encoder, SBERTEncoder
 
 
 class QueryBuilder:
@@ -43,7 +42,7 @@ class QueryBuilder:
             return es_query
 
         match_clauses = []
-        for q in [query] + synonyms:
+        for q in [query, *synonyms]:
             match_clauses.append(
                 {
                     "multi_match": {

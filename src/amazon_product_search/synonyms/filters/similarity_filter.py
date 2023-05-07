@@ -1,11 +1,11 @@
 import polars as pl
 import torch
-import torch.nn.functional as F
-from amazon_product_search_dense_retrieval.encoders import Encoder, SBERTEncoder
 from more_itertools import chunked
+from torch.nn.functional import cosine_similarity
 from tqdm import tqdm
 
 from amazon_product_search.constants import HF
+from amazon_product_search_dense_retrieval.encoders import Encoder, SBERTEncoder
 
 
 class SimilarityFilter:
@@ -25,7 +25,7 @@ class SimilarityFilter:
         """
         left_tensor = torch.from_numpy(self.encoder.encode(left))
         right_tensor = torch.from_numpy(self.encoder.encode(right))
-        return F.cosine_similarity(left_tensor, right_tensor, dim=1).tolist()
+        return cosine_similarity(left_tensor, right_tensor, dim=1).tolist()
 
     def apply(self, synonyms_df: pl.DataFrame, threshold: float = 0.5) -> pl.DataFrame:
         """Filter out synonyms based on the similarity between terms.

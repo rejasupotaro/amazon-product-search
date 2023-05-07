@@ -4,7 +4,7 @@ from amazon_product_search.nlp.tokenizer import DicType, OutputFormat, Tokenizer
 
 
 @pytest.mark.parametrize(
-    "s,expected",
+    ("s", "expected"),
     [
         ("", []),
         (" ", []),
@@ -22,7 +22,7 @@ def test_tokenize_with_unidic(s, expected):
 
 
 @pytest.mark.parametrize(
-    "s,expected",
+    ("s", "expected"),
     [
         ("", []),
         (" ", []),
@@ -40,12 +40,16 @@ def test_tokenize_with_ipadic(s, expected):
 
 
 @pytest.mark.parametrize(
-    "s,expected",
+    ("s", "expected"),
     [
         ("", []),
         (
             "キャンプ用品",
-            [("キャンプ", ["名詞", "普通名詞", "サ変可能", "*"]), ("用", ["接尾辞", "名詞的", "一般", "*"]), ("品", ["接尾辞", "名詞的", "一般", "*"])],
+            [
+                ("キャンプ", ["名詞", "普通名詞", "サ変可能", "*"]),
+                ("用", ["接尾辞", "名詞的", "一般", "*"]),
+                ("品", ["接尾辞", "名詞的", "一般", "*"]),
+            ],
         ),
     ],
 )

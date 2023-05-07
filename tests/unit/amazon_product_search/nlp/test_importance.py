@@ -3,9 +3,9 @@ import pytest
 from amazon_product_search.retrieval.importance_estimator import ColBERTTermImportanceEstimator
 
 
-@pytest.mark.skip
+@pytest.mark.skip()
 @pytest.mark.parametrize(
-    "text,expected",
+    ("text", "expected"),
     [
         ("", []),
         ("ナイキの靴", ["ナイキ", "の", "靴"]),

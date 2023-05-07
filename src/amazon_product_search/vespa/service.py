@@ -1,10 +1,10 @@
 from typing import Optional
 
 from docker.models.containers import Container
-from vespa.application import ApplicationPackage
-from vespa.deployment import Vespa, VespaDocker
 
 from amazon_product_search.vespa.package import create_package
+from vespa.application import ApplicationPackage
+from vespa.deployment import Vespa, VespaDocker
 
 
 def start(name_or_id: Optional[str] = None, app_package: Optional[ApplicationPackage] = None) -> Vespa:
@@ -18,11 +18,7 @@ def start(name_or_id: Optional[str] = None, app_package: Optional[ApplicationPac
     Returns:
         Vespa: The Vespa app.
     """
-    if name_or_id:
-        vespa_docker = VespaDocker.from_container_name_or_id(name_or_id)
-    else:
-        vespa_docker = VespaDocker()
-
+    vespa_docker = VespaDocker.from_container_name_or_id(name_or_id) if name_or_id else VespaDocker()
     if app_package:
         return vespa_docker.deploy(app_package)
     else:
