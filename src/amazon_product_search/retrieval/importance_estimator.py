@@ -10,7 +10,7 @@ class ColBERTTermImportanceEstimator(ColBERTWrapper):
             tokenized_text = self.tokenize([text])
             _, _, _, stopword_importance = self.colberter.encode_doc(tokenized_text)
 
-            results = list(zip(self.tokenizer.tokenize(text), stopword_importance[0]))
+            results = list(zip(self.tokenizer.tokenize(text), stopword_importance[0], strict=True))
 
         outputs = []
         i = 0

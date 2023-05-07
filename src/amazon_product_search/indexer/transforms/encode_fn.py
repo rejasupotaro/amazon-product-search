@@ -42,5 +42,5 @@ class BatchEncodeFn(beam.DoFn):
         logging.info(f"Encode {len(products)} products in a batch")
         texts = [product["product_title"] + " " + product["product_brand"] for product in products]
         product_vectors = self._encode(texts)
-        for product, product_vector in zip(products, product_vectors):
+        for product, product_vector in zip(products, product_vectors, strict=True):
             yield product["product_id"], product_vector

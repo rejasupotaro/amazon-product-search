@@ -17,9 +17,9 @@ extractor = KeywordExtractor()
 
 def draw_results(results: dict[str, list[tuple[str, float]]]):
     rows = []
-    for result in list(zip(*results.values())):
+    for result in list(zip(*results.values(), strict=True)):
         row = {}
-        for method, (keyword, score) in zip(results.keys(), result):
+        for method, (keyword, score) in zip(results.keys(), result, strict=True):
             row[method] = f"{keyword} ({round(score, 4)})"
         rows.append(row)
     st.write(pl.from_dicts(rows).to_pandas())
@@ -79,7 +79,7 @@ def main():
         for i, method in enumerate(methods):
             with columns[i]:
                 st.write(f"#### {method}")
-                for keyword, score in results[method]:
+                for keyword, _score in results[method]:
                     text = re.sub(keyword, f"<mark style='background-color:#FF9900'>{keyword}</mark>", text)
                 st.markdown(text, unsafe_allow_html=True)
 

@@ -64,7 +64,9 @@ class DotReranker:
             query_cls_vec = self.encode([query]).repeat(len(results), 1)
             product_cls_vec = self.encode([result.product["product_title"] for result in results])
             scores = torch.diagonal(torch.mm(query_cls_vec, product_cls_vec.transpose(0, 1)))
-        results = [result for result, score in sorted(zip(results, scores), key=lambda e: e[1], reverse=True)]
+        results = [
+            result for result, score in sorted(zip(results, scores, strict=True), key=lambda e: e[1], reverse=True)
+        ]
         return results
 
 
@@ -79,7 +81,9 @@ class ColBERTReranker(ColBERTWrapper):
             tokenized_products = self.tokenize(products)
             scores, _, _ = self.colberter(tokenized_queries, tokenized_products)
             scores = scores.numpy()
-        results = [result for result, score in sorted(zip(results, scores), key=lambda e: e[1], reverse=True)]
+        results = [
+            result for result, score in sorted(zip(results, scores, strict=True), key=lambda e: e[1], reverse=True)
+        ]
         return results
 
 
@@ -111,7 +115,9 @@ class SpladeReranker:
             tokenized_products = self.tokenize(products)
             scores, _, _ = self.splade(tokenized_queries, tokenized_products)
             scores = scores.squeeze(-1).numpy()
-        results = [result for result, score in sorted(zip(results, scores), key=lambda e: e[1], reverse=True)]
+        results = [
+            result for result, score in sorted(zip(results, scores, strict=True), key=lambda e: e[1], reverse=True)
+        ]
         return results
 
 
