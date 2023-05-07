@@ -51,7 +51,24 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
 # For available rules, see https://beta.ruff.rs/docs/rules/
-select = ["E", "F", "W", "C90", "I", "N", "B", "C4", "SIM", "RUF", "TID", "TCH", "YTT", "Q", "ISC", "PT"]
+select = [
+    "F",  # Pyflakes
+    "E",  # pydocstyle
+    "W",  # pydocstyle
+    "C90",  # mccabe
+    "I",  # isort
+    "N",  # pep8-naming
+    "YTT",  # flake8-2020
+    "B",  # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "ISC",  # flake8-implicit-str-concat
+    "Q",  # flake8-quotes
+    "PT",  # flake8-pytest-style
+    "SIM",  # flake8-simplify
+    "TID",  # flake8-tidy-imports
+    "TCH",  # flake8-type-checking
+    "RUF",  # Ruff-specific rules
+]
 line-length = 120
 
 [tool.ruff.isort]
