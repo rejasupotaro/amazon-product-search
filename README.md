@@ -91,7 +91,8 @@ The demo application allows for the execution of experiments with different expe
 Run the following tasks after adding any modifications.
 
 ```shell
-$ poetry run inv format lint
+$ poetry run ruff .
+$ poetry run mypy src
 $ poetry run pytest tests/unit -vv
 $ poetry run pytest tests/integration -vv
 ```
