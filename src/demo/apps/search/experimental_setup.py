@@ -29,18 +29,17 @@ class ExperimentalSetup:
     num_queries: Optional[int] = None
 
 
-# fmt: off
 EXPERIMENTS = {
     "different_fields": ExperimentalSetup(
         index_name="products_all_jp",
         locale="jp",
         num_queries=5000,
         variants=[
-            Variant(name="title", fields=["product_title"]),  # noqa
-            Variant(name="title,description", fields=["product_title", "product_description"]),  # noqa
-            Variant(name="title,bullet_point", fields=["product_title", "product_bullet_point"]),  # noqa
-            Variant(name="title,brand", fields=["product_title", "product_brand"]),  # noqa
-            Variant(name="title,color", fields=["product_title", "product_color"]),  # noqa
+            Variant(name="title", fields=["product_title"]),
+            Variant(name="title,description", fields=["product_title", "product_description"]),
+            Variant(name="title,bullet_point", fields=["product_title", "product_bullet_point"]),
+            Variant(name="title,brand", fields=["product_title", "product_brand"]),
+            Variant(name="title,color", fields=["product_title", "product_color"]),
         ],
     ),
     "different_weights": ExperimentalSetup(
@@ -48,11 +47,11 @@ EXPERIMENTS = {
         locale="jp",
         num_queries=5000,
         variants=[
-            Variant(name="title", fields=["product_title"]),  # noqa
-            Variant(name="title^1,bullet_point^1", fields=["product_title^1", "product_bullet_point^1"]),  # noqa
-            Variant(name="title^2,bullet_point^1", fields=["product_title^2", "product_bullet_point^1"]),  # noqa
-            Variant(name="title^5,bullet_point^1", fields=["product_title^5", "product_bullet_point^1"]),  # noqa
-            Variant(name="title^10,bullet_point^1", fields=["product_title^10", "product_bullet_point^1"]),  # noqa
+            Variant(name="title", fields=["product_title"]),
+            Variant(name="title^1,bullet_point^1", fields=["product_title^1", "product_bullet_point^1"]),
+            Variant(name="title^2,bullet_point^1", fields=["product_title^2", "product_bullet_point^1"]),
+            Variant(name="title^5,bullet_point^1", fields=["product_title^5", "product_bullet_point^1"]),
+            Variant(name="title^10,bullet_point^1", fields=["product_title^10", "product_bullet_point^1"]),
         ],
     ),
     "synonym_expansion": ExperimentalSetup(
@@ -60,9 +59,9 @@ EXPERIMENTS = {
         locale="jp",
         num_queries=5000,
         variants=[
-            Variant(name="title", fields=["product_title"], enable_synonym_expansion=False),  # noqa
-            Variant(name="title,brand,color", fields=["product_title", "product_brand", "product_color"]),  # noqa
-            Variant(name="query expansion + title", fields=["product_title"], enable_synonym_expansion=True),  # noqa
+            Variant(name="title", fields=["product_title"], enable_synonym_expansion=False),
+            Variant(name="title,brand,color", fields=["product_title", "product_brand", "product_color"]),
+            Variant(name="query expansion + title", fields=["product_title"], enable_synonym_expansion=True),
             Variant(name="query expansion + title,brand,color", fields=["product_title", "product_brand", "product_color"], enable_synonym_expansion=True),  # noqa
         ],
     ),
@@ -83,10 +82,9 @@ EXPERIMENTS = {
         locale="jp",
         num_queries=50,
         variants=[
-            Variant(name="sparse", fields=["product_title"]),  # noqa
-            Variant(name="dense", fields=["product_vector"]),  # noqa
-            Variant(name="hybrid", fields=["product_title", "product_vector"]),  # noqa
+            Variant(name="sparse", fields=["product_title"]),
+            Variant(name="dense", fields=["product_vector"]),
+            Variant(name="hybrid", fields=["product_title", "product_vector"]),
         ],
     ),
 }
-# fmt: on

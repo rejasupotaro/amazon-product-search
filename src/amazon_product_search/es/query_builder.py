@@ -43,7 +43,7 @@ class QueryBuilder:
             return es_query
 
         match_clauses = []
-        for q in [query] + synonyms:
+        for q in [query, *synonyms]:
             match_clauses.append(
                 {
                     "multi_match": {
