@@ -5,27 +5,15 @@ from tasks import data_tasks, demo_tasks, es_tasks, gcloud_tasks, synonyms_tasks
 
 @task
 def format(c):
-    """Run formatters (isort and black)."""
-    print("Running isort...")
-    c.run("poetry run isort .")
-
-    print("Running black...")
-    c.run("poetry run black .")
+    print("Running ruff...")
+    c.run("poetry run ruff . --fix")
     print("Done")
 
 
 @task
 def lint(c):
-    """Run linters (isort, black, flake8, and mypy)."""
-    print("Running isort...")
-    c.run("poetry run isort . --check")
-
-    print("Running black...")
-    c.run("poetry run black . --check")
-
-    print("Running flake8...")
-    c.run("poetry run pflake8 src tests tasks")
-
+    print("Running ruff...")
+    c.run("poetry run ruff .")
     print("Running mypy...")
     c.run("poetry run mypy src")
     print("Done")
