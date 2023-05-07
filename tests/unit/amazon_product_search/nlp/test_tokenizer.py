@@ -4,7 +4,7 @@ from amazon_product_search.nlp.tokenizer import DicType, OutputFormat, Tokenizer
 
 
 @pytest.mark.parametrize(
-    "s,expected",
+    ("s", "expected"),
     [
         ("", []),
         (" ", []),
@@ -22,7 +22,7 @@ def test_tokenize_with_unidic(s, expected):
 
 
 @pytest.mark.parametrize(
-    "s,expected",
+    ("s", "expected"),
     [
         ("", []),
         (" ", []),
@@ -40,7 +40,7 @@ def test_tokenize_with_ipadic(s, expected):
 
 
 @pytest.mark.parametrize(
-    "s,expected",
+    ("s", "expected"),
     [
         ("", []),
         (

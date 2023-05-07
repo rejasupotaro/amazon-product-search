@@ -30,7 +30,7 @@ def test_sentence_bert_reranker():
     assert actual == expected
 
 
-@pytest.mark.skip
+@pytest.mark.skip()
 def test_colbert_reranker():
     results = [
         Result(product={"id": "1", "product_title": "xxxxx"}, score=10),

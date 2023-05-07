@@ -11,7 +11,7 @@ from amazon_product_search.indexer.pipeline import create_pipeline
 from tests.integration.es_docker import EsDocker
 
 
-@pytest.fixture
+@pytest.fixture()
 def es_docker() -> Iterator[EsDocker]:
     with EsDocker(container_id="amazon_product_search_test") as instance:
         yield instance
