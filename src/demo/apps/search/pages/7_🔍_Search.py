@@ -43,41 +43,45 @@ def main():
     size = 20
 
     st.write("#### Input")
-    indices = es_client.list_indices()
-    index_name = st.selectbox("Index:", indices)
+    with st.form("input"):
+        indices = es_client.list_indices()
+        index_name = st.selectbox("Index:", indices)
 
-    query = st.text_input("Query:")
-    normalized_query = normalize_query(query)
+        query = st.text_input("Query:")
+        normalized_query = normalize_query(query)
 
-    selected_fields = st.multiselect(
-        "Fields:",
-        options=[
-            "product_title",
-            "product_description",
-            "product_bullet_point",
-            "product_brand",
-            "product_color",
-            "product_vector",
-        ],
-        default=["product_title"],
-    )
-    sparse_fields, dense_fields = split_fields(selected_fields)
-
-    is_synonym_expansion_enabled = st.checkbox("enable_synonym_expansion")
-
-    reranker = from_string(st.selectbox("reranker:", ["NoOpReranker", "RandomReranker", "DotReranker"]))
-
-    es_query = None
-    if sparse_fields:
-        es_query = query_builder.build_multimatch_search_query(
-            query=normalized_query,
-            fields=sparse_fields,
-            is_synonym_expansion_enabled=is_synonym_expansion_enabled,
+        selected_fields = st.multiselect(
+            "Fields:",
+            options=[
+                "product_title",
+                "product_description",
+                "product_bullet_point",
+                "product_brand",
+                "product_color",
+                "product_vector",
+            ],
+            default=["product_title"],
         )
-    es_knn_query = None
-    if normalized_query and dense_fields:
-        # TODO: Should multiple vector fields be handled?
-        es_knn_query = query_builder.build_knn_search_query(normalized_query, field=dense_fields[0], top_k=size)
+        sparse_fields, dense_fields = split_fields(selected_fields)
+
+        is_synonym_expansion_enabled = st.checkbox("enable_synonym_expansion")
+
+        reranker = from_string(st.selectbox("reranker:", ["NoOpReranker", "RandomReranker", "DotReranker"]))
+
+        es_query = None
+        if sparse_fields:
+            es_query = query_builder.build_multimatch_search_query(
+                query=normalized_query,
+                fields=sparse_fields,
+                is_synonym_expansion_enabled=is_synonym_expansion_enabled,
+            )
+        es_knn_query = None
+        if normalized_query and dense_fields:
+            # TODO: Should multiple vector fields be handled?
+            es_knn_query = query_builder.build_knn_search_query(normalized_query, field=dense_fields[0], top_k=size)
+
+        if not st.form_submit_button("Search"):
+            return
 
     st.write("----")
 
