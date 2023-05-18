@@ -70,7 +70,7 @@ def main():
 
         es_query = None
         if sparse_fields:
-            es_query = query_builder.build_multimatch_search_query(
+            es_query = query_builder.build_sparse_search_query(
                 query=normalized_query,
                 fields=sparse_fields,
                 is_synonym_expansion_enabled=is_synonym_expansion_enabled,

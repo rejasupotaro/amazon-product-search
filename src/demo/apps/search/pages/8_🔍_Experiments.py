@@ -54,7 +54,7 @@ def search(index_name: str, query: str, variant: Variant) -> Response:
 
     sparse_fields, dense_fields = utils.split_fields(variant.fields)
     if sparse_fields:
-        es_query = query_builder.build_multimatch_search_query(
+        es_query = query_builder.build_sparse_search_query(
             query=query, fields=sparse_fields, is_synonym_expansion_enabled=variant.enable_synonym_expansion
         )
     if dense_fields:

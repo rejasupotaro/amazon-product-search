@@ -10,7 +10,7 @@ class QueryBuilder:
         self.synonym_dict = SynonymDict()
         self.encoder: Encoder = SBERTEncoder(HF.JP_SBERT)
 
-    def build_multimatch_search_query(
+    def build_sparse_search_query(
         self, query: str, fields: list[str], is_synonym_expansion_enabled: bool = False
     ) -> dict[str, Any]:
         """Build a multi-match ES query.
