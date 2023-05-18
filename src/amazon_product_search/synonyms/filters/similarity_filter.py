@@ -44,7 +44,7 @@ class SimilarityFilter:
             scores.extend(self.calculate_score(queries, titles))
 
         synonyms_df = (
-            synonyms_df.with_column(pl.Series(name="similarity", values=scores))
+            synonyms_df.with_columns(pl.Series(name="similarity", values=scores))
             .filter(pl.col("similarity") > threshold)
             .sort("similarity", reverse=True)
         )
