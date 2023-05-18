@@ -20,9 +20,14 @@ query_builder = QueryBuilder()
 
 
 @st.cache_data
-def load_labels(experimental_setup: ExperimentalSetup) -> pl.DataFrame:
-    df = utils.load_labels(experimental_setup.locale)
+def _load_labels(locale: str) -> pl.DataFrame:
+    df = utils.load_labels(locale)
     df = df.filter(pl.col("split") == "test")
+    return df
+
+
+def load_labels(experimental_setup: ExperimentalSetup) -> pl.DataFrame:
+    df = _load_labels(experimental_setup.locale)
     if experimental_setup.num_queries:
         queries = df.get_column("query").sample(frac=1).unique()[: experimental_setup.num_queries]
         df = df.filter(pl.col("query").is_in(queries))
