@@ -10,20 +10,49 @@ class QueryBuilder:
         self.synonym_dict = SynonymDict()
         self.encoder: Encoder = SBERTEncoder(HF.JP_SBERT)
 
-    def _multi_match(self, query: str, fields: list[str], query_type: str) -> dict[str, Any]:
+    def _multi_match(self, query: str, fields: list[str], match_type: str = "cross_fields") -> dict[str, Any]:
         return {
             "multi_match": {
                 "query": query,
-                "type": query_type,
+                "type": match_type,
                 "fields": fields,
                 "operator": "and",
             }
         }
 
+    def _combined_fields(self, query: str, fields: list[str]) -> dict[str, Any]:
+        return {
+            "combined_fields": {
+                "query": query,
+                "fields": fields,
+                "operator": "and",
+            }
+        }
+
+    def _simple_query_string(self, query: str, fields: list[str]) -> dict[str, Any]:
+        return {
+            "simple_query_string": {
+                "query": query,
+                "fields": fields,
+                "default_operator": "and",
+            }
+        }
+
+    def _build_sparse_search_query(self, query_type: str, query: str, fields: list[str]) -> dict[str, Any]:
+        match query_type:
+            case "multi_match":
+                return self._multi_match(query, fields)
+            case "combined_fields":
+                return self._combined_fields(query, fields)
+            case "simple_query_string":
+                return self._simple_query_string(query, fields)
+            case _:
+                raise ValueError(f"Unkknown query_type is given: {query_type}")
+
     def build_sparse_search_query(
         self, query: str,
         fields: list[str],
-        query_type: str = "cross_fields",
+        query_type: str = "multi_match",
         is_synonym_expansion_enabled: bool = False,
     ) -> dict[str, Any]:
         """Build a multi-match ES query.
@@ -40,7 +69,7 @@ class QueryBuilder:
                 "match_all": {},
             }
 
-        es_query = self._multi_match(query, fields, query_type)
+        es_query = self._build_sparse_search_query(query_type, query, fields)
         if not is_synonym_expansion_enabled:
             return es_query
 
@@ -50,7 +79,7 @@ class QueryBuilder:
 
         match_clauses = []
         for q in [query, *synonyms]:
-            match_clauses.append(self._multi_match(q, fields))
+            match_clauses.append(self._build_sparse_search_query(query_type, q, fields))
         return {
             "bool": {
                 "should": match_clauses,
