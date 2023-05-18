@@ -10,8 +10,21 @@ class QueryBuilder:
         self.synonym_dict = SynonymDict()
         self.encoder: Encoder = SBERTEncoder(HF.JP_SBERT)
 
+    def _multi_match(self, query: str, fields: list[str], query_type: str) -> dict[str, Any]:
+        return {
+            "multi_match": {
+                "query": query,
+                "type": query_type,
+                "fields": fields,
+                "operator": "and",
+            }
+        }
+
     def build_sparse_search_query(
-        self, query: str, fields: list[str], is_synonym_expansion_enabled: bool = False
+        self, query: str,
+        fields: list[str],
+        query_type: str = "cross_fields",
+        is_synonym_expansion_enabled: bool = False,
     ) -> dict[str, Any]:
         """Build a multi-match ES query.
 
@@ -27,14 +40,7 @@ class QueryBuilder:
                 "match_all": {},
             }
 
-        es_query = {
-            "multi_match": {
-                "query": query,
-                "type": "cross_fields",
-                "fields": fields,
-                "operator": "and",
-            }
-        }
+        es_query = self._multi_match(query, fields, query_type)
         if not is_synonym_expansion_enabled:
             return es_query
 
@@ -44,16 +50,7 @@ class QueryBuilder:
 
         match_clauses = []
         for q in [query, *synonyms]:
-            match_clauses.append(
-                {
-                    "multi_match": {
-                        "query": q,
-                        "type": "cross_fields",
-                        "fields": fields,
-                        "operator": "and",
-                    }
-                }
-            )
+            match_clauses.append(self._multi_match(q, fields))
         return {
             "bool": {
                 "should": match_clauses,
