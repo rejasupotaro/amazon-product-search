@@ -9,8 +9,9 @@ def test_build_search_query():
     assert es_query == {
         "multi_match": {
             "query": "query",
+            "type": "cross_fields",
             "fields": ["product_title"],
-            "operator": "or",
+            "operator": "and",
         }
     }
 
@@ -29,15 +30,17 @@ def test_build_search_query_with_synonym_expansion_enabled(mock_method):
                 {
                     "multi_match": {
                         "query": "query",
+                        "type": "cross_fields",
                         "fields": ["product_title"],
-                        "operator": "or",
+                        "operator": "and",
                     },
                 },
                 {
                     "multi_match": {
                         "query": "synonym",
+                        "type": "cross_fields",
                         "fields": ["product_title"],
-                        "operator": "or",
+                        "operator": "and",
                     },
                 },
             ],
