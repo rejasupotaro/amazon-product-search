@@ -31,7 +31,7 @@ class ExperimentalSetup:
 
 EXPERIMENTS = {
     "different_fields": ExperimentalSetup(
-        index_name="products_jp",
+        index_name="products_all_jp",
         locale="jp",
         num_queries=5000,
         variants=[
@@ -43,7 +43,7 @@ EXPERIMENTS = {
         ],
     ),
     "different_weights": ExperimentalSetup(
-        index_name="products_jp",
+        index_name="products_all_jp",
         locale="jp",
         num_queries=5000,
         variants=[
@@ -55,7 +55,7 @@ EXPERIMENTS = {
         ],
     ),
     "synonym_expansion": ExperimentalSetup(
-        index_name="products_jp",
+        index_name="products_all_jp",
         locale="jp",
         num_queries=5000,
         variants=[
@@ -78,7 +78,7 @@ EXPERIMENTS = {
         ],
     ),
     "sparse_vs_dense": ExperimentalSetup(
-        index_name="products_jp",
+        index_name="products_dense_jp",
         locale="jp",
         num_queries=50,
         variants=[
