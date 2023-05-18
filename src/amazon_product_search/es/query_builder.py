@@ -30,8 +30,9 @@ class QueryBuilder:
         es_query = {
             "multi_match": {
                 "query": query,
+                "type": "cross_fields",
                 "fields": fields,
-                "operator": "or",
+                "operator": "and",
             }
         }
         if not is_synonym_expansion_enabled:
@@ -47,8 +48,9 @@ class QueryBuilder:
                 {
                     "multi_match": {
                         "query": q,
+                        "type": "cross_fields",
                         "fields": fields,
-                        "operator": "or",
+                        "operator": "and",
                     }
                 }
             )
