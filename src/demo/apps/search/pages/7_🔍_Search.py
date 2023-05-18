@@ -78,7 +78,7 @@ def main():
         es_knn_query = None
         if normalized_query and dense_fields:
             # TODO: Should multiple vector fields be handled?
-            es_knn_query = query_builder.build_knn_search_query(normalized_query, field=dense_fields[0], top_k=size)
+            es_knn_query = query_builder.build_dense_search_query(normalized_query, field=dense_fields[0], top_k=size)
 
         if not st.form_submit_button("Search"):
             return

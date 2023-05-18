@@ -61,7 +61,7 @@ class QueryBuilder:
             }
         }
 
-    def build_knn_search_query(self, query: str, field: str, top_k: int) -> dict[str, Any]:
+    def build_dense_search_query(self, query: str, field: str, top_k: int) -> dict[str, Any]:
         """Build a KNN ES query from given conditions.
 
         Args:
