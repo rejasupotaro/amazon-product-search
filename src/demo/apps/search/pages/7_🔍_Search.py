@@ -37,12 +37,19 @@ def draw_response_stats(response: Response):
 
         explanation = result.explanation
         row["total_score"] = explanation["value"]
+        sparse_score = 0
+        dense_score = None
         if explanation["description"] == "sum of:":
             for child_explanation in explanation["details"]:
                 if child_explanation["description"] == "within top k documents":
-                    row["dense_score"] = child_explanation["value"]
+                    if not dense_score:
+                        dense_score = 0
+                    dense_score += child_explanation["value"]
                 else:
-                    row["sparse_score"] = child_explanation["value"]
+                    sparse_score += child_explanation["value"]
+        if dense_score:
+            row["sparse_score"] = sparse_score
+            row["dense_score"] = dense_score
         rows.append(row)
 
     df = pd.DataFrame(rows)

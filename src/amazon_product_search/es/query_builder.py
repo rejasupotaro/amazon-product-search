@@ -1,7 +1,6 @@
 from typing import Any
 
-from amazon_product_search.constants import DATA_DIR
-from amazon_product_search.constants import HF
+from amazon_product_search.constants import DATA_DIR, HF
 from amazon_product_search.synonyms.synonym_dict import SynonymDict
 from amazon_product_search_dense_retrieval.encoders import Encoder, SBERTEncoder
 
