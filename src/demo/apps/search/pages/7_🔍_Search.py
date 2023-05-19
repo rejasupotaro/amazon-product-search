@@ -1,10 +1,11 @@
 from typing import Any, Optional
 
+import pandas as pd
 import streamlit as st
 
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.query_builder import QueryBuilder
-from amazon_product_search.es.response import Result
+from amazon_product_search.es.response import Response, Result
 from amazon_product_search.nlp.normalizer import normalize_query
 from amazon_product_search.reranking.reranker import from_string
 from demo.page_config import set_page_config
@@ -27,6 +28,27 @@ def draw_es_query(query: Optional[dict[str, Any]], knn_query: Optional[dict[str,
 
     st.write("Elasticsearch Query:")
     st.write(es_query)
+
+
+def draw_response_stats(response: Response):
+    rows = []
+    for result in response.results:
+        row = {"product_title": result.product["product_title"]}
+
+        explanation = result.explanation
+        row["total_score"] = explanation["value"]
+        if explanation["description"] == "sum of:":
+            for child_explanation in explanation["details"]:
+                if child_explanation["description"] == "within top k documents":
+                    row["dense_score"] = child_explanation["value"]
+                else:
+                    row["sparse_score"] = child_explanation["value"]
+        rows.append(row)
+
+    df = pd.DataFrame(rows)
+    with st.expander("Response Stats"):
+        st.write(df)
+        st.write(df.describe())
 
 
 def draw_products(results: list[Result]):
@@ -106,6 +128,7 @@ def main():
     st.write("#### Output")
     response = es_client.search(index_name=index_name, query=es_query, knn_query=es_knn_query, size=size, explain=True)
     response.results = reranker.rerank(normalized_query, response.results)
+    draw_response_stats(response)
     st.write(f"{response.total_hits} products found")
     draw_products(response.results)
 
