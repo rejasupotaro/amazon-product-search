@@ -1,13 +1,14 @@
 from typing import Any
 
+from amazon_product_search.constants import DATA_DIR
 from amazon_product_search.constants import HF
 from amazon_product_search.synonyms.synonym_dict import SynonymDict
 from amazon_product_search_dense_retrieval.encoders import Encoder, SBERTEncoder
 
 
 class QueryBuilder:
-    def __init__(self):
-        self.synonym_dict = SynonymDict()
+    def __init__(self, data_dir: str = DATA_DIR):
+        self.synonym_dict = SynonymDict(data_dir)
         self.encoder: Encoder = SBERTEncoder(HF.JP_SBERT)
 
     def _multi_match(self, query: str, fields: list[str], match_type: str = "cross_fields") -> dict[str, Any]:

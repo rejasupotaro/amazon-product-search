@@ -7,21 +7,22 @@ from amazon_product_search.nlp.tokenizer import Tokenizer
 
 
 class SynonymDict:
-    def __init__(self, synonym_filename: str = "synonyms_jp_sbert.csv"):
+    def __init__(self, data_dir: str = DATA_DIR, synonym_filename: str = "synonyms_jp_sbert.csv"):
         self.tokenizer = Tokenizer()
-        self._entry_dict: dict[str, list[tuple[str, float]]] = self.load_synonym_dict(synonym_filename)
+        self._entry_dict: dict[str, list[tuple[str, float]]] = self.load_synonym_dict(data_dir, synonym_filename)
 
     @staticmethod
-    def load_synonym_dict(synonym_filename: str) -> dict[str, list[tuple[str, float]]]:
+    def load_synonym_dict(data_dir: str, synonym_filename: str) -> dict[str, list[tuple[str, float]]]:
         """Load the synonym file and convert it into a dict for lookup.
 
         Args:
-        synonym_filename (str): A filename to load, which is supposed to be under `{DATA_DIR}/includes`.
+            data_dir (str): The data directory.
+            synonym_filename (str): A filename to load, which is supposed to be under `{DATA_DIR}/includes`.
 
         Returns:
             dict[str, list[str]]: The converted synonym dict.
         """
-        df = pl.read_csv(f"{DATA_DIR}/includes/{synonym_filename}")
+        df = pl.read_csv(f"{data_dir}/includes/{synonym_filename}")
         entry_dict = defaultdict(list)
         for row in df.to_dicts():
             query = row["query"]
