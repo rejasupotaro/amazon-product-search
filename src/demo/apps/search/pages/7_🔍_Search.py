@@ -64,6 +64,11 @@ def main():
         )
         sparse_fields, dense_fields = split_fields(selected_fields)
 
+        query_type = st.selectbox(
+            "Query Type:",
+            options=["multi_match", "combined_fields", "simple_query_string"],
+        )
+
         is_synonym_expansion_enabled = st.checkbox("enable_synonym_expansion")
 
         reranker = from_string(st.selectbox("reranker:", ["NoOpReranker", "RandomReranker", "DotReranker"]))
@@ -73,6 +78,7 @@ def main():
             es_query = query_builder.build_sparse_search_query(
                 query=normalized_query,
                 fields=sparse_fields,
+                query_type=query_type,
                 is_synonym_expansion_enabled=is_synonym_expansion_enabled,
             )
         es_knn_query = None

@@ -47,7 +47,7 @@ class QueryBuilder:
             case "simple_query_string":
                 return self._simple_query_string(query, fields)
             case _:
-                raise ValueError(f"Unkknown query_type is given: {query_type}")
+                raise ValueError(f"Unknown query_type is given: {query_type}")
 
     def build_sparse_search_query(
         self, query: str,
