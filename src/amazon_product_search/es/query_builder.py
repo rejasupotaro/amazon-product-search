@@ -10,11 +10,11 @@ class QueryBuilder:
         self.synonym_dict = SynonymDict(data_dir)
         self.encoder: Encoder = SBERTEncoder(HF.JP_SBERT)
 
-    def _multi_match(self, query: str, fields: list[str], match_type: str) -> dict[str, Any]:
+    def _multi_match(self, query: str, fields: list[str], query_type: str) -> dict[str, Any]:
         return {
             "multi_match": {
                 "query": query,
-                "type": match_type,
+                "type": query_type,
                 "fields": fields,
                 "operator": "and",
             }
@@ -54,7 +54,7 @@ class QueryBuilder:
     def build_sparse_search_query(
         self, query: str,
         fields: list[str],
-        query_type: str = "cross_fields",
+        query_type: str = "combined_fields",
         is_synonym_expansion_enabled: bool = False,
     ) -> dict[str, Any]:
         """Build a multi-match ES query.
