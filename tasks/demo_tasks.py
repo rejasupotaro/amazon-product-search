@@ -7,6 +7,11 @@ def eda(c):
 
 
 @task
+def features(c):
+    c.run("poetry run streamlit run src/demo/apps/features/🤖_Tokenization.py")
+
+
+@task
 def search(c):
     c.run("poetry run streamlit run src/demo/apps/search/🏠_Home.py")
 
