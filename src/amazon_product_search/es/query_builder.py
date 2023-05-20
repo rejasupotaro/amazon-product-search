@@ -10,44 +10,49 @@ class QueryBuilder:
         self.synonym_dict = SynonymDict(data_dir)
         self.encoder: Encoder = SBERTEncoder(HF.JP_SBERT)
 
-    def _multi_match(self, query: str, fields: list[str], query_type: str) -> dict[str, Any]:
+    def _multi_match(self, query: str, fields: list[str], query_type: str, boost: float) -> dict[str, Any]:
         return {
             "multi_match": {
                 "query": query,
                 "type": query_type,
                 "fields": fields,
                 "operator": "and",
+                "boost": boost,
             }
         }
 
-    def _combined_fields(self, query: str, fields: list[str]) -> dict[str, Any]:
+    def _combined_fields(self, query: str, fields: list[str], boost: float) -> dict[str, Any]:
         return {
             "combined_fields": {
                 "query": query,
                 "fields": fields,
                 "operator": "and",
+                "boost": boost,
             }
         }
 
-    def _simple_query_string(self, query: str, fields: list[str]) -> dict[str, Any]:
+    def _simple_query_string(self, query: str, fields: list[str], boost: float) -> dict[str, Any]:
         return {
             "simple_query_string": {
                 "query": query,
                 "fields": fields,
                 "default_operator": "and",
+                "boost": boost,
             }
         }
 
-    def _build_sparse_search_query(self, query_type: str, query: str, fields: list[str]) -> dict[str, Any]:
+    def _build_sparse_search_query(
+        self, query_type: str, query: str, fields: list[str], boost: float
+    ) -> dict[str, Any]:
         match query_type:
             case "cross_fields":
-                return self._multi_match(query, fields, query_type="cross_fields")
+                return self._multi_match(query, fields, query_type="cross_fields", boost=boost)
             case "best_fields":
-                return self._multi_match(query, fields, query_type="best_fields")
+                return self._multi_match(query, fields, query_type="best_fields", boost=boost)
             case "combined_fields":
-                return self._combined_fields(query, fields)
+                return self._combined_fields(query, fields, boost)
             case "simple_query_string":
-                return self._simple_query_string(query, fields)
+                return self._simple_query_string(query, fields, boost)
             case _:
                 raise ValueError(f"Unknown query_type is given: {query_type}")
 
@@ -55,6 +60,7 @@ class QueryBuilder:
         self, query: str,
         fields: list[str],
         query_type: str = "combined_fields",
+        boost: float = 1.0,
         is_synonym_expansion_enabled: bool = False,
     ) -> dict[str, Any]:
         """Build a multi-match ES query.
@@ -71,7 +77,7 @@ class QueryBuilder:
                 "match_all": {},
             }
 
-        es_query = self._build_sparse_search_query(query_type, query, fields)
+        es_query = self._build_sparse_search_query(query_type, query, fields, boost)
         if not is_synonym_expansion_enabled:
             return es_query
 
@@ -81,7 +87,7 @@ class QueryBuilder:
 
         match_clauses = []
         for q in [query, *synonyms]:
-            match_clauses.append(self._build_sparse_search_query(query_type, q, fields))
+            match_clauses.append(self._build_sparse_search_query(query_type, q, fields, boost))
         return {
             "bool": {
                 "should": match_clauses,
@@ -89,7 +95,7 @@ class QueryBuilder:
             }
         }
 
-    def build_dense_search_query(self, query: str, field: str, top_k: int) -> dict[str, Any]:
+    def build_dense_search_query(self, query: str, field: str, top_k: int, boost: float = 1.0) -> dict[str, Any]:
         """Build a KNN ES query from given conditions.
 
         Args:
@@ -106,4 +112,5 @@ class QueryBuilder:
             "field": field,
             "k": top_k,
             "num_candidates": 100,
+            "boost": boost,
         }

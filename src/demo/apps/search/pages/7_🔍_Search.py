@@ -81,7 +81,7 @@ def main():
         query = st.text_input("Query:")
         normalized_query = normalize_query(query)
 
-        selected_fields = st.multiselect(
+        fields = st.multiselect(
             "Fields:",
             options=[
                 "product_title",
@@ -93,7 +93,13 @@ def main():
             ],
             default=["product_title"],
         )
-        sparse_fields, dense_fields = split_fields(selected_fields)
+        sparse_fields, dense_fields = split_fields(fields)
+
+        columns = st.columns(2)
+        with columns[0]:
+            sparse_boost = st.number_input("Sparse Boost", value=1.0)
+        with columns[1]:
+            dense_boost = st.number_input("Dense Boost", value=1.0)
 
         query_type = st.selectbox(
             "Query Type:",
@@ -110,12 +116,15 @@ def main():
                 query=normalized_query,
                 fields=sparse_fields,
                 query_type=query_type,
+                boost=sparse_boost,
                 is_synonym_expansion_enabled=is_synonym_expansion_enabled,
             )
         es_knn_query = None
         if normalized_query and dense_fields:
             # TODO: Should multiple vector fields be handled?
-            es_knn_query = query_builder.build_dense_search_query(normalized_query, field=dense_fields[0], top_k=size)
+            es_knn_query = query_builder.build_dense_search_query(
+                normalized_query, field=dense_fields[0], top_k=size, boost=dense_boost,
+            )
 
         if not st.form_submit_button("Search"):
             return
