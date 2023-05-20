@@ -5,11 +5,12 @@ from amazon_product_search.es.query_builder import QueryBuilder
 
 def test_build_search_query():
     query_builder = QueryBuilder()
-    es_query = query_builder.build_sparse_search_query(query="query", fields=["product_title"])
+    es_query = query_builder.build_sparse_search_query(
+        query="query", fields=["product_title"], query_type="combined_fields"
+    )
     assert es_query == {
-        "multi_match": {
+        "combined_fields": {
             "query": "query",
-            "type": "cross_fields",
             "fields": ["product_title"],
             "operator": "and",
         }
@@ -22,23 +23,21 @@ def test_build_search_query_with_synonym_expansion_enabled(mock_method):
 
     query_builder = QueryBuilder()
     es_query = query_builder.build_sparse_search_query(
-        query="query", fields=["product_title"], is_synonym_expansion_enabled=True
+        query="query", fields=["product_title"], query_type="combined_fields", is_synonym_expansion_enabled=True
     )
     assert es_query == {
         "bool": {
             "should": [
                 {
-                    "multi_match": {
+                    "combined_fields": {
                         "query": "query",
-                        "type": "cross_fields",
                         "fields": ["product_title"],
                         "operator": "and",
                     },
                 },
                 {
-                    "multi_match": {
+                    "combined_fields": {
                         "query": "synonym",
-                        "type": "cross_fields",
                         "fields": ["product_title"],
                         "operator": "and",
                     },
