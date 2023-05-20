@@ -13,6 +13,7 @@ def test_build_search_query():
             "query": "query",
             "fields": ["product_title"],
             "operator": "and",
+            "boost": 1.0,
         }
     }
 
@@ -33,6 +34,7 @@ def test_build_search_query_with_synonym_expansion_enabled(mock_method):
                         "query": "query",
                         "fields": ["product_title"],
                         "operator": "and",
+                        "boost": 1.0,
                     },
                 },
                 {
@@ -40,6 +42,7 @@ def test_build_search_query_with_synonym_expansion_enabled(mock_method):
                         "query": "synonym",
                         "fields": ["product_title"],
                         "operator": "and",
+                        "boost": 1.0,
                     },
                 },
             ],
@@ -51,4 +54,4 @@ def test_build_search_query_with_synonym_expansion_enabled(mock_method):
 def test_build_knn_search_query():
     query_builder = QueryBuilder()
     es_query = query_builder.build_dense_search_query(query="query", field="product_vector", top_k=10)
-    assert es_query.keys() == {"query_vector", "field", "k", "num_candidates"}
+    assert es_query.keys() == {"query_vector", "field", "k", "num_candidates", "boost"}
