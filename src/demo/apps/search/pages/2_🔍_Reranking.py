@@ -76,10 +76,7 @@ def search(query: str, doc_ids: list[str], all_judgements: dict[str, str]) -> li
 def compute_ndcg(products: list[dict[str, Any]]) -> Optional[float]:
     retrieved_ids = [product["product_id"] for product in products]
     judgements: dict[str, str] = {product["product_id"]: product["esci_label"] for product in products}
-    ndcg = metrics.compute_ndcg(retrieved_ids, judgements)
-    if ndcg:
-        ndcg = round(ndcg, 4)
-    return ndcg
+    return metrics.compute_ndcg(retrieved_ids, judgements)
 
 
 def draw_results(results: list[Result]):
