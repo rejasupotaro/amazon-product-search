@@ -62,7 +62,9 @@ def search(index_name: str, query: str, variant: Variant) -> Response:
         )
     if dense_fields:
         # TODO: Should multiple vector fields be handled?
-        es_knn_query = query_builder.build_dense_search_query(query, dense_fields[0], top_k=variant.top_k)
+        es_knn_query = query_builder.build_dense_search_query(
+            query, dense_fields[0], boost=variant.dense_boost, top_k=variant.top_k
+        )
 
     return es_client.search(index_name=index_name, query=es_query, knn_query=es_knn_query, size=variant.top_k)
 

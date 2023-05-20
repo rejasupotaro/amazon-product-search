@@ -19,6 +19,7 @@ class Variant:
     name: str
     fields: list[str] = field(default_factory=lambda: ["product_title"])
     query_type: str = "combined_fields"
+    dense_boost: float = 1.0
     enable_synonym_expansion: bool = False
     top_k: int = 100
     reranker: Reranker = field(default_factory=lambda: NoOpReranker())
@@ -98,7 +99,10 @@ EXPERIMENTS = {
         variants=[
             Variant(name="sparse", fields=["product_title"]),
             Variant(name="dense", fields=["product_vector"]),
-            Variant(name="hybrid", fields=["product_title", "product_vector"]),
+            Variant(name="hybrid (sparse * 1.0 + dense * 1.0)", fields=["product_title", "product_vector"], dense_boost=1.0),  # noqa
+            Variant(name="hybrid (sparse * 1.0 + dense * 5.0)", fields=["product_title", "product_vector"], dense_boost=5.0),  # noqa
+            Variant(name="hybrid (sparse * 1.0 + dense * 10.0)", fields=["product_title", "product_vector"], dense_boost=10.0),  # noqa
+            Variant(name="hybrid (sparse * 1.0 + dense * 20.0)", fields=["product_title", "product_vector"], dense_boost=20.0),  # noqa
         ],
     ),
 }
