@@ -1,8 +1,20 @@
-from invoke import Collection
+from invoke import Collection, task
 
 from tasks import data_tasks, demo_tasks, es_tasks, gcloud_tasks, synonyms_tasks, vespa_tasks
 
+
+@task
+def verify(c):
+    print("Running ruff...")
+    c.run("poetry run ruff . --fix")
+    print("Running mypy...")
+    c.run("poetry run mypy src")
+    print("Running pytest...")
+    c.run("poetry run pytest tests/unit -vv")
+
+
 ns = Collection()
+ns.add_task(verify)
 ns.add_collection(Collection.from_module(data_tasks, name="data"))
 ns.add_collection(Collection.from_module(demo_tasks, name="demo"))
 ns.add_collection(Collection.from_module(es_tasks, name="es"))
