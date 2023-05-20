@@ -1,5 +1,8 @@
 from typing import Any
 
+from torch import Tensor
+
+from amazon_product_search.cache import instance_lru_cache
 from amazon_product_search.constants import DATA_DIR, HF
 from amazon_product_search.synonyms.synonym_dict import SynonymDict
 from amazon_product_search_dense_retrieval.encoders import Encoder, SBERTEncoder
@@ -95,6 +98,10 @@ class QueryBuilder:
             }
         }
 
+    @instance_lru_cache(maxsize=128)
+    def _encode(self, query: str) -> Tensor:
+        return self.encoder.encode(query)
+
     def build_dense_search_query(self, query: str, field: str, top_k: int, boost: float = 1.0) -> dict[str, Any]:
         """Build a KNN ES query from given conditions.
 
@@ -106,7 +113,7 @@ class QueryBuilder:
         Returns:
             dict[str, Any]: The constructed ES query.
         """
-        query_vector = self.encoder.encode(query)
+        query_vector = self._encode(query)
         return {
             "query_vector": query_vector,
             "field": field,
