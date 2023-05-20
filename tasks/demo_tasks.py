@@ -13,7 +13,7 @@ def features(c):
 
 @task
 def search(c):
-    c.run("poetry run streamlit run src/demo/apps/search/🏠_Home.py")
+    c.run("poetry run streamlit run src/demo/apps/search/🔍_Retrieval.py")
 
 
 @task

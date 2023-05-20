@@ -40,7 +40,6 @@ es_client = EsClient()
 rerankers = init_rerankers()
 
 
-@st.cache_data
 def extract_judgements(df: pl.DataFrame) -> dict[str, str]:
     return {row["product_id"]: row["esci_label"] for row in df.select(["product_id", "esci_label"]).to_dicts()}
 
