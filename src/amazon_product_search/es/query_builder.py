@@ -2,7 +2,7 @@ from typing import Any
 
 from torch import Tensor
 
-from amazon_product_search.cache import instance_lru_cache
+from amazon_product_search.cache import weak_lru_cache
 from amazon_product_search.constants import DATA_DIR, HF
 from amazon_product_search.synonyms.synonym_dict import SynonymDict
 from amazon_product_search_dense_retrieval.encoders import Encoder, SBERTEncoder
@@ -98,7 +98,7 @@ class QueryBuilder:
             }
         }
 
-    @instance_lru_cache(maxsize=128)
+    @weak_lru_cache(maxsize=128)
     def _encode(self, query: str) -> Tensor:
         return self.encoder.encode(query)
 

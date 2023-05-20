@@ -1,18 +1,16 @@
-from functools import wraps
+import weakref
+from functools import lru_cache, wraps
 from typing import Any, Callable
 
 
-def instance_lru_cache(maxsize: int) -> Callable:
-    cache: dict[tuple[Any, ...], Any] = {}
-    def decorator(func: Callable) -> Callable:
+def weak_lru_cache(maxsize: int = 128, typed: bool = False) -> Callable:
+    def wrapper(func: Callable) -> Callable:
+        @lru_cache(maxsize, typed)
+        def _func(_self, *args, **kwargs) -> Any:
+            return func(_self(), *args, **kwargs)
+
         @wraps(func)
-        def wrapper(*args: Any) -> Any:
-            if args in cache:
-                return cache[args]
-            result = func(*args)
-            if maxsize is not None and len(cache) >= maxsize:
-                cache.popitem()
-            cache[args] = result
-            return result
-        return wrapper
-    return decorator
+        def inner(self, *args, **kwargs) -> Any:
+            return _func(weakref.ref(self), *args, **kwargs)
+        return inner
+    return wrapper
