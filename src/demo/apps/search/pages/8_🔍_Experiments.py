@@ -54,12 +54,15 @@ def search(index_name: str, query: str, variant: Variant) -> Response:
 
     sparse_fields, dense_fields = utils.split_fields(variant.fields)
     if sparse_fields:
-        es_query = query_builder.build_multimatch_search_query(
-            query=query, fields=sparse_fields, is_synonym_expansion_enabled=variant.enable_synonym_expansion
+        es_query = query_builder.build_sparse_search_query(
+            query=query,
+            fields=sparse_fields,
+            query_type=variant.query_type,
+            is_synonym_expansion_enabled=variant.enable_synonym_expansion,
         )
     if dense_fields:
         # TODO: Should multiple vector fields be handled?
-        es_knn_query = query_builder.build_knn_search_query(query, dense_fields[0], top_k=variant.top_k)
+        es_knn_query = query_builder.build_dense_search_query(query, dense_fields[0], top_k=variant.top_k)
 
     return es_client.search(index_name=index_name, query=es_query, knn_query=es_knn_query, size=variant.top_k)
 
@@ -156,11 +159,11 @@ def main():
 
     st.write("#### Metrics by query")
     with st.expander("click to expand"):
-        st.write(metrics_df)
+        st.write(metrics_df.to_pandas())
 
     st.write("#### Metrics by variant")
     stats_df = compute_stats(metrics_df)
-    st.write(stats_df)
+    st.write(stats_df.to_pandas())
 
     st.write("#### Analysis")
     draw_figures(metrics_df)

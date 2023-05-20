@@ -5,13 +5,15 @@ from amazon_product_search.es.query_builder import QueryBuilder
 
 def test_build_search_query():
     query_builder = QueryBuilder()
-    es_query = query_builder.build_multimatch_search_query(query="query", fields=["product_title"])
+    es_query = query_builder.build_sparse_search_query(
+        query="query", fields=["product_title"], query_type="combined_fields"
+    )
     assert es_query == {
-        "multi_match": {
+        "combined_fields": {
             "query": "query",
-            "type": "cross_fields",
             "fields": ["product_title"],
             "operator": "and",
+            "boost": 1.0,
         }
     }
 
@@ -21,26 +23,26 @@ def test_build_search_query_with_synonym_expansion_enabled(mock_method):
     mock_method.return_value = {"query": [("synonym", 1.0), ("antonym", 0.1)]}
 
     query_builder = QueryBuilder()
-    es_query = query_builder.build_multimatch_search_query(
-        query="query", fields=["product_title"], is_synonym_expansion_enabled=True
+    es_query = query_builder.build_sparse_search_query(
+        query="query", fields=["product_title"], query_type="combined_fields", is_synonym_expansion_enabled=True
     )
     assert es_query == {
         "bool": {
             "should": [
                 {
-                    "multi_match": {
+                    "combined_fields": {
                         "query": "query",
-                        "type": "cross_fields",
                         "fields": ["product_title"],
                         "operator": "and",
+                        "boost": 1.0,
                     },
                 },
                 {
-                    "multi_match": {
+                    "combined_fields": {
                         "query": "synonym",
-                        "type": "cross_fields",
                         "fields": ["product_title"],
                         "operator": "and",
+                        "boost": 1.0,
                     },
                 },
             ],
@@ -51,5 +53,5 @@ def test_build_search_query_with_synonym_expansion_enabled(mock_method):
 
 def test_build_knn_search_query():
     query_builder = QueryBuilder()
-    es_query = query_builder.build_knn_search_query(query="query", field="product_vector", top_k=10)
-    assert es_query.keys() == {"query_vector", "field", "k", "num_candidates"}
+    es_query = query_builder.build_dense_search_query(query="query", field="product_vector", top_k=10)
+    assert es_query.keys() == {"query_vector", "field", "k", "num_candidates", "boost"}

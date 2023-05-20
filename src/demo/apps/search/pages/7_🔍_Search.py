@@ -1,10 +1,11 @@
 from typing import Any, Optional
 
+import pandas as pd
 import streamlit as st
 
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.query_builder import QueryBuilder
-from amazon_product_search.es.response import Result
+from amazon_product_search.es.response import Response, Result
 from amazon_product_search.nlp.normalizer import normalize_query
 from amazon_product_search.reranking.reranker import from_string
 from demo.page_config import set_page_config
@@ -29,6 +30,36 @@ def draw_es_query(query: Optional[dict[str, Any]], knn_query: Optional[dict[str,
     st.write(es_query)
 
 
+def draw_response_stats(response: Response):
+    rows = []
+    for result in response.results:
+        row = {"product_title": result.product["product_title"]}
+
+        explanation = result.explanation
+        row["total_score"] = explanation["value"]
+        sparse_score = 0
+        dense_score = None
+        if explanation["description"] == "sum of:":
+            for child_explanation in explanation["details"]:
+                if child_explanation["description"] == "within top k documents":
+                    if not dense_score:
+                        dense_score = 0
+                    dense_score += child_explanation["value"]
+                else:
+                    sparse_score += child_explanation["value"]
+        if dense_score:
+            row["sparse_score"] = sparse_score
+            row["dense_score"] = dense_score
+        else:
+            row["sparse_score"] = row["total_score"]
+        rows.append(row)
+
+    df = pd.DataFrame(rows)
+    with st.expander("Response Stats"):
+        st.write(df)
+        st.write(df.describe())
+
+
 def draw_products(results: list[Result]):
     for result in results:
         with st.expander(f"{result.product['product_title']} ({result.score})"):
@@ -50,7 +81,7 @@ def main():
         query = st.text_input("Query:")
         normalized_query = normalize_query(query)
 
-        selected_fields = st.multiselect(
+        fields = st.multiselect(
             "Fields:",
             options=[
                 "product_title",
@@ -62,7 +93,18 @@ def main():
             ],
             default=["product_title"],
         )
-        sparse_fields, dense_fields = split_fields(selected_fields)
+        sparse_fields, dense_fields = split_fields(fields)
+
+        columns = st.columns(2)
+        with columns[0]:
+            sparse_boost = st.number_input("Sparse Boost", value=1.0)
+        with columns[1]:
+            dense_boost = st.number_input("Dense Boost", value=1.0)
+
+        query_type = st.selectbox(
+            "Query Type:",
+            options=["combined_fields", "cross_fields", "best_fields", "simple_query_string"],
+        )
 
         is_synonym_expansion_enabled = st.checkbox("enable_synonym_expansion")
 
@@ -70,15 +112,19 @@ def main():
 
         es_query = None
         if sparse_fields:
-            es_query = query_builder.build_multimatch_search_query(
+            es_query = query_builder.build_sparse_search_query(
                 query=normalized_query,
                 fields=sparse_fields,
+                query_type=query_type,
+                boost=sparse_boost,
                 is_synonym_expansion_enabled=is_synonym_expansion_enabled,
             )
         es_knn_query = None
         if normalized_query and dense_fields:
             # TODO: Should multiple vector fields be handled?
-            es_knn_query = query_builder.build_knn_search_query(normalized_query, field=dense_fields[0], top_k=size)
+            es_knn_query = query_builder.build_dense_search_query(
+                normalized_query, field=dense_fields[0], top_k=size, boost=dense_boost,
+            )
 
         if not st.form_submit_button("Search"):
             return
@@ -100,6 +146,7 @@ def main():
     st.write("#### Output")
     response = es_client.search(index_name=index_name, query=es_query, knn_query=es_knn_query, size=size, explain=True)
     response.results = reranker.rerank(normalized_query, response.results)
+    draw_response_stats(response)
     st.write(f"{response.total_hits} products found")
     draw_products(response.results)
 
