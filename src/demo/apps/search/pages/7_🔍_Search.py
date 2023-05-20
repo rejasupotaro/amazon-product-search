@@ -50,6 +50,8 @@ def draw_response_stats(response: Response):
         if dense_score:
             row["sparse_score"] = sparse_score
             row["dense_score"] = dense_score
+        else:
+            row["sparse_score"] = row["total_score"]
         rows.append(row)
 
     df = pd.DataFrame(rows)
