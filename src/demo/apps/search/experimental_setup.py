@@ -16,6 +16,7 @@ from amazon_product_search.source import Locale
 class Variant:
     name: str
     fields: list[str] = field(default_factory=lambda: ["product_title"])
+    query_type: str = "combined_fields"
     enable_synonym_expansion: bool = False
     top_k: int = 100
     reranker: Reranker = field(default_factory=lambda: NoOpReranker())
@@ -30,6 +31,17 @@ class ExperimentalSetup:
 
 
 EXPERIMENTS = {
+    "query_types": ExperimentalSetup(
+        index_name="products_jp",
+        locale="jp",
+        num_queries=100,
+        variants=[
+            Variant(name="best_fields", query_type="best_fields"),
+            Variant(name="cross_fields", query_type="cross_fields"),
+            Variant(name="combined_fields", query_type="combined_fields"),
+            Variant(name="simple_query_string", query_type="simple_query_string"),
+        ],
+    ),
     "different_fields": ExperimentalSetup(
         index_name="products_jp",
         locale="jp",

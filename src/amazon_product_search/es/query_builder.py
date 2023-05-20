@@ -41,9 +41,9 @@ class QueryBuilder:
     def _build_sparse_search_query(self, query_type: str, query: str, fields: list[str]) -> dict[str, Any]:
         match query_type:
             case "cross_fields":
-                return self._multi_match(query, fields, match_type="cross_fields")
+                return self._multi_match(query, fields, query_type="cross_fields")
             case "best_fields":
-                return self._multi_match(query, fields, match_type="best_fields")
+                return self._multi_match(query, fields, query_type="best_fields")
             case "combined_fields":
                 return self._combined_fields(query, fields)
             case "simple_query_string":
