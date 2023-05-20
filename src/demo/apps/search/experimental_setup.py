@@ -37,7 +37,7 @@ EXPERIMENTS = {
     "query_types": ExperimentalSetup(
         index_name="products_jp",
         locale="jp",
-        num_queries=100,
+        num_queries=5000,
         variants=[
             Variant(name="best_fields", fields=ALL_FIELDS, query_type="best_fields"),
             Variant(name="cross_fields", fields=ALL_FIELDS, query_type="cross_fields"),
@@ -80,6 +80,19 @@ EXPERIMENTS = {
             Variant(name="query expansion + title,brand,color", fields=["product_title", "product_brand", "product_color"], enable_synonym_expansion=True),  # noqa
         ],
     ),
+    "sparse_vs_dense": ExperimentalSetup(
+        index_name="products_jp",
+        locale="jp",
+        num_queries=5000,
+        variants=[
+            Variant(name="sparse", fields=["product_title"]),
+            Variant(name="dense", fields=["product_vector"]),
+            Variant(name="hybrid (sparse * 1.0 + dense * 1.0)", fields=["product_title", "product_vector"], dense_boost=1.0),  # noqa
+            Variant(name="hybrid (sparse * 1.0 + dense * 5.0)", fields=["product_title", "product_vector"], dense_boost=5.0),  # noqa
+            Variant(name="hybrid (sparse * 1.0 + dense * 10.0)", fields=["product_title", "product_vector"], dense_boost=10.0),  # noqa
+            Variant(name="hybrid (sparse * 1.0 + dense * 20.0)", fields=["product_title", "product_vector"], dense_boost=20.0),  # noqa
+        ],
+    ),
     "reranking": ExperimentalSetup(
         index_name="products_jp",
         locale="jp",
@@ -90,19 +103,6 @@ EXPERIMENTS = {
             Variant(name="title,bullet_point + SBERT", fields=["product_title", "product_description", "product_bullet_point"], enable_synonym_expansion=True, reranker=DotReranker()),  # noqa
             Variant(name="title,bullet_point + ColBERT", fields=["product_title", "product_description", "product_bullet_point"], enable_synonym_expansion=True, reranker=ColBERTReranker()),  # noqa
             Variant(name="title,bullet_point + SPLADE", fields=["product_title", "product_description", "product_bullet_point"], enable_synonym_expansion=True, reranker=SpladeReranker()),  # noqa
-        ],
-    ),
-    "sparse_vs_dense": ExperimentalSetup(
-        index_name="products_jp",
-        locale="jp",
-        num_queries=50,
-        variants=[
-            Variant(name="sparse", fields=["product_title"]),
-            Variant(name="dense", fields=["product_vector"]),
-            Variant(name="hybrid (sparse * 1.0 + dense * 1.0)", fields=["product_title", "product_vector"], dense_boost=1.0),  # noqa
-            Variant(name="hybrid (sparse * 1.0 + dense * 5.0)", fields=["product_title", "product_vector"], dense_boost=5.0),  # noqa
-            Variant(name="hybrid (sparse * 1.0 + dense * 10.0)", fields=["product_title", "product_vector"], dense_boost=10.0),  # noqa
-            Variant(name="hybrid (sparse * 1.0 + dense * 20.0)", fields=["product_title", "product_vector"], dense_boost=20.0),  # noqa
         ],
     ),
 }
