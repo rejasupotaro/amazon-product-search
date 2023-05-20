@@ -11,6 +11,8 @@ from amazon_product_search.reranking.reranker import (
 )
 from amazon_product_search.source import Locale
 
+ALL_FIELDS = ["product_title", "product_brand", "product_color", "product_bullet_point", "product_description"]
+
 
 @dataclass
 class Variant:
@@ -36,10 +38,10 @@ EXPERIMENTS = {
         locale="jp",
         num_queries=100,
         variants=[
-            Variant(name="best_fields", query_type="best_fields"),
-            Variant(name="cross_fields", query_type="cross_fields"),
-            Variant(name="combined_fields", query_type="combined_fields"),
-            Variant(name="simple_query_string", query_type="simple_query_string"),
+            Variant(name="best_fields", fields=ALL_FIELDS, query_type="best_fields"),
+            Variant(name="cross_fields", fields=ALL_FIELDS, query_type="cross_fields"),
+            Variant(name="combined_fields", fields=ALL_FIELDS, query_type="combined_fields"),
+            Variant(name="simple_query_string", fields=ALL_FIELDS, query_type="simple_query_string"),
         ],
     ),
     "different_fields": ExperimentalSetup(
