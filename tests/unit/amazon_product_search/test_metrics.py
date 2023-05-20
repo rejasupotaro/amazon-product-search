@@ -72,7 +72,7 @@ def test_compute_ap(retrieved_ids, relevant_ids, expected):
 )
 def test_compute_ndcg(retrieved_ids, relevant_ids, expected):
     actual = compute_ndcg(retrieved_ids, relevant_ids, prime=False)
-    assert actual == expected
+    assert actual == (round(expected, 4) if expected else None)
 
 
 @pytest.mark.parametrize(
@@ -87,4 +87,4 @@ def test_compute_ndcg(retrieved_ids, relevant_ids, expected):
 )
 def test_compute_ndcg_prime(retrieved_ids, relevant_ids, expected):
     actual = compute_ndcg(retrieved_ids, relevant_ids, prime=True)
-    assert actual == expected
+    assert actual == (round(expected, 4) if expected else None)
