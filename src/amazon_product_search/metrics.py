@@ -61,7 +61,7 @@ def compute_ndcg(retrieved_ids: list[str], judgements: dict[str, str], prime: bo
         y_pred = [LABEL_TO_GAIN[judgements[doc_id]] for doc_id in retrieved_ids if doc_id in judgements]
     else:
         y_pred = [LABEL_TO_GAIN[judgements[doc_id]] if doc_id in judgements else 0 for doc_id in retrieved_ids]
-    y_true = sorted(y_pred, reverse=True)
+    y_true = sorted([LABEL_TO_GAIN[label] for label in judgements.values()], reverse=True)
     idcg_val = compute_dcg(y_true)
     dcg_val = compute_dcg(y_pred)
     ndcg = round(dcg_val / idcg_val, 4) if idcg_val != 0 else None
