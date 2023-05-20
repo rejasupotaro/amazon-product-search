@@ -13,7 +13,7 @@ LABEL_TO_GAIN: dict[str, float] = {
 def compute_zero_hit_rate(xs: list[int]) -> Optional[float]:
     if len(xs) == 0:
         return None
-    return len([x for x in xs if x == 0]) / len(xs)
+    return round(len([x for x in xs if x == 0]) / len(xs), 4)
 
 
 def compute_recall(retrieved_ids: list[str], relevant_ids: set[str]) -> Optional[float]:
