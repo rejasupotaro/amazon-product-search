@@ -95,7 +95,7 @@ def main():
 
         query_type = st.selectbox(
             "Query Type:",
-            options=["cross_fields", "best_fields", "combined_fields", "simple_query_string"],
+            options=["combined_fields", "cross_fields", "best_fields", "simple_query_string"],
         )
 
         is_synonym_expansion_enabled = st.checkbox("enable_synonym_expansion")
