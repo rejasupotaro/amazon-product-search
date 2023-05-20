@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Literal, Optional
 
 from amazon_product_search.reranking.reranker import (
     ColBERTReranker,
@@ -12,6 +12,7 @@ from amazon_product_search.reranking.reranker import (
 from amazon_product_search.source import Locale
 
 ALL_FIELDS = ["product_title", "product_brand", "product_color", "product_bullet_point", "product_description"]
+Task = Literal["retrieval", "reranking"]
 
 
 @dataclass
@@ -29,14 +30,16 @@ class Variant:
 class ExperimentalSetup:
     index_name: str
     locale: Locale
-    variants: list[Variant]
+    task: Task
     num_queries: Optional[int] = None
+    variants: list[Variant] = field(default_factory=list)
 
 
 EXPERIMENTS = {
     "query_types": ExperimentalSetup(
         index_name="products_jp",
         locale="jp",
+        task="retrieval",
         num_queries=5000,
         variants=[
             Variant(name="best_fields", fields=ALL_FIELDS, query_type="best_fields"),
@@ -48,6 +51,7 @@ EXPERIMENTS = {
     "different_fields": ExperimentalSetup(
         index_name="products_jp",
         locale="jp",
+        task="retrieval",
         num_queries=5000,
         variants=[
             Variant(name="title", fields=["product_title"]),
@@ -60,6 +64,7 @@ EXPERIMENTS = {
     "different_weights": ExperimentalSetup(
         index_name="products_jp",
         locale="jp",
+        task="retrieval",
         num_queries=5000,
         variants=[
             Variant(name="title", fields=["product_title"]),
@@ -72,6 +77,7 @@ EXPERIMENTS = {
     "synonym_expansion": ExperimentalSetup(
         index_name="products_jp",
         locale="jp",
+        task="retrieval",
         num_queries=5000,
         variants=[
             Variant(name="title", fields=["product_title"], enable_synonym_expansion=False),
@@ -83,6 +89,7 @@ EXPERIMENTS = {
     "sparse_vs_dense": ExperimentalSetup(
         index_name="products_jp",
         locale="jp",
+        task="retrieval",
         num_queries=5000,
         variants=[
             Variant(name="sparse", fields=["product_title"]),
@@ -96,6 +103,7 @@ EXPERIMENTS = {
     "reranking": ExperimentalSetup(
         index_name="products_jp",
         locale="jp",
+        task="reranking",
         num_queries=500,
         variants=[
             Variant(name="title,bullet_point", fields=["product_title", "product_description", "product_bullet_point"], enable_synonym_expansion=True, reranker=NoOpReranker()),  # noqa
