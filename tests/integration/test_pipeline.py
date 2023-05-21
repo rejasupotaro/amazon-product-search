@@ -80,4 +80,7 @@ def test_pipeline(tmp_path: Path, es_docker):
 
     response = client.search(index_name, query={"match_all": {}})
     actual = [result.product for result in response.results]
+    for product in actual:
+        assert "product_vector" in product
+        del product["product_vector"]
     assert actual == expected
