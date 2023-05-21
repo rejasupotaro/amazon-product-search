@@ -1,7 +1,13 @@
 import numpy as np
 import pytest
 
-from amazon_product_search.metrics import compute_ap, compute_ndcg, compute_recall, compute_zero_hit_rate
+from amazon_product_search.metrics import (
+    compute_ap,
+    compute_dot_products,
+    compute_ndcg,
+    compute_recall,
+    compute_zero_hit_rate,
+)
 
 
 @pytest.mark.parametrize(
@@ -89,3 +95,10 @@ def test_compute_ndcg(retrieved_ids, relevant_ids, expected):
 def test_compute_ndcg_prime(retrieved_ids, relevant_ids, expected):
     actual = compute_ndcg(retrieved_ids, relevant_ids, prime=True)
     assert actual == (round(expected, 4) if expected is not None else None)
+
+
+def test_dot_products():
+    query_vector = np.array([1.0, 1.0])
+    product_vectors = np.array([[1.0, 1.0], [0.5, 0.5], [0.1, 0.1]])
+    actual = compute_dot_products(query_vector, product_vectors).tolist()
+    assert actual == [2, 1, 0.2]
