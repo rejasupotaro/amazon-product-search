@@ -7,7 +7,7 @@ import streamlit as st
 
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.query_builder import QueryBuilder
-from amazon_product_search.es.response import Result
+from amazon_product_search.es.response import Response, Result
 from amazon_product_search.metrics import compute_cosine_similarity, compute_ndcg, compute_recall
 from amazon_product_search.nlp.normalizer import normalize_query
 from amazon_product_search.reranking.reranker import from_string
@@ -43,6 +43,43 @@ def draw_es_query(query: Optional[dict[str, Any]], knn_query: Optional[dict[str,
 
     st.write("Elasticsearch Query:")
     st.write(es_query)
+
+
+def draw_response_stats(response: Response, normalized_query: str):
+    rows = []
+    for result in response.results:
+        row = {"product_title": result.product["product_title"]}
+
+        explanation = result.explanation
+        row["total_score"] = explanation["value"]
+        sparse_score = 0
+        dense_score = None
+        if explanation["description"] == "sum of:":
+            for child_explanation in explanation["details"]:
+                if child_explanation["description"] == "within top k documents":
+                    if not dense_score:
+                        dense_score = 0
+                    dense_score += child_explanation["value"]
+                else:
+                    sparse_score += child_explanation["value"]
+        if dense_score:
+            row["sparse_score"] = sparse_score
+            row["dense_score"] = dense_score
+        else:
+            row["sparse_score"] = row["total_score"]
+        rows.append(row)
+
+    df = pd.DataFrame(rows)
+    with st.expander("Response Stats"):
+        st.write(df)
+
+        query_vector = query_builder.encode(normalized_query)
+        product_vectors = np.array([result.product["product_vector"] for result in response.results])
+        scores = compute_cosine_similarity(query_vector, product_vectors)
+        scores_df = pd.DataFrame([{"i": i, "score": score} for i, score in enumerate(scores)])
+        fig = px.line(scores_df, x="i", y="score")
+        fig.update_layout(title="Cosine Similarity")
+        st.plotly_chart(fig, use_container_width=True)
 
 
 def draw_products(results: list[Result], label_dict: dict[str, str]):
@@ -147,15 +184,7 @@ def main():
     if not response.results:
         return
 
-    with st.expander("Response Stats", expanded=False):
-        query_vector = query_builder.encode(normalized_query)
-        product_vectors = np.array([result.product["product_vector"] for result in response.results])
-        scores = compute_cosine_similarity(query_vector, product_vectors)
-        scores_df = pd.DataFrame([{"i": i, "score": score} for i, score in enumerate(scores)])
-        fig = px.line(scores_df, x="i", y="score")
-        fig.update_layout(title="Cosine Similarity")
-        st.plotly_chart(fig, use_container_width=True)
-
+    draw_response_stats(response, normalized_query)
 
     retrieved_ids = [result.product["product_id"] for result in response.results]
     judgements = {product_id: label for product_id, (label, product_title) in label_dict.items()}
