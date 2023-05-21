@@ -114,9 +114,9 @@ def compute_stats(metrics_df: pl.DataFrame) -> pl.DataFrame:
         [
             pl.col("total_hits").mean().cast(int),
             pl.col("total_hits").apply(lambda series: compute_zero_hit_rate(series.to_list())).alias("zero_hit_rate"),
-            pl.col("recall").mean(),
-            pl.col("ndcg").mean(),
-            pl.col("ndcg_prime").mean(),
+            pl.col("recall").mean().round(4),
+            pl.col("ndcg").mean().round(4),
+            pl.col("ndcg_prime").mean().round(4),
         ]
     )
     return stats_df
