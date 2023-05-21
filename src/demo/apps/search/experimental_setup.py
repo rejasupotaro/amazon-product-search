@@ -82,8 +82,8 @@ EXPERIMENTS = {
         variants=[
             Variant(name="title", fields=["product_title"], enable_synonym_expansion=False),
             Variant(name="title,brand,color", fields=["product_title", "product_brand", "product_color"]),
-            Variant(name="query expansion + title", fields=["product_title"], enable_synonym_expansion=True),
-            Variant(name="query expansion + title,brand,color", fields=["product_title", "product_brand", "product_color"], enable_synonym_expansion=True),  # noqa
+            Variant(name="title + query expansion", fields=["product_title"], enable_synonym_expansion=True),
+            Variant(name="title,brand,color + query expansion", fields=["product_title", "product_brand", "product_color"], enable_synonym_expansion=True),  # noqa
         ],
     ),
     "sparse_vs_dense": ExperimentalSetup(
