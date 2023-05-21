@@ -65,6 +65,7 @@ class QueryBuilder:
         query_type: str = "combined_fields",
         boost: float = 1.0,
         is_synonym_expansion_enabled: bool = False,
+        product_ids: list[str] | None = None,
     ) -> dict[str, Any]:
         """Build a multi-match ES query.
 
@@ -80,29 +81,62 @@ class QueryBuilder:
                 "match_all": {},
             }
 
-        es_query = self._build_sparse_search_query(query_type, query, fields, boost)
-        if not is_synonym_expansion_enabled:
-            return es_query
+        synonyms = None
+        if is_synonym_expansion_enabled:
+            synonyms = self.synonym_dict.find_synonyms(query)
 
-        synonyms = self.synonym_dict.find_synonyms(query)
+        terms_clause = None
+        if product_ids:
+            terms_clause = {
+                "terms": {
+                    "product_id": product_ids,
+                },
+            }
+
         if not synonyms:
-            return es_query
+            match_clause = self._build_sparse_search_query(query_type, query, fields, boost)
+            if not terms_clause:
+                return match_clause
+            return {
+                "bool": {
+                    "should": [
+                        match_clause,
+                    ],
+                    "must": [
+                        terms_clause,
+                    ],
+                },
+            }
 
         match_clauses = []
         for q in [query, *synonyms]:
             match_clauses.append(self._build_sparse_search_query(query_type, q, fields, boost))
-        return {
+        bool_clause = {
             "bool": {
                 "should": match_clauses,
                 "minimum_should_match": 1,
             }
+        }
+        if not terms_clause:
+            return bool_clause
+        return {
+            "bool": {
+                "should": [
+                    bool_clause,
+                ],
+                "must": [
+                    terms_clause,
+                ],
+            },
         }
 
     @weak_lru_cache(maxsize=128)
     def _encode(self, query: str) -> Tensor:
         return self.encoder.encode(query)
 
-    def build_dense_search_query(self, query: str, field: str, top_k: int, boost: float = 1.0) -> dict[str, Any]:
+    def build_dense_search_query(
+        self, query: str, field: str, top_k: int, boost: float = 1.0, product_ids: list[str] | None = None,
+    ) -> dict[str, Any]:
         """Build a KNN ES query from given conditions.
 
         Args:
@@ -113,11 +147,19 @@ class QueryBuilder:
         Returns:
             dict[str, Any]: The constructed ES query.
         """
-        query_vector = self._encode(query)
-        return {
+        query_vector = self._encode(query).tolist()
+        knn_clause = {
             "query_vector": query_vector,
             "field": field,
             "k": top_k,
             "num_candidates": 100,
             "boost": boost,
         }
+        if not product_ids:
+            return knn_clause
+        knn_clause["filter"] = {
+            "terms": {
+                "product_id": product_ids,
+            },
+        }
+        return knn_clause

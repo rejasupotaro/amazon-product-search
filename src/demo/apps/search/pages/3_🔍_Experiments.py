@@ -48,7 +48,7 @@ def draw_variants(variants: list[Variant]):
     st.write(variants_df.to_pandas())
 
 
-def search(index_name: str, query: str, variant: Variant) -> Response:
+def search(index_name: str, query: str, variant: Variant, labeled_ids: list[str] | None) -> Response:
     es_query = None
     es_knn_query = None
 
@@ -59,6 +59,7 @@ def search(index_name: str, query: str, variant: Variant) -> Response:
             fields=sparse_fields,
             query_type=variant.query_type,
             is_synonym_expansion_enabled=variant.enable_synonym_expansion,
+            product_ids=labeled_ids,
         )
     if dense_fields:
         # TODO: Should multiple vector fields be handled?
@@ -69,8 +70,13 @@ def search(index_name: str, query: str, variant: Variant) -> Response:
     return es_client.search(index_name=index_name, query=es_query, knn_query=es_knn_query, size=variant.top_k)
 
 
-def compute_metrics(index_name: str, query: str, variant: Variant, labels_df: pl.DataFrame) -> dict[str, Any]:
-    response = search(index_name, query, variant)
+def compute_metrics(
+    experimental_setup: ExperimentalSetup, variant: Variant, query: str, labels_df: pl.DataFrame
+) -> dict[str, Any]:
+    labeled_ids = None
+    if experimental_setup.task == "reranking":
+        labeled_ids = labels_df.get_column("product_id").to_list()
+    response = search(experimental_setup.index_name, query, variant, labeled_ids)
     response.results = variant.reranker.rerank(query, response.results)
 
     retrieved_ids = [result.product["product_id"] for result in response.results]
@@ -98,7 +104,7 @@ def perform_search(experimental_setup: ExperimentalSetup, query_dict: dict[str, 
         progress_text.text(f"Query ({n} / {total_examples}): {query}")
         progress_bar.progress(n / total_examples)
         for variant in experimental_setup.variants:
-            metrics.append(compute_metrics(experimental_setup.index_name, query, variant, query_labels_df))
+            metrics.append(compute_metrics(experimental_setup, variant, query, query_labels_df))
     progress_text.text(f"Done ({n} / {total_examples})")
     return metrics
 
