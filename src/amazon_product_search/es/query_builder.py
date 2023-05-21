@@ -131,7 +131,7 @@ class QueryBuilder:
         }
 
     @weak_lru_cache(maxsize=128)
-    def _encode(self, query: str) -> Tensor:
+    def encode(self, query: str) -> Tensor:
         return self.encoder.encode(query)
 
     def build_dense_search_query(
@@ -147,7 +147,7 @@ class QueryBuilder:
         Returns:
             dict[str, Any]: The constructed ES query.
         """
-        query_vector = self._encode(query).tolist()
+        query_vector = self.encode(query).tolist()
         knn_clause = {
             "query_vector": query_vector,
             "field": field,

@@ -1,11 +1,14 @@
 from typing import Any, Optional
 
+import numpy as np
 import pandas as pd
+import plotly.express as px
 import streamlit as st
 
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.query_builder import QueryBuilder
 from amazon_product_search.es.response import Response, Result
+from amazon_product_search.metrics import compute_cosine_similarity
 from amazon_product_search.nlp.normalizer import normalize_query
 from amazon_product_search.reranking.reranker import from_string
 from demo.page_config import set_page_config
@@ -30,7 +33,7 @@ def draw_es_query(query: Optional[dict[str, Any]], knn_query: Optional[dict[str,
     st.write(es_query)
 
 
-def draw_response_stats(response: Response):
+def draw_response_stats(response: Response, normalized_query: str):
     rows = []
     for result in response.results:
         row = {"product_title": result.product["product_title"]}
@@ -57,7 +60,14 @@ def draw_response_stats(response: Response):
     df = pd.DataFrame(rows)
     with st.expander("Response Stats"):
         st.write(df)
-        st.write(df.describe())
+
+        query_vector = query_builder.encode(normalized_query)
+        product_vectors = np.array([result.product["product_vector"] for result in response.results])
+        scores = compute_cosine_similarity(query_vector, product_vectors)
+        scores_df = pd.DataFrame([{"i": i, "score": score} for i, score in enumerate(scores)])
+        fig = px.line(scores_df, x="i", y="score")
+        fig.update_layout(title="Cosine Similarity")
+        st.plotly_chart(fig, use_container_width=True)
 
 
 def draw_products(results: list[Result]):
@@ -146,7 +156,7 @@ def main():
     st.write("#### Output")
     response = es_client.search(index_name=index_name, query=es_query, knn_query=es_knn_query, size=size, explain=True)
     response.results = reranker.rerank(normalized_query, response.results)
-    draw_response_stats(response)
+    draw_response_stats(response, normalized_query)
     st.write(f"{response.total_hits} products found")
     draw_products(response.results)
 

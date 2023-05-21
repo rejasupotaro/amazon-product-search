@@ -68,5 +68,7 @@ def compute_ndcg(retrieved_ids: list[str], judgements: dict[str, str], prime: bo
     return ndcg
 
 
-def compute_dot_products(query_vector: np.ndarray, product_vectors: np.ndarray) -> np.ndarray:
-    return np.dot(query_vector, product_vectors.T)
+def compute_cosine_similarity(query_vector: np.ndarray, product_vectors: np.ndarray) -> np.ndarray:
+    numerator = np.dot(query_vector, product_vectors.T)
+    denominator = (np.linalg.norm(query_vector) * np.linalg.norm(product_vectors, axis=1))
+    return numerator / denominator

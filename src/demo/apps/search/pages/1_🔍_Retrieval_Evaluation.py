@@ -1,11 +1,14 @@
 from typing import Any, Optional
 
+import numpy as np
+import pandas as pd
+import plotly.express as px
 import streamlit as st
 
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.query_builder import QueryBuilder
 from amazon_product_search.es.response import Result
-from amazon_product_search.metrics import compute_ndcg, compute_recall
+from amazon_product_search.metrics import compute_cosine_similarity, compute_ndcg, compute_recall
 from amazon_product_search.nlp.normalizer import normalize_query
 from amazon_product_search.reranking.reranker import from_string
 from demo.page_config import set_page_config
@@ -143,6 +146,17 @@ def main():
     response.results = reranker.rerank(normalized_query, response.results)
     if not response.results:
         return
+
+    with st.expander("Response Stats", expanded=False):
+        query_vector = query_builder.encode(normalized_query)
+        product_vectors = np.array([result.product["product_vector"] for result in response.results])
+        scores = compute_cosine_similarity(query_vector, product_vectors)
+        scores_df = pd.DataFrame([{"i": i, "score": score} for i, score in enumerate(scores)])
+        fig = px.line(scores_df, x="i", y="score")
+        fig.update_layout(title="Cosine Similarity")
+        st.plotly_chart(fig, use_container_width=True)
+
+
     retrieved_ids = [result.product["product_id"] for result in response.results]
     judgements = {product_id: label for product_id, (label, product_title) in label_dict.items()}
     ndcg = compute_ndcg(retrieved_ids, judgements)
