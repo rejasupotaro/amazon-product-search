@@ -5,7 +5,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from amazon_product_search.es.response import Response
+from amazon_product_search.es.response import Response, Result
 from amazon_product_search.metrics import compute_cosine_similarity
 
 
@@ -101,3 +101,20 @@ def draw_response_stats(response: Response, query_vector: np.ndarray):
         fig.update_layout(title="Cosine Similarity")
         st.plotly_chart(fig, use_container_width=True)
 
+
+def draw_products(results: list[Result], label_dict: dict[str, str]):
+    for result in results:
+        product = result.product
+        header = f"{result.product['product_title']} ({result.score})"
+        if label_dict:
+            label = {
+                "E": "[Exact] ",
+                "S": "[Substitute] ",
+                "C": "[Complement] ",
+                "I": "[Irrelevant] ",
+                "-": "",
+            }[label_dict.get(product["product_id"], ("-", ""))[0]]
+            header = f"{label}{header}"
+        with st.expander(header):
+            st.write(result.product)
+            st.write(result.explanation)

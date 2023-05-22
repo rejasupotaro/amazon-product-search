@@ -4,11 +4,10 @@ import streamlit as st
 
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.query_builder import QueryBuilder
-from amazon_product_search.es.response import Result
 from amazon_product_search.metrics import compute_ndcg, compute_recall
 from amazon_product_search.nlp.normalizer import normalize_query
 from amazon_product_search.reranking.reranker import from_string
-from demo.apps.search.search_ui import draw_input_form, draw_response_stats
+from demo.apps.search.search_ui import draw_input_form, draw_products, draw_response_stats
 from demo.page_config import set_page_config
 from demo.utils import load_merged, split_fields
 
@@ -41,24 +40,6 @@ def draw_es_query(query: Optional[dict[str, Any]], knn_query: Optional[dict[str,
 
     st.write("Elasticsearch Query:")
     st.write(es_query)
-
-
-def draw_products(results: list[Result], label_dict: dict[str, str]):
-    for result in results:
-        product = result.product
-        header = f"{result.product['product_title']} ({result.score})"
-        if label_dict:
-            label = {
-                "E": "[Exact] ",
-                "S": "[Substitute] ",
-                "C": "[Complement] ",
-                "I": "[Irrelevant] ",
-                "-": "",
-            }[label_dict.get(product["product_id"], ("-", ""))[0]]
-            header = f"{label}{header}"
-        with st.expander(header):
-            st.write(result.product)
-            st.write(result.explanation)
 
 
 def main():
