@@ -5,14 +5,27 @@ import streamlit as st
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.query_builder import QueryBuilder
 from amazon_product_search.es.response import Result
+from amazon_product_search.metrics import compute_ndcg, compute_recall
 from amazon_product_search.nlp.normalizer import normalize_query
 from amazon_product_search.reranking.reranker import from_string
 from demo.apps.search.search_ui import draw_input_form, draw_response_stats
 from demo.page_config import set_page_config
-from demo.utils import split_fields
+from demo.utils import load_merged, split_fields
 
 es_client = EsClient()
 query_builder = QueryBuilder()
+
+
+@st.cache_data
+def load_dataset() -> dict[str, dict[str, tuple[str, str]]]:
+    df = load_merged(locale="jp").to_pandas()
+    df = df[df["split"] == "test"]
+    query_to_label: dict[str, dict[str, tuple[str, str]]] = {}
+    for query, group in df.groupby("query"):
+        query_to_label[query] = {}
+        for row in group.to_dict("records"):
+            query_to_label[query][row["product_id"]] = (row["esci_label"], row["product_title"])
+    return query_to_label
 
 
 def draw_es_query(query: Optional[dict[str, Any]], knn_query: Optional[dict[str, Any]], size: int):
@@ -30,10 +43,20 @@ def draw_es_query(query: Optional[dict[str, Any]], knn_query: Optional[dict[str,
     st.write(es_query)
 
 
-
-def draw_products(results: list[Result]):
+def draw_products(results: list[Result], label_dict: dict[str, str]):
     for result in results:
-        with st.expander(f"{result.product['product_title']} ({result.score})"):
+        product = result.product
+        header = f"{result.product['product_title']} ({result.score})"
+        if label_dict:
+            label = {
+                "E": "[Exact] ",
+                "S": "[Substitute] ",
+                "C": "[Complement] ",
+                "I": "[Irrelevant] ",
+                "-": "",
+            }[label_dict.get(product["product_id"], ("-", ""))[0]]
+            header = f"{label}{header}"
+        with st.expander(header):
             st.write(result.product)
             st.write(result.explanation)
 
@@ -42,9 +65,15 @@ def main():
     set_page_config()
     st.write("## Search")
 
+    queries, query_to_label = None, {}
+    use_dataset = st.checkbox("Use Dataset:", value=True)
+    if use_dataset:
+        query_to_label = load_dataset()
+        queries = query_to_label.keys()
+
     st.write("#### Input")
     with st.form("input"):
-        form_input = draw_input_form(es_client.list_indices())
+        form_input = draw_input_form(es_client.list_indices(), queries)
         if not st.form_submit_button("Search"):
             return
 
@@ -79,6 +108,11 @@ def main():
 
         draw_es_query(es_query, es_knn_query, size)
 
+    label_dict = query_to_label.get(form_input.query, {})
+    if label_dict:
+        with st.expander("Labels", expanded=False):
+            st.write(label_dict)
+
     st.write("----")
 
     st.write("#### Output")
@@ -92,8 +126,15 @@ def main():
     query_vector = query_builder.encode(normalized_query)
     draw_response_stats(response, query_vector)
 
-    st.write(f"{response.total_hits} products found")
-    draw_products(response.results)
+    header = f"{response.total_hits} products found"
+    if label_dict:
+        retrieved_ids = [result.product["product_id"] for result in response.results]
+        judgements = {product_id: label for product_id, (label, product_title) in label_dict.items()}
+        ndcg = compute_ndcg(retrieved_ids, judgements)
+        recall = compute_recall(retrieved_ids, judgements.keys())
+        header = f"{header} (NDCG: {ndcg}, Recall: {recall})"
+    st.write(header)
+    draw_products(response.results, label_dict)
 
 
 if __name__ == "__main__":
