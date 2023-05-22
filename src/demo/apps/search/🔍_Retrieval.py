@@ -1,16 +1,13 @@
 from typing import Any, Optional
 
-import numpy as np
-import pandas as pd
-import plotly.express as px
 import streamlit as st
 
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.query_builder import QueryBuilder
-from amazon_product_search.es.response import Response, Result
-from amazon_product_search.metrics import compute_cosine_similarity
+from amazon_product_search.es.response import Result
 from amazon_product_search.nlp.normalizer import normalize_query
 from amazon_product_search.reranking.reranker import from_string
+from demo.apps.search.search_ui import draw_input_form, draw_response_stats
 from demo.page_config import set_page_config
 from demo.utils import split_fields
 
@@ -33,42 +30,6 @@ def draw_es_query(query: Optional[dict[str, Any]], knn_query: Optional[dict[str,
     st.write(es_query)
 
 
-def draw_response_stats(response: Response, normalized_query: str):
-    rows = []
-    for result in response.results:
-        row = {"product_title": result.product["product_title"]}
-
-        explanation = result.explanation
-        row["total_score"] = explanation["value"]
-        sparse_score = 0
-        dense_score = None
-        if explanation["description"] == "sum of:":
-            for child_explanation in explanation["details"]:
-                if child_explanation["description"] == "within top k documents":
-                    if not dense_score:
-                        dense_score = 0
-                    dense_score += child_explanation["value"]
-                else:
-                    sparse_score += child_explanation["value"]
-        if dense_score:
-            row["sparse_score"] = sparse_score
-            row["dense_score"] = dense_score
-        else:
-            row["sparse_score"] = row["total_score"]
-        rows.append(row)
-
-    df = pd.DataFrame(rows)
-    with st.expander("Response Stats"):
-        st.write(df)
-
-        query_vector = query_builder.encode(normalized_query)
-        product_vectors = np.array([result.product["product_vector"] for result in response.results])
-        scores = compute_cosine_similarity(query_vector, product_vectors)
-        scores_df = pd.DataFrame([{"i": i, "score": score} for i, score in enumerate(scores)])
-        fig = px.line(scores_df, x="i", y="score")
-        fig.update_layout(title="Cosine Similarity")
-        st.plotly_chart(fig, use_container_width=True)
-
 
 def draw_products(results: list[Result]):
     for result in results:
@@ -81,63 +42,30 @@ def main():
     set_page_config()
     st.write("## Search")
 
-    size = 20
-
     st.write("#### Input")
     with st.form("input"):
-        indices = es_client.list_indices()
-        index_name = st.selectbox("Index:", indices)
-
-        query = st.text_input("Query:")
-        normalized_query = normalize_query(query)
-
-        fields = st.multiselect(
-            "Fields:",
-            options=[
-                "product_title",
-                "product_description",
-                "product_bullet_point",
-                "product_brand",
-                "product_color",
-                "product_vector",
-            ],
-            default=["product_title"],
-        )
-        sparse_fields, dense_fields = split_fields(fields)
-
-        columns = st.columns(2)
-        with columns[0]:
-            sparse_boost = st.number_input("Sparse Boost", value=1.0)
-        with columns[1]:
-            dense_boost = st.number_input("Dense Boost", value=1.0)
-
-        query_type = st.selectbox(
-            "Query Type:",
-            options=["combined_fields", "cross_fields", "best_fields", "simple_query_string"],
-        )
-
-        is_synonym_expansion_enabled = st.checkbox("enable_synonym_expansion")
-
-        reranker = from_string(st.selectbox("reranker:", ["NoOpReranker", "RandomReranker", "DotReranker"]))
-
-        es_query = None
-        if sparse_fields:
-            es_query = query_builder.build_sparse_search_query(
-                query=normalized_query,
-                fields=sparse_fields,
-                query_type=query_type,
-                boost=sparse_boost,
-                is_synonym_expansion_enabled=is_synonym_expansion_enabled,
-            )
-        es_knn_query = None
-        if normalized_query and dense_fields:
-            # TODO: Should multiple vector fields be handled?
-            es_knn_query = query_builder.build_dense_search_query(
-                normalized_query, field=dense_fields[0], top_k=size, boost=dense_boost,
-            )
-
+        form_input = draw_input_form(es_client.list_indices())
         if not st.form_submit_button("Search"):
             return
+
+    size = 20
+    normalized_query = normalize_query(form_input.query)
+    sparse_fields, dense_fields = split_fields(form_input.fields)
+    es_query = None
+    if sparse_fields:
+        es_query = query_builder.build_sparse_search_query(
+            query=normalized_query,
+            fields=sparse_fields,
+            query_type=form_input.query_type,
+            boost=form_input.sparse_boost,
+            is_synonym_expansion_enabled=form_input.is_synonym_expansion_enabled,
+        )
+    es_knn_query = None
+    if normalized_query and dense_fields:
+        es_knn_query = query_builder.build_dense_search_query(
+            normalized_query, field=dense_fields[0], top_k=size, boost=form_input.dense_boost,
+        )
+    reranker = from_string(form_input.reranker_str)
 
     st.write("----")
 
@@ -146,7 +74,7 @@ def main():
         st.write(normalized_query)
 
         st.write("Analyzed Query")
-        analyzed_query = es_client.analyze(query)
+        analyzed_query = es_client.analyze(normalized_query)
         st.write(analyzed_query)
 
         draw_es_query(es_query, es_knn_query, size)
@@ -154,9 +82,16 @@ def main():
     st.write("----")
 
     st.write("#### Output")
-    response = es_client.search(index_name=index_name, query=es_query, knn_query=es_knn_query, size=size, explain=True)
+    response = es_client.search(
+        index_name=form_input.index_name, query=es_query, knn_query=es_knn_query, size=size, explain=True,
+    )
+    if not response.results:
+        return
     response.results = reranker.rerank(normalized_query, response.results)
-    draw_response_stats(response, normalized_query)
+
+    query_vector = query_builder.encode(normalized_query)
+    draw_response_stats(response, query_vector)
+
     st.write(f"{response.total_hits} products found")
     draw_products(response.results)
 
