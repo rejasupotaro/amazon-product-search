@@ -108,11 +108,13 @@ def main():
     draw_response_stats(response, query_vector)
 
     header = f"{response.total_hits} products found"
+    st.write(list(label_dict.items()))
     if label_dict:
         retrieved_ids = [result.product["product_id"] for result in response.results]
         judgements = {product_id: label for product_id, (label, product_title) in label_dict.items()}
+        relevant_ids = {product_id for product_id, (label, product_title) in label_dict.items() if label == "E"}
         ndcg = compute_ndcg(retrieved_ids, judgements)
-        recall = compute_recall(retrieved_ids, judgements.keys())
+        recall = compute_recall(retrieved_ids, relevant_ids)
         header = f"{header} (NDCG: {ndcg}, Recall: {recall})"
     st.write(header)
     draw_products(response.results, label_dict)

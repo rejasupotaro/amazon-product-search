@@ -104,11 +104,12 @@ def main():
 
     columns = st.columns(2)
     judgements = {product_id: label for product_id, (label, product_title) in label_dict.items()}
+    relevant_ids = {product_id for product_id, (label, product_title) in label_dict.items() if label == "E"}
     with columns[0]:
         header = f"{sparse_response.total_hits} products found"
         if label_dict:
             ndcg = compute_ndcg(sparse_retrieved_ids, judgements)
-            recall = compute_recall(sparse_retrieved_ids, judgements.keys())
+            recall = compute_recall(sparse_retrieved_ids, relevant_ids)
             header = f"{header} (NDCG: {ndcg}, Recall: {recall})"
         st.write(header)
         draw_products(sparse_response.results, label_dict)
@@ -116,7 +117,7 @@ def main():
         header = f"{dense_response.total_hits} products found"
         if label_dict:
             ndcg = compute_ndcg(dense_retrieved_ids, judgements)
-            recall = compute_recall(dense_retrieved_ids, judgements.keys())
+            recall = compute_recall(dense_retrieved_ids, relevant_ids)
             header = f"{header} (NDCG: {ndcg}, Recall: {recall})"
         st.write(header)
         draw_products(dense_response.results, label_dict)
