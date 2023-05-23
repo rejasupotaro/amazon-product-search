@@ -2,6 +2,7 @@ import streamlit as st
 
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.query_builder import QueryBuilder
+from amazon_product_search.es.response import Response
 from amazon_product_search.metrics import compute_ndcg, compute_recall
 from amazon_product_search.nlp.normalizer import normalize_query
 from demo.apps.search.search_ui import draw_products
@@ -22,6 +23,36 @@ def load_dataset() -> dict[str, dict[str, tuple[str, str]]]:
         for row in group.to_dict("records"):
             query_to_label[query][row["product_id"]] = (row["esci_label"], row["product_title"])
     return query_to_label
+
+
+def search(
+    index_name: str,
+    query: str,
+    sparse_fields: list[str],
+    query_type: str,
+    is_synonym_expansion_enabled: bool,
+    size: int = 20,
+) -> tuple[Response, Response]:
+    normalized_query = normalize_query(query)
+    sparse_query = query_builder.build_sparse_search_query(
+        query=normalized_query,
+        fields=sparse_fields,
+        query_type=query_type,
+        is_synonym_expansion_enabled=is_synonym_expansion_enabled,
+    )
+
+    query_vector = query_builder.encode(normalized_query)
+    dense_query = {
+        "query_vector": query_vector,
+        "field": "product_vector",
+        "k": size,
+        "num_candidates": size,
+    }
+
+    sparse_response = es_client.search(index_name=index_name, query=sparse_query, size=size)
+    dense_response = es_client.knn_search(index_name=index_name, knn_query=dense_query)
+
+    return sparse_response, dense_response
 
 
 def main():
@@ -62,24 +93,6 @@ def main():
         if not st.form_submit_button("Search"):
             return
 
-    size = 20
-
-    normalized_query = normalize_query(query)
-    sparse_query = query_builder.build_sparse_search_query(
-        query=normalized_query,
-        fields=sparse_fields,
-        query_type=query_type,
-        is_synonym_expansion_enabled=is_synonym_expansion_enabled,
-    )
-
-    query_vector = query_builder.encode(normalized_query)
-    dense_query = {
-        "query_vector": query_vector,
-        "field": "product_vector",
-        "k": size,
-        "num_candidates": size,
-    }
-
     st.write("----")
 
     label_dict = query_to_label.get(query, {})
@@ -87,16 +100,15 @@ def main():
         with st.expander("Labels", expanded=False):
             st.write(label_dict)
 
-    sparse_response = es_client.search(index_name=index_name, query=sparse_query, size=size)
-    dense_response = es_client.knn_search(index_name=index_name, knn_query=dense_query)
+    st.write("----")
+
+    sparse_response, dense_response = search(index_name, query, sparse_fields, query_type, is_synonym_expansion_enabled)
 
     sparse_retrieved_ids = [result.product["product_id"] for result in sparse_response.results]
     dense_retrieved_ids = [result.product["product_id"] for result in dense_response.results]
     union = set(sparse_retrieved_ids) | set(dense_retrieved_ids)
     intersection = set(sparse_retrieved_ids) & set(dense_retrieved_ids)
     iou = round(len(intersection) / len(union), 4)
-
-    st.write("----")
 
     st.write("#### Output")
 
