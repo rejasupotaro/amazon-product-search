@@ -40,7 +40,7 @@ def main():
 
         query = st.selectbox("Query:", queries) if queries else st.text_input("Query:")
 
-        fields = st.multiselect(
+        sparse_fields = st.multiselect(
             "Fields:",
             options=[
                 "product_title",
@@ -65,15 +65,15 @@ def main():
     size = 20
 
     normalized_query = normalize_query(query)
-    es_query = query_builder.build_sparse_search_query(
+    sparse_query = query_builder.build_sparse_search_query(
         query=normalized_query,
-        fields=fields,
+        fields=sparse_fields,
         query_type=query_type,
         is_synonym_expansion_enabled=is_synonym_expansion_enabled,
     )
 
     query_vector = query_builder.encode(normalized_query)
-    es_knn_query = {
+    dense_query = {
         "query_vector": query_vector,
         "field": "product_vector",
         "k": size,
@@ -87,8 +87,8 @@ def main():
         with st.expander("Labels", expanded=False):
             st.write(label_dict)
 
-    sparse_response = es_client.search(index_name=index_name, query=es_query, size=size)
-    dense_response = es_client.knn_search(index_name=index_name, knn_query=es_knn_query)
+    sparse_response = es_client.search(index_name=index_name, query=sparse_query, size=size)
+    dense_response = es_client.knn_search(index_name=index_name, knn_query=dense_query)
 
     sparse_retrieved_ids = [result.product["product_id"] for result in sparse_response.results]
     dense_retrieved_ids = [result.product["product_id"] for result in dense_response.results]

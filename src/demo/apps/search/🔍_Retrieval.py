@@ -61,18 +61,18 @@ def main():
     size = 20
     normalized_query = normalize_query(form_input.query)
     sparse_fields, dense_fields = split_fields(form_input.fields)
-    es_query = None
+    sparse_query = None
     if sparse_fields:
-        es_query = query_builder.build_sparse_search_query(
+        sparse_query = query_builder.build_sparse_search_query(
             query=normalized_query,
             fields=sparse_fields,
             query_type=form_input.query_type,
             boost=form_input.sparse_boost,
             is_synonym_expansion_enabled=form_input.is_synonym_expansion_enabled,
         )
-    es_knn_query = None
+    dense_query = None
     if normalized_query and dense_fields:
-        es_knn_query = query_builder.build_dense_search_query(
+        dense_query = query_builder.build_dense_search_query(
             normalized_query, field=dense_fields[0], top_k=size, boost=form_input.dense_boost,
         )
     reranker = from_string(form_input.reranker_str)
@@ -87,7 +87,7 @@ def main():
         analyzed_query = es_client.analyze(normalized_query)
         st.write(analyzed_query)
 
-        draw_es_query(es_query, es_knn_query, size)
+        draw_es_query(sparse_query, dense_query, size)
 
     label_dict = query_to_label.get(form_input.query, {})
     if label_dict:
@@ -98,7 +98,7 @@ def main():
 
     st.write("#### Output")
     response = es_client.search(
-        index_name=form_input.index_name, query=es_query, knn_query=es_knn_query, size=size, explain=True,
+        index_name=form_input.index_name, query=sparse_query, knn_query=dense_query, size=size, explain=True,
     )
     if not response.results:
         return
@@ -108,7 +108,6 @@ def main():
     draw_response_stats(response, query_vector)
 
     header = f"{response.total_hits} products found"
-    st.write(list(label_dict.items()))
     if label_dict:
         retrieved_ids = [result.product["product_id"] for result in response.results]
         judgements = {product_id: label for product_id, (label, product_title) in label_dict.items()}
