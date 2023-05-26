@@ -4,7 +4,7 @@ import streamlit as st
 
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.query_builder import QueryBuilder
-from amazon_product_search.metrics import compute_ndcg, compute_recall
+from amazon_product_search.metrics import compute_ndcg, compute_precision, compute_recall
 from amazon_product_search.nlp.normalizer import normalize_query
 from amazon_product_search.reranking.reranker import from_string
 from demo.apps.search.search_ui import draw_input_form, draw_products, draw_response_stats
@@ -112,9 +112,10 @@ def main():
         retrieved_ids = [result.product["product_id"] for result in response.results]
         judgements = {product_id: label for product_id, (label, product_title) in label_dict.items()}
         relevant_ids = {product_id for product_id, (label, product_title) in label_dict.items() if label == "E"}
-        ndcg = compute_ndcg(retrieved_ids, judgements)
+        precision = compute_precision(retrieved_ids, relevant_ids)
         recall = compute_recall(retrieved_ids, relevant_ids)
-        header = f"{header} (NDCG: {ndcg}, Recall: {recall})"
+        ndcg = compute_ndcg(retrieved_ids, judgements)
+        header = f"{header} (Precision: {precision}, Recall: {recall}, NDCG: {ndcg})"
     st.write(header)
     draw_products(response.results, label_dict)
 
