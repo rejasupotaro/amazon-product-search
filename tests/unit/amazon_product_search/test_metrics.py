@@ -5,6 +5,7 @@ from amazon_product_search.metrics import (
     compute_ap,
     compute_cosine_similarity,
     compute_ndcg,
+    compute_precision,
     compute_recall,
     compute_zero_hit_rate,
 )
@@ -40,6 +41,22 @@ def test_compute_zero_hit_rate(xs, expected):
 )
 def test_compute_recall(retrieved_ids, relevant_ids, expected):
     actual = compute_recall(retrieved_ids, relevant_ids)
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    ("retrieved_ids", "relevant_ids", "expected"),
+    [
+        ([], set(), None),
+        (["1"], set(), 0),
+        ([], {"1"}, None),
+        (["1"], {"1"}, 1),
+        (["1", "2"], {"1"}, 0.5),
+        (["1"], {"1", "2"}, 1),
+    ]
+)
+def test_compute_precision(retrieved_ids, relevant_ids, expected):
+    actual = compute_precision(retrieved_ids, relevant_ids)
     assert actual == expected
 
 

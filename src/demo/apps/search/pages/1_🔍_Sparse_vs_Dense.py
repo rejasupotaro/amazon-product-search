@@ -3,7 +3,7 @@ import streamlit as st
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.query_builder import QueryBuilder
 from amazon_product_search.es.response import Response
-from amazon_product_search.metrics import compute_ndcg, compute_recall
+from amazon_product_search.metrics import compute_ndcg, compute_precision, compute_recall
 from amazon_product_search.nlp.normalizer import normalize_query
 from demo.apps.search.search_ui import draw_products
 from demo.page_config import set_page_config
@@ -120,17 +120,19 @@ def main():
     with columns[0]:
         header = f"{sparse_response.total_hits} products found"
         if label_dict:
-            ndcg = compute_ndcg(sparse_retrieved_ids, judgements)
+            precision = compute_precision(sparse_retrieved_ids, relevant_ids)
             recall = compute_recall(sparse_retrieved_ids, relevant_ids)
-            header = f"{header} (NDCG: {ndcg}, Recall: {recall})"
+            ndcg = compute_ndcg(sparse_retrieved_ids, judgements)
+            header = f"{header} (Precision: {precision}, Recall: {recall}, NDCG: {ndcg})"
         st.write(header)
         draw_products(sparse_response.results, label_dict)
     with columns[1]:
         header = f"{dense_response.total_hits} products found"
         if label_dict:
-            ndcg = compute_ndcg(dense_retrieved_ids, judgements)
+            precision = compute_precision(dense_retrieved_ids, relevant_ids)
             recall = compute_recall(dense_retrieved_ids, relevant_ids)
-            header = f"{header} (NDCG: {ndcg}, Recall: {recall})"
+            ndcg = compute_ndcg(dense_retrieved_ids, judgements)
+            header = f"{header} (Preicison: {precision}, Recall: {recall}, NDCG: {ndcg})"
         st.write(header)
         draw_products(dense_response.results, label_dict)
 
