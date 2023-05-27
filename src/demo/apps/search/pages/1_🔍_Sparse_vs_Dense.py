@@ -104,18 +104,25 @@ def main():
 
     st.write("#### Output")
 
+    relevant_ids = {product_id for product_id, (label, product_title) in label_dict.items() if label == "E"}
     sparse_response, dense_response = search(index_name, query, sparse_fields, query_type, is_synonym_expansion_enabled)
     sparse_retrieved_ids = [result.product["product_id"] for result in sparse_response.results]
     dense_retrieved_ids = [result.product["product_id"] for result in dense_response.results]
+    sparse_relevant_ids = [retrieved_id for retrieved_id in sparse_retrieved_ids if retrieved_id in relevant_ids]
+    dense_relevant_ids = [retrieved_id for retrieved_id in dense_retrieved_ids if retrieved_id in relevant_ids]
 
-    union = set(sparse_retrieved_ids) | set(dense_retrieved_ids)
-    intersection = set(sparse_retrieved_ids) & set(dense_retrieved_ids)
-    iou = round(len(intersection) / len(union), 4)
-    st.write(f"IoU: {iou} ({len(intersection)} / {len(union)})")
+    all_union = set(sparse_retrieved_ids) | set(dense_retrieved_ids)
+    all_intersection = set(sparse_retrieved_ids) & set(dense_retrieved_ids)
+    all_iou = round(len(all_intersection) / len(all_union), 4) if all_union else None
+    all_iou_text = f"All IoU: {all_iou} ({len(all_intersection)} / {len(all_union)})"
+    relevant_union = set(sparse_relevant_ids) | set(dense_relevant_ids)
+    relevant_intersection = set(sparse_relevant_ids) & set(dense_relevant_ids)
+    relevant_iou = round(len(relevant_intersection) / len(relevant_union), 4) if relevant_union else None
+    relevant_iou_text = f"Relevant IoU: {relevant_iou} ({len(relevant_intersection)} / {len(relevant_union)})"
+    st.write(f"{all_iou_text}, {relevant_iou_text}")
 
     columns = st.columns(2)
     judgements = {product_id: label for product_id, (label, product_title) in label_dict.items()}
-    relevant_ids = {product_id for product_id, (label, product_title) in label_dict.items() if label == "E"}
     with columns[0]:
         header = f"{sparse_response.total_hits} products found"
         if label_dict:
