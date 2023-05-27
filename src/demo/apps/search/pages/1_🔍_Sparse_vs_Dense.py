@@ -102,17 +102,16 @@ def main():
 
     st.write("----")
 
-    sparse_response, dense_response = search(index_name, query, sparse_fields, query_type, is_synonym_expansion_enabled)
+    st.write("#### Output")
 
+    sparse_response, dense_response = search(index_name, query, sparse_fields, query_type, is_synonym_expansion_enabled)
     sparse_retrieved_ids = [result.product["product_id"] for result in sparse_response.results]
     dense_retrieved_ids = [result.product["product_id"] for result in dense_response.results]
+
     union = set(sparse_retrieved_ids) | set(dense_retrieved_ids)
     intersection = set(sparse_retrieved_ids) & set(dense_retrieved_ids)
     iou = round(len(intersection) / len(union), 4)
-
-    st.write("#### Output")
-
-    st.write(f"IoU: {iou}")
+    st.write(f"IoU: {iou} ({len(intersection)} / {len(union)})")
 
     columns = st.columns(2)
     judgements = {product_id: label for product_id, (label, product_title) in label_dict.items()}
