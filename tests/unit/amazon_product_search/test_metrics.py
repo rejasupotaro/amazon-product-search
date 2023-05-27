@@ -4,6 +4,7 @@ import pytest
 from amazon_product_search.metrics import (
     compute_ap,
     compute_cosine_similarity,
+    compute_iou,
     compute_ndcg,
     compute_precision,
     compute_recall,
@@ -57,6 +58,22 @@ def test_compute_recall(retrieved_ids, relevant_ids, expected):
 )
 def test_compute_precision(retrieved_ids, relevant_ids, expected):
     actual = compute_precision(retrieved_ids, relevant_ids)
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    ("a", "b", "expected"),
+    [
+        (set(), set(), (None, set(), set())),
+        ({"1"}, set(), (0, set(), {"1"})),
+        (set(), {"1"}, (0, set(), {"1"})),
+        ({"1"}, {"1"}, (1, {"1"}, {"1"})),
+        ({"1", "2"}, {"1"}, (0.5, {"1"}, {"1", "2"})),
+        ({"1", "2"}, {"3"}, (0, set(), {"1", "2", "3"})),
+    ]
+)
+def test_compute_iou(a, b, expected):
+    actual = compute_iou(a, b)
     assert actual == expected
 
 

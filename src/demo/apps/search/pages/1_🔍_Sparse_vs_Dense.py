@@ -3,7 +3,7 @@ import streamlit as st
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.query_builder import QueryBuilder
 from amazon_product_search.es.response import Response
-from amazon_product_search.metrics import compute_ndcg, compute_precision, compute_recall
+from amazon_product_search.metrics import compute_iou, compute_ndcg, compute_precision, compute_recall
 from amazon_product_search.nlp.normalizer import normalize_query
 from demo.apps.search.search_ui import draw_products
 from demo.page_config import set_page_config
@@ -111,13 +111,9 @@ def main():
     sparse_relevant_ids = [retrieved_id for retrieved_id in sparse_retrieved_ids if retrieved_id in relevant_ids]
     dense_relevant_ids = [retrieved_id for retrieved_id in dense_retrieved_ids if retrieved_id in relevant_ids]
 
-    all_union = set(sparse_retrieved_ids) | set(dense_retrieved_ids)
-    all_intersection = set(sparse_retrieved_ids) & set(dense_retrieved_ids)
-    all_iou = round(len(all_intersection) / len(all_union), 4) if all_union else None
+    all_iou, all_intersection, all_union = compute_iou(set(sparse_retrieved_ids), set(dense_retrieved_ids))
     all_iou_text = f"All IoU: {all_iou} ({len(all_intersection)} / {len(all_union)})"
-    relevant_union = set(sparse_relevant_ids) | set(dense_relevant_ids)
-    relevant_intersection = set(sparse_relevant_ids) & set(dense_relevant_ids)
-    relevant_iou = round(len(relevant_intersection) / len(relevant_union), 4) if relevant_union else None
+    relevant_iou, relevant_intersection, relevant_union = compute_iou(set(sparse_relevant_ids), set(dense_relevant_ids))
     relevant_iou_text = f"Relevant IoU: {relevant_iou} ({len(relevant_intersection)} / {len(relevant_union)})"
     st.write(f"{all_iou_text}, {relevant_iou_text}")
 

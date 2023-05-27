@@ -28,6 +28,13 @@ def compute_precision(retrieved_ids: list[str], relevant_ids: set[str]) -> Optio
     return round(len((set(retrieved_ids) & relevant_ids)) / len(retrieved_ids), 4)
 
 
+def compute_iou(a: set[str], b: set[str]) -> tuple[Optional[float], set[str], set[str]]:
+    union = a | b
+    intersection = a & b
+    iou = round(len(intersection) / len(union), 4) if union else None
+    return iou, intersection, union
+
+
 def compute_ap(retrieved_ids: list[str], relevant_ids: set[str]) -> Optional[float]:
     if not retrieved_ids or not relevant_ids:
         return None
