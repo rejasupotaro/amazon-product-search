@@ -22,7 +22,9 @@ def compute_recall(retrieved_ids: list[str], relevant_ids: set[str]) -> Optional
     return round(len(set(retrieved_ids) & relevant_ids) / len(relevant_ids), 4)
 
 
-def compute_precision(retrieved_ids: list[str], relevant_ids: set[str]) -> Optional[float]:
+def compute_precision(
+    retrieved_ids: list[str], relevant_ids: set[str]
+) -> Optional[float]:
     if not retrieved_ids:
         return None
     return round(len((set(retrieved_ids) & relevant_ids)) / len(retrieved_ids), 4)
@@ -57,7 +59,9 @@ def compute_dcg(gains: list[float]) -> float:
     return result
 
 
-def compute_ndcg(retrieved_ids: list[str], judgements: dict[str, str], prime: bool = False) -> Optional[float]:
+def compute_ndcg(
+    retrieved_ids: list[str], judgements: dict[str, str], prime: bool = False
+) -> Optional[float]:
     """Compute Normalized Discounted Cumulative Gain (NDCG) based on the given relevance judgements.
 
     NDCG' is a variant of NDCG that calculates the score using only annotated documents.
@@ -71,17 +75,28 @@ def compute_ndcg(retrieved_ids: list[str], judgements: dict[str, str], prime: bo
         Optional[float]: The computed score or None.
     """
     if prime:
-        y_pred = [LABEL_TO_GAIN[judgements[doc_id]] for doc_id in retrieved_ids if doc_id in judgements]
+        y_pred = [
+            LABEL_TO_GAIN[judgements[doc_id]]
+            for doc_id in retrieved_ids
+            if doc_id in judgements
+        ]
     else:
-        y_pred = [LABEL_TO_GAIN[judgements[doc_id]] if doc_id in judgements else 0 for doc_id in retrieved_ids]
-    y_true = sorted([LABEL_TO_GAIN[label] for label in judgements.values()], reverse=True)
+        y_pred = [
+            LABEL_TO_GAIN[judgements[doc_id]] if doc_id in judgements else 0
+            for doc_id in retrieved_ids
+        ]
+    y_true = sorted(
+        [LABEL_TO_GAIN[label] for label in judgements.values()], reverse=True
+    )
     idcg_val = compute_dcg(y_true)
     dcg_val = compute_dcg(y_pred)
     ndcg = round(dcg_val / idcg_val, 4) if idcg_val != 0 else None
     return ndcg
 
 
-def compute_cosine_similarity(query_vector: np.ndarray, product_vectors: np.ndarray) -> np.ndarray:
+def compute_cosine_similarity(
+    query_vector: np.ndarray, product_vectors: np.ndarray
+) -> np.ndarray:
     numerator = np.dot(query_vector, product_vectors.T)
-    denominator = (np.linalg.norm(query_vector) * np.linalg.norm(product_vectors, axis=1))
+    denominator = np.linalg.norm(query_vector) * np.linalg.norm(product_vectors, axis=1)
     return numerator / denominator

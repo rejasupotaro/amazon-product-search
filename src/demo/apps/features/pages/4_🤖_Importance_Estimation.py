@@ -5,7 +5,9 @@ import polars as pl
 import streamlit as st
 from st_aggrid import AgGrid, GridOptionsBuilder
 
-from amazon_product_search.retrieval.importance_estimator import ColBERTTermImportanceEstimator
+from amazon_product_search.retrieval.importance_estimator import (
+    ColBERTTermImportanceEstimator,
+)
 from demo.page_config import set_page_config
 from demo.utils import load_products
 
@@ -43,7 +45,9 @@ def main():
     gb.configure_side_bar()
     gb.configure_selection("single", use_checkbox=True)
     grid_options = gb.build()
-    selected_rows = AgGrid(products_df.to_pandas(), gridOptions=grid_options).selected_rows
+    selected_rows = AgGrid(
+        products_df.to_pandas(), gridOptions=grid_options
+    ).selected_rows
 
     if not selected_rows:
         return

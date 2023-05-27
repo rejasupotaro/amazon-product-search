@@ -21,7 +21,12 @@ from amazon_product_search.reranking.reranker import (
 from demo.page_config import set_page_config
 from demo.utils import load_merged
 
-RERANKER_NAMES = ["Random Reranker", "Dot Reranker", "ColBERT Reranker", "SPLADE Reranker"]
+RERANKER_NAMES = [
+    "Random Reranker",
+    "Dot Reranker",
+    "ColBERT Reranker",
+    "SPLADE Reranker",
+]
 
 
 def init_rerankers() -> dict[str, Reranker]:
@@ -41,10 +46,15 @@ rerankers = init_rerankers()
 
 
 def extract_judgements(df: pl.DataFrame) -> dict[str, str]:
-    return {row["product_id"]: row["esci_label"] for row in df.select(["product_id", "esci_label"]).to_dicts()}
+    return {
+        row["product_id"]: row["esci_label"]
+        for row in df.select(["product_id", "esci_label"]).to_dicts()
+    }
 
 
-def search(query: str, doc_ids: list[str], all_judgements: dict[str, str]) -> list[Result]:
+def search(
+    query: str, doc_ids: list[str], all_judgements: dict[str, str]
+) -> list[Result]:
     doc_id_filter_clauses = [{"term": {"product_id": doc_id}} for doc_id in doc_ids]
     es_query = {
         "bool": {
@@ -75,7 +85,9 @@ def search(query: str, doc_ids: list[str], all_judgements: dict[str, str]) -> li
 
 def compute_ndcg(products: list[dict[str, Any]]) -> Optional[float]:
     retrieved_ids = [product["product_id"] for product in products]
-    judgements: dict[str, str] = {product["product_id"]: product["esci_label"] for product in products}
+    judgements: dict[str, str] = {
+        product["product_id"]: product["esci_label"] for product in products
+    }
     return metrics.compute_ndcg(retrieved_ids, judgements)
 
 
@@ -86,7 +98,9 @@ def draw_results(results: list[Result]):
     st.write(f"NDCG: {ndcg}")
 
     df = pl.from_dicts(products)
-    st.write(df.select(["esci_label", "query", "product_title", "product_id"]).to_pandas())
+    st.write(
+        df.select(["esci_label", "query", "product_title", "product_id"]).to_pandas()
+    )
 
 
 def draw_examples(query: str, results: list[Result]):
@@ -99,7 +113,12 @@ def draw_examples(query: str, results: list[Result]):
                 draw_results(random_results)
 
 
-def run_comparison(df: pl.DataFrame, all_judgements: dict[str, str], num_queries: int, reranker_names: list[str]):
+def run_comparison(
+    df: pl.DataFrame,
+    all_judgements: dict[str, str],
+    num_queries: int,
+    reranker_names: list[str],
+):
     queries = df.get_column("query").unique().to_list()
     n = 0
     progress_text = st.empty()
@@ -122,7 +141,9 @@ def run_comparison(df: pl.DataFrame, all_judgements: dict[str, str], num_queries
                         result.product
                         for result in search(
                             query,
-                            doc_ids=[result.product["product_id"] for result in results],
+                            doc_ids=[
+                                result.product["product_id"] for result in results
+                            ],
                             all_judgements=all_judgements,
                         )
                     ]
@@ -135,7 +156,12 @@ def run_comparison(df: pl.DataFrame, all_judgements: dict[str, str], num_queries
                     "query": query,
                     "variant": reranker_name,
                     "ndcg": compute_ndcg(
-                        [result.product for result in rerankers[reranker_name].rerank(query, results)]
+                        [
+                            result.product
+                            for result in rerankers[reranker_name].rerank(
+                                query, results
+                            )
+                        ]
                     ),
                 }
             )
@@ -172,8 +198,12 @@ def main():
 
     st.write("### Comparison")
     with st.form("experimental_setup"):
-        num_queries = st.number_input("Num Queries:", value=100, min_value=1, max_value=1000)
-        reranker_names = st.multiselect("Rerankers:", RERANKER_NAMES, default=RERANKER_NAMES)
+        num_queries = st.number_input(
+            "Num Queries:", value=100, min_value=1, max_value=1000
+        )
+        reranker_names = st.multiselect(
+            "Rerankers:", RERANKER_NAMES, default=RERANKER_NAMES
+        )
         if not st.form_submit_button("Run"):
             return
     run_comparison(df, all_judgements, num_queries, reranker_names)

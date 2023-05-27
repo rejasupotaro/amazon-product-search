@@ -1,14 +1,37 @@
 from vespa.application import ApplicationPackage
-from vespa.package import HNSW, Document, Field, FieldSet, OnnxModel, RankProfile, Schema
+from vespa.package import (
+    HNSW,
+    Document,
+    Field,
+    FieldSet,
+    OnnxModel,
+    RankProfile,
+    Schema,
+)
 
 
 def create_package() -> ApplicationPackage:
     product_document = Document(
         fields=[
             Field(name="product_id", type="string", indexing=["attribute", "summary"]),
-            Field(name="product_title", type="string", indexing=["index", "summary"], index="enable-bm25"),
-            Field(name="product_bullet_point", type="string", indexing=["index", "summary"], index="enable-bm25"),
-            Field(name="product_description", type="string", indexing=["index", "summary"], index="enable-bm25"),
+            Field(
+                name="product_title",
+                type="string",
+                indexing=["index", "summary"],
+                index="enable-bm25",
+            ),
+            Field(
+                name="product_bullet_point",
+                type="string",
+                indexing=["index", "summary"],
+                index="enable-bm25",
+            ),
+            Field(
+                name="product_description",
+                type="string",
+                indexing=["index", "summary"],
+                index="enable-bm25",
+            ),
             Field(
                 name="product_brand",
                 type="string",
@@ -44,7 +67,13 @@ def create_package() -> ApplicationPackage:
         fieldsets=[
             FieldSet(
                 name="default",
-                fields=["product_title", "product_brand", "product_description", "product_brand", "product_color"],
+                fields=[
+                    "product_title",
+                    "product_brand",
+                    "product_description",
+                    "product_brand",
+                    "product_color",
+                ],
             )
         ],
         models=[
@@ -61,9 +90,15 @@ def create_package() -> ApplicationPackage:
         ],
         rank_profiles=[
             RankProfile(name="random", inherits="default", first_phase="random"),
-            RankProfile(name="bm25", inherits="default", first_phase="bm25(product_title) + bm25(product_description)"),
             RankProfile(
-                name="native_rank", inherits="default", first_phase="nativeRank(product_title, product_description)"
+                name="bm25",
+                inherits="default",
+                first_phase="bm25(product_title) + bm25(product_description)",
+            ),
+            RankProfile(
+                name="native_rank",
+                inherits="default",
+                first_phase="nativeRank(product_title, product_description)",
             ),
             RankProfile(
                 name="semantic-similarity",

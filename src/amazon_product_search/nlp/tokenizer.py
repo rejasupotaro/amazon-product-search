@@ -38,7 +38,11 @@ class POSTag(Enum):
 
 
 class Tokenizer:
-    def __init__(self, dic_type: DicType = DicType.UNIDIC, output_format: OutputFormat = OutputFormat.WAKATI):
+    def __init__(
+        self,
+        dic_type: DicType = DicType.UNIDIC,
+        output_format: OutputFormat = OutputFormat.WAKATI,
+    ):
         self.dic_type = dic_type
         self.output_format = output_format
 

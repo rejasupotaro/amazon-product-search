@@ -7,12 +7,18 @@ from amazon_product_search.nlp.tokenizer import Tokenizer
 
 
 class SynonymDict:
-    def __init__(self, data_dir: str = DATA_DIR, synonym_filename: str = "synonyms_jp_sbert.csv"):
+    def __init__(
+        self, data_dir: str = DATA_DIR, synonym_filename: str = "synonyms_jp_sbert.csv"
+    ):
         self.tokenizer = Tokenizer()
-        self._entry_dict: dict[str, list[tuple[str, float]]] = self.load_synonym_dict(data_dir, synonym_filename)
+        self._entry_dict: dict[str, list[tuple[str, float]]] = self.load_synonym_dict(
+            data_dir, synonym_filename
+        )
 
     @staticmethod
-    def load_synonym_dict(data_dir: str, synonym_filename: str) -> dict[str, list[tuple[str, float]]]:
+    def load_synonym_dict(
+        data_dir: str, synonym_filename: str
+    ) -> dict[str, list[tuple[str, float]]]:
         """Load the synonym file and convert it into a dict for lookup.
 
         Args:
@@ -53,7 +59,9 @@ class SynonymDict:
             if token not in self._entry_dict:
                 continue
             candidates: list[tuple[str, float]] = self._entry_dict[token]
-            synonyms = [synonym for synonym, similarity in candidates if similarity >= threshold]
+            synonyms = [
+                synonym for synonym, similarity in candidates if similarity >= threshold
+            ]
             if synonyms:
                 all_synonyms.extend(synonyms)
         return all_synonyms

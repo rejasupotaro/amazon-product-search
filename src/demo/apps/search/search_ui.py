@@ -47,12 +47,19 @@ def draw_input_form(indices: list[str], queries: list[str] | None = None) -> For
 
     query_type = st.selectbox(
         "Query Type:",
-        options=["combined_fields", "cross_fields", "best_fields", "simple_query_string"],
+        options=[
+            "combined_fields",
+            "cross_fields",
+            "best_fields",
+            "simple_query_string",
+        ],
     )
 
     is_synonym_expansion_enabled = st.checkbox("enable_synonym_expansion")
 
-    reranker_str = st.selectbox("reranker:", ["NoOpReranker", "RandomReranker", "DotReranker"])
+    reranker_str = st.selectbox(
+        "reranker:", ["NoOpReranker", "RandomReranker", "DotReranker"]
+    )
 
     return FormInput(
         index_name,
@@ -94,9 +101,13 @@ def draw_response_stats(response: Response, query_vector: np.ndarray):
     with st.expander("Response Stats"):
         st.write(df)
 
-        product_vectors = np.array([result.product["product_vector"] for result in response.results])
+        product_vectors = np.array(
+            [result.product["product_vector"] for result in response.results]
+        )
         scores = compute_cosine_similarity(query_vector, product_vectors)
-        scores_df = pd.DataFrame([{"i": i, "score": score} for i, score in enumerate(scores)])
+        scores_df = pd.DataFrame(
+            [{"i": i, "score": score} for i, score in enumerate(scores)]
+        )
         fig = px.line(scores_df, x="i", y="score")
         fig.update_layout(title="Cosine Similarity")
         st.plotly_chart(fig, use_container_width=True)

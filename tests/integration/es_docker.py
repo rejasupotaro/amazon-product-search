@@ -36,9 +36,9 @@ class EsDocker:
         while waited <= max_wait:
             sleep(5)
             waited += 5
-            output = self.container.exec_run("bash -c 'curl -s http://localhost:9200/_cluster/health'").output.decode(
-                "utf-8"
-            )
+            output = self.container.exec_run(
+                "bash -c 'curl -s http://localhost:9200/_cluster/health'"
+            ).output.decode("utf-8")
             try:
                 response = json.loads(output)
             except JSONDecodeError:

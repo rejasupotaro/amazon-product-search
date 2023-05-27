@@ -7,7 +7,9 @@ from amazon_product_search.constants import DATA_DIR
 Locale = Literal["jp", "us", "es"]
 
 
-def load_products(locale: Optional[Locale] = None, nrows: int = -1, data_dir: str = DATA_DIR) -> pl.DataFrame:
+def load_products(
+    locale: Optional[Locale] = None, nrows: int = -1, data_dir: str = DATA_DIR
+) -> pl.DataFrame:
     if locale:
         filename = f"{data_dir}/products_{locale}.parquet"
     else:
@@ -18,7 +20,9 @@ def load_products(locale: Optional[Locale] = None, nrows: int = -1, data_dir: st
         return pl.read_parquet(filename)
 
 
-def load_labels(locale: Optional[Locale] = None, nrows: int = -1, data_dir: str = DATA_DIR) -> pl.DataFrame:
+def load_labels(
+    locale: Optional[Locale] = None, nrows: int = -1, data_dir: str = DATA_DIR
+) -> pl.DataFrame:
     if locale:
         filename = f"{data_dir}/examples_{locale}.parquet"
     else:
@@ -34,7 +38,9 @@ def load_sources(data_dir: str = DATA_DIR) -> pl.DataFrame:
     return pl.read_csv(filename).to_pandas()
 
 
-def load_merged(locale: Locale, nrows: int = -1, data_dir: str = DATA_DIR) -> pl.DataFrame:
+def load_merged(
+    locale: Locale, nrows: int = -1, data_dir: str = DATA_DIR
+) -> pl.DataFrame:
     filename = f"{data_dir}/merged_{locale}.parquet"
     if nrows > 0:
         return pl.read_parquet(filename).head(nrows)
@@ -68,9 +74,9 @@ def merge_and_split(data_dir: str = DATA_DIR):
     print("Load sources")
     sources_df = pl.from_pandas(load_sources())
     print("Merge datasets")
-    merged_df = labels_df.join(products_df, how="left", on=["product_id", "product_locale"]).join(
-        sources_df, how="left", on=["query_id"]
-    )
+    merged_df = labels_df.join(
+        products_df, how="left", on=["product_id", "product_locale"]
+    ).join(sources_df, how="left", on=["query_id"])
 
     locales = labels_df["product_locale"].unique().to_list()
     print(f"The dataset contains locales: {locales}")
@@ -80,18 +86,24 @@ def merge_and_split(data_dir: str = DATA_DIR):
         filtered_df = products_df.filter(pl.col("product_locale") == locale)
         filepath = f"{data_dir}/products_{locale}.parquet"
         filtered_df.write_parquet(filepath)
-        print(f"Catalog dataset (locale: {locale}) containing {len(filtered_df)} rows was saved to {filepath}")
+        print(
+            f"Catalog dataset (locale: {locale}) containing {len(filtered_df)} rows was saved to {filepath}"
+        )
 
     print("Split judgement dataset by locale")
     for locale in locales:
         filtered_df = labels_df.filter(pl.col("product_locale") == locale)
         filepath = f"{data_dir}/examples_{locale}.parquet"
         filtered_df.write_parquet(filepath)
-        print(f"Label dataset (locale: {locale}) containing {len(filtered_df)} rows was saved to {filepath}")
+        print(
+            f"Label dataset (locale: {locale}) containing {len(filtered_df)} rows was saved to {filepath}"
+        )
 
     print("Split merged dataset by locale")
     for locale in locales:
         filtered_df = merged_df.filter(pl.col("product_locale") == locale)
         filepath = f"{data_dir}/merged_{locale}.parquet"
         filtered_df.write_parquet(filepath)
-        print(f"Merged dataset (locale: {locale}) containing {len(filtered_df)} rows was saved to {filepath}")
+        print(
+            f"Merged dataset (locale: {locale}) containing {len(filtered_df)} rows was saved to {filepath}"
+        )

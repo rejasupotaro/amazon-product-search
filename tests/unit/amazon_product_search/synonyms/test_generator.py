@@ -1,6 +1,9 @@
 import polars as pl
 
-from amazon_product_search.synonyms.generator import generate_candidates, preprocess_query_title_pairs
+from amazon_product_search.synonyms.generator import (
+    generate_candidates,
+    preprocess_query_title_pairs,
+)
 
 
 def test_preprocess_query_title_pairs():

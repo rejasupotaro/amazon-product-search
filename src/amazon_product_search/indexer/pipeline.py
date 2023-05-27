@@ -13,7 +13,9 @@ from amazon_product_search.indexer.io.vespa_io import WriteToVespa
 from amazon_product_search.indexer.options import IndexerOptions
 from amazon_product_search.indexer.transforms.analyze_fn import AnalyzeFn
 from amazon_product_search.indexer.transforms.encode_fn import BatchEncodeFn
-from amazon_product_search.indexer.transforms.extract_keywords_fn import ExtractKeywordsFn
+from amazon_product_search.indexer.transforms.extract_keywords_fn import (
+    ExtractKeywordsFn,
+)
 from amazon_product_search.indexer.transforms.filters import is_indexable
 from amazon_product_search.source import Locale
 
@@ -56,7 +58,9 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
 
     branches = {}
     if options.extract_keywords:
-        branches["extracted_keywords"] = products | "Extract keywords" >> beam.ParDo(ExtractKeywordsFn())
+        branches["extracted_keywords"] = products | "Extract keywords" >> beam.ParDo(
+            ExtractKeywordsFn()
+        )
     if options.encode_text:
         branches["product_vector"] = (
             products
@@ -64,7 +68,9 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
             | "Encode products" >> beam.ParDo(BatchEncodeFn(shared_handle=Shared()))
         )
     if branches:
-        branches["product"] = products | beam.WithKeys(lambda product: product["product_id"])
+        branches["product"] = products | beam.WithKeys(
+            lambda product: product["product_id"]
+        )
         products = branches | beam.CoGroupByKey() | beam.Map(join_branches)
 
     batched_products = products | "Batch products for indexing" >> BatchElements()

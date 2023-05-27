@@ -19,7 +19,9 @@ def load_query_title_pairs(locale: Locale, nrows: int = -1) -> pl.DataFrame:
 
 
 def preprocess_query_title_pairs(df: pl.DataFrame) -> pl.DataFrame:
-    df = df.filter((pl.col("query").is_not_null() & pl.col("product_title").is_not_null()))
+    df = df.filter(
+        (pl.col("query").is_not_null() & pl.col("product_title").is_not_null())
+    )
     return df.with_columns(
         [
             pl.col("query").apply(normalize_doc),
@@ -82,7 +84,12 @@ def generate_candidates(pairs: list[list[str]]) -> pl.DataFrame:
     return candidates_df
 
 
-def generate(model_name: str, output_filename: str, min_cooccurrence: int = 10, min_npmi: float = 0.5):
+def generate(
+    model_name: str,
+    output_filename: str,
+    min_cooccurrence: int = 10,
+    min_npmi: float = 0.5,
+):
     """Generate synonyms from query title pairs.
 
     1. Load the relevance judgement file.
@@ -110,7 +117,8 @@ def generate(model_name: str, output_filename: str, min_cooccurrence: int = 10, 
 
     print("Filter synonyms by Mutual Information")
     candidates_df = candidates_df.filter(
-        (pl.col("cooccurrence") >= min_cooccurrence) & (pl.col("npmi").abs() >= min_npmi)
+        (pl.col("cooccurrence") >= min_cooccurrence)
+        & (pl.col("npmi").abs() >= min_npmi)
     )
 
     print("Filter synonyms by Semantic Similarity")

@@ -22,5 +22,7 @@ class ExtractKeywordsFn(beam.DoFn):
             yield product["product_id"], result
             return
 
-        result["product_description_keybert"] = self.convert_results_to_text(self._extractor.apply_keybert(text))
+        result["product_description_keybert"] = self.convert_results_to_text(
+            self._extractor.apply_keybert(text)
+        )
         yield product["product_id"], result

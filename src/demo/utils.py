@@ -55,7 +55,9 @@ def analyze_dataframe(df: pl.DataFrame) -> pl.DataFrame:
                 "column": column,
                 "dtype": str(series.dtype),
                 "nan_rate": series.is_null().sum() / len(series),
-                "mean_length": series.fill_null("").apply(len).mean() if series.dtype == pl.Utf8 else None,
+                "mean_length": series.fill_null("").apply(len).mean()
+                if series.dtype == pl.Utf8
+                else None,
             }
         )
     return pl.from_dicts(rows)

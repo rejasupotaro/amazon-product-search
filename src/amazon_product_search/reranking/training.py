@@ -28,7 +28,9 @@ def load_dataset(locale: Locale, num_examples: int) -> pd.DataFrame:
     print(queries_df.columns)
 
     products_filepath = f"{DATA_DIR}/product_catalogue-v0.3_{locale}.csv.zip"
-    products_df = pd.read_csv(products_filepath, usecols=["product_id", "product_title", "product_brand"])
+    products_df = pd.read_csv(
+        products_filepath, usecols=["product_id", "product_title", "product_brand"]
+    )
     products_df.fillna("", inplace=True)
 
     df = queries_df.merge(products_df, on="product_id", how="left")
@@ -41,7 +43,13 @@ def load_dataset(locale: Locale, num_examples: int) -> pd.DataFrame:
     return df[["query", "product", "gain"]]
 
 
-def train(locale: Locale, base_model_name: str, output_model_name: str, num_examples: int, test_size: float):
+def train(
+    locale: Locale,
+    base_model_name: str,
+    output_model_name: str,
+    num_examples: int,
+    test_size: float,
+):
     print("1. Load data")
     df = load_dataset(locale, num_examples=num_examples)
 
@@ -50,7 +58,9 @@ def train(locale: Locale, base_model_name: str, output_model_name: str, num_exam
 
     train_examples = []
     for row in train_df.to_dict("records"):
-        train_examples.append(InputExample(texts=[row["query"], row["product"]], label=float(row["gain"])))
+        train_examples.append(
+            InputExample(texts=[row["query"], row["product"]], label=float(row["gain"]))
+        )
     train_dataloader: DataLoader = DataLoader(
         train_examples, shuffle=True, batch_size=4, drop_last=True  # type: ignore
     )
@@ -60,7 +70,11 @@ def train(locale: Locale, base_model_name: str, output_model_name: str, num_exam
     for row in test_df.to_dict("records"):
         qid = query_to_id[row["query"]]
         if qid not in test_examples:
-            test_examples[qid] = {"query": row["query"], "positive": set(), "negative": set()}
+            test_examples[qid] = {
+                "query": row["query"],
+                "positive": set(),
+                "negative": set(),
+            }
         if row["gain"] > 0:
             test_examples[qid]["positive"].add(row["product"])
         else:

@@ -12,5 +12,7 @@ def weak_lru_cache(maxsize: int = 128, typed: bool = False) -> Callable:
         @wraps(func)
         def inner(self, *args, **kwargs) -> Any:
             return _func(weakref.ref(self), *args, **kwargs)
+
         return inner
+
     return wrapper

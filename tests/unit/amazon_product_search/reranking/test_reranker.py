@@ -1,12 +1,18 @@
 import pytest
 
 from amazon_product_search.es.response import Result
-from amazon_product_search.reranking.reranker import ColBERTReranker, DotReranker, NoOpReranker
+from amazon_product_search.reranking.reranker import (
+    ColBERTReranker,
+    DotReranker,
+    NoOpReranker,
+)
 
 
 def test_no_op_reranker():
     product_ids = list(range(10))
-    results = [Result(product={"id": product_id}, score=1) for product_id in product_ids]
+    results = [
+        Result(product={"id": product_id}, score=1) for product_id in product_ids
+    ]
 
     reranker = NoOpReranker()
     reranked_results = reranker.rerank("query", results)

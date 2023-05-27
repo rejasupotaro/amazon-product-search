@@ -16,7 +16,10 @@ def main():
 
     st.write("### Product Catalogue")
     df = load_products(locale="jp", nrows=1000)
-    df = df.filter((pl.col("product_description").is_not_null()) & pl.col("product_bullet_point").is_not_null())
+    df = df.filter(
+        (pl.col("product_description").is_not_null())
+        & pl.col("product_bullet_point").is_not_null()
+    )
     df = df.fill_null("")
 
     product = None
@@ -41,13 +44,21 @@ def main():
     with columns[0]:
         st.write("### Fugashi (UniDic)")
         st.write(
-            pl.from_dicts([{"token": token, "pos": pos} for token, pos in unidic_tokenizer.tokenize(s)]).to_pandas()
+            pl.from_dicts(
+                [
+                    {"token": token, "pos": pos}
+                    for token, pos in unidic_tokenizer.tokenize(s)
+                ]
+            ).to_pandas()
         )
     with columns[1]:
         st.write("### Fugashi (IPADIC)")
         st.write(
             pl.from_dicts(
-                [{"token": token, "pos": list(pos)} for token, pos in ipadic_tokenizer.tokenize(s)]
+                [
+                    {"token": token, "pos": list(pos)}
+                    for token, pos in ipadic_tokenizer.tokenize(s)
+                ]
             ).to_pandas()
         )
 

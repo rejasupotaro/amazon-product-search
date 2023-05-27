@@ -10,6 +10,7 @@ class Counter:
         """n will be incremented only when i is not in cache."""
         self.n += 1
 
+
 def test_instance_cache():
     counter = Counter()
     for i, expected in [

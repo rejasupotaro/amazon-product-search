@@ -8,7 +8,11 @@ from vespa.io import VespaQueryResponse, VespaResponse
 
 
 class VespaClient:
-    def __init__(self, host: Optional[str] = None, app_package: Optional[ApplicationPackage] = None):
+    def __init__(
+        self,
+        host: Optional[str] = None,
+        app_package: Optional[ApplicationPackage] = None,
+    ):
         self.vespa_app = vespa_service.connect(host, app_package)
 
     def feed(

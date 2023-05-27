@@ -62,10 +62,17 @@ class DotReranker:
 
         with torch.no_grad():
             query_cls_vec = self.encode([query]).repeat(len(results), 1)
-            product_cls_vec = self.encode([result.product["product_title"] for result in results])
-            scores = torch.diagonal(torch.mm(query_cls_vec, product_cls_vec.transpose(0, 1)))
+            product_cls_vec = self.encode(
+                [result.product["product_title"] for result in results]
+            )
+            scores = torch.diagonal(
+                torch.mm(query_cls_vec, product_cls_vec.transpose(0, 1))
+            )
         results = [
-            result for result, score in sorted(zip(results, scores, strict=True), key=lambda e: e[1], reverse=True)
+            result
+            for result, score in sorted(
+                zip(results, scores, strict=True), key=lambda e: e[1], reverse=True
+            )
         ]
         return results
 
@@ -82,13 +89,20 @@ class ColBERTReranker(ColBERTWrapper):
             scores, _, _ = self.colberter(tokenized_queries, tokenized_products)
             scores = scores.numpy()
         results = [
-            result for result, score in sorted(zip(results, scores, strict=True), key=lambda e: e[1], reverse=True)
+            result
+            for result, score in sorted(
+                zip(results, scores, strict=True), key=lambda e: e[1], reverse=True
+            )
         ]
         return results
 
 
 class SpladeReranker:
-    def __init__(self, model_filepath: str = HF.JP_SPLADE, bert_model_name: str = "cl-tohoku/bert-base-japanese-v2"):
+    def __init__(
+        self,
+        model_filepath: str = HF.JP_SPLADE,
+        bert_model_name: str = "cl-tohoku/bert-base-japanese-v2",
+    ):
         self.splade = Splade(bert_model_name)
         self.splade.load_state_dict(torch.load(model_filepath))
         self.splade.eval()
@@ -116,7 +130,10 @@ class SpladeReranker:
             scores, _, _ = self.splade(tokenized_queries, tokenized_products)
             scores = scores.squeeze(-1).numpy()
         results = [
-            result for result, score in sorted(zip(results, scores, strict=True), key=lambda e: e[1], reverse=True)
+            result
+            for result, score in sorted(
+                zip(results, scores, strict=True), key=lambda e: e[1], reverse=True
+            )
         ]
         return results
 

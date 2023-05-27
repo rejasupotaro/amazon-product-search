@@ -11,6 +11,15 @@ class KeywordGenerator:
     def generate(self, text: str, num_queries: int = 10) -> list[str]:
         input_ids = self.tokenizer.encode(text, return_tensors="pt").to(self.device)
         outputs = self.model.generate(
-            input_ids=input_ids, max_length=256, do_sample=True, top_k=10, num_return_sequences=num_queries
+            input_ids=input_ids,
+            max_length=256,
+            do_sample=True,
+            top_k=10,
+            num_return_sequences=num_queries,
         )
-        return list({self.tokenizer.decode(outputs[i], skip_special_tokens=True) for i in range(num_queries)})
+        return list(
+            {
+                self.tokenizer.decode(outputs[i], skip_special_tokens=True)
+                for i in range(num_queries)
+            }
+        )

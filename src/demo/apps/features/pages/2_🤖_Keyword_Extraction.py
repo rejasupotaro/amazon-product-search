@@ -31,7 +31,12 @@ def main():
 
     st.write("### Product Catalogue")
     df = load_products(locale="jp", nrows=1000)
-    df = df.filter((pl.col("product_description").is_not_null() & pl.col("product_bullet_point").is_not_null()))
+    df = df.filter(
+        (
+            pl.col("product_description").is_not_null()
+            & pl.col("product_bullet_point").is_not_null()
+        )
+    )
     df = df.fill_null("")
 
     product = None
@@ -80,7 +85,11 @@ def main():
             with columns[i]:
                 st.write(f"#### {method}")
                 for keyword, _score in results[method]:
-                    text = re.sub(keyword, f"<mark style='background-color:#FF9900'>{keyword}</mark>", text)
+                    text = re.sub(
+                        keyword,
+                        f"<mark style='background-color:#FF9900'>{keyword}</mark>",
+                        text,
+                    )
                 st.markdown(text, unsafe_allow_html=True)
 
 

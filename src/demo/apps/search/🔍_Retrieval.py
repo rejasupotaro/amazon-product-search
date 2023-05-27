@@ -4,10 +4,18 @@ import streamlit as st
 
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.query_builder import QueryBuilder
-from amazon_product_search.metrics import compute_ndcg, compute_precision, compute_recall
+from amazon_product_search.metrics import (
+    compute_ndcg,
+    compute_precision,
+    compute_recall,
+)
 from amazon_product_search.nlp.normalizer import normalize_query
 from amazon_product_search.reranking.reranker import from_string
-from demo.apps.search.search_ui import draw_input_form, draw_products, draw_response_stats
+from demo.apps.search.search_ui import (
+    draw_input_form,
+    draw_products,
+    draw_response_stats,
+)
 from demo.page_config import set_page_config
 from demo.utils import load_merged, split_fields
 
@@ -23,11 +31,16 @@ def load_dataset() -> dict[str, dict[str, tuple[str, str]]]:
     for query, group in df.groupby("query"):
         query_to_label[query] = {}
         for row in group.to_dict("records"):
-            query_to_label[query][row["product_id"]] = (row["esci_label"], row["product_title"])
+            query_to_label[query][row["product_id"]] = (
+                row["esci_label"],
+                row["product_title"],
+            )
     return query_to_label
 
 
-def draw_es_query(query: Optional[dict[str, Any]], knn_query: Optional[dict[str, Any]], size: int):
+def draw_es_query(
+    query: Optional[dict[str, Any]], knn_query: Optional[dict[str, Any]], size: int
+):
     es_query: dict[str, Any] = {
         "size": size,
     }
@@ -73,7 +86,10 @@ def main():
     dense_query = None
     if normalized_query and dense_fields:
         dense_query = query_builder.build_dense_search_query(
-            normalized_query, field=dense_fields[0], top_k=size, boost=form_input.dense_boost,
+            normalized_query,
+            field=dense_fields[0],
+            top_k=size,
+            boost=form_input.dense_boost,
         )
     reranker = from_string(form_input.reranker_str)
 
@@ -98,7 +114,11 @@ def main():
 
     st.write("#### Output")
     response = es_client.search(
-        index_name=form_input.index_name, query=sparse_query, knn_query=dense_query, size=size, explain=True,
+        index_name=form_input.index_name,
+        query=sparse_query,
+        knn_query=dense_query,
+        size=size,
+        explain=True,
     )
     if not response.results:
         return
@@ -110,8 +130,15 @@ def main():
     header = f"{response.total_hits} products found"
     if label_dict:
         retrieved_ids = [result.product["product_id"] for result in response.results]
-        judgements = {product_id: label for product_id, (label, product_title) in label_dict.items()}
-        relevant_ids = {product_id for product_id, (label, product_title) in label_dict.items() if label == "E"}
+        judgements = {
+            product_id: label
+            for product_id, (label, product_title) in label_dict.items()
+        }
+        relevant_ids = {
+            product_id
+            for product_id, (label, product_title) in label_dict.items()
+            if label == "E"
+        }
         precision = compute_precision(retrieved_ids, relevant_ids)
         recall = compute_recall(retrieved_ids, relevant_ids)
         ndcg = compute_ndcg(retrieved_ids, judgements)

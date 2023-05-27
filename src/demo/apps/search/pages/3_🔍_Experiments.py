@@ -8,7 +8,12 @@ import streamlit as st
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.query_builder import QueryBuilder
 from amazon_product_search.es.response import Response
-from amazon_product_search.metrics import compute_ndcg, compute_precision, compute_recall, compute_zero_hit_rate
+from amazon_product_search.metrics import (
+    compute_ndcg,
+    compute_precision,
+    compute_recall,
+    compute_zero_hit_rate,
+)
 from amazon_product_search.nlp.normalizer import normalize_query
 from amazon_product_search.reranking import reranker
 from demo import utils
@@ -29,7 +34,11 @@ def _load_labels(locale: str) -> pl.DataFrame:
 def load_labels(experimental_setup: ExperimentalSetup) -> pl.DataFrame:
     df = _load_labels(experimental_setup.locale)
     if experimental_setup.num_queries:
-        queries = df.get_column("query").sample(frac=1).unique()[: experimental_setup.num_queries]
+        queries = (
+            df.get_column("query")
+            .sample(frac=1)
+            .unique()[: experimental_setup.num_queries]
+        )
         df = df.filter(pl.col("query").is_in(queries))
     return df
 
@@ -48,7 +57,9 @@ def draw_variants(variants: list[Variant]):
     st.write(variants_df.to_pandas())
 
 
-def search(index_name: str, query: str, variant: Variant, labeled_ids: list[str] | None) -> Response:
+def search(
+    index_name: str, query: str, variant: Variant, labeled_ids: list[str] | None
+) -> Response:
     es_query = None
     es_knn_query = None
 
@@ -67,11 +78,19 @@ def search(index_name: str, query: str, variant: Variant, labeled_ids: list[str]
             query, dense_fields[0], boost=variant.dense_boost, top_k=variant.top_k
         )
 
-    return es_client.search(index_name=index_name, query=es_query, knn_query=es_knn_query, size=variant.top_k)
+    return es_client.search(
+        index_name=index_name,
+        query=es_query,
+        knn_query=es_knn_query,
+        size=variant.top_k,
+    )
 
 
 def compute_metrics(
-    experimental_setup: ExperimentalSetup, variant: Variant, query: str, labels_df: pl.DataFrame
+    experimental_setup: ExperimentalSetup,
+    variant: Variant,
+    query: str,
+    labels_df: pl.DataFrame,
 ) -> dict[str, Any]:
     labeled_ids = None
     if experimental_setup.task == "reranking":
@@ -80,8 +99,12 @@ def compute_metrics(
     response.results = variant.reranker.rerank(query, response.results)
 
     retrieved_ids = [result.product["product_id"] for result in response.results]
-    relevant_ids = set(labels_df.filter(pl.col("esci_label") == "E").get_column("product_id").to_list())
-    judgements: dict[str, str] = {row["product_id"]: row["esci_label"] for row in labels_df.to_dicts()}
+    relevant_ids = set(
+        labels_df.filter(pl.col("esci_label") == "E").get_column("product_id").to_list()
+    )
+    judgements: dict[str, str] = {
+        row["product_id"]: row["esci_label"] for row in labels_df.to_dicts()
+    }
     metric_dict = {
         "variant": variant.name,
         "query": query,
@@ -95,7 +118,9 @@ def compute_metrics(
     return metric_dict
 
 
-def perform_search(experimental_setup: ExperimentalSetup, query_dict: dict[str, pl.DataFrame]) -> list[dict[str, Any]]:
+def perform_search(
+    experimental_setup: ExperimentalSetup, query_dict: dict[str, pl.DataFrame]
+) -> list[dict[str, Any]]:
     total_examples = len(query_dict)
     n = 0
     progress_text = st.empty()
@@ -107,20 +132,29 @@ def perform_search(experimental_setup: ExperimentalSetup, query_dict: dict[str, 
         progress_text.text(f"Query ({n} / {total_examples}): {query}")
         progress_bar.progress(n / total_examples)
         for variant in experimental_setup.variants:
-            metrics.append(compute_metrics(experimental_setup, variant, query, query_labels_df))
+            metrics.append(
+                compute_metrics(experimental_setup, variant, query, query_labels_df)
+            )
     progress_text.text(f"Done ({n} / {total_examples})")
     return metrics
 
 
-def compute_stats(experimental_setup: ExperimentalSetup, metrics_df: pl.DataFrame) -> pl.DataFrame:
+def compute_stats(
+    experimental_setup: ExperimentalSetup, metrics_df: pl.DataFrame
+) -> pl.DataFrame:
     stats_df = metrics_df.groupby("variant").agg(
         [
             pl.col("total_hits").mean().cast(int),
-            pl.col("total_hits").apply(lambda series: compute_zero_hit_rate(series.to_list())).alias("zero_hit_rate"),
-        ] + (
+            pl.col("total_hits")
+            .apply(lambda series: compute_zero_hit_rate(series.to_list()))
+            .alias("zero_hit_rate"),
+        ]
+        + (
             [pl.col("precision").mean().round(4)]
-            if experimental_setup.task == "retrieval" else []
-        ) + [
+            if experimental_setup.task == "retrieval"
+            else []
+        )
+        + [
             pl.col("recall").mean().round(4),
             pl.col("ndcg").mean().round(4),
             pl.col("ndcg_prime").mean().round(4),

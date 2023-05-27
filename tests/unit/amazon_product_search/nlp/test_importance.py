@@ -1,6 +1,8 @@
 import pytest
 
-from amazon_product_search.retrieval.importance_estimator import ColBERTTermImportanceEstimator
+from amazon_product_search.retrieval.importance_estimator import (
+    ColBERTTermImportanceEstimator,
+)
 
 
 @pytest.mark.skip()
