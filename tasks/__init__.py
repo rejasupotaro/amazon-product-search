@@ -1,10 +1,19 @@
 from invoke import Collection, task
 
-from tasks import data_tasks, demo_tasks, es_tasks, gcloud_tasks, synonyms_tasks, vespa_tasks
+from tasks import (
+    data_tasks,
+    demo_tasks,
+    es_tasks,
+    gcloud_tasks,
+    synonyms_tasks,
+    vespa_tasks,
+)
 
 
 @task
 def verify(c):
+    print("Running black...")
+    c.run("poetry run black .")
     print("Running ruff...")
     c.run("poetry run ruff . --fix")
     print("Running mypy...")
