@@ -41,6 +41,7 @@ mypy = "^0.982"
 jupyterlab = "3.5.0"
 seaborn = "^0.12.1"
 ruff = "^0.0.265"
+black = "^23.3.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
