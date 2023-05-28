@@ -11,13 +11,14 @@ from amazon_product_search.reranking.reranker import (
 )
 from amazon_product_search.source import Locale
 
-ALL_FIELDS = [
+SPARSE_FIELDS = [
     "product_title",
     "product_brand",
     "product_color",
     "product_bullet_point",
     "product_description",
 ]
+ALL_FIELDS = [*SPARSE_FIELDS, "product_vector"]
 Task = Literal["retrieval", "reranking"]
 
 
@@ -48,14 +49,18 @@ EXPERIMENTS = {
         task="retrieval",
         num_queries=5000,
         variants=[
-            Variant(name="best_fields", fields=ALL_FIELDS, query_type="best_fields"),
-            Variant(name="cross_fields", fields=ALL_FIELDS, query_type="cross_fields"),
+            Variant(name="best_fields", fields=SPARSE_FIELDS, query_type="best_fields"),
             Variant(
-                name="combined_fields", fields=ALL_FIELDS, query_type="combined_fields"
+                name="cross_fields", fields=SPARSE_FIELDS, query_type="cross_fields"
+            ),
+            Variant(
+                name="combined_fields",
+                fields=SPARSE_FIELDS,
+                query_type="combined_fields",
             ),
             Variant(
                 name="simple_query_string",
-                fields=ALL_FIELDS,
+                fields=SPARSE_FIELDS,
                 query_type="simple_query_string",
             ),
         ],
@@ -135,26 +140,26 @@ EXPERIMENTS = {
         task="retrieval",
         num_queries=5000,
         variants=[
-            Variant(name="sparse", fields=["product_title"]),
+            Variant(name="sparse", fields=SPARSE_FIELDS),
             Variant(name="dense", fields=["product_vector"]),
             Variant(
                 name="hybrid (sparse * 1.0 + dense * 1.0)",
-                fields=["product_title", "product_vector"],
+                fields=ALL_FIELDS,
                 dense_boost=1.0,
             ),
             Variant(
                 name="hybrid (sparse * 1.0 + dense * 5.0)",
-                fields=["product_title", "product_vector"],
+                fields=ALL_FIELDS,
                 dense_boost=5.0,
             ),
             Variant(
                 name="hybrid (sparse * 1.0 + dense * 10.0)",
-                fields=["product_title", "product_vector"],
+                fields=ALL_FIELDS,
                 dense_boost=10.0,
             ),
             Variant(
                 name="hybrid (sparse * 1.0 + dense * 20.0)",
-                fields=["product_title", "product_vector"],
+                fields=ALL_FIELDS,
                 dense_boost=20.0,
             ),
         ],
