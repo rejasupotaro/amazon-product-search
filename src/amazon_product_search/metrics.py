@@ -16,17 +16,23 @@ def compute_zero_hit_rate(xs: list[int]) -> Optional[float]:
     return round(len([x for x in xs if x == 0]) / len(xs), 4)
 
 
-def compute_recall(retrieved_ids: list[str], relevant_ids: set[str]) -> Optional[float]:
+def compute_recall(
+    retrieved_ids: list[str], relevant_ids: set[str], k: Optional[int] = None
+) -> Optional[float]:
     if not relevant_ids:
         return None
+    if k:
+        retrieved_ids = retrieved_ids[:k]
     return round(len(set(retrieved_ids) & relevant_ids) / len(relevant_ids), 4)
 
 
 def compute_precision(
-    retrieved_ids: list[str], relevant_ids: set[str]
+    retrieved_ids: list[str], relevant_ids: set[str], k: Optional[int] = None
 ) -> Optional[float]:
     if not retrieved_ids:
         return None
+    if k:
+        retrieved_ids = retrieved_ids[:k]
     return round(len((set(retrieved_ids) & relevant_ids)) / len(retrieved_ids), 4)
 
 
@@ -60,7 +66,10 @@ def compute_dcg(gains: list[float]) -> float:
 
 
 def compute_ndcg(
-    retrieved_ids: list[str], judgements: dict[str, str], prime: bool = False
+    retrieved_ids: list[str],
+    judgements: dict[str, str],
+    prime: bool = False,
+    k: Optional[int] = None,
 ) -> Optional[float]:
     """Compute Normalized Discounted Cumulative Gain (NDCG) based on the given relevance judgements.
 
@@ -74,6 +83,8 @@ def compute_ndcg(
     Returns:
         Optional[float]: The computed score or None.
     """
+    if k:
+        retrieved_ids = retrieved_ids[:k]
     if prime:
         y_pred = [
             LABEL_TO_GAIN[judgements[doc_id]]
