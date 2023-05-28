@@ -114,7 +114,8 @@ def compute_metrics(
         "ndcg_prime": compute_ndcg(retrieved_ids, judgements, prime=True),
     }
     if experimental_setup.task == "retrieval":
-        metric_dict["precision"] = compute_precision(retrieved_ids, relevant_ids)
+        precision = compute_precision(retrieved_ids, relevant_ids, k=10)
+        metric_dict["precision@10"] = precision if precision is None else 0
     return metric_dict
 
 
@@ -150,7 +151,7 @@ def compute_stats(
             .alias("zero_hit_rate"),
         ]
         + (
-            [pl.col("precision").mean().round(4)]
+            [pl.col("precision@10").mean().round(4)]
             if experimental_setup.task == "retrieval"
             else []
         )
