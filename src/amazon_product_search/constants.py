@@ -16,7 +16,8 @@ class HF:
 
     # For Japanese
     JP_BERT = "cl-tohoku/bert-base-japanese-v2"
-    JP_SBERT = "sonoisa/sentence-bert-base-ja-mean-tokens-v2"
+    JP_SBERT_MEAN = "sonoisa/sentence-bert-base-ja-mean-tokens-v2"
+    JP_SLUKE_MEAN = "sonoisa/sentence-luke-japanese-base-lite"
     JP_DISTILBERT = "line-corporation/line-distilbert-base-japanese"
     JP_DEBERTA = "ku-nlp/deberta-v2-base-japanese"
     JP_FINE_TUNED_SBERT = f"{MODELS_DIR}/jp_fine_tuned_sbert"

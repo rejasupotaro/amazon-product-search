@@ -40,7 +40,7 @@ def delete_all_docs(c, schema):
 @task
 def search(c):
     client = VespaClient()
-    query_vector = SBERTEncoder(HF.JP_SBERT).encode(input("query: "))
+    query_vector = SBERTEncoder(HF.JP_SLUKE_MEAN).encode(input("query: "))
     query_vector = [float(v) for v in query_vector]
     query = {
         "yql": "select * from sources * where ({targetHits:10}nearestNeighbor(product_vector,query_vector))",

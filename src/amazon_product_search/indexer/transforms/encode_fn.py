@@ -15,7 +15,7 @@ class EncodeFn(beam.DoFn):
         pass
 
     def setup(self):
-        self.encoder: Encoder = SBERTEncoder(HF.JP_SBERT)
+        self.encoder: Encoder = SBERTEncoder(HF.JP_SLUKE_MEAN)
 
     def process(self, product: Dict[str, Any]) -> Iterator[Dict[str, Any]]:
         text = product["product_title"] + " " + product["product_brand"]
@@ -31,7 +31,7 @@ class BatchEncodeFn(beam.DoFn):
     def setup(self):
         def initialize_encoder():
             # Load a potentially large model in memory. Executed once per process.
-            return WeakReference[Encoder](SBERTEncoder(HF.JP_SBERT))
+            return WeakReference[Encoder](SBERTEncoder(HF.JP_SLUKE_MEAN))
 
         self._weak_reference: WeakReference[Encoder] = self._shared_handle.acquire(
             initialize_encoder
