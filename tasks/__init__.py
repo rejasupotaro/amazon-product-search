@@ -19,7 +19,7 @@ def verify(c):
     print("Running mypy...")
     c.run("poetry run mypy src")
     print("Running pytest...")
-    c.run("poetry run pytest tests/unit -vv")
+    c.run("poetry run pytest tests/unit")
 
 
 ns = Collection()
