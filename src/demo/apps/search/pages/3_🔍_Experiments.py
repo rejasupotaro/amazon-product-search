@@ -227,8 +227,11 @@ def main():
         st.write(metrics_df.to_pandas())
 
     st.write("#### Metrics by variant")
-    stats_df = compute_stats(experimental_setup, metrics_df)
-    st.write(stats_df.to_pandas())
+    stats_df = compute_stats(experimental_setup, metrics_df).to_pandas()
+    stats_df = stats_df.sort_values("ndcg@100", ascending=False)
+    st.write(stats_df)
+    with st.expander("Metrics in markdown"):
+        st.text(stats_df.to_markdown(index=False))
 
     st.write("#### Analysis")
     draw_figures(metrics_df)
