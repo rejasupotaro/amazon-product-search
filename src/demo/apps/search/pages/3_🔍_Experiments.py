@@ -176,9 +176,13 @@ def compute_stats(
 
 
 def draw_figures(metrics_df: pl.DataFrame):
-    for metric in ["total_hits", "recall@100", "ndcg@100"]:
-        fig = px.box(metrics_df.to_pandas(), y=metric, color="variant")
-        st.plotly_chart(fig)
+    for metric in ["precision", "recall", "ndcg"]:
+        for column, k in zip(st.columns(2), [10, 100], strict=True):
+            if f"{metric}@{k}" not in metrics_df.columns:
+                continue
+            with column:
+                fig = px.box(metrics_df.to_pandas(), y=f"{metric}@{k}", color="variant")
+                st.plotly_chart(fig)
 
 
 def main():
