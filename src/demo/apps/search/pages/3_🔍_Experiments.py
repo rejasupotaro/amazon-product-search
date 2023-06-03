@@ -118,9 +118,9 @@ def compute_metrics(
     }
     if experimental_setup.task == "retrieval":
         precision_at_10 = compute_precision(retrieved_ids, relevant_ids, k=10)
-        metric_dict["precision@10"] = precision_at_10 if precision_at_10 is None else 0
+        metric_dict["precision@10"] = precision_at_10 if precision_at_10 is not None else 0
         precision_at_100 = compute_precision(retrieved_ids, relevant_ids, k=100)
-        metric_dict["precision@100"] = precision_at_100 if precision_at_100 is None else 0
+        metric_dict["precision@100"] = precision_at_100 if precision_at_100 is not None else 0
     return metric_dict
 
 
