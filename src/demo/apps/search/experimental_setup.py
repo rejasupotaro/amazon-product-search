@@ -140,25 +140,25 @@ EXPERIMENTS = {
         task="retrieval",
         num_queries=5000,
         variants=[
-            Variant(name="sparse", fields=SPARSE_FIELDS),
-            Variant(name="dense", fields=["product_vector"]),
+            Variant(name="sparse only", fields=SPARSE_FIELDS),
+            Variant(name="dense only", fields=["product_vector"]),
             Variant(
-                name="hybrid (sparse * 1.0 + dense * 1.0)",
+                name="sparse * 1.0 + dense * 1.0",
                 fields=ALL_FIELDS,
                 dense_boost=1.0,
             ),
             Variant(
-                name="hybrid (sparse * 1.0 + dense * 5.0)",
+                name="sparse * 1.0 + dense * 5.0",
                 fields=ALL_FIELDS,
                 dense_boost=5.0,
             ),
             Variant(
-                name="hybrid (sparse * 1.0 + dense * 10.0)",
+                name="sparse * 1.0 + dense * 10.0",
                 fields=ALL_FIELDS,
                 dense_boost=10.0,
             ),
             Variant(
-                name="hybrid (sparse * 1.0 + dense * 20.0)",
+                name="sparse * 1.0 + dense * 20.0",
                 fields=ALL_FIELDS,
                 dense_boost=20.0,
             ),

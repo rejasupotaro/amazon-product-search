@@ -109,18 +109,16 @@ def compute_metrics(
         "variant": variant.name,
         "query": query,
         "total_hits": response.total_hits,
-        "recall@10": compute_recall(retrieved_ids, relevant_ids, k=10),
-        "recall@100": compute_recall(retrieved_ids, relevant_ids, k=100),
-        "ndcg@10": compute_ndcg(retrieved_ids, judgements, k=10),
-        "ndcg@100": compute_ndcg(retrieved_ids, judgements, k=100),
-        "ndcg_prime@10": compute_ndcg(retrieved_ids, judgements, k=10, prime=True),
-        "ndcg_prime@100": compute_ndcg(retrieved_ids, judgements, k=100, prime=True),
+        "R@10": compute_recall(retrieved_ids, relevant_ids, k=10),
+        "R@100": compute_recall(retrieved_ids, relevant_ids, k=100),
+        "NDCG@10": compute_ndcg(retrieved_ids, judgements, k=10),
+        "NDCG@100": compute_ndcg(retrieved_ids, judgements, k=100),
     }
     if experimental_setup.task == "retrieval":
         precision_at_10 = compute_precision(retrieved_ids, relevant_ids, k=10)
-        metric_dict["precision@10"] = precision_at_10 if precision_at_10 is not None else 0
+        metric_dict["P@10"] = precision_at_10 if precision_at_10 is not None else 0
         precision_at_100 = compute_precision(retrieved_ids, relevant_ids, k=100)
-        metric_dict["precision@100"] = precision_at_100 if precision_at_100 is not None else 0
+        metric_dict["P@100"] = precision_at_100 if precision_at_100 is not None else 0
     return metric_dict
 
 
@@ -157,26 +155,24 @@ def compute_stats(
         ]
         + (
             [
-                pl.col("precision@10").mean().round(4),
-                pl.col("precision@100").mean().round(4),
+                pl.col("P@10").mean().round(4),
+                pl.col("P@100").mean().round(4),
             ]
             if experimental_setup.task == "retrieval"
             else []
         )
         + [
-            pl.col("recall@10").mean().round(4),
-            pl.col("recall@100").mean().round(4),
-            pl.col("ndcg@10").mean().round(4),
-            pl.col("ndcg@100").mean().round(4),
-            pl.col("ndcg_prime@10").mean().round(4),
-            pl.col("ndcg_prime@100").mean().round(4),
+            pl.col("R@10").mean().round(4),
+            pl.col("R@100").mean().round(4),
+            pl.col("NDCG@10").mean().round(4),
+            pl.col("NDCG@100").mean().round(4),
         ]
     )
     return stats_df
 
 
 def draw_figures(metrics_df: pl.DataFrame):
-    for metric in ["precision", "recall", "ndcg"]:
+    for metric in ["P", "R", "NDCG"]:
         for column, k in zip(st.columns(2), [10, 100], strict=True):
             if f"{metric}@{k}" not in metrics_df.columns:
                 continue
@@ -228,7 +224,7 @@ def main():
 
     st.write("#### Metrics by variant")
     stats_df = compute_stats(experimental_setup, metrics_df).to_pandas()
-    stats_df = stats_df.sort_values("ndcg@100", ascending=False)
+    stats_df = stats_df.sort_values("NDCG@100", ascending=False)
     st.write(stats_df)
     with st.expander("Metrics in markdown"):
         st.text(stats_df.to_markdown(index=False))
