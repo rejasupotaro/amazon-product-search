@@ -76,25 +76,13 @@ def draw_input_form(indices: list[str], queries: list[str] | None = None) -> For
 def draw_response_stats(response: Response, query_vector: np.ndarray):
     rows = []
     for result in response.results:
-        row = {"product_title": result.product["product_title"]}
-
-        explanation = result.explanation
-        row["total_score"] = explanation["value"]
-        sparse_score = 0
-        dense_score = None
-        if explanation["description"] == "sum of:":
-            for child_explanation in explanation["details"]:
-                if child_explanation["description"] == "within top k documents":
-                    if not dense_score:
-                        dense_score = 0
-                    dense_score += child_explanation["value"]
-                else:
-                    sparse_score += child_explanation["value"]
-        if dense_score:
-            row["sparse_score"] = sparse_score
-            row["dense_score"] = dense_score
-        else:
-            row["sparse_score"] = row["total_score"]
+        sparse_score, dense_score = result.get_scores_in_explanation()
+        row = {
+            "product_title": result.product["product_title"],
+            "total_score": result.score,
+            "sprase_score": sparse_score,
+            "dense_score": dense_score,
+        }
         rows.append(row)
 
     df = pd.DataFrame(rows)
