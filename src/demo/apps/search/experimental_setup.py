@@ -82,6 +82,7 @@ EXPERIMENTS = {
             ),
             Variant(name="title,brand", fields=["product_title", "product_brand"]),
             Variant(name="title,color", fields=["product_title", "product_color"]),
+            Variant(name="all", fields=SPARSE_FIELDS),
         ],
     ),
     "different_weights": ExperimentalSetup(
