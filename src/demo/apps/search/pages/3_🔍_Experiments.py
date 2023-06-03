@@ -109,13 +109,18 @@ def compute_metrics(
         "variant": variant.name,
         "query": query,
         "total_hits": response.total_hits,
-        "recall": compute_recall(retrieved_ids, relevant_ids),
-        "ndcg": compute_ndcg(retrieved_ids, judgements),
-        "ndcg_prime": compute_ndcg(retrieved_ids, judgements, prime=True),
+        "recall@10": compute_recall(retrieved_ids, relevant_ids, k=10),
+        "recall@100": compute_recall(retrieved_ids, relevant_ids, k=100),
+        "ndcg@10": compute_ndcg(retrieved_ids, judgements, k=10),
+        "ndcg@100": compute_ndcg(retrieved_ids, judgements, k=100),
+        "ndcg_prime@10": compute_ndcg(retrieved_ids, judgements, k=10, prime=True),
+        "ndcg_prime@100": compute_ndcg(retrieved_ids, judgements, k=100, prime=True),
     }
     if experimental_setup.task == "retrieval":
-        precision = compute_precision(retrieved_ids, relevant_ids, k=10)
-        metric_dict["precision@10"] = precision if precision is None else 0
+        precision_at_10 = compute_precision(retrieved_ids, relevant_ids, k=10)
+        metric_dict["precision@10"] = precision_at_10 if precision_at_10 is None else 0
+        precision_at_100 = compute_precision(retrieved_ids, relevant_ids, k=100)
+        metric_dict["precision@100"] = precision_at_100 if precision_at_100 is None else 0
     return metric_dict
 
 
@@ -151,21 +156,27 @@ def compute_stats(
             .alias("zero_hit_rate"),
         ]
         + (
-            [pl.col("precision@10").mean().round(4)]
+            [
+                pl.col("precision@10").mean().round(4),
+                pl.col("precision@100").mean().round(4),
+            ]
             if experimental_setup.task == "retrieval"
             else []
         )
         + [
-            pl.col("recall").mean().round(4),
-            pl.col("ndcg").mean().round(4),
-            pl.col("ndcg_prime").mean().round(4),
+            pl.col("recall@10").mean().round(4),
+            pl.col("recall@100").mean().round(4),
+            pl.col("ndcg@10").mean().round(4),
+            pl.col("ndcg@100").mean().round(4),
+            pl.col("ndcg_prime@10").mean().round(4),
+            pl.col("ndcg_prime@100").mean().round(4),
         ]
     )
     return stats_df
 
 
 def draw_figures(metrics_df: pl.DataFrame):
-    for metric in ["total_hits", "recall", "ndcg"]:
+    for metric in ["total_hits", "recall@100", "ndcg@100"]:
         fig = px.box(metrics_df.to_pandas(), y=metric, color="variant")
         st.plotly_chart(fig)
 
@@ -188,7 +199,7 @@ def main():
     content = f"""
     The experiment is conducted on `{experimental_setup.index_name}` containing `{num_docs}` docs in total.
     We send `{len(query_dict)}` queries to the index with different parameters shown below.
-    Then, we compute Total Hits, Zero Hit Rate, Recall, and NDCG on each variant.
+    Then, we compute Total Hits, Zero Hit Rate, Precision, Recall, NDCG, and NDCG' on each variant.
     """
     st.write(content)
 
