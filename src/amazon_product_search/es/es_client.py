@@ -13,7 +13,7 @@ from amazon_product_search.es.response import Response, Result
 class EsClient:
     """A wrapper class of https://elasticsearch-py.readthedocs.io/"""
 
-    def __init__(self, es_host: str = "http://localhost:9200"):
+    def __init__(self, es_host: str = "http://localhost:9200") -> None:
         self.es = Elasticsearch(es_host)
 
     def list_indices(self) -> list[str]:
@@ -21,10 +21,10 @@ class EsClient:
             alias for alias in self.es.indices.get_alias() if not alias.startswith(".")
         ]
 
-    def delete_index(self, index_name: str):
+    def delete_index(self, index_name: str) -> None:
         self.es.indices.delete(index=index_name)
 
-    def create_index(self, index_name: str):
+    def create_index(self, index_name: str) -> None:
         """Create a new index using a mapping file (`schema/es/products.json`).
 
         Args:
@@ -35,7 +35,7 @@ class EsClient:
             print(schema)
         self.es.indices.create(index=index_name, mappings=schema["mappings"])
 
-    def import_model(self, model_id: str, tmp_path: str = MODELS_DIR):
+    def import_model(self, model_id: str, tmp_path: str = MODELS_DIR) -> None:
         """Import a TransformerModel into Elasticsearch.
 
         Call `POST _ml/trained_models/_model_id_/deployment/_start` after the model is imported.
@@ -89,7 +89,7 @@ class EsClient:
 
     def index_doc(
         self, index_name: str, doc: dict[str, Any], doc_id: Optional[str] = None
-    ):
+    ) -> None:
         self.es.index(index=index_name, document=doc, id=doc_id)
         self.es.indices.refresh(index=index_name)
 
@@ -204,5 +204,5 @@ class EsClient:
         es_response = self.es.knn_search(index=index_name, knn=knn_query)
         return self._convert_es_response_to_response(es_response)
 
-    def close(self):
+    def close(self) -> None:
         self.es.close()

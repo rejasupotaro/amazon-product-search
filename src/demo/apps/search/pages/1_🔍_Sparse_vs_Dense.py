@@ -65,7 +65,7 @@ def search(
     return sparse_response, dense_response
 
 
-def main():
+def main() -> None:
     set_page_config()
     st.write("## Search")
 
@@ -77,9 +77,10 @@ def main():
 
     st.write("#### Input")
     with st.form("input"):
-        index_name = st.selectbox("Index:", es_client.list_indices())
+        index_name = str(st.selectbox("Index:", es_client.list_indices()))
 
         query = st.selectbox("Query:", queries) if queries else st.text_input("Query:")
+        assert query is not None
 
         sparse_fields = st.multiselect(
             "Fields:",
@@ -93,14 +94,16 @@ def main():
             default=["product_title"],
         )
 
-        query_type = st.selectbox(
-            "Query Type:",
-            options=[
-                "combined_fields",
-                "cross_fields",
-                "best_fields",
-                "simple_query_string",
-            ],
+        query_type = str(
+            st.selectbox(
+                "Query Type:",
+                options=[
+                    "combined_fields",
+                    "cross_fields",
+                    "best_fields",
+                    "simple_query_string",
+                ],
+            )
         )
 
         is_synonym_expansion_enabled = st.checkbox("enable_synonym_expansion")

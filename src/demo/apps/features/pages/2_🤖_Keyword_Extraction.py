@@ -15,7 +15,7 @@ tokenizer = Tokenizer()
 extractor = KeywordExtractor()
 
 
-def draw_results(results: dict[str, list[tuple[str, float]]]):
+def draw_results(results: dict[str, list[tuple[str, float]]]) -> None:
     rows = []
     for result in list(zip(*results.values(), strict=True)):
         row = {}
@@ -25,7 +25,7 @@ def draw_results(results: dict[str, list[tuple[str, float]]]):
     st.write(pl.from_dicts(rows).to_pandas())
 
 
-def main():
+def main() -> None:
     set_page_config()
     st.write("## Keyword Extraction")
 

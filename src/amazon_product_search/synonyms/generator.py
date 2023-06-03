@@ -89,7 +89,7 @@ def generate(
     output_filename: str,
     min_cooccurrence: int = 10,
     min_npmi: float = 0.5,
-):
+) -> None:
     """Generate synonyms from query title pairs.
 
     1. Load the relevance judgement file.

@@ -6,7 +6,7 @@ from amazon_product_search.vespa.vespa_client import VespaClient
 client = VespaClient()
 
 
-def main():
+def main() -> None:
     endpoints = [
         "http://localhost:19071/ApplicationStatus",
         "http://localhost:8080/document/v1/amazon/product/docid",

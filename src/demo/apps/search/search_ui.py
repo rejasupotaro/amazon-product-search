@@ -73,7 +73,7 @@ def draw_input_form(indices: list[str], queries: list[str] | None = None) -> For
     )
 
 
-def draw_response_stats(response: Response, query_vector: np.ndarray):
+def draw_response_stats(response: Response, query_vector: np.ndarray) -> None:
     rows = []
     for result in response.results:
         sparse_score, dense_score = result.get_scores_in_explanation()
@@ -101,7 +101,7 @@ def draw_response_stats(response: Response, query_vector: np.ndarray):
         st.plotly_chart(fig, use_container_width=True)
 
 
-def draw_products(results: list[Result], label_dict: dict[str, str]):
+def draw_products(results: list[Result], label_dict: dict[str, str]) -> None:
     for result in results:
         product = result.product
         header = f"{result.product['product_title']} ({result.score})"

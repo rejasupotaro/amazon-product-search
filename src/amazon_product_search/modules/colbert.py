@@ -8,7 +8,7 @@ from amazon_product_search.constants import HF
 
 
 class ColBERTer(nn.Module):
-    def __init__(self, bert_model_name: str):
+    def __init__(self, bert_model_name: str) -> None:
         super().__init__()
         self.bert_model = AutoModel.from_pretrained(bert_model_name)
         trainable = False
@@ -97,7 +97,7 @@ class ColBERTWrapper:
         self,
         model_filepath: str = HF.JP_COLBERT,
         bert_model_name: str = "cl-tohoku/bert-base-japanese-v2",
-    ):
+    ) -> None:
         self.colberter = ColBERTer(bert_model_name)
         self.colberter.load_state_dict(torch.load(model_filepath))
         self.colberter.eval()

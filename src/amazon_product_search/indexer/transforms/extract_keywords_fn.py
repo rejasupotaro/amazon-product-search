@@ -6,7 +6,7 @@ from amazon_product_search.retrieval.keyword_extractor import KeywordExtractor
 
 
 class ExtractKeywordsFn(beam.DoFn):
-    def setup(self):
+    def setup(self) -> None:
         self._extractor = KeywordExtractor()
 
     @staticmethod

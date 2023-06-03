@@ -31,7 +31,7 @@ def start(
         return vespa_docker.deploy(create_package())
 
 
-def stop(name_or_id: str = "amazon"):
+def stop(name_or_id: str = "amazon") -> None:
     """Stop the Vespa container.
 
     Args:

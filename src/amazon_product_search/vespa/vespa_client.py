@@ -12,7 +12,7 @@ class VespaClient:
         self,
         host: Optional[str] = None,
         app_package: Optional[ApplicationPackage] = None,
-    ):
+    ) -> None:
         self.vespa_app = vespa_service.connect(host, app_package)
 
     def feed(

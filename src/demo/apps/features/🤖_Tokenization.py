@@ -10,7 +10,7 @@ unidic_tokenizer = Tokenizer(DicType.UNIDIC, output_format=OutputFormat.DUMP)
 ipadic_tokenizer = Tokenizer(DicType.IPADIC, output_format=OutputFormat.DUMP)
 
 
-def main():
+def main() -> None:
     set_page_config()
     st.write("## Tokenization")
 

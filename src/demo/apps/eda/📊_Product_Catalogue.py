@@ -7,13 +7,13 @@ from demo.page_config import set_page_config
 from demo.utils import analyze_dataframe, load_products
 
 
-def draw_column_info(products_df: pl.DataFrame):
+def draw_column_info(products_df: pl.DataFrame) -> None:
     st.write("### Columns")
     analyzed_df = analyze_dataframe(products_df)
     st.write(analyzed_df.to_pandas())
 
 
-def draw_brand_info(products_df: pl.DataFrame):
+def draw_brand_info(products_df: pl.DataFrame) -> None:
     st.write("### Brand")
     count_df = (
         products_df.groupby("product_brand")
@@ -27,7 +27,7 @@ def draw_brand_info(products_df: pl.DataFrame):
     st.plotly_chart(fig, use_container_width=True)
 
 
-def draw_color_info(products_df: pl.DataFrame):
+def draw_color_info(products_df: pl.DataFrame) -> None:
     st.write("### Color")
     count_df = (
         products_df.groupby("product_color")
@@ -41,7 +41,7 @@ def draw_color_info(products_df: pl.DataFrame):
     st.plotly_chart(fig, use_container_width=True)
 
 
-def draw_examples(products_df: pl.DataFrame):
+def draw_examples(products_df: pl.DataFrame) -> None:
     st.write("### Examples")
 
     gb = GridOptionsBuilder.from_dataframe(products_df.to_pandas())
@@ -61,7 +61,7 @@ def draw_examples(products_df: pl.DataFrame):
     st.write(judgement)
 
 
-def main():
+def main() -> None:
     set_page_config()
     st.write("## Product Catalogue")
 

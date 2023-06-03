@@ -11,10 +11,10 @@ from amazon_product_search_dense_retrieval.encoders import Encoder, SBERTEncoder
 
 
 class EncodeFn(beam.DoFn):
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
-    def setup(self):
+    def setup(self) -> None:
         self.encoder: Encoder = SBERTEncoder(HF.JP_SLUKE_MEAN)
 
     def process(self, product: Dict[str, Any]) -> Iterator[Dict[str, Any]]:
@@ -25,11 +25,11 @@ class EncodeFn(beam.DoFn):
 
 
 class BatchEncodeFn(beam.DoFn):
-    def __init__(self, shared_handle: Shared):
+    def __init__(self, shared_handle: Shared) -> None:
         self._shared_handle = shared_handle
 
-    def setup(self):
-        def initialize_encoder():
+    def setup(self) -> None:
+        def initialize_encoder() -> WeakReference[Encoder]:
             # Load a potentially large model in memory. Executed once per process.
             return WeakReference[Encoder](SBERTEncoder(HF.JP_SLUKE_MEAN))
 

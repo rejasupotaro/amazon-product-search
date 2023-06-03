@@ -28,7 +28,7 @@ class RandomReranker:
 
 
 class DotReranker:
-    def __init__(self, model_name: str = HF.JP_SLUKE_MEAN, batch_size: int = 8):
+    def __init__(self, model_name: str = HF.JP_SLUKE_MEAN, batch_size: int = 8) -> None:
         self.model = AutoModel.from_pretrained(model_name)
         self.model.eval()
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)

@@ -5,7 +5,7 @@ from amazon_product_search.constants import DATA_DIR
 
 class IndexerOptions(PipelineOptions):
     @classmethod
-    def _add_argparse_args(cls, parser):
+    def _add_argparse_args(cls, parser) -> None:
         parser.add_argument("--index_name", type=str)
         parser.add_argument("--locale", type=str)
         parser.add_argument("--data_dir", type=str, default=DATA_DIR)

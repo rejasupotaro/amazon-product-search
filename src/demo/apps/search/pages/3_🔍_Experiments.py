@@ -47,7 +47,7 @@ def count_docs(index_name: str) -> int:
     return es_client.count_docs(index_name)
 
 
-def draw_variants(variants: list[Variant]):
+def draw_variants(variants: list[Variant]) -> None:
     rows = []
     for variant in variants:
         row = asdict(variant)
@@ -171,7 +171,7 @@ def compute_stats(
     return stats_df
 
 
-def draw_figures(metrics_df: pl.DataFrame):
+def draw_figures(metrics_df: pl.DataFrame) -> None:
     for metric in ["P", "R", "NDCG"]:
         for column, k in zip(st.columns(2), [10, 100], strict=True):
             if f"{metric}@{k}" not in metrics_df.columns:
@@ -181,7 +181,7 @@ def draw_figures(metrics_df: pl.DataFrame):
                 st.plotly_chart(fig)
 
 
-def main():
+def main() -> None:
     set_page_config()
     st.write("## Experiments")
 
@@ -191,9 +191,9 @@ def main():
     num_docs = count_docs(experimental_setup.index_name)
 
     labels_df = load_labels(experimental_setup)
-    query_dict: dict[str, pl.DataFrame] = {}
+    query_dict = {}
     for query, query_labels_df in labels_df.groupby("query"):
-        query_dict[query] = query_labels_df
+        query_dict[str(query)] = query_labels_df
 
     st.write("### Experimental Setup")
     content = f"""

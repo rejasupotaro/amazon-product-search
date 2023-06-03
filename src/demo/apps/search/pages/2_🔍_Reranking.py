@@ -91,7 +91,7 @@ def compute_ndcg(products: list[dict[str, Any]]) -> Optional[float]:
     return metrics.compute_ndcg(retrieved_ids, judgements)
 
 
-def draw_results(results: list[Result]):
+def draw_results(results: list[Result]) -> None:
     products = [result.product for result in results]
 
     ndcg = compute_ndcg(products)
@@ -103,7 +103,7 @@ def draw_results(results: list[Result]):
     )
 
 
-def draw_examples(query: str, results: list[Result]):
+def draw_examples(query: str, results: list[Result]) -> None:
     for reranker_names in chunked(rerankers, 2):
         columns = st.columns(2)
         for i, reranker_name in enumerate(reranker_names):
@@ -118,7 +118,7 @@ def run_comparison(
     all_judgements: dict[str, str],
     num_queries: int,
     reranker_names: list[str],
-):
+) -> None:
     queries = df.get_column("query").unique().to_list()
     n = 0
     progress_text = st.empty()
@@ -176,7 +176,7 @@ def run_comparison(
     st.write(metrics_df.to_pandas())
 
 
-def main():
+def main() -> None:
     set_page_config()
     st.write("## Reranking")
 
@@ -188,7 +188,7 @@ def main():
     st.write("### Example")
 
     queries = df["query"].unique()
-    query = st.selectbox("Query:", queries)
+    query = str(st.selectbox("Query:", queries))
     filtered_df = df.filter(pl.col("query") == query)
 
     products = filtered_df.to_dicts()
@@ -198,8 +198,8 @@ def main():
 
     st.write("### Comparison")
     with st.form("experimental_setup"):
-        num_queries = st.number_input(
-            "Num Queries:", value=100, min_value=1, max_value=1000
+        num_queries = int(
+            st.number_input("Num Queries:", value=100, min_value=1, max_value=1000)
         )
         reranker_names = st.multiselect(
             "Rerankers:", RERANKER_NAMES, default=RERANKER_NAMES

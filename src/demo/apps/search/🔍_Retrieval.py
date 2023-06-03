@@ -40,7 +40,7 @@ def load_dataset() -> dict[str, dict[str, tuple[str, str]]]:
 
 def draw_es_query(
     query: Optional[dict[str, Any]], knn_query: Optional[dict[str, Any]], size: int
-):
+) -> None:
     es_query: dict[str, Any] = {
         "size": size,
     }
@@ -55,7 +55,7 @@ def draw_es_query(
     st.write(es_query)
 
 
-def main():
+def main() -> None:
     set_page_config()
     st.write("## Search")
 

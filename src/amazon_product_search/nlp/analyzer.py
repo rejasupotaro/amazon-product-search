@@ -5,7 +5,7 @@ from amazon_product_search.nlp.tokenizer import Tokenizer
 
 
 class Analyzer:
-    def __init__(self, text_fields: list[str]):
+    def __init__(self, text_fields: list[str]) -> None:
         self.text_fields = text_fields
         self.tokenizer = Tokenizer()
 

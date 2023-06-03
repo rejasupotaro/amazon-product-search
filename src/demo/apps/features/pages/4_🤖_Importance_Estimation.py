@@ -14,7 +14,7 @@ from demo.utils import load_products
 estimator = ColBERTTermImportanceEstimator()
 
 
-def estimate_importance(text: Optional[str]):
+def estimate_importance(text: Optional[str]) -> None:
     if not text:
         return
     results = estimator.estimate(text)
@@ -32,7 +32,7 @@ def estimate_importance(text: Optional[str]):
     st.write([f"{result[0]} ({result[1]})" for result in results])
 
 
-def main():
+def main() -> None:
     set_page_config()
     st.write("## Importance Estimation")
 

@@ -49,7 +49,7 @@ def train(
     output_model_name: str,
     num_examples: int,
     test_size: float,
-):
+) -> None:
     print("1. Load data")
     df = load_dataset(locale, num_examples=num_examples)
 

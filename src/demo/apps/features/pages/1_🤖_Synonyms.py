@@ -17,7 +17,7 @@ def load_queries() -> list[str]:
     return queries
 
 
-def main():
+def main() -> None:
     set_page_config()
     st.write("## Synonyms")
 

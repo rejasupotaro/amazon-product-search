@@ -4,5 +4,5 @@ T = TypeVar("T")
 
 
 class WeakReference(Generic[T]):
-    def __init__(self, ref: T):
+    def __init__(self, ref: T) -> None:
         self.ref = ref

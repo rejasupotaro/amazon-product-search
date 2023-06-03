@@ -42,7 +42,7 @@ class Tokenizer:
         self,
         dic_type: DicType = DicType.UNIDIC,
         output_format: OutputFormat = OutputFormat.WAKATI,
-    ):
+    ) -> None:
         self.dic_type = dic_type
         self.output_format = output_format
 

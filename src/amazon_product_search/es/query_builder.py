@@ -9,7 +9,7 @@ from amazon_product_search_dense_retrieval.encoders import Encoder, SBERTEncoder
 
 
 class QueryBuilder:
-    def __init__(self, data_dir: str = DATA_DIR):
+    def __init__(self, data_dir: str = DATA_DIR) -> None:
         self.synonym_dict = SynonymDict(data_dir)
         self.encoder: Encoder = SBERTEncoder(HF.JP_SLUKE_MEAN)
 
