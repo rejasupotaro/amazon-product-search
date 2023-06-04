@@ -6,6 +6,9 @@ import polars as pl
 from apache_beam.transforms.ptransform import PTransform
 from apache_beam.transforms.util import BatchElements
 from apache_beam.utils.shared import Shared
+
+from amazon_product_search import source
+from amazon_product_search.source import Locale
 from indexing.io.elasticsearch_io import WriteToElasticsearch
 from indexing.io.vespa_io import WriteToVespa
 from indexing.options import IndexerOptions
@@ -15,9 +18,6 @@ from indexing.transforms.extract_keywords_fn import (
     ExtractKeywordsFn,
 )
 from indexing.transforms.filters import is_indexable
-
-from amazon_product_search import source
-from amazon_product_search.source import Locale
 
 
 def get_input_source(data_dir: str, locale: Locale, nrows: int = -1) -> PTransform:
