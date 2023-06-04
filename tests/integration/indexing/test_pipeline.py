@@ -4,11 +4,11 @@ from typing import Iterator
 
 import polars as pl
 import pytest
+from indexing.options import IndexerOptions
+from indexing.pipeline import create_pipeline
 
 from amazon_product_search.es.es_client import EsClient
-from amazon_product_search.indexer.options import IndexerOptions
-from amazon_product_search.indexer.pipeline import create_pipeline
-from tests.integration.es_docker import EsDocker
+from tests.integration.indexing.es_docker import EsDocker
 
 
 @pytest.fixture()

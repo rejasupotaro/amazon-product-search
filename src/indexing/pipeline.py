@@ -6,17 +6,17 @@ import polars as pl
 from apache_beam.transforms.ptransform import PTransform
 from apache_beam.transforms.util import BatchElements
 from apache_beam.utils.shared import Shared
-
-from amazon_product_search import source
-from amazon_product_search.indexer.io.elasticsearch_io import WriteToElasticsearch
-from amazon_product_search.indexer.io.vespa_io import WriteToVespa
-from amazon_product_search.indexer.options import IndexerOptions
-from amazon_product_search.indexer.transforms.analyze_fn import AnalyzeFn
-from amazon_product_search.indexer.transforms.encode_fn import BatchEncodeFn
-from amazon_product_search.indexer.transforms.extract_keywords_fn import (
+from indexing.io.elasticsearch_io import WriteToElasticsearch
+from indexing.io.vespa_io import WriteToVespa
+from indexing.options import IndexerOptions
+from indexing.transforms.analyze_fn import AnalyzeFn
+from indexing.transforms.encode_fn import BatchEncodeFn
+from indexing.transforms.extract_keywords_fn import (
     ExtractKeywordsFn,
 )
-from amazon_product_search.indexer.transforms.filters import is_indexable
+from indexing.transforms.filters import is_indexable
+
+from amazon_product_search import source
 from amazon_product_search.source import Locale
 
 
