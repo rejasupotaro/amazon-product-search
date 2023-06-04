@@ -13,7 +13,7 @@ class EsDocker:
         docker_client = docker.from_env()
         try:
             container = docker_client.containers.get(container_id=container_id)
-            if not isinstance(self.container, Container):
+            if not isinstance(container, Container):
                 raise TypeError("The type of container must be Container")
             self.container = cast(Container, container)
             self.container.restart()
