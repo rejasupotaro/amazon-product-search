@@ -28,7 +28,7 @@ def get_input_source(data_dir: str, locale: Locale, nrows: int = -1) -> PTransfo
     return beam.Create(products)
 
 
-def join_branches(kv: Tuple[str, Dict[str, Any]]) -> dict[str, Any]:
+def join_branches(kv: Tuple[str, Dict[str, Any]]) -> Dict[str, Any]:
     (product_id, group) = kv
     product = group["product"][-1]
 
