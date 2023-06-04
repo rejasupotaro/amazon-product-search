@@ -34,7 +34,7 @@ def train_encoder(c):
     gcloud ai custom-jobs create \
         --region={REGION} \
         --display-name={display_name} \
-        --config=vertex_ai/train_encoder.yaml
+        --config=vertex/train_encoder.yaml
     """
     c.run(command)
 
@@ -47,6 +47,6 @@ def hello(c):
     gcloud ai custom-jobs create \
         --region={REGION} \
         --display-name={display_name} \
-        --config=vertex_ai/hello.yaml
+        --config=vertex/hello.yaml
     """
     c.run(command)
