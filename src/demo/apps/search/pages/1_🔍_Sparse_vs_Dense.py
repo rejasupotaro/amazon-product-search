@@ -60,7 +60,7 @@ def search(
     sparse_response = es_client.search(
         index_name=index_name, query=sparse_query, size=size
     )
-    dense_response = es_client.knn_search(index_name=index_name, knn_query=dense_query)
+    dense_response = es_client.search(index_name=index_name, knn_query=dense_query)
 
     return sparse_response, dense_response
 

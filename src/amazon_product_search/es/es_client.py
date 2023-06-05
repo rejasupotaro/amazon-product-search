@@ -177,8 +177,8 @@ class EsClient:
     def search(
         self,
         index_name: str,
-        query: dict[str, Any],
-        knn_query: Optional[dict[str, Any]] = None,
+        query: dict[str, Any] | None = None,
+        knn_query: dict[str, Any] | None = None,
         size: int = 20,
         explain: bool = False,
     ) -> Response:
@@ -198,10 +198,6 @@ class EsClient:
         es_response = self.es.search(
             index=index_name, query=query, knn=knn_query, size=size, explain=explain
         )
-        return self._convert_es_response_to_response(es_response)
-
-    def knn_search(self, index_name: str, knn_query: dict[str, Any]) -> Response:
-        es_response = self.es.knn_search(index=index_name, knn=knn_query)
         return self._convert_es_response_to_response(es_response)
 
     def close(self) -> None:
