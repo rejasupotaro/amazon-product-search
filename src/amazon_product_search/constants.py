@@ -10,6 +10,9 @@ REGION = os.getenv("REGION", "asia-northeast1")
 STAGING_BUCKET = os.getenv("STAGING_BUCKET", "")
 SERVICE_ACCOUNT = os.getenv("SERVICE_ACCOUNT", "")
 
+TRAINING_IMAGE_URI = f"gcr.io/{PROJECT_ID}/{PROJECT_NAME}/training"
+INDEXING_IMAGE_URI = f"gcr.io/{PROJECT_ID}/{PROJECT_NAME}/indexing"
+
 
 class HF:
     # For English

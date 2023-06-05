@@ -1,27 +1,29 @@
 from invoke import task
 
-from amazon_product_search.constants import PROJECT_ID, PROJECT_NAME, REGION
+from amazon_product_search.constants import (
+    INDEXING_IMAGE_URI,
+    REGION,
+    TRAINING_IMAGE_URI,
+)
 from amazon_product_search.timestamp import get_unix_timestamp
 
 
 @task
 def build_training(c):
-    image_uri = f"gcr.io/{PROJECT_ID}/{PROJECT_NAME}/training"
     command = f"""
     gcloud builds submit . \
         --config=cloudbuild.yaml \
-        --substitutions=_DOCKERFILE=Dockerfile.training,_IMAGE={image_uri} \
+        --substitutions=_DOCKERFILE=Dockerfile.training,_IMAGE={TRAINING_IMAGE_URI} \
     """
     c.run(command)
 
 
 @task
 def build_indexing(c):
-    image_uri = f"gcr.io/{PROJECT_ID}/{PROJECT_NAME}/pipeline"
     command = f"""
     gcloud builds submit . \
         --config=cloudbuild.yaml \
-        --substitutions=_DOCKERFILE=Dockerfile.indexing,_IMAGE={image_uri} \
+        --substitutions=_DOCKERFILE=Dockerfile.indexing,_IMAGE={INDEXING_IMAGE_URI} \
     """
     c.run(command)
 
