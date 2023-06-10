@@ -7,14 +7,28 @@ from amazon_product_search.constants import (
     REGION,
     SERVICE_ACCOUNT,
     STAGING_BUCKET,
+    TRAINING_IMAGE_URI,
     VERTEX_DIR,
 )
 from amazon_product_search.timestamp import get_unix_timestamp
 
 
-@dsl.component
-def train() -> None:
+@dsl.component(
+    base_image=TRAINING_IMAGE_URI,
+    install_kfp_package=False,
+)
+def preprocess() -> None:
+    print("Preprocess")
+
+
+@dsl.container_component
+def train() -> dsl.ContainerSpec:
     print("Train")
+    return dsl.ContainerSpec(
+        image=TRAINING_IMAGE_URI,
+        command=["python"],
+        args=["-c", "print('Hello World')"],
+    )
 
 
 @dsl.component
@@ -31,7 +45,10 @@ def predict() -> None:
     name="train",
 )
 def training_pipeline() -> None:
+    preprocess()
+
     train_task = train()
+    train_task.after(preprocess)
 
     evaluate_task = evaluate()
     evaluate_task.after(train_task)
