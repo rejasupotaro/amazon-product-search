@@ -60,7 +60,6 @@ The command below launches the [Streamlit](https://streamlit.io/) demo app.
 # Launch Elasticsearch beforehand
 $ docker compose up
 
-$ poetry run inv demo.eda
 $ poetry run inv demo.search
 ```
 
@@ -91,7 +90,8 @@ The demo application allows for the execution of experiments with different expe
 Run the following tasks after adding any modifications.
 
 ```shell
-$ poetry run ruff .
+$ poetry run black .
+$ poetry run ruff . --fix
 $ poetry run mypy src
 $ poetry run pytest tests/unit -vv
 $ poetry run pytest tests/integration -vv
