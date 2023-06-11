@@ -1,6 +1,10 @@
-export PROJECT_ID=<Your GCP Project ID>
-export PROJECT_NAME=<Your GCP Project Name>
-export REGION=asia-northeast1
-export DATA_DIR=data
-export MODELS_DIR=models
-export CLOUDSDK_ACTIVE_CONFIG_NAME=<Your Config Name>
+export PROJECT_DIR="."
+export DATA_DIR=${PROJECT_DIR}/data
+export MODELS_DIR=${PROJECT_DIR}/models
+export CLOUDSDK_ACTIVE_CONFIG_NAME=amazon-product-search
+export PROJECT_ID=<GCP Project ID>
+export PROJECT_NAME=<GCP Project Name>
+export REGION=<GCP Region>
+export STAGING_BUCKET=<Bucket URI for Vertex AI Pipeline>
+export SERVICE_ACCOUNT=<Service Account for Vertex AI Pipeline>
+export OPENAI_API_KEY=<Open API Key>
