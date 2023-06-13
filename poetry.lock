@@ -186,7 +186,7 @@ unidic-lite = "^1.0.8"
 type = "git"
 url = "https://github.com/rejasupotaro/amazon-product-search-dense-retrieval.git"
 reference = "HEAD"
-resolved_reference = "e6f59dd03ba48d2b1f699aaf76375b7d4a41585e"
+resolved_reference = "39a460e9436e20049b76554e74a86e1af67fd856"
 
 [[package]]
 name = "annoy"
