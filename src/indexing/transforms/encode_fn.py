@@ -7,7 +7,7 @@ from indexing.transforms.weak_reference import WeakReference
 from torch import Tensor
 
 from amazon_product_search.constants import HF
-from amazon_product_search_dense_retrieval.encoders import Encoder, SBERTEncoder
+from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 
 
 class EncodeFn(beam.DoFn):
@@ -15,7 +15,7 @@ class EncodeFn(beam.DoFn):
         pass
 
     def setup(self) -> None:
-        self.encoder: Encoder = SBERTEncoder(HF.JP_SLUKE_MEAN)
+        self.encoder: SBERTEncoder = SBERTEncoder(HF.JP_SLUKE_MEAN)
 
     def process(self, product: Dict[str, Any]) -> Iterator[Dict[str, Any]]:
         text = product["product_title"] + " " + product["product_brand"]
@@ -29,11 +29,11 @@ class BatchEncodeFn(beam.DoFn):
         self._shared_handle = shared_handle
 
     def setup(self) -> None:
-        def initialize_encoder() -> WeakReference[Encoder]:
+        def initialize_encoder() -> WeakReference[SBERTEncoder]:
             # Load a potentially large model in memory. Executed once per process.
-            return WeakReference[Encoder](SBERTEncoder(HF.JP_SLUKE_MEAN))
+            return WeakReference[SBERTEncoder](SBERTEncoder(HF.JP_SLUKE_MEAN))
 
-        self._weak_reference: WeakReference[Encoder] = self._shared_handle.acquire(
+        self._weak_reference: WeakReference[SBERTEncoder] = self._shared_handle.acquire(
             initialize_encoder
         )
 
