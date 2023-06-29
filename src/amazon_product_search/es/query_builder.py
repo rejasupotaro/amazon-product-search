@@ -5,13 +5,13 @@ from torch import Tensor
 from amazon_product_search.cache import weak_lru_cache
 from amazon_product_search.constants import DATA_DIR, HF
 from amazon_product_search.synonyms.synonym_dict import SynonymDict
-from amazon_product_search_dense_retrieval.encoders import Encoder, SBERTEncoder
+from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 
 
 class QueryBuilder:
     def __init__(self, data_dir: str = DATA_DIR) -> None:
         self.synonym_dict = SynonymDict(data_dir)
-        self.encoder: Encoder = SBERTEncoder(HF.JP_SLUKE_MEAN)
+        self.encoder: SBERTEncoder = SBERTEncoder(HF.JP_SLUKE_MEAN)
 
     def _multi_match(
         self, query: str, fields: list[str], query_type: str, boost: float
