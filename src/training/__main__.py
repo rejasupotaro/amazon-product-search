@@ -58,6 +58,16 @@ def training_pipeline() -> None:
 
 
 def main():
+    """Invoke a Vertex AI custom training job.
+
+    Run `poetry run inv gcloud.build-training` to build the image used for training in advance.
+
+    To create a job, run `poetry run python -m training`. It first compiles the pipeline into the YAML format.
+    The YAML file includes all information for executing the pipeline on Vertex AI pipelines.
+
+    For more details:
+    * https://cloud.google.com/vertex-ai/docs/pipelines/build-pipeline
+    """
     experiment = f"training-{get_unix_timestamp()}"
     package_path = f"{VERTEX_DIR}/training_pipeline.yaml"
 
