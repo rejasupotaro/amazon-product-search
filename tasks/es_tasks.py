@@ -43,7 +43,7 @@ def index(
     runner="DirectRunner",
 ):
     command = [
-        "poetry run python src/amazon_product_search/indexing/main.py",
+        "poetry run python src/amazon_product_search/indexing/pipeline.py",
         f"--runner={runner}",
         f"--index_name={index_name}",
         f"--locale={locale}",

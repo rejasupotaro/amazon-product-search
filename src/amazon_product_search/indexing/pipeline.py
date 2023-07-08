@@ -105,3 +105,9 @@ def run(options: IndexerOptions) -> None:
     pipeline = create_pipeline(options)
     result = pipeline.run()
     result.wait_until_finish()
+
+
+if __name__ == "__main__":
+    logging.getLogger().setLevel(logging.INFO)
+    options = IndexerOptions()
+    run(options)
