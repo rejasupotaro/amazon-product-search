@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, cast
 
 from amazon_product_search.core.nlp.normalizer import normalize_doc
 from amazon_product_search.core.nlp.tokenizer import Tokenizer
@@ -12,7 +12,7 @@ class Analyzer:
     def _normalize(self, s: str) -> str:
         s = normalize_doc(s)
         tokens = self.tokenizer.tokenize(s)
-        return " ".join(tokens)
+        return " ".join(cast(list, tokens))
 
     def analyze(self, product: Dict[str, Any]) -> Dict[str, Any]:
         for field in self.text_fields:

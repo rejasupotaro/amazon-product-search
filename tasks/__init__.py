@@ -17,7 +17,7 @@ def verify(c):
     print("Running ruff...")
     c.run("poetry run ruff . --fix")
     print("Running mypy...")
-    c.run("poetry run mypy src")
+    c.run("poetry run mypy src/amazon_product_search --explicit-package-bases  --namespace-packages")
     print("Running pytest...")
     c.run("poetry run pytest tests/unit")
 

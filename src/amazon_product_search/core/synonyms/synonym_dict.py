@@ -1,4 +1,5 @@
 from collections import defaultdict
+from typing import cast
 
 import polars as pl
 
@@ -48,7 +49,7 @@ class SynonymDict:
             list[str]: A list of synonyms.
         """
         all_synonyms = []
-        tokens = self.tokenizer.tokenize(query)
+        tokens = cast(list, self.tokenizer.tokenize(query))
         for token in tokens:
             if token not in self._entry_dict:
                 continue

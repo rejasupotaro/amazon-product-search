@@ -10,7 +10,7 @@ from vespa.io import VespaQueryResponse, VespaResponse
 class VespaClient:
     def __init__(
         self,
-        host: Optional[str] = None,
+        host: str = "",
         app_package: Optional[ApplicationPackage] = None,
     ) -> None:
         self.vespa_app = vespa_service.connect(host, app_package)

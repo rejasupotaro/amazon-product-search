@@ -10,9 +10,9 @@ from amazon_product_search.core.metrics import (
     compute_recall,
 )
 from amazon_product_search.core.nlp.normalizer import normalize_query
-from amazon_product_search.demo.apps.search.search_ui import draw_products
-from amazon_product_search.demo.page_config import set_page_config
-from amazon_product_search.demo.utils import load_merged
+from demo.apps.search.search_ui import draw_products
+from demo.page_config import set_page_config
+from demo.utils import load_merged
 
 es_client = EsClient()
 query_builder = QueryBuilder()
