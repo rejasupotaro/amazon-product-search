@@ -5,7 +5,7 @@ from amazon_product_search.constants import (
     REGION,
     TRAINING_IMAGE_URI,
 )
-from amazon_product_search.timestamp import get_unix_timestamp
+from amazon_product_search.core.timestamp import get_unix_timestamp
 
 
 @task

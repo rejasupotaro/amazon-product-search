@@ -1,7 +1,7 @@
 import requests
 import streamlit as st
 
-from amazon_product_search.vespa.vespa_client import VespaClient
+from amazon_product_search.core.vespa.vespa_client import VespaClient
 
 client = VespaClient()
 

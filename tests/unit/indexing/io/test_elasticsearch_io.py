@@ -6,8 +6,8 @@ from apache_beam.testing.test_pipeline import TestPipeline
 from indexing.io.elasticsearch_io import WriteToElasticsearch
 
 
-@patch("amazon_product_search.es.es_client.Elasticsearch")
-@patch("amazon_product_search.es.es_client.EsClient.index_docs", return_value=(0, 0))
+@patch("amazon_product_search.core.es.es_client.Elasticsearch")
+@patch("amazon_product_search.core.es.es_client.EsClient.index_docs", return_value=(0, 0))
 def test_bulk_called_n_times(mock_es, mock_es_client):
     products = [
         {

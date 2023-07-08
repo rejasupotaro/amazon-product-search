@@ -1,7 +1,7 @@
 from invoke import task
 
 from amazon_product_search.constants import HF, PROJECT_ID, PROJECT_NAME, REGION
-from amazon_product_search.es.es_client import EsClient
+from amazon_product_search.core.es.es_client import EsClient
 
 
 @task

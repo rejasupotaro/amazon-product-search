@@ -1,8 +1,8 @@
 import polars as pl
 import streamlit as st
 
-from amazon_product_search import source
-from amazon_product_search.source import Locale
+from amazon_product_search.core import source
+from amazon_product_search.core.source import Locale
 
 
 @st.cache_data

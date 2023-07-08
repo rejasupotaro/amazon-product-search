@@ -2,7 +2,7 @@ from typing import Any, Dict, Iterator
 
 import apache_beam as beam
 
-from amazon_product_search.nlp.analyzer import Analyzer
+from amazon_product_search.core.nlp.analyzer import Analyzer
 
 
 class AnalyzeFn(beam.DoFn):

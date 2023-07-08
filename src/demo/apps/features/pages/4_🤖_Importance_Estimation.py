@@ -5,7 +5,7 @@ import polars as pl
 import streamlit as st
 from st_aggrid import AgGrid, GridOptionsBuilder
 
-from amazon_product_search.retrieval.importance_estimator import (
+from amazon_product_search.core.retrieval.importance_estimator import (
     ColBERTTermImportanceEstimator,
 )
 from demo.page_config import set_page_config

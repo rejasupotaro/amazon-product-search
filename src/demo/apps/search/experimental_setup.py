@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Literal, Optional
 
-from amazon_product_search.reranking.reranker import (
+from amazon_product_search.core.reranking.reranker import (
     ColBERTReranker,
     DotReranker,
     NoOpReranker,
@@ -9,7 +9,7 @@ from amazon_product_search.reranking.reranker import (
     Reranker,
     SpladeReranker,
 )
-from amazon_product_search.source import Locale
+from amazon_product_search.core.source import Locale
 
 SPARSE_FIELDS = [
     "product_title",

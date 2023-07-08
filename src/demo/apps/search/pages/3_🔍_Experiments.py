@@ -5,17 +5,17 @@ import plotly.express as px
 import polars as pl
 import streamlit as st
 
-from amazon_product_search.es.es_client import EsClient
-from amazon_product_search.es.query_builder import QueryBuilder
-from amazon_product_search.es.response import Response
-from amazon_product_search.metrics import (
+from amazon_product_search.core.es.es_client import EsClient
+from amazon_product_search.core.es.query_builder import QueryBuilder
+from amazon_product_search.core.es.response import Response
+from amazon_product_search.core.metrics import (
     compute_ndcg,
     compute_precision,
     compute_recall,
     compute_zero_hit_rate,
 )
-from amazon_product_search.nlp.normalizer import normalize_query
-from amazon_product_search.reranking import reranker
+from amazon_product_search.core.nlp.normalizer import normalize_query
+from amazon_product_search.core.reranking import reranker
 from demo import utils
 from demo.apps.search.experimental_setup import EXPERIMENTS, ExperimentalSetup, Variant
 from demo.page_config import set_page_config

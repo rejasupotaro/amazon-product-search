@@ -1,6 +1,6 @@
 from invoke import task
 
-import amazon_product_search.vespa.service as vespa_service
+import amazon_product_search.core.vespa.service as vespa_service
 from amazon_product_search.constants import (
     HF,
     PROJECT_ID,
@@ -8,7 +8,7 @@ from amazon_product_search.constants import (
     REGION,
     VESPA_DIR,
 )
-from amazon_product_search.vespa.vespa_client import VespaClient
+from amazon_product_search.core.vespa.vespa_client import VespaClient
 from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 
 

@@ -1,15 +1,15 @@
 import streamlit as st
 
-from amazon_product_search.es.es_client import EsClient
-from amazon_product_search.es.query_builder import QueryBuilder
-from amazon_product_search.es.response import Response
-from amazon_product_search.metrics import (
+from amazon_product_search.core.es.es_client import EsClient
+from amazon_product_search.core.es.query_builder import QueryBuilder
+from amazon_product_search.core.es.response import Response
+from amazon_product_search.core.metrics import (
     compute_iou,
     compute_ndcg,
     compute_precision,
     compute_recall,
 )
-from amazon_product_search.nlp.normalizer import normalize_query
+from amazon_product_search.core.nlp.normalizer import normalize_query
 from demo.apps.search.search_ui import draw_products
 from demo.page_config import set_page_config
 from demo.utils import load_merged

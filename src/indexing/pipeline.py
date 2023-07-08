@@ -7,8 +7,8 @@ from apache_beam.transforms.ptransform import PTransform
 from apache_beam.transforms.util import BatchElements
 from apache_beam.utils.shared import Shared
 
-from amazon_product_search import source
-from amazon_product_search.source import Locale
+from amazon_product_search.core import source
+from amazon_product_search.core.source import Locale
 from indexing.io.elasticsearch_io import WriteToElasticsearch
 from indexing.io.vespa_io import WriteToVespa
 from indexing.options import IndexerOptions

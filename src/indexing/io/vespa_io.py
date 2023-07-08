@@ -3,7 +3,7 @@ from typing import Any, Callable, Dict, List
 
 import apache_beam as beam
 
-from amazon_product_search.vespa.vespa_client import VespaClient
+from amazon_product_search.core.vespa.vespa_client import VespaClient
 
 
 class WriteToVespa(beam.DoFn):

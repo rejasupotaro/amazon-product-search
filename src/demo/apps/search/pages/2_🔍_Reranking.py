@@ -8,9 +8,9 @@ from more_itertools import chunked
 
 from amazon_product_search import metrics
 from amazon_product_search.constants import HF
-from amazon_product_search.es.es_client import EsClient
-from amazon_product_search.es.response import Result
-from amazon_product_search.reranking.reranker import (
+from amazon_product_search.core.es.es_client import EsClient
+from amazon_product_search.core.es.response import Result
+from amazon_product_search.core.reranking.reranker import (
     ColBERTReranker,
     DotReranker,
     NoOpReranker,
