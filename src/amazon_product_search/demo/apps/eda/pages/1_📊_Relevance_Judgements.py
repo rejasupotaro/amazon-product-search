@@ -2,8 +2,8 @@ import plotly.express as px
 import polars as pl
 import streamlit as st
 
-from demo.page_config import set_page_config
-from demo.utils import analyze_dataframe, load_merged
+from amazon_product_search.demo.page_config import set_page_config
+from amazon_product_search.demo.utils import analyze_dataframe, load_merged
 
 
 def main():

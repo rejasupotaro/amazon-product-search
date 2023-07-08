@@ -2,8 +2,8 @@ import polars as pl
 import streamlit as st
 
 from amazon_product_search.core.synonyms.synonym_dict import SynonymDict
-from demo.page_config import set_page_config
-from demo.utils import load_labels
+from amazon_product_search.demo.page_config import set_page_config
+from amazon_product_search.demo.utils import load_labels
 
 SBERT_SYNONYM_DICT = SynonymDict(synonym_filename="synonyms_jp_sbert.csv")
 FINE_TUNED_SBERT_SYNONYM_DICT = SynonymDict(

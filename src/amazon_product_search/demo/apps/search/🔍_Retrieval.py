@@ -11,13 +11,13 @@ from amazon_product_search.core.metrics import (
 )
 from amazon_product_search.core.nlp.normalizer import normalize_query
 from amazon_product_search.core.reranking.reranker import from_string
-from demo.apps.search.search_ui import (
+from amazon_product_search.demo.apps.search.search_ui import (
     draw_input_form,
     draw_products,
     draw_response_stats,
 )
-from demo.page_config import set_page_config
-from demo.utils import load_merged, split_fields
+from amazon_product_search.demo.page_config import set_page_config
+from amazon_product_search.demo.utils import load_merged, split_fields
 
 es_client = EsClient()
 query_builder = QueryBuilder()

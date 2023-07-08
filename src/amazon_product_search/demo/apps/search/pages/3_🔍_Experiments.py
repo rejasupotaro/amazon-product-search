@@ -16,9 +16,9 @@ from amazon_product_search.core.metrics import (
 )
 from amazon_product_search.core.nlp.normalizer import normalize_query
 from amazon_product_search.core.reranking import reranker
-from demo import utils
-from demo.apps.search.experimental_setup import EXPERIMENTS, ExperimentalSetup, Variant
-from demo.page_config import set_page_config
+from amazon_product_search.demo import utils
+from amazon_product_search.demo.apps.search.experimental_setup import EXPERIMENTS, ExperimentalSetup, Variant
+from amazon_product_search.demo.page_config import set_page_config
 
 es_client = EsClient()
 query_builder = QueryBuilder()

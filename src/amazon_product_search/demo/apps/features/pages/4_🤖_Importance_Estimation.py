@@ -8,8 +8,8 @@ from st_aggrid import AgGrid, GridOptionsBuilder
 from amazon_product_search.core.retrieval.importance_estimator import (
     ColBERTTermImportanceEstimator,
 )
-from demo.page_config import set_page_config
-from demo.utils import load_products
+from amazon_product_search.demo.page_config import set_page_config
+from amazon_product_search.demo.utils import load_products
 
 estimator = ColBERTTermImportanceEstimator()
 

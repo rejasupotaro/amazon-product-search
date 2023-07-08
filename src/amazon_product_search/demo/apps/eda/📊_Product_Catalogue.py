@@ -3,8 +3,8 @@ import polars as pl
 import streamlit as st
 from st_aggrid import AgGrid, GridOptionsBuilder
 
-from demo.page_config import set_page_config
-from demo.utils import analyze_dataframe, load_products
+from amazon_product_search.demo.page_config import set_page_config
+from amazon_product_search.demo.utils import analyze_dataframe, load_products
 
 
 def draw_column_info(products_df: pl.DataFrame) -> None:

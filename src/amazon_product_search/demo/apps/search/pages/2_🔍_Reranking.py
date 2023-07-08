@@ -18,8 +18,8 @@ from amazon_product_search.core.reranking.reranker import (
     Reranker,
     SpladeReranker,
 )
-from demo.page_config import set_page_config
-from demo.utils import load_merged
+from amazon_product_search.demo.page_config import set_page_config
+from amazon_product_search.demo.utils import load_merged
 
 RERANKER_NAMES = [
     "Random Reranker",
