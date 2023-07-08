@@ -50,9 +50,7 @@ EXPERIMENTS = {
         num_queries=5000,
         variants=[
             Variant(name="best_fields", fields=SPARSE_FIELDS, query_type="best_fields"),
-            Variant(
-                name="cross_fields", fields=SPARSE_FIELDS, query_type="cross_fields"
-            ),
+            Variant(name="cross_fields", fields=SPARSE_FIELDS, query_type="cross_fields"),
             Variant(
                 name="combined_fields",
                 fields=SPARSE_FIELDS,
@@ -116,9 +114,7 @@ EXPERIMENTS = {
         task="retrieval",
         num_queries=5000,
         variants=[
-            Variant(
-                name="title", fields=["product_title"], enable_synonym_expansion=False
-            ),
+            Variant(name="title", fields=["product_title"], enable_synonym_expansion=False),
             Variant(
                 name="title,brand,color",
                 fields=["product_title", "product_brand", "product_color"],

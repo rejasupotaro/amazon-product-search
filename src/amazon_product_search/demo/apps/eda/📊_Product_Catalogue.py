@@ -15,12 +15,7 @@ def draw_column_info(products_df: pl.DataFrame) -> None:
 
 def draw_brand_info(products_df: pl.DataFrame) -> None:
     st.write("### Brand")
-    count_df = (
-        products_df.groupby("product_brand")
-        .count()
-        .sort("count", reverse=True)
-        .head(100)
-    )
+    count_df = products_df.groupby("product_brand").count().sort("count", reverse=True).head(100)
 
     fig = px.bar(count_df.to_pandas(), x="product_brand", y="count")
     fig.update_layout(title="Top 50 brands")
@@ -29,12 +24,7 @@ def draw_brand_info(products_df: pl.DataFrame) -> None:
 
 def draw_color_info(products_df: pl.DataFrame) -> None:
     st.write("### Color")
-    count_df = (
-        products_df.groupby("product_color")
-        .count()
-        .sort("count", reverse=True)
-        .head(100)
-    )
+    count_df = products_df.groupby("product_color").count().sort("count", reverse=True).head(100)
 
     fig = px.bar(count_df.to_pandas(), x="product_color", y="count")
     fig.update_layout(title="Top 50 color names")
@@ -49,9 +39,7 @@ def draw_examples(products_df: pl.DataFrame) -> None:
     gb.configure_side_bar()
     gb.configure_selection("single", use_checkbox=True)
     grid_options = gb.build()
-    selected_rows = AgGrid(
-        products_df.to_pandas(), gridOptions=grid_options
-    ).selected_rows
+    selected_rows = AgGrid(products_df.to_pandas(), gridOptions=grid_options).selected_rows
 
     if not selected_rows:
         return

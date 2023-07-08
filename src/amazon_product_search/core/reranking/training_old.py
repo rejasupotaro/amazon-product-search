@@ -28,9 +28,7 @@ def load_dataset(locale: Locale, num_examples: int) -> pd.DataFrame:
     print(queries_df.columns)
 
     products_filepath = f"{DATA_DIR}/product_catalogue-v0.3_{locale}.csv.zip"
-    products_df = pd.read_csv(
-        products_filepath, usecols=["product_id", "product_title", "product_brand"]
-    )
+    products_df = pd.read_csv(products_filepath, usecols=["product_id", "product_title", "product_brand"])
     products_df.fillna("", inplace=True)
 
     df = queries_df.merge(products_df, on="product_id", how="left")
@@ -58,9 +56,7 @@ def train(
 
     train_examples = []
     for row in train_df.to_dict("records"):
-        train_examples.append(
-            InputExample(texts=[row["query"], row["product"]], label=float(row["gain"]))
-        )
+        train_examples.append(InputExample(texts=[row["query"], row["product"]], label=float(row["gain"])))
     train_dataloader: DataLoader = DataLoader(
         train_examples, shuffle=True, batch_size=4, drop_last=True  # type: ignore
     )

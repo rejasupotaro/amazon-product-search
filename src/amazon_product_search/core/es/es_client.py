@@ -17,9 +17,7 @@ class EsClient:
         self.es = Elasticsearch(es_host)
 
     def list_indices(self) -> list[str]:
-        return [
-            alias for alias in self.es.indices.get_alias() if not alias.startswith(".")
-        ]
+        return [alias for alias in self.es.indices.get_alias() if not alias.startswith(".")]
 
     def delete_index(self, index_name: str) -> None:
         self.es.indices.delete(index=index_name)
@@ -87,9 +85,7 @@ class EsClient:
     def count_docs(self, index_name: str) -> int:
         return self.es.count(index=index_name)["count"]
 
-    def index_doc(
-        self, index_name: str, doc: dict[str, Any], doc_id: Optional[str] = None
-    ) -> None:
+    def index_doc(self, index_name: str, doc: dict[str, Any], doc_id: Optional[str] = None) -> None:
         self.es.index(index=index_name, document=doc, id=doc_id)
         self.es.indices.refresh(index=index_name)
 
@@ -195,9 +191,7 @@ class EsClient:
         Returns:
             Response: A Response object.
         """
-        es_response = self.es.search(
-            index=index_name, query=query, knn=knn_query, size=size, explain=explain
-        )
+        es_response = self.es.search(index=index_name, query=query, knn=knn_query, size=size, explain=explain)
         return self._convert_es_response_to_response(es_response)
 
     def close(self) -> None:

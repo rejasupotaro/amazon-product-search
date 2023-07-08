@@ -58,9 +58,7 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
 
     branches = {}
     if options.extract_keywords:
-        branches["extracted_keywords"] = products | "Extract keywords" >> beam.ParDo(
-            ExtractKeywordsFn()
-        )
+        branches["extracted_keywords"] = products | "Extract keywords" >> beam.ParDo(ExtractKeywordsFn())
     if options.encode_text:
         branches["product_vector"] = (
             products
@@ -68,9 +66,7 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
             | "Encode products" >> beam.ParDo(BatchEncodeFn(shared_handle=Shared()))
         )
     if branches:
-        branches["product"] = products | beam.WithKeys(
-            lambda product: product["product_id"]
-        )
+        branches["product"] = products | beam.WithKeys(lambda product: product["product_id"])
         products = branches | beam.CoGroupByKey() | beam.Map(join_branches)
 
     batched_products = products | "Batch products for indexing" >> BatchElements()

@@ -22,9 +22,7 @@ class WriteToElasticsearch(beam.DoFn):
 
     def process(self, docs: List[Dict[str, Any]]) -> None:
         logging.info(f"Index {len(docs)} docs in a batch")
-        self.es_client.index_docs(
-            self.index_name, docs, id_fn=lambda doc: doc["product_id"]
-        )
+        self.es_client.index_docs(self.index_name, docs, id_fn=lambda doc: doc["product_id"])
 
     def teardown(self) -> None:
         if self.es_client:

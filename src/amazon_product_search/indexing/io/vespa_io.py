@@ -7,9 +7,7 @@ from amazon_product_search.core.vespa.vespa_client import VespaClient
 
 
 class WriteToVespa(beam.DoFn):
-    def __init__(
-        self, host: str, schema: str, id_fn: Callable[[Dict[str, Any]], str]
-    ) -> None:
+    def __init__(self, host: str, schema: str, id_fn: Callable[[Dict[str, Any]], str]) -> None:
         self.host = host
         self.schema = schema
         self.id_fn = id_fn

@@ -28,12 +28,7 @@ def main() -> None:
 
     st.write("### Product Catalogue")
     df = load_products(locale="jp", nrows=1000)
-    df = df.filter(
-        (
-            pl.col("product_description").is_not_null()
-            & pl.col("product_bullet_point").is_not_null()
-        )
-    )
+    df = df.filter((pl.col("product_description").is_not_null() & pl.col("product_bullet_point").is_not_null()))
     df = df.fill_null("")
 
     product = None

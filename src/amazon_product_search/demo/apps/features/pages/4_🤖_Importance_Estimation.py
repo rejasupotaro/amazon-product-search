@@ -45,9 +45,7 @@ def main() -> None:
     gb.configure_side_bar()
     gb.configure_selection("single", use_checkbox=True)
     grid_options = gb.build()
-    selected_rows = AgGrid(
-        products_df.to_pandas(), gridOptions=grid_options
-    ).selected_rows
+    selected_rows = AgGrid(products_df.to_pandas(), gridOptions=grid_options).selected_rows
 
     if not selected_rows:
         return

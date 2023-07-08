@@ -3,9 +3,7 @@ from transformers import T5ForConditionalGeneration, T5Tokenizer
 
 
 class KeywordGenerator:
-    def __init__(
-        self, model_name: str = "doc2query/msmarco-japanese-mt5-base-v1"
-    ) -> None:
+    def __init__(self, model_name: str = "doc2query/msmarco-japanese-mt5-base-v1") -> None:
         self.tokenizer = T5Tokenizer.from_pretrained(model_name)
         self.model = T5ForConditionalGeneration.from_pretrained(model_name)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -19,9 +17,4 @@ class KeywordGenerator:
             top_k=10,
             num_return_sequences=num_queries,
         )
-        return list(
-            {
-                self.tokenizer.decode(outputs[i], skip_special_tokens=True)
-                for i in range(num_queries)
-            }
-        )
+        return list({self.tokenizer.decode(outputs[i], skip_special_tokens=True) for i in range(num_queries)})

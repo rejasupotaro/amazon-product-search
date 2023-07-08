@@ -6,9 +6,7 @@ from amazon_product_search.demo.page_config import set_page_config
 from amazon_product_search.demo.utils import load_labels
 
 SBERT_SYNONYM_DICT = SynonymDict(synonym_filename="synonyms_jp_sbert.csv")
-FINE_TUNED_SBERT_SYNONYM_DICT = SynonymDict(
-    synonym_filename="synonyms_jp_fine_tuned_sbert.csv"
-)
+FINE_TUNED_SBERT_SYNONYM_DICT = SynonymDict(synonym_filename="synonyms_jp_fine_tuned_sbert.csv")
 
 
 def load_queries() -> list[str]:
@@ -43,9 +41,7 @@ def main() -> None:
     df = df.with_columns(
         [
             pl.col("synonyms").apply(len).alias("num_synonyms"),
-            pl.col("synonyms")
-            .apply(lambda synonyms: int(len(synonyms) > 0))
-            .alias("found"),
+            pl.col("synonyms").apply(lambda synonyms: int(len(synonyms) > 0)).alias("found"),
         ]
     )
 

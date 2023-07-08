@@ -7,9 +7,7 @@ from vespa.application import ApplicationPackage
 from vespa.deployment import Vespa, VespaDocker
 
 
-def start(
-    name_or_id: Optional[str] = None, app_package: Optional[ApplicationPackage] = None
-) -> Vespa:
+def start(name_or_id: Optional[str] = None, app_package: Optional[ApplicationPackage] = None) -> Vespa:
     """Start the Vespa container
 
     Args:
@@ -20,11 +18,7 @@ def start(
     Returns:
         Vespa: The Vespa app.
     """
-    vespa_docker = (
-        VespaDocker.from_container_name_or_id(name_or_id)
-        if name_or_id
-        else VespaDocker()
-    )
+    vespa_docker = VespaDocker.from_container_name_or_id(name_or_id) if name_or_id else VespaDocker()
     if app_package:
         return vespa_docker.deploy(app_package)
     else:

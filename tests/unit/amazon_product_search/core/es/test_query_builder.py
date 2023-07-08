@@ -139,9 +139,7 @@ def test_build_search_query_with_synonym_expansion_enabled_with_product_ids(
 
 def test_build_knn_search_query():
     query_builder = QueryBuilder()
-    es_query = query_builder.build_dense_search_query(
-        query="query", field="product_vector", top_k=10
-    )
+    es_query = query_builder.build_dense_search_query(query="query", field="product_vector", top_k=10)
     assert es_query.keys() == {"query_vector", "field", "k", "num_candidates", "boost"}
 
 

@@ -34,11 +34,7 @@ def _load_labels(locale: str) -> pl.DataFrame:
 def load_labels(experimental_setup: ExperimentalSetup) -> pl.DataFrame:
     df = _load_labels(experimental_setup.locale)
     if experimental_setup.num_queries:
-        queries = (
-            df.get_column("query")
-            .sample(frac=1)
-            .unique()[: experimental_setup.num_queries]
-        )
+        queries = df.get_column("query").sample(frac=1).unique()[: experimental_setup.num_queries]
         df = df.filter(pl.col("query").is_in(queries))
     return df
 
@@ -57,9 +53,7 @@ def draw_variants(variants: list[Variant]) -> None:
     st.write(variants_df.to_pandas())
 
 
-def search(
-    index_name: str, query: str, variant: Variant, labeled_ids: list[str] | None
-) -> Response:
+def search(index_name: str, query: str, variant: Variant, labeled_ids: list[str] | None) -> Response:
     es_query = None
     es_knn_query = None
 
@@ -99,12 +93,8 @@ def compute_metrics(
     response.results = variant.reranker.rerank(query, response.results)
 
     retrieved_ids = [result.product["product_id"] for result in response.results]
-    relevant_ids = set(
-        labels_df.filter(pl.col("esci_label") == "E").get_column("product_id").to_list()
-    )
-    judgements: dict[str, str] = {
-        row["product_id"]: row["esci_label"] for row in labels_df.to_dicts()
-    }
+    relevant_ids = set(labels_df.filter(pl.col("esci_label") == "E").get_column("product_id").to_list())
+    judgements: dict[str, str] = {row["product_id"]: row["esci_label"] for row in labels_df.to_dicts()}
     metric_dict = {
         "variant": variant.name,
         "query": query,
@@ -122,9 +112,7 @@ def compute_metrics(
     return metric_dict
 
 
-def perform_search(
-    experimental_setup: ExperimentalSetup, query_dict: dict[str, pl.DataFrame]
-) -> list[dict[str, Any]]:
+def perform_search(experimental_setup: ExperimentalSetup, query_dict: dict[str, pl.DataFrame]) -> list[dict[str, Any]]:
     total_examples = len(query_dict)
     n = 0
     progress_text = st.empty()
@@ -136,22 +124,16 @@ def perform_search(
         progress_text.text(f"Query ({n} / {total_examples}): {query}")
         progress_bar.progress(n / total_examples)
         for variant in experimental_setup.variants:
-            metrics.append(
-                compute_metrics(experimental_setup, variant, query, query_labels_df)
-            )
+            metrics.append(compute_metrics(experimental_setup, variant, query, query_labels_df))
     progress_text.text(f"Done ({n} / {total_examples})")
     return metrics
 
 
-def compute_stats(
-    experimental_setup: ExperimentalSetup, metrics_df: pl.DataFrame
-) -> pl.DataFrame:
+def compute_stats(experimental_setup: ExperimentalSetup, metrics_df: pl.DataFrame) -> pl.DataFrame:
     stats_df = metrics_df.groupby("variant").agg(
         [
             pl.col("total_hits").mean().cast(int),
-            pl.col("total_hits")
-            .apply(lambda series: compute_zero_hit_rate(series.to_list()))
-            .alias("zero_hit_rate"),
+            pl.col("total_hits").apply(lambda series: compute_zero_hit_rate(series.to_list())).alias("zero_hit_rate"),
         ]
         + (
             [

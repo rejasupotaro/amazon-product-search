@@ -38,9 +38,7 @@ class Splade(nn.Module):
         vecs, _ = torch.max(logits * attention_mask, dim=1)
         return vecs
 
-    def forward(
-        self, queries: dict[str, Tensor], docs: dict[str, Tensor]
-    ) -> tuple[Tensor, Tensor, Tensor]:
+    def forward(self, queries: dict[str, Tensor], docs: dict[str, Tensor]) -> tuple[Tensor, Tensor, Tensor]:
         doc_vecs = self.encode_logits(docs)
         query_vecs = self.encode_logits(queries).to(doc_vecs.device)
 

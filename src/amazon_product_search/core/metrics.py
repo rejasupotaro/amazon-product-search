@@ -16,9 +16,7 @@ def compute_zero_hit_rate(xs: list[int]) -> Optional[float]:
     return round(len([x for x in xs if x == 0]) / len(xs), 4)
 
 
-def compute_recall(
-    retrieved_ids: list[str], relevant_ids: set[str], k: Optional[int] = None
-) -> Optional[float]:
+def compute_recall(retrieved_ids: list[str], relevant_ids: set[str], k: Optional[int] = None) -> Optional[float]:
     if not relevant_ids:
         return None
     if k:
@@ -26,9 +24,7 @@ def compute_recall(
     return round(len(set(retrieved_ids) & relevant_ids) / len(relevant_ids), 4)
 
 
-def compute_precision(
-    retrieved_ids: list[str], relevant_ids: set[str], k: Optional[int] = None
-) -> Optional[float]:
+def compute_precision(retrieved_ids: list[str], relevant_ids: set[str], k: Optional[int] = None) -> Optional[float]:
     if not retrieved_ids:
         return None
     if k:
@@ -86,28 +82,17 @@ def compute_ndcg(
     if k:
         retrieved_ids = retrieved_ids[:k]
     if prime:
-        y_pred = [
-            LABEL_TO_GAIN[judgements[doc_id]]
-            for doc_id in retrieved_ids
-            if doc_id in judgements
-        ]
+        y_pred = [LABEL_TO_GAIN[judgements[doc_id]] for doc_id in retrieved_ids if doc_id in judgements]
     else:
-        y_pred = [
-            LABEL_TO_GAIN[judgements[doc_id]] if doc_id in judgements else 0
-            for doc_id in retrieved_ids
-        ]
-    y_true = sorted(
-        [LABEL_TO_GAIN[label] for label in judgements.values()], reverse=True
-    )
+        y_pred = [LABEL_TO_GAIN[judgements[doc_id]] if doc_id in judgements else 0 for doc_id in retrieved_ids]
+    y_true = sorted([LABEL_TO_GAIN[label] for label in judgements.values()], reverse=True)
     idcg_val = compute_dcg(y_true)
     dcg_val = compute_dcg(y_pred)
     ndcg = round(dcg_val / idcg_val, 4) if idcg_val != 0 else None
     return ndcg
 
 
-def compute_cosine_similarity(
-    query_vector: np.ndarray, product_vectors: np.ndarray
-) -> np.ndarray:
+def compute_cosine_similarity(query_vector: np.ndarray, product_vectors: np.ndarray) -> np.ndarray:
     numerator = np.dot(query_vector, product_vectors.T)
     denominator = np.linalg.norm(query_vector) * np.linalg.norm(product_vectors, axis=1)
     return numerator / denominator

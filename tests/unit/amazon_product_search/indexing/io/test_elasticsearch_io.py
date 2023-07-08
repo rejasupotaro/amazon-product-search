@@ -23,9 +23,7 @@ def test_bulk_called_n_times(mock_es, mock_es_client):
             (
                 pipeline
                 | beam.Create(products)
-                | beam.BatchElements(
-                    min_batch_size=batch_size, max_batch_size=batch_size
-                )
+                | beam.BatchElements(min_batch_size=batch_size, max_batch_size=batch_size)
                 | beam.ParDo(
                     WriteToElasticsearch(
                         es_host="http://localhost:9200",

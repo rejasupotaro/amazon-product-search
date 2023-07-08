@@ -38,9 +38,7 @@ def load_dataset() -> dict[str, dict[str, tuple[str, str]]]:
     return query_to_label
 
 
-def draw_es_query(
-    query: Optional[dict[str, Any]], knn_query: Optional[dict[str, Any]], size: int
-) -> None:
+def draw_es_query(query: Optional[dict[str, Any]], knn_query: Optional[dict[str, Any]], size: int) -> None:
     es_query: dict[str, Any] = {
         "size": size,
     }
@@ -130,15 +128,8 @@ def main() -> None:
     header = f"{response.total_hits} products found"
     if label_dict:
         retrieved_ids = [result.product["product_id"] for result in response.results]
-        judgements = {
-            product_id: label
-            for product_id, (label, product_title) in label_dict.items()
-        }
-        relevant_ids = {
-            product_id
-            for product_id, (label, product_title) in label_dict.items()
-            if label == "E"
-        }
+        judgements = {product_id: label for product_id, (label, product_title) in label_dict.items()}
+        relevant_ids = {product_id for product_id, (label, product_title) in label_dict.items() if label == "E"}
         precision = compute_precision(retrieved_ids, relevant_ids)
         recall = compute_recall(retrieved_ids, relevant_ids)
         ndcg = compute_ndcg(retrieved_ids, judgements)

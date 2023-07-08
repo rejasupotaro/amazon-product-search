@@ -17,14 +17,10 @@ class ColBERTer(nn.Module):
         self.score_merger = nn.Parameter(torch.zeros(1))
 
         self.cls_compression_dim = 32
-        self.cls_compressor = nn.Linear(
-            self.bert_model.config.hidden_size, self.cls_compression_dim
-        )
+        self.cls_compressor = nn.Linear(self.bert_model.config.hidden_size, self.cls_compression_dim)
 
         self.compression_dim = 32
-        self.compressor = nn.Linear(
-            self.bert_model.config.hidden_size, self.compression_dim
-        )
+        self.compressor = nn.Linear(self.bert_model.config.hidden_size, self.compression_dim)
 
         self.stopword_reducer = nn.Linear(self.compression_dim, 1, bias=True)
         nn.init.constant_(self.stopword_reducer.bias, 1)
@@ -34,9 +30,7 @@ class ColBERTer(nn.Module):
         doc_cls_vec, doc_vecs, doc_mask, token_importance = self.encode_doc(doc)
 
         cls_score = self.compute_cls_score(query_cls_vec, doc_cls_vec)
-        term_score = self.compute_term_score(
-            query_vecs, query_mask, doc_vecs, doc_mask, exact_scoring_mask=None
-        )
+        term_score = self.compute_term_score(query_vecs, query_mask, doc_vecs, doc_mask, exact_scoring_mask=None)
 
         weight = torch.sigmoid(self.score_merger)
         cls_score *= weight
@@ -50,9 +44,7 @@ class ColBERTer(nn.Module):
         token_vecs = token_vecs * token_mask.unsqueeze(-1)
         return cls_vec, token_vecs, token_mask
 
-    def encode_doc(
-        self, doc: dict[str, Tensor]
-    ) -> tuple[Tensor, Tensor, Tensor, Tensor]:
+    def encode_doc(self, doc: dict[str, Tensor]) -> tuple[Tensor, Tensor, Tensor, Tensor]:
         cls_vec, token_vecs, token_mask = self.encode_shared(doc)
         token_importance = nn.functional.relu(self.stopword_reducer(token_vecs))
         token_vecs = token_vecs * token_importance
@@ -62,9 +54,7 @@ class ColBERTer(nn.Module):
 
     def encode_shared(self, tokens: dict[str, Tensor]) -> tuple[Tensor, Tensor, Tensor]:
         token_mask = tokens["attention_mask"].bool()
-        vecs = self.bert_model(
-            input_ids=tokens["input_ids"], attention_mask=tokens["attention_mask"]
-        )[0]
+        vecs = self.bert_model(input_ids=tokens["input_ids"], attention_mask=tokens["attention_mask"])[0]
         cls_vecs = vecs[:, 0, :]
         cls_vecs = self.cls_compressor(cls_vecs)
         token_vecs = self.compressor(vecs)
@@ -83,9 +73,7 @@ class ColBERTer(nn.Module):
         exact_scoring_mask: Optional[Tensor] = None,
     ) -> Tensor:
         score_per_term = torch.bmm(query_vecs, doc_vecs.transpose(2, 1))
-        score_per_term[
-            ~(doc_mask).unsqueeze(1).expand(-1, score_per_term.shape[1], -1)
-        ] = -1000
+        score_per_term[~(doc_mask).unsqueeze(1).expand(-1, score_per_term.shape[1], -1)] = -1000
         term_score = score_per_term.max(-1).values
         term_score[~query_mask] = 0
         term_score = term_score.sum(-1)
