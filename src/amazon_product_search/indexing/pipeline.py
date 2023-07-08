@@ -9,15 +9,15 @@ from apache_beam.utils.shared import Shared
 
 from amazon_product_search.core import source
 from amazon_product_search.core.source import Locale
-from indexing.io.elasticsearch_io import WriteToElasticsearch
-from indexing.io.vespa_io import WriteToVespa
-from indexing.options import IndexerOptions
-from indexing.transforms.analyze_fn import AnalyzeFn
-from indexing.transforms.encode_fn import BatchEncodeFn
-from indexing.transforms.extract_keywords_fn import (
+from amazon_product_search.indexing.io.elasticsearch_io import WriteToElasticsearch
+from amazon_product_search.indexing.io.vespa_io import WriteToVespa
+from amazon_product_search.indexing.options import IndexerOptions
+from amazon_product_search.indexing.transforms.analyze_fn import AnalyzeFn
+from amazon_product_search.indexing.transforms.encode_fn import BatchEncodeFn
+from amazon_product_search.indexing.transforms.extract_keywords_fn import (
     ExtractKeywordsFn,
 )
-from indexing.transforms.filters import is_indexable
+from amazon_product_search.indexing.transforms.filters import is_indexable
 
 
 def get_input_source(data_dir: str, locale: Locale, nrows: int = -1) -> PTransform:

@@ -1,7 +1,7 @@
 import logging
 
-from indexing import pipeline
-from indexing.options import IndexerOptions
+from amazon_product_search.indexing import pipeline
+from amazon_product_search.indexing.options import IndexerOptions
 
 
 def main() -> None:

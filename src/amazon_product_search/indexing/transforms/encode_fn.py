@@ -3,10 +3,10 @@ from typing import Any, Dict, Iterator, List, Tuple
 
 import apache_beam as beam
 from apache_beam.utils.shared import Shared
-from indexing.transforms.weak_reference import WeakReference
 from torch import Tensor
 
 from amazon_product_search.constants import HF
+from amazon_product_search.indexing.transforms.weak_reference import WeakReference
 from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 
 
