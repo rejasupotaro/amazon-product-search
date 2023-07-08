@@ -17,13 +17,14 @@ from amazon_product_search.core.timestamp import get_unix_timestamp
     base_image=TRAINING_IMAGE_URI,
     install_kfp_package=False,
 )
-def preprocess() -> None:
-    print("Preprocess")
+def preprocess(message: str) -> None:
+    import logging
+
+    logging.info(message)
 
 
 @dsl.container_component
 def train() -> dsl.ContainerSpec:
-    print("Train")
     return dsl.ContainerSpec(
         image=TRAINING_IMAGE_URI,
         command=["python"],
@@ -42,10 +43,10 @@ def predict() -> None:
 
 
 @dsl.pipeline(
-    name="train",
+    name="example",
 )
-def training_pipeline() -> None:
-    preprocess()
+def pipeline_func(message: str) -> None:
+    preprocess(message=message)
 
     train_task = train()
     train_task.after(preprocess)
@@ -57,19 +58,20 @@ def training_pipeline() -> None:
     predict_task.after(evaluate_task)
 
 
-def main():
+def main() -> None:
     """Invoke a Vertex AI custom training job.
 
     Run `poetry run inv gcloud.build-training` to build the image used for training in advance.
 
-    To create a job, run `poetry run python -m training`. It first compiles the pipeline into the YAML format.
+    To create a job, run `poetry run python src/amazon_product_search/training/example/pipeline.py`.
+    It first compiles the pipeline into the YAML format.
     The YAML file includes all information for executing the pipeline on Vertex AI pipelines.
 
     For more details:
     * https://cloud.google.com/vertex-ai/docs/pipelines/build-pipeline
     """
-    experiment = f"training-{get_unix_timestamp()}"
-    package_path = f"{VERTEX_DIR}/training_pipeline.yaml"
+    experiment = f"example-{get_unix_timestamp()}"
+    package_path = f"{VERTEX_DIR}/example.yaml"
 
     aiplatform.init(
         project=PROJECT_ID,
@@ -79,9 +81,12 @@ def main():
     )
 
     Compiler().compile(
-        pipeline_func=training_pipeline,
+        pipeline_func=pipeline_func,
         package_path=package_path,
         type_check=True,
+        pipeline_parameters={
+            "message": "Hello World",
+        },
     )
 
     job = aiplatform.PipelineJob(
