@@ -104,7 +104,7 @@ def run(
     trainer = pl.Trainer(
         max_epochs=max_epochs,
         accelerator="auto",
-        precision="16",
+        precision="16-mixed",
         devices=devices,
     )
     trainer.fit(fine_tuner, data_module)
