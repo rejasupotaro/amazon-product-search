@@ -1,3 +1,4 @@
+import math
 from typing import Optional, Union
 
 import pandas as pd
@@ -61,10 +62,23 @@ class TokenizedSentencesDataset(Dataset):
 
 
 class MLMDataModule(pl.LightningDataModule):
-    def __init__(self, bert_model_name: str, df: pd.DataFrame, mlm_probability: float, batch_size: int):
+    def __init__(
+        self,
+        bert_model_name: str,
+        df: pd.DataFrame,
+        mlm_probability: float,
+        batch_size: int,
+        num_sentences: Optional[int] = None,
+    ):
         super().__init__()
         self.train_df = df[df["split"] == "train"]
         self.val_df = df[df["split"] == "val"]
+        if num_sentences:
+            self.train_df = self.train_df.head(num_sentences)
+            train_size = len(self.train_df)
+            val_size = math.ceil(train_size * 0.2)
+            self.val_df = self.val_df.head(val_size)
+
         self.tokenizer = AutoTokenizer.from_pretrained(bert_model_name)
         self.collator = DataCollatorForWholeWordMask(
             tokenizer=self.tokenizer, mlm=True, mlm_probability=mlm_probability
@@ -94,11 +108,9 @@ def run(
     devices: Union[list[int], str, int] = "auto",
 ):
     df = pd.read_parquet(f"{data_dir}/{input_filename}")
-    if num_sentences:
-        df = df.head(num_sentences)
 
     fine_tuner = MLMFineTuner(bert_model_name, learning_rate)
-    data_module = MLMDataModule(bert_model_name, df, mlm_probability, batch_size)
+    data_module = MLMDataModule(bert_model_name, df, mlm_probability, batch_size, num_sentences)
 
     trainer = pl.Trainer(
         max_epochs=max_epochs,
