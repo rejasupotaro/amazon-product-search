@@ -25,7 +25,6 @@ class MLMFineTuner(pl.LightningModule):
         labels = batch["labels"]
         outputs = self.model(input_ids).logits
         loss = cross_entropy(outputs.view(-1, self.model.config.vocab_size), labels.view(-1))
-        self.log("train_loss", loss, prog_bar=True)
         return loss
 
     def training_step(self, batch: list[str], batch_idx: int) -> torch.Tensor:
