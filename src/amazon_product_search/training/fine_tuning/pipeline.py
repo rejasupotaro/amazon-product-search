@@ -11,7 +11,6 @@ from amazon_product_search.constants import (
     TRAINING_IMAGE_URI,
     VERTEX_DIR,
 )
-from amazon_product_search.core.timestamp import get_unix_timestamp
 
 
 @dsl.component(
@@ -42,7 +41,7 @@ def main() -> None:
     pipeline_parameters = {
         "data_dir": data_dir,
     }
-    experiment = f"fine-tuning-{get_unix_timestamp()}"
+    experiment = "fine-tuning"
     package_path = f"{VERTEX_DIR}/fine_tuning.yaml"
 
     aiplatform.init(

@@ -10,7 +10,6 @@ from amazon_product_search.constants import (
     TRAINING_IMAGE_URI,
     VERTEX_DIR,
 )
-from amazon_product_search.core.timestamp import get_unix_timestamp
 
 
 @dsl.component(
@@ -70,7 +69,7 @@ def main() -> None:
     For more details:
     * https://cloud.google.com/vertex-ai/docs/pipelines/build-pipeline
     """
-    experiment = f"example-{get_unix_timestamp()}"
+    experiment = "example"
     package_path = f"{VERTEX_DIR}/example.yaml"
 
     aiplatform.init(
