@@ -34,6 +34,7 @@ eland = "8.7.0"
 amazon-product-search-dense-retrieval = {git = "https://github.com/rejasupotaro/amazon-product-search-dense-retrieval.git"}
 google-cloud-aiplatform = "^1.25.0"
 kfp = {version = "^2.0.0rc1", allow-prereleases = true}
+gcsfs = "^2023.6.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2"
