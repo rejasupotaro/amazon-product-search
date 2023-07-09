@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 
 import pandas as pd
 import pytorch_lightning as pl
@@ -15,7 +15,7 @@ from transformers import (
 
 
 class MLMFineTuner(pl.LightningModule):
-    def __init__(self, bert_model_name: str, learning_rate: float = 1e-4):
+    def __init__(self, bert_model_name: str, learning_rate: float):
         super().__init__()
         self.model = AutoModelForMaskedLM.from_pretrained(bert_model_name)
         self.learning_rate = learning_rate
@@ -62,22 +62,25 @@ class TokenizedSentencesDataset(Dataset):
 
 
 class MLMDataModule(pl.LightningDataModule):
-    def __init__(self, bert_model_name: str, df: pd.DataFrame):
+    def __init__(self, bert_model_name: str, df: pd.DataFrame, mlm_probability: float, batch_size: int):
         super().__init__()
         self.train_df = df[df["split"] == "train"]
         self.val_df = df[df["split"] == "val"]
         self.tokenizer = AutoTokenizer.from_pretrained(bert_model_name)
-        self.collator = DataCollatorForWholeWordMask(tokenizer=self.tokenizer, mlm=True, mlm_probability=0.1)
+        self.collator = DataCollatorForWholeWordMask(
+            tokenizer=self.tokenizer, mlm=True, mlm_probability=mlm_probability
+        )
+        self.batch_size = batch_size
 
     def train_dataloader(self) -> DataLoader:
         sentences = self.train_df["product_title"].unique().tolist()
         dataset = TokenizedSentencesDataset(sentences, self.tokenizer)
-        return DataLoader(dataset, batch_size=32, shuffle=True, collate_fn=self.collator)
+        return DataLoader(dataset, batch_size=self.batch_size, shuffle=True, collate_fn=self.collator)
 
     def val_dataloader(self) -> DataLoader:
         sentences = self.val_df["product_title"].unique().tolist()
         dataset = TokenizedSentencesDataset(sentences, self.tokenizer)
-        return DataLoader(dataset, batch_size=32, shuffle=False, collate_fn=self.collator)
+        return DataLoader(dataset, batch_size=self.batch_size, shuffle=False, collate_fn=self.collator)
 
 
 def run(
@@ -86,13 +89,17 @@ def run(
     bert_model_name: str,
     max_epochs: int,
     learning_rate: float = 1e-4,
+    batch_size: int = 32,
+    num_sentences: Optional[int] = None,
+    mlm_probability: float = 0.1,
     devices: Union[list[int], str, int] = "auto",
 ):
     df = pd.read_parquet(f"{data_dir}/{input_filename}")
-    df = df.head(1000)
+    if num_sentences:
+        df = df.head(num_sentences)
 
     fine_tuner = MLMFineTuner(bert_model_name, learning_rate)
-    data_module = MLMDataModule(bert_model_name, df)
+    data_module = MLMDataModule(bert_model_name, df, mlm_probability, batch_size)
 
     trainer = pl.Trainer(
         max_epochs=max_epochs,
@@ -101,3 +108,9 @@ def run(
         devices=devices,
     )
     trainer.fit(fine_tuner, data_module)
+
+    output_dir = f"{data_dir}/fine_tuned/{bert_model_name}"
+    model = fine_tuner.model
+    tokenizer = data_module.tokenizer
+    model.save_pretrained(output_dir)
+    tokenizer.saved_pretrained(output_dir)
