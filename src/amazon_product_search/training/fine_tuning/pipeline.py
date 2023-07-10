@@ -41,7 +41,7 @@ def main() -> None:
     pipeline_parameters = {
         "data_dir": data_dir,
     }
-    experiment = "fine-tuning"
+    experiment = "fine-tuning-1"
     package_path = f"{VERTEX_DIR}/fine_tuning.yaml"
 
     aiplatform.init(

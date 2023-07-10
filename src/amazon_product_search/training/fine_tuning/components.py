@@ -100,11 +100,11 @@ def run(
     data_dir: str,
     input_filename: str,
     bert_model_name: str,
-    max_epochs: int,
     learning_rate: float = 1e-4,
+    mlm_probability: float = 0.1,
     batch_size: int = 32,
     num_sentences: Optional[int] = None,
-    mlm_probability: float = 0.1,
+    max_epochs: int = 1,
     devices: Union[list[int], str, int] = "auto",
 ):
     df = pd.read_parquet(f"{data_dir}/{input_filename}")
@@ -124,4 +124,4 @@ def run(
     model = fine_tuner.model
     tokenizer = data_module.tokenizer
     model.save_pretrained(output_dir)
-    tokenizer.saved_pretrained(output_dir)
+    tokenizer.save_pretrained(output_dir)
