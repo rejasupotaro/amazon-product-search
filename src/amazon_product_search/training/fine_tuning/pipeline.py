@@ -1,6 +1,9 @@
+from typing import Any
+
 from google.cloud import aiplatform
 from kfp import dsl
 from kfp.compiler import Compiler
+from kfp.dsl import Metrics, Output
 
 from amazon_product_search.constants import (
     PROJECT_ID,
@@ -17,15 +20,20 @@ from amazon_product_search.constants import (
     base_image=TRAINING_IMAGE_URI,
     install_kfp_package=False,
 )
-def fine_tune(data_dir: str) -> None:
+def fine_tune(data_dir: str, metrics_output: Output[Metrics]) -> None:
     from amazon_product_search.training.fine_tuning.components import run
 
-    run(
+    metrics: list[dict[str, Any]] = run(
         data_dir,
         input_filename="merged_jp.parquet",
         bert_model_name="cl-tohoku/bert-base-japanese-char-v2",
         max_epochs=1,
     )
+    for metric in metrics:
+        epoch = metric["epoch"]
+        del metric["epoch"]
+        for key, value in metric.items():
+            metrics_output.log_metric(f"{key} ({epoch})", value)
 
 
 @dsl.pipeline(

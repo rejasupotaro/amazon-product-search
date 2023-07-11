@@ -1,9 +1,10 @@
 import math
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 import pandas as pd
-import pytorch_lightning as pl
 import torch
+from pytorch_lightning import LightningDataModule, LightningModule, Trainer
+from pytorch_lightning.callbacks import Callback
 from torch import Tensor
 from torch.nn.functional import cross_entropy
 from torch.optim import Optimizer
@@ -15,7 +16,7 @@ from transformers import (
 )
 
 
-class MLMFineTuner(pl.LightningModule):
+class MLMFineTuner(LightningModule):
     def __init__(self, bert_model_name: str, learning_rate: float):
         super().__init__()
         self.model = AutoModelForMaskedLM.from_pretrained(bert_model_name)
@@ -30,12 +31,12 @@ class MLMFineTuner(pl.LightningModule):
 
     def training_step(self, batch: list[str], batch_idx: int) -> torch.Tensor:
         loss = self(batch)
-        self.log("train_loss", loss, prog_bar=True)
+        self.log("train_loss", loss.numpy()[0].round(4), prog_bar=True)
         return loss
 
     def validation_step(self, batch: list[str], batch_idx: int) -> torch.Tensor:
         loss = self(batch)
-        self.log("val_loss", loss, prog_bar=True)
+        self.log("val_loss", loss.numpy()[0].round(4), prog_bar=True)
         return loss
 
     def configure_optimizers(self) -> Optimizer:
@@ -61,7 +62,7 @@ class TokenizedSentencesDataset(Dataset):
         )
 
 
-class MLMDataModule(pl.LightningDataModule):
+class MLMDataModule(LightningDataModule):
     def __init__(
         self,
         bert_model_name: str,
@@ -96,6 +97,31 @@ class MLMDataModule(pl.LightningDataModule):
         return DataLoader(dataset, batch_size=self.batch_size, shuffle=False, collate_fn=self.collator)
 
 
+class MetricLogger(Callback):
+    def __init__(self):
+        self.metrics = []
+
+    def on_train_epoch_end(self, trainer: Trainer, pl_module: LightningModule) -> None:
+        epoch = trainer.current_epoch
+        train_loss = trainer.callback_metrics["train_loss"]
+        self.metrics.append(
+            {
+                "epoch": epoch,
+                "train_loss": train_loss,
+            }
+        )
+
+    def on_validation_epoch_end(self, trainer: Trainer, pl_module: LightningModule) -> None:
+        epoch = trainer.current_epoch
+        train_loss = trainer.callback_metrics["val_loss"]
+        self.metrics.append(
+            {
+                "epoch": epoch,
+                "val_loss": train_loss,
+            }
+        )
+
+
 def run(
     data_dir: str,
     input_filename: str,
@@ -106,17 +132,19 @@ def run(
     num_sentences: Optional[int] = None,
     max_epochs: int = 1,
     devices: Union[list[int], str, int] = "auto",
-):
+) -> list[dict[str, Any]]:
     df = pd.read_parquet(f"{data_dir}/{input_filename}")
 
     fine_tuner = MLMFineTuner(bert_model_name, learning_rate)
     data_module = MLMDataModule(bert_model_name, df, mlm_probability, batch_size, num_sentences)
+    metric_logger = MetricLogger()
 
-    trainer = pl.Trainer(
+    trainer = Trainer(
         max_epochs=max_epochs,
         accelerator="auto",
         precision="16-mixed",
         devices=devices,
+        callbacks=[metric_logger],
     )
     trainer.fit(fine_tuner, data_module)
 
@@ -125,3 +153,5 @@ def run(
     tokenizer = data_module.tokenizer
     model.save_pretrained(output_dir)
     tokenizer.save_pretrained(output_dir)
+
+    return metric_logger.metrics
