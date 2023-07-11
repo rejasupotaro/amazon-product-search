@@ -1,6 +1,7 @@
 from google.cloud import aiplatform
 from kfp import dsl
 from kfp.compiler import Compiler
+from kfp.dsl import Metrics, Output
 
 from amazon_product_search.constants import (
     PROJECT_ID,
@@ -10,6 +11,7 @@ from amazon_product_search.constants import (
     TRAINING_IMAGE_URI,
     VERTEX_DIR,
 )
+from amazon_product_search.core.timestamp import get_unix_timestamp
 
 
 @dsl.component(
@@ -32,8 +34,10 @@ def train() -> dsl.ContainerSpec:
 
 
 @dsl.component
-def evaluate() -> None:
+def evaluate(metrics_output: Output[Metrics]) -> None:
     print("Evaluate")
+    metrics_output.log_metric("loss", 0.1)
+    metrics_output.log_metric("acc", 0.9)
 
 
 @dsl.component
@@ -42,7 +46,7 @@ def predict() -> None:
 
 
 @dsl.pipeline(
-    name="example",
+    name="dummy",
 )
 def pipeline_func(message: str) -> None:
     preprocess(message=message)
@@ -62,15 +66,15 @@ def main() -> None:
 
     Run `poetry run inv gcloud.build-training` to build the image used for training in advance.
 
-    To create a job, run `poetry run python src/amazon_product_search/training/example/pipeline.py`.
+    To create a job, run `poetry run python src/amazon_product_search/training/dummy/pipeline.py`.
     It first compiles the pipeline into the YAML format.
     The YAML file includes all information for executing the pipeline on Vertex AI pipelines.
 
     For more details:
     * https://cloud.google.com/vertex-ai/docs/pipelines/build-pipeline
     """
-    experiment = "example"
-    package_path = f"{VERTEX_DIR}/example.yaml"
+    experiment = f"dummy-{get_unix_timestamp()}"
+    package_path = f"{VERTEX_DIR}/dummy.yaml"
 
     aiplatform.init(
         project=PROJECT_ID,
