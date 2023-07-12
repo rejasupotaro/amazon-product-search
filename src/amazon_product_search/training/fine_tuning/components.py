@@ -73,7 +73,7 @@ class MLMDataModule(LightningDataModule):
     ):
         super().__init__()
         self.train_df = df[df["split"] == "train"]
-        self.val_df = df[df["split"] == "val"]
+        self.val_df = df[df["split"] == "test"]
         if num_sentences:
             self.train_df = self.train_df.head(num_sentences)
             train_size = len(self.train_df)
