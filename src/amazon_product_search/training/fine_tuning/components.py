@@ -31,12 +31,12 @@ class MLMFineTuner(LightningModule):
 
     def training_step(self, batch: list[str], batch_idx: int) -> torch.Tensor:
         loss = self(batch)
-        self.log("train_loss", loss.numpy()[0].round(4), prog_bar=True)
+        self.log("train_loss", loss, prog_bar=True)
         return loss
 
     def validation_step(self, batch: list[str], batch_idx: int) -> torch.Tensor:
         loss = self(batch)
-        self.log("val_loss", loss.numpy()[0].round(4), prog_bar=True)
+        self.log("val_loss", loss, prog_bar=True)
         return loss
 
     def configure_optimizers(self) -> Optimizer:
@@ -103,21 +103,21 @@ class MetricLogger(Callback):
 
     def on_train_epoch_end(self, trainer: Trainer, pl_module: LightningModule) -> None:
         epoch = trainer.current_epoch
-        train_loss = trainer.callback_metrics["train_loss"]
+        loss = trainer.callback_metrics["train_loss"]
         self.metrics.append(
             {
                 "epoch": epoch,
-                "train_loss": train_loss,
+                "train_loss": loss.detach().cpu().numpy().round(4),
             }
         )
 
     def on_validation_epoch_end(self, trainer: Trainer, pl_module: LightningModule) -> None:
         epoch = trainer.current_epoch
-        train_loss = trainer.callback_metrics["val_loss"]
+        loss = trainer.callback_metrics["val_loss"]
         self.metrics.append(
             {
                 "epoch": epoch,
-                "val_loss": train_loss,
+                "val_loss": loss.detach().cpu().numpy().round(4),
             }
         )
 
