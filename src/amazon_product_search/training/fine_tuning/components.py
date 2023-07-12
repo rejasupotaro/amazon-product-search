@@ -107,7 +107,7 @@ class MetricLogger(Callback):
         self.metrics.append(
             {
                 "epoch": epoch,
-                "train_loss": loss.detach().cpu().numpy().round(4),
+                "train_loss": round(float(loss.detach().cpu().numpy()), 4),
             }
         )
 
@@ -117,7 +117,7 @@ class MetricLogger(Callback):
         self.metrics.append(
             {
                 "epoch": epoch,
-                "val_loss": loss.detach().cpu().numpy().round(4),
+                "val_loss": round(float(loss.detach().cpu().numpy()), 4),
             }
         )
 
