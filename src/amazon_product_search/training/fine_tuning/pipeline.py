@@ -42,8 +42,8 @@ def fine_tune(
 @dsl.pipeline(
     name="fine_tuning",
 )
-def pipeline_func(data_dir: str) -> None:
-    fine_tune(data_dir=data_dir)
+def pipeline_func(data_dir: str, max_epochs: int, batch_size: int, num_sentences: Optional[int]) -> None:
+    fine_tune(data_dir=data_dir, max_epochs=max_epochs, batch_size=batch_size, num_sentences=num_sentences)
 
 
 def main() -> None:
