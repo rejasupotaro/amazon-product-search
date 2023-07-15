@@ -54,7 +54,7 @@ def fine_tune(
         value = row["value"]
         metric_dict[metric_name].append(value)
     for key, values in metric_dict.items():
-        metrics_output.log_metric(key, values)
+        metrics_output.log_metric(key, values[-1])
 
 
 @dsl.pipeline(
