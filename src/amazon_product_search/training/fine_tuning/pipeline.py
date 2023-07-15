@@ -23,8 +23,9 @@ from amazon_product_search.core.timestamp import get_unix_timestamp
 def fine_tune(
     data_dir: str, max_epochs: int, batch_size: int, num_sentences: Optional[int], metrics_output: Output[Metrics]
 ) -> None:
-    from amazon_product_search.training.fine_tuning.components import run
     from collections import defaultdict
+
+    from amazon_product_search.training.fine_tuning.components import run
 
     metrics: list[dict[str, Any]] = run(
         data_dir,
