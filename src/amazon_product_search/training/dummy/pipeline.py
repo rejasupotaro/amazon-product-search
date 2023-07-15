@@ -36,8 +36,8 @@ def train() -> dsl.ContainerSpec:
 @dsl.component
 def evaluate(metrics_output: Output[Metrics]) -> None:
     print("Evaluate")
-    metrics_output.log_metric("loss", 0.1)
-    metrics_output.log_metric("acc", 0.9)
+    metrics_output.log_metric("loss", [0.2, 0.1])
+    metrics_output.log_metric("acc", [0.8, 0.9])
 
 
 @dsl.component
@@ -73,7 +73,8 @@ def main() -> None:
     For more details:
     * https://cloud.google.com/vertex-ai/docs/pipelines/build-pipeline
     """
-    experiment = f"dummy-{get_unix_timestamp()}"
+    experiment = "dummy-1"
+    display_name = f"dummy-{get_unix_timestamp()}"
     package_path = f"{VERTEX_DIR}/dummy.yaml"
 
     aiplatform.init(
@@ -93,7 +94,7 @@ def main() -> None:
     )
 
     job = aiplatform.PipelineJob(
-        display_name=experiment,
+        display_name=display_name,
         template_path=package_path,
     )
     job.submit(

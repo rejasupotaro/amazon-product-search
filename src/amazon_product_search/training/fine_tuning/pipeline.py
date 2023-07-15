@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import Any, Optional
 
 from google.cloud import aiplatform
@@ -14,6 +15,7 @@ from amazon_product_search.constants import (
     TRAINING_IMAGE_URI,
     VERTEX_DIR,
 )
+from amazon_product_search.core.timestamp import get_unix_timestamp
 
 
 @dsl.component(
@@ -32,11 +34,26 @@ def fine_tune(
         batch_size=batch_size,
         num_sentences=num_sentences,
     )
-    for metric in metrics:
-        epoch = metric["epoch"]
-        del metric["epoch"]
-        for key, value in metric.items():
-            metrics_output.log_metric(f"{key} ({epoch})", value)
+    # metrics are given as follows:
+    # [
+    #     {"epoch": 0, "metric_name": "train_loss", "value": 0.2},
+    #     {"epoch": 1, "metric_name": "train_loss", "value": 0.1},
+    #     {"epoch": 0, "metric_name": "val_loss", "value": 0.3},
+    #     {"epoch": 1, "metric_name": "val_loss", "value": 0.2},
+    # ]
+    # In order to log metrics in the format of key-value pairs,
+    # the metric list provided above will be converted as follows
+    # {
+    #     "train_loss": [0.2, 0.1],
+    #     "val_loss": [0.3, 0.2],
+    # }
+    metric_dict = defaultdict(list)
+    for row in sorted(metrics, key=lambda metric: metric["epoch"]):
+        metric_name = row["metric_name"]
+        value = row["value"]
+        metric_dict[metric_name].append(value)
+    for key, values in metric_dict.items():
+        metrics_output.log_metric(key, values)
 
 
 @dsl.pipeline(
@@ -56,6 +73,7 @@ def main() -> None:
         "num_sentences": 20,
     }
     experiment = "fine-tuning-1"
+    display_name = f"dummy-{get_unix_timestamp()}"
     package_path = f"{VERTEX_DIR}/fine_tuning.yaml"
 
     aiplatform.init(
@@ -73,7 +91,7 @@ def main() -> None:
     )
 
     job = aiplatform.PipelineJob(
-        display_name=experiment,
+        display_name=display_name,
         template_path=package_path,
     )
     job.submit(
