@@ -4,7 +4,6 @@ from typing import Any, Optional, Union
 import pandas as pd
 import torch
 from pytorch_lightning import LightningDataModule, LightningModule, Trainer
-from pytorch_lightning.callbacks import Callback
 from torch import Tensor
 from torch.nn.functional import cross_entropy
 from torch.optim import Optimizer
@@ -14,6 +13,8 @@ from transformers import (
     AutoTokenizer,
     DataCollatorForWholeWordMask,
 )
+
+from amazon_product_search.training.shared.metric_logger import MetricLogger
 
 
 class MLMFineTuner(LightningModule):
@@ -95,33 +96,6 @@ class MLMDataModule(LightningDataModule):
         sentences = self.val_df["product_title"].unique().tolist()
         dataset = TokenizedSentencesDataset(sentences, self.tokenizer)
         return DataLoader(dataset, batch_size=self.batch_size, shuffle=False, collate_fn=self.collator)
-
-
-class MetricLogger(Callback):
-    def __init__(self):
-        self.metrics = []
-
-    def on_train_epoch_end(self, trainer: Trainer, pl_module: LightningModule) -> None:
-        epoch = trainer.current_epoch
-        loss = trainer.callback_metrics["train_loss"]
-        self.metrics.append(
-            {
-                "epoch": epoch,
-                "metric_name": "train_loss",
-                "value": round(float(loss.detach().cpu().numpy()), 4),
-            }
-        )
-
-    def on_validation_epoch_end(self, trainer: Trainer, pl_module: LightningModule) -> None:
-        epoch = trainer.current_epoch
-        loss = trainer.callback_metrics["val_loss"]
-        self.metrics.append(
-            {
-                "epoch": epoch,
-                "metric_name": "val_loss",
-                "value": round(float(loss.detach().cpu().numpy()), 4),
-            }
-        )
 
 
 def run(
