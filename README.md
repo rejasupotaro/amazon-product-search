@@ -4,11 +4,11 @@
 
 This repo showcases and compares various search algorithms and models for [Shopping Queries Dataset: A Large-Scale ESCI Benchmark for Improving Product Search](https://github.com/amazon-science/esci-data).
 
-The details and results of experiments will be added to this wiki: https://github.com/rejasupotaro/amazon-product-search/wiki
+The details and results of experiments can be found in this wiki: https://github.com/rejasupotaro/amazon-product-search/wiki
 
 ## Installation
 
-Copy `.envrc.example` and fill in the necessary environment variables. Afterwards, proceed to installing the dependencies.
+Copy `.envrc.example` and fill in the necessary environment variables. Afterwards, proceed with installing the dependencies.
 
 ```shell
 $ pyenv install 3.10.8
@@ -36,7 +36,7 @@ $ poetry run inv data.merge-and-split
 
 ## Index Products
 
-This project indexes products into Elasticsearch. If you want to try it on your own machine, launch Elasticsearch locally and execute the document indexing pipeline against the created index.
+This project involves indexing products into Elasticsearch. If you want to try it on your own machine, launch Elasticsearch locally and execute the document indexing pipeline against the created index.
 
 ```shell
 $ docker compose up
