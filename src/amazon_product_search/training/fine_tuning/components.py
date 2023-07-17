@@ -71,6 +71,7 @@ class MLMDataModule(LightningDataModule):
         mlm_probability: float,
         batch_size: int,
         num_sentences: Optional[int] = None,
+        prepend_tag: bool = False,
     ):
         super().__init__()
         self.train_df = df[df["split"] == "train"]
@@ -86,14 +87,36 @@ class MLMDataModule(LightningDataModule):
             tokenizer=self.tokenizer, mlm=True, mlm_probability=mlm_probability
         )
         self.batch_size = batch_size
+        self.prepend_tag = prepend_tag
+
+    @staticmethod
+    def make_sentences(df: pd.DataFrame, prepend_tag: bool) -> list[str]:
+        columns = [
+            ("product_title", "title"),
+            ("product_brand", "brand"),
+            ("product_color", "color"),
+            ("product_bullet_point", "bullet"),
+            ("product_description", "desc"),
+        ]
+        df = df[[column[0] for column in columns]]
+        df = df.drop_duplicates()
+
+        sentences = []
+        for row in df.to_dict("records"):
+            if prepend_tag:
+                sentence = " ".join([f"{tag}: {row[field_name]}" for field_name, tag in columns if row[field_name]])
+            else:
+                sentence = " ".join([row[field_name] for field_name, tag in columns if row[field_name]])
+            sentences.append(sentence)
+        return sentences
 
     def train_dataloader(self) -> DataLoader:
-        sentences = self.train_df["product_title"].unique().tolist()
+        sentences = self.make_sentences(self.train_df, self.prepend_tag)
         dataset = TokenizedSentencesDataset(sentences, self.tokenizer)
         return DataLoader(dataset, batch_size=self.batch_size, shuffle=True, collate_fn=self.collator)
 
     def val_dataloader(self) -> DataLoader:
-        sentences = self.val_df["product_title"].unique().tolist()
+        sentences = self.make_sentences(self.val_df, self.prepend_tag)
         dataset = TokenizedSentencesDataset(sentences, self.tokenizer)
         return DataLoader(dataset, batch_size=self.batch_size, shuffle=False, collate_fn=self.collator)
 
