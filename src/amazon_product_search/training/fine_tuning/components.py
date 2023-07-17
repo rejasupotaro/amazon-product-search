@@ -10,7 +10,7 @@ from transformers import (
     AutoModelForMaskedLM,
 )
 
-from amazon_product_search.training.fine_tuning.data_module import MLMDataModule
+from amazon_product_search.training.fine_tuning.data_module import ProductMLMDataModule
 from amazon_product_search.training.shared.metric_logger import MetricLogger
 
 
@@ -56,7 +56,7 @@ def run(
     df = pd.read_parquet(f"{data_dir}/{input_filename}")
 
     fine_tuner = MLMFineTuner(bert_model_name, learning_rate)
-    data_module = MLMDataModule(bert_model_name, df, mlm_probability, batch_size, num_sentences)
+    data_module = ProductMLMDataModule(bert_model_name, df, mlm_probability, batch_size, num_sentences)
     metric_logger = MetricLogger()
 
     trainer = Trainer(

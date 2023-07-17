@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from amazon_product_search.training.fine_tuning.components import MLMDataModule
+from amazon_product_search.training.fine_tuning.components import ProductMLMDataModule
 
 
 @pytest.mark.parametrize(
@@ -23,5 +23,5 @@ def test_make_sentences(prepend_tag, expected):
             },
         ]
     )
-    actual = MLMDataModule.make_sentences(df, prepend_tag)
+    actual = ProductMLMDataModule.make_sentences(df, prepend_tag)
     assert actual == expected

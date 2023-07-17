@@ -28,7 +28,7 @@ class TokenizedSentencesDataset(Dataset):
         )
 
 
-class MLMDataModule(LightningDataModule):
+class ProductMLMDataModule(LightningDataModule):
     def __init__(
         self,
         bert_model_name: str,
