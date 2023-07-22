@@ -14,11 +14,18 @@ def test_build_search_query():
         query="query", fields=["product_title"], query_type="combined_fields"
     )
     assert es_query == {
-        "combined_fields": {
-            "query": "query",
-            "fields": ["product_title"],
-            "operator": "and",
-            "boost": 1.0,
+        "bool": {
+            "should": [
+                {
+                    "combined_fields": {
+                        "query": "query",
+                        "fields": ["product_title"],
+                        "operator": "and",
+                        "boost": 1.0,
+                    }
+                }
+            ],
+            "minimum_should_match": 1,
         }
     }
 
@@ -71,11 +78,18 @@ def test_build_search_query_with_product_ids():
         "bool": {
             "should": [
                 {
-                    "combined_fields": {
-                        "query": "query",
-                        "fields": ["product_title"],
-                        "operator": "and",
-                        "boost": 1.0,
+                    "bool": {
+                        "should": [
+                            {
+                                "combined_fields": {
+                                    "query": "query",
+                                    "fields": ["product_title"],
+                                    "operator": "and",
+                                    "boost": 1.0,
+                                },
+                            }
+                        ],
+                        "minimum_should_match": 1,
                     },
                 },
             ],

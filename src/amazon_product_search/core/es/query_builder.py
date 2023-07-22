@@ -87,7 +87,7 @@ class QueryBuilder:
         if not query:
             return self.match_all()
 
-        synonyms = None
+        synonyms = []
         if is_synonym_expansion_enabled:
             synonyms = self.synonym_dict.find_synonyms(query)
 
@@ -96,21 +96,6 @@ class QueryBuilder:
             terms_clause = {
                 "terms": {
                     "product_id": product_ids,
-                },
-            }
-
-        if not synonyms:
-            match_clause = self._build_sparse_search_query(query_type, query, fields, boost)
-            if not terms_clause:
-                return match_clause
-            return {
-                "bool": {
-                    "should": [
-                        match_clause,
-                    ],
-                    "must": [
-                        terms_clause,
-                    ],
                 },
             }
 
