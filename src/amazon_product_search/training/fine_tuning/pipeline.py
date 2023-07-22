@@ -21,14 +21,18 @@ from amazon_product_search.core.timestamp import get_unix_timestamp
     base_image=TRAINING_IMAGE_URI,
 )
 def fine_tune(
-    data_dir: str, max_epochs: int, batch_size: int, num_sentences: Optional[int], metrics_output: Output[Metrics]
+    project_dir: str,
+    max_epochs: int,
+    batch_size: int,
+    num_sentences: Optional[int],
+    metrics_output: Output[Metrics],
 ) -> None:
     from collections import defaultdict
 
     from amazon_product_search.training.fine_tuning.components import run
 
     metrics: list[dict[str, Any]] = run(
-        data_dir,
+        project_dir,
         input_filename="merged_jp.parquet",
         bert_model_name="cl-tohoku/bert-base-japanese-char-v2",
         max_epochs=max_epochs,
@@ -60,15 +64,14 @@ def fine_tune(
 @dsl.pipeline(
     name="fine_tuning",
 )
-def pipeline_func(data_dir: str, max_epochs: int, batch_size: int, num_sentences: Optional[int]) -> None:
-    fine_tune(data_dir=data_dir, max_epochs=max_epochs, batch_size=batch_size, num_sentences=num_sentences)
+def pipeline_func(project_dir: str, max_epochs: int, batch_size: int, num_sentences: Optional[int]) -> None:
+    fine_tune(project_dir=project_dir, max_epochs=max_epochs, batch_size=batch_size, num_sentences=num_sentences)
 
 
 def main() -> None:
     project_dir = f"gs://{PROJECT_NAME}"
-    data_dir = f"{project_dir}/data"
     pipeline_parameters = {
-        "data_dir": data_dir,
+        "project_dir": project_dir,
         "max_epochs": 1,
         "batch_size": 2,
         "num_sentences": 20,

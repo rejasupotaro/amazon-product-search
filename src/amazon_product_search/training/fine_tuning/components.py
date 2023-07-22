@@ -44,7 +44,7 @@ class MLMFineTuner(LightningModule):
 
 
 def run(
-    data_dir: str,
+    project_dir: str,
     input_filename: str,
     bert_model_name: str,
     learning_rate: float = 1e-4,
@@ -54,6 +54,9 @@ def run(
     max_epochs: int = 1,
     devices: Union[list[int], str, int] = "auto",
 ) -> list[dict[str, Any]]:
+    data_dir = f"{project_dir}/data"
+    models_dir = f"{project_dir}/models"
+
     df = pd.read_parquet(f"{data_dir}/{input_filename}")
 
     fine_tuner = MLMFineTuner(bert_model_name, learning_rate)
@@ -63,7 +66,7 @@ def run(
         monitor="val_loss",
         mode="min",
         save_top_k=1,
-        dirpath=f"{data_dir}/checkpoints/{bert_model_name}",
+        dirpath=f"{models_dir}/checkpoints/{bert_model_name}",
         filename="{epoch:02d}-{val_loss:.2f}",
     )
 
@@ -76,7 +79,7 @@ def run(
     )
     trainer.fit(fine_tuner, data_module)
 
-    output_dir = f"{data_dir}/fine_tuned/{bert_model_name}"
+    output_dir = f"{models_dir}/fine_tuned/{bert_model_name}"
     model = fine_tuner.model
     tokenizer = data_module.tokenizer
     model.save_pretrained(output_dir)
