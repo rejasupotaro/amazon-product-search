@@ -1,6 +1,14 @@
+import json
 from unittest.mock import patch
 
 from amazon_product_search.core.es.query_builder import QueryBuilder
+
+
+def test_match_all():
+    query_builder = QueryBuilder()
+    es_query_str = query_builder.match_all()
+    es_query = json.loads(es_query_str)
+    assert es_query == {"match_all": {}}
 
 
 def test_build_search_query():

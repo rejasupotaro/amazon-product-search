@@ -4,6 +4,7 @@ from torch import Tensor
 
 from amazon_product_search.constants import DATA_DIR, HF
 from amazon_product_search.core.cache import weak_lru_cache
+from amazon_product_search.core.es.templates.template_loader import TemplateLoader
 from amazon_product_search.core.synonyms.synonym_dict import SynonymDict
 from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 
@@ -12,6 +13,10 @@ class QueryBuilder:
     def __init__(self, data_dir: str = DATA_DIR) -> None:
         self.synonym_dict = SynonymDict(data_dir)
         self.encoder: SBERTEncoder = SBERTEncoder(HF.JP_SLUKE_MEAN)
+        self.template_loader = TemplateLoader()
+
+    def match_all(self) -> str:
+        return self.template_loader.load("match_all.j2").render()
 
     def _multi_match(self, query: str, fields: list[str], query_type: str, boost: float) -> dict[str, Any]:
         return {
