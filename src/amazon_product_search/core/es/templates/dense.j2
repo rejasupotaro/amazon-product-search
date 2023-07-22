@@ -1,0 +1,14 @@
+{
+    {% if product_ids %}
+    "filter": {
+        "terms": {
+            "product_id": {{ product_ids | tojson }}
+        }
+    },
+    {% endif %}
+    "query_vector": {{ query_vector }},
+    "field": "{{ field }}",
+    "k": {{ k }},
+    "num_candidates": {{ num_candidates }},
+    "boost": {{ boost }}
+}

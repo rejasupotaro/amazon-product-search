@@ -1,3 +1,4 @@
+import json
 from typing import Any
 
 from torch import Tensor
@@ -15,8 +16,9 @@ class QueryBuilder:
         self.encoder: SBERTEncoder = SBERTEncoder(HF.JP_SLUKE_MEAN)
         self.template_loader = TemplateLoader()
 
-    def match_all(self) -> str:
-        return self.template_loader.load("match_all.j2").render()
+    def match_all(self) -> dict[str, Any]:
+        es_query_str = self.template_loader.load("match_all.j2").render()
+        return json.loads(es_query_str)
 
     def _multi_match(self, query: str, fields: list[str], query_type: str, boost: float) -> dict[str, Any]:
         return {
@@ -159,18 +161,12 @@ class QueryBuilder:
             dict[str, Any]: The constructed ES query.
         """
         query_vector = self.encode(query).tolist()
-        knn_clause = {
-            "query_vector": query_vector,
-            "field": field,
-            "k": top_k,
-            "num_candidates": 100,
-            "boost": boost,
-        }
-        if not product_ids:
-            return knn_clause
-        knn_clause["filter"] = {
-            "terms": {
-                "product_id": product_ids,
-            },
-        }
-        return knn_clause
+        es_query_str = self.template_loader.load("dense.j2").render(
+            query_vector=query_vector,
+            field=field,
+            k=top_k,
+            num_candidates=100,
+            boost=boost,
+            product_ids=product_ids,
+        )
+        return json.loads(es_query_str)
