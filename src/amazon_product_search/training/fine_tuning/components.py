@@ -3,6 +3,7 @@ from typing import Any, Optional, Union
 import pandas as pd
 import torch
 from pytorch_lightning import LightningModule, Trainer
+from pytorch_lightning.callbacks import ModelCheckpoint
 from torch import Tensor
 from torch.nn.functional import cross_entropy
 from torch.optim import Optimizer
@@ -58,13 +59,20 @@ def run(
     fine_tuner = MLMFineTuner(bert_model_name, learning_rate)
     data_module = ProductMLMDataModule(bert_model_name, df, mlm_probability, batch_size, num_sentences)
     metric_logger = MetricLogger()
+    model_checkpoint = ModelCheckpoint(
+        monitor="val_loss",
+        mode="min",
+        save_top_k=1,
+        dirpath=f"{data_dir}/checkpoints/{bert_model_name}",
+        filename="{epoch:02d}-{val_loss:.2f}",
+    )
 
     trainer = Trainer(
         max_epochs=max_epochs,
         accelerator="auto",
         precision="16-mixed",
         devices=devices,
-        callbacks=[metric_logger],
+        callbacks=[metric_logger, model_checkpoint],
     )
     trainer.fit(fine_tuner, data_module)
 
