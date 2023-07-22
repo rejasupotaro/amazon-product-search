@@ -85,9 +85,7 @@ class QueryBuilder:
             dict[str, Any]: The constructed ES query.
         """
         if not query:
-            return {
-                "match_all": {},
-            }
+            return self.match_all()
 
         synonyms = None
         if is_synonym_expansion_enabled:
