@@ -20,52 +20,6 @@ class QueryBuilder:
         es_query_str = self.template_loader.load("match_all.j2").render()
         return json.loads(es_query_str)
 
-    def _multi_match(self, query: str, fields: list[str], query_type: str, boost: float) -> dict[str, Any]:
-        return {
-            "multi_match": {
-                "query": query,
-                "type": query_type,
-                "fields": fields,
-                "operator": "and",
-                "boost": boost,
-            }
-        }
-
-    def _combined_fields(self, query: str, fields: list[str], boost: float) -> dict[str, Any]:
-        return {
-            "combined_fields": {
-                "query": query,
-                "fields": fields,
-                "operator": "and",
-                "boost": boost,
-            }
-        }
-
-    def _simple_query_string(self, query: str, fields: list[str], boost: float) -> dict[str, Any]:
-        return {
-            "simple_query_string": {
-                "query": query,
-                "fields": fields,
-                "default_operator": "and",
-                "boost": boost,
-            }
-        }
-
-    def _build_sparse_search_query(
-        self, query_type: str, query: str, fields: list[str], boost: float
-    ) -> dict[str, Any]:
-        match query_type:
-            case "cross_fields":
-                return self._multi_match(query, fields, query_type="cross_fields", boost=boost)
-            case "best_fields":
-                return self._multi_match(query, fields, query_type="best_fields", boost=boost)
-            case "combined_fields":
-                return self._combined_fields(query, fields, boost)
-            case "simple_query_string":
-                return self._simple_query_string(query, fields, boost)
-            case _:
-                raise ValueError(f"Unknown query_type is given: {query_type}")
-
     def build_sparse_search_query(
         self,
         query: str,
@@ -91,21 +45,20 @@ class QueryBuilder:
         if is_synonym_expansion_enabled:
             synonyms = self.synonym_dict.find_synonyms(query)
 
-        match_clauses = []
-        for q in [query, *synonyms]:
-            match_clauses.append(self._build_sparse_search_query(query_type, q, fields, boost))
-        bool_clause = {
-            "bool": {
-                "should": match_clauses,
-                "minimum_should_match": 1,
-            }
-        }
+        query_match = json.loads(
+            self.template_loader.load("query_match.j2").render(
+                queries=[query, *synonyms],
+                query_type=query_type,
+                fields=fields,
+                boost=boost,
+            )
+        )
         if not product_ids:
-            return bool_clause
+            return query_match
         return {
             "bool": {
                 "should": [
-                    bool_clause,
+                    query_match,
                 ],
                 "must": [
                     {
