@@ -31,7 +31,7 @@ class EsClient:
         with open("schema/es/products.json") as file:
             schema = json.load(file)
             print(schema)
-        self.es.indices.create(index=index_name, mappings=schema["mappings"])
+        self.es.indices.create(index=index_name, mappings=schema["mappings"], timeout="30s")
 
     def import_model(self, model_id: str, tmp_path: str = MODELS_DIR) -> None:
         """Import a TransformerModel into Elasticsearch.

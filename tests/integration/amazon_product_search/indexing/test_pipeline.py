@@ -87,4 +87,3 @@ def test_pipeline(tmp_path: Path, es_docker: EsDocker):
         assert "product_vector" in product
         del product["product_vector"]
     assert actual == expected
-    raise AssertionError()
