@@ -17,7 +17,7 @@ def es_docker() -> Iterator[EsDocker]:
         yield instance
 
 
-def test_pipeline(tmp_path: Path, es_docker):
+def test_pipeline(tmp_path: Path, es_docker: EsDocker):
     inputs = [
         {
             "product_id": "1",
@@ -45,6 +45,9 @@ def test_pipeline(tmp_path: Path, es_docker):
     dest_host = "http://localhost:9200"
 
     client = EsClient(es_host=dest_host)
+    print("!!!!!!!!")
+    print(es_docker)
+    print(client.list_indices())
     if index_name in client.list_indices():
         client.delete_index(index_name)
     client.create_index(index_name)
@@ -84,3 +87,4 @@ def test_pipeline(tmp_path: Path, es_docker):
         assert "product_vector" in product
         del product["product_vector"]
     assert actual == expected
+    raise AssertionError()

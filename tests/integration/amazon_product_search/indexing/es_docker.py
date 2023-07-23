@@ -43,6 +43,7 @@ class EsDocker:
                 response = json.loads(output)
             except JSONDecodeError:
                 continue
+            print(response)
             status = response["status"]
             if status != "green":
                 continue
