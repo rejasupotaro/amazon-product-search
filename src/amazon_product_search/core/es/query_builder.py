@@ -1,11 +1,12 @@
 import json
-from typing import Any
+from typing import Any, cast
 
 from torch import Tensor
 
 from amazon_product_search.constants import DATA_DIR, HF
 from amazon_product_search.core.cache import weak_lru_cache
 from amazon_product_search.core.es.templates.template_loader import TemplateLoader
+from amazon_product_search.core.nlp.tokenizer import Tokenizer
 from amazon_product_search.core.synonyms.synonym_dict import SynonymDict
 from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 
@@ -13,6 +14,7 @@ from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 class QueryBuilder:
     def __init__(self, data_dir: str = DATA_DIR) -> None:
         self.synonym_dict = SynonymDict(data_dir)
+        self.tokenizer = Tokenizer()
         self.encoder: SBERTEncoder = SBERTEncoder(HF.JP_SLUKE_MEAN)
         self.template_loader = TemplateLoader()
 
@@ -40,6 +42,9 @@ class QueryBuilder:
         """
         if not query:
             return self.match_all()
+
+        tokens = cast(list, self.tokenizer.tokenize(query))
+        query = " ".join(tokens)
 
         synonyms = []
         if is_synonym_expansion_enabled:
