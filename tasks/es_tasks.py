@@ -1,3 +1,6 @@
+import contextlib
+
+from elasticsearch import NotFoundError
 from invoke import task
 
 from amazon_product_search.constants import HF, PROJECT_ID, PROJECT_NAME, REGION
@@ -21,7 +24,9 @@ def create_index(c, index_name):
 @task
 def recreate_index(c, index_name):
     es_client = EsClient()
-    es_client.delete_index(index_name=index_name)
+    with contextlib.suppress(NotFoundError):
+        es_client.delete_index(index_name=index_name)
+
     es_client.create_index(index_name=index_name)
 
 
