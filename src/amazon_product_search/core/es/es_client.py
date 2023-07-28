@@ -22,13 +22,13 @@ class EsClient:
     def delete_index(self, index_name: str) -> None:
         self.es.indices.delete(index=index_name)
 
-    def create_index(self, index_name: str) -> None:
+    def create_index(self, index_name: str, schema_filename: str = "products.json") -> None:
         """Create a new index using a mapping file (`schema/es/products.json`).
 
         Args:
             index_name (str): An index name to create.
         """
-        with open("schema/es/products.json") as file:
+        with open(f"schema/es/{schema_filename}") as file:
             schema = json.load(file)
             print(schema)
         self.es.indices.create(index=index_name, mappings=schema["mappings"])
