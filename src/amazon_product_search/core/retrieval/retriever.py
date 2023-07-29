@@ -29,7 +29,7 @@ class Retriever:
         self.es_client = EsClient()
         self.query_builder = QueryBuilder()
 
-    def _rff(self, sparse_response: Response, dense_response: Response, k: int) -> Response:
+    def _rrf(self, sparse_response: Response, dense_response: Response, k: int = 60) -> Response:
         id_to_product: dict[str, dict[str, Any]] = {}
         sparse_results: dict[str, float] = {}
         dense_results: dict[str, float] = {}
@@ -43,13 +43,13 @@ class Retriever:
             id_to_product[product_id] = result.product
             dense_results[product_id] = 1 / (k + i + 1)
 
-        results = []
+        results: list[Result] = []
         for product_id in sparse_results.keys() | dense_results.keys():
             score = sparse_results.get(product_id, 0) + dense_results.get(product_id, 0)
             result = Result(product=id_to_product[product_id], score=score)
             results.append(result)
 
-        results = sorted(results, key=lambda result: result.score, reverse=True)
+        results = sorted(results, key=lambda result: (result.score, result.product["product_id"]), reverse=True)
         return Response(results=results, total_hits=len(results))
 
     def search(
@@ -61,7 +61,7 @@ class Retriever:
         query_type: str = "combined_fields",
         sparse_boost: float = 1.0,
         dense_boost: float = 1.0,
-        rrf_k: bool = False,
+        rrf: bool | int = False,
         size: int = 20,
     ):
         normalized_query = normalize_query(query)
@@ -84,24 +84,8 @@ class Retriever:
                 boost=dense_boost,
             )
 
-        if rrf_k:
-            sparse_response = self.es_client.search(
-                index_name=index_name,
-                query=sparse_query,
-                knn_query=None,
-                size=size,
-                explain=True,
-            )
-            dense_response = self.es_client.search(
-                index_name=index_name,
-                query=None,
-                knn_query=dense_query,
-                size=size,
-                explain=True,
-            )
-            response = self._rff(sparse_response, dense_response, rrf_k)
-        else:
-            response = self.es_client.search(
+        if not rrf:
+            return self.es_client.search(
                 index_name=index_name,
                 query=sparse_query,
                 knn_query=dense_query,
@@ -109,4 +93,20 @@ class Retriever:
                 explain=True,
             )
 
-        return response
+        sparse_response = self.es_client.search(
+            index_name=index_name,
+            query=sparse_query,
+            knn_query=None,
+            size=size,
+            explain=True,
+        )
+        dense_response = self.es_client.search(
+            index_name=index_name,
+            query=None,
+            knn_query=dense_query,
+            size=size,
+            explain=True,
+        )
+        if isinstance(rrf, bool):
+            return self._rrf(sparse_response, dense_response)
+        return self._rrf(sparse_response, dense_response, rrf)
