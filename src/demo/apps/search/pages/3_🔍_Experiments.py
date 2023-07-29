@@ -16,6 +16,7 @@ from amazon_product_search.core.metrics import (
 )
 from amazon_product_search.core.nlp.normalizer import normalize_query
 from amazon_product_search.core.reranking import reranker
+from amazon_product_search.core.retrieval.retriever import split_fields
 from demo import utils
 from demo.apps.search.experimental_setup import EXPERIMENTS, ExperimentalSetup, Variant
 from demo.page_config import set_page_config
@@ -57,7 +58,7 @@ def search(index_name: str, query: str, variant: Variant, labeled_ids: list[str]
     es_query = None
     es_knn_query = None
 
-    sparse_fields, dense_fields = utils.split_fields(variant.fields)
+    sparse_fields, dense_fields = split_fields(variant.fields)
     if sparse_fields:
         es_query = query_builder.build_sparse_search_query(
             query=query,

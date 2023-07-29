@@ -11,13 +11,14 @@ from amazon_product_search.core.metrics import (
 )
 from amazon_product_search.core.nlp.normalizer import normalize_query
 from amazon_product_search.core.reranking.reranker import from_string
+from amazon_product_search.core.retrieval.retriever import split_fields
 from demo.apps.search.search_ui import (
     draw_input_form,
     draw_products,
     draw_response_stats,
 )
 from demo.page_config import set_page_config
-from demo.utils import load_merged, split_fields
+from demo.utils import load_merged
 
 es_client = EsClient()
 query_builder = QueryBuilder()
@@ -96,10 +97,6 @@ def main() -> None:
     with st.expander("Query Details", expanded=False):
         st.write("Normalized Query:")
         st.write(normalized_query)
-
-        st.write("Analyzed Query")
-        analyzed_query = es_client.analyze(normalized_query)
-        st.write(analyzed_query)
 
         draw_es_query(sparse_query, dense_query, size)
 

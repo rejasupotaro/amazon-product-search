@@ -20,24 +20,6 @@ def load_merged(locale: Locale, nrows: int = -1) -> pl.DataFrame:
     return source.load_merged(locale, nrows)
 
 
-def split_fields(fields: list[str]) -> tuple[list[str], list[str]]:
-    """Convert a given list of fields into a tuple of (sparse_fields, dense_fields)
-
-    Field names containing "vector" will be considered dense_fields.
-
-    Args:
-        fields (list[str]): A list of fields.
-
-    Returns:
-        tuple[list[str], list[str]]: A tuple of (sparse_fields, dense_fields)
-    """
-    sparse_fields: list[str] = []
-    dense_fields: list[str] = []
-    for field in fields:
-        (dense_fields if "vector" in field else sparse_fields).append(field)
-    return sparse_fields, dense_fields
-
-
 def analyze_dataframe(df: pl.DataFrame) -> pl.DataFrame:
     """Calculate the basic statistics for a given DataFrame.
 

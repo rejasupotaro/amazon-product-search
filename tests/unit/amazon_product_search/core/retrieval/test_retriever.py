@@ -1,4 +1,4 @@
-from demo.utils import split_fields
+from amazon_product_search.core.retrieval.retriever import split_fields
 
 
 def test_split_fields():
