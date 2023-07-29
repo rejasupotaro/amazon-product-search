@@ -4,10 +4,10 @@ from typing import Any, Callable, Iterator, Optional
 
 from eland.ml.pytorch import PyTorchModel
 from eland.ml.pytorch.transformers import TransformerModel
-from elasticsearch import Elasticsearch, helpers
 
 from amazon_product_search.constants import MODELS_DIR
 from amazon_product_search.core.es.response import Response, Result
+from elasticsearch import Elasticsearch, helpers
 
 
 class EsClient:
