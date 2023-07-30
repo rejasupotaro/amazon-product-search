@@ -161,7 +161,12 @@ EXPERIMENTS = {
                 dense_boost=20.0,
             ),
             Variant(
-                name="RRF",
+                name="RRF (10)",
+                fields=ALL_FIELDS,
+                rrf=10,
+            ),
+            Variant(
+                name="RRF (60)",
                 fields=ALL_FIELDS,
                 rrf=60,
             ),
