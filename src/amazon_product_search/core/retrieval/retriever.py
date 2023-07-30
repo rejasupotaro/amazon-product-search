@@ -25,9 +25,16 @@ def split_fields(fields: list[str]) -> tuple[list[str], list[str]]:
 
 
 class Retriever:
-    def __init__(self):
-        self.es_client = EsClient()
-        self.query_builder = QueryBuilder()
+    def __init__(self, es_client: EsClient | None = None, query_builder: QueryBuilder | None = None) -> None:
+        if es_client:
+            self.es_client = es_client
+        else:
+            self.es_client = EsClient()
+
+        if query_builder:
+            self.query_builder = query_builder
+        else:
+            self.query_builder = QueryBuilder()
 
     def _rrf(self, sparse_response: Response, dense_response: Response, k: int = 60) -> Response:
         id_to_product: dict[str, dict[str, Any]] = {}
@@ -59,6 +66,7 @@ class Retriever:
         fields: list[str],
         is_synonym_expansion_enabled: bool = False,
         query_type: str = "combined_fields",
+        product_ids: list[str] | None = None,
         sparse_boost: float = 1.0,
         dense_boost: float = 1.0,
         rrf: bool | int = False,
@@ -74,6 +82,7 @@ class Retriever:
                 query_type=query_type,
                 boost=sparse_boost,
                 is_synonym_expansion_enabled=is_synonym_expansion_enabled,
+                product_ids=product_ids,
             )
         dense_query = None
         if normalized_query and dense_fields:
