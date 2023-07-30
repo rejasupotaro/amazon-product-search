@@ -6,7 +6,6 @@ import polars as pl
 import streamlit as st
 
 from amazon_product_search.core.es.es_client import EsClient
-from amazon_product_search.core.es.query_builder import QueryBuilder
 from amazon_product_search.core.es.response import Response
 from amazon_product_search.core.metrics import (
     compute_ndcg,
@@ -14,15 +13,14 @@ from amazon_product_search.core.metrics import (
     compute_recall,
     compute_zero_hit_rate,
 )
-from amazon_product_search.core.nlp.normalizer import normalize_query
 from amazon_product_search.core.reranking import reranker
-from amazon_product_search.core.retrieval.retriever import split_fields
+from amazon_product_search.core.retrieval.retriever import Retriever
 from demo import utils
 from demo.apps.search.experimental_setup import EXPERIMENTS, ExperimentalSetup, Variant
 from demo.page_config import set_page_config
 
 es_client = EsClient()
-query_builder = QueryBuilder()
+retriever = Retriever(es_client=es_client)
 
 
 @st.cache_data
@@ -55,28 +53,15 @@ def draw_variants(variants: list[Variant]) -> None:
 
 
 def search(index_name: str, query: str, variant: Variant, labeled_ids: list[str] | None) -> Response:
-    es_query = None
-    es_knn_query = None
-
-    sparse_fields, dense_fields = split_fields(variant.fields)
-    if sparse_fields:
-        es_query = query_builder.build_sparse_search_query(
-            query=query,
-            fields=sparse_fields,
-            query_type=variant.query_type,
-            is_synonym_expansion_enabled=variant.enable_synonym_expansion,
-            product_ids=labeled_ids,
-        )
-    if dense_fields:
-        # TODO: Should multiple vector fields be handled?
-        es_knn_query = query_builder.build_dense_search_query(
-            query, dense_fields[0], boost=variant.dense_boost, top_k=variant.top_k
-        )
-
-    return es_client.search(
+    return retriever.search(
         index_name=index_name,
-        query=es_query,
-        knn_query=es_knn_query,
+        query=query,
+        fields=variant.fields,
+        query_type=variant.query_type,
+        is_synonym_expansion_enabled=variant.enable_synonym_expansion,
+        product_ids=labeled_ids,
+        dense_boost=variant.dense_boost,
+        rrf=variant.rrf,
         size=variant.top_k,
     )
 
@@ -121,7 +106,6 @@ def perform_search(experimental_setup: ExperimentalSetup, query_dict: dict[str, 
     metrics = []
     for query, query_labels_df in query_dict.items():
         n += 1
-        query = normalize_query(query)
         progress_text.text(f"Query ({n} / {total_examples}): {query}")
         progress_bar.progress(n / total_examples)
         for variant in experimental_setup.variants:

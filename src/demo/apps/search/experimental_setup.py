@@ -30,6 +30,7 @@ class Variant:
     dense_boost: float = 1.0
     enable_synonym_expansion: bool = False
     top_k: int = 100
+    rrf: bool | int = False
     reranker: Reranker = field(default_factory=lambda: NoOpReranker())
 
 
@@ -158,6 +159,11 @@ EXPERIMENTS = {
                 name="sparse * 1.0 + dense * 20.0",
                 fields=ALL_FIELDS,
                 dense_boost=20.0,
+            ),
+            Variant(
+                name="RRF",
+                fields=ALL_FIELDS,
+                rrf=60,
             ),
         ],
     ),
