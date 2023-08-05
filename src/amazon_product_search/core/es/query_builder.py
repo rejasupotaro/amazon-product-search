@@ -3,7 +3,7 @@ from typing import Any, cast
 
 from torch import Tensor
 
-from amazon_product_search.constants import DATA_DIR, HF
+from amazon_product_search.constants import DATA_DIR, HF, PROJECT_DIR
 from amazon_product_search.core.cache import weak_lru_cache
 from amazon_product_search.core.es.templates.template_loader import TemplateLoader
 from amazon_product_search.core.nlp.tokenizer import Tokenizer
@@ -12,11 +12,11 @@ from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 
 
 class QueryBuilder:
-    def __init__(self, data_dir: str = DATA_DIR) -> None:
+    def __init__(self, data_dir: str = DATA_DIR, project_dir: str = PROJECT_DIR) -> None:
         self.synonym_dict = SynonymDict(data_dir)
         self.tokenizer = Tokenizer()
         self.encoder: SBERTEncoder = SBERTEncoder(HF.JP_SLUKE_MEAN)
-        self.template_loader = TemplateLoader()
+        self.template_loader = TemplateLoader(project_dir)
 
     def match_all(self) -> dict[str, Any]:
         es_query_str = self.template_loader.load("match_all.j2").render()
