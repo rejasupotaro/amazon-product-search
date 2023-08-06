@@ -1,9 +1,13 @@
-import numpy as np
+def min_max_scale(x: list[float], min_val: float | None = None, max_val: float | None = None) -> list[float]:
+    if not x:
+        return []
 
-
-def min_max_scale(x: np.ndarray, min_val: float | None, max_val: float | None) -> np.ndarray:
     if min_val is None:
-        min_val = np.min(x)
+        min_val = min(x)
     if max_val is None:
-        max_val = np.max(x)
-    return (x - min_val) / (max_val - min_val)
+        max_val = max(x)
+
+    if min_val == max_val:
+        return [0.5] * len(x)
+
+    return [(val - min_val) / (max_val - min_val) for val in x]

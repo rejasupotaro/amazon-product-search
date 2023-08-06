@@ -4,6 +4,7 @@ from amazon_product_search.core.es.es_client import EsClient
 from amazon_product_search.core.es.query_builder import QueryBuilder
 from amazon_product_search.core.es.response import Response, Result
 from amazon_product_search.core.nlp.normalizer import normalize_query
+from amazon_product_search.core.retrieval.score_normalizer import min_max_scale
 
 
 def split_fields(fields: list[str]) -> tuple[list[str], list[str]]:
@@ -24,6 +25,67 @@ def split_fields(fields: list[str]) -> tuple[list[str], list[str]]:
     return sparse_fields, dense_fields
 
 
+def _merge_responses_by_score(sparse_response: Response, dense_response: Response) -> Response:
+    id_to_product: dict[str, dict[str, Any]] = {}
+    sparse_results: dict[str, float] = {}
+    dense_results: dict[str, float] = {}
+
+    for result in sparse_response.results:
+        product_id = result.product["product_id"]
+        id_to_product[product_id] = result.product
+        sparse_results[product_id] = result.score
+    for result in dense_response.results:
+        product_id = result.product["product_id"]
+        id_to_product[product_id] = result.product
+        dense_results[product_id] = result.score
+
+    results: list[Result] = []
+    for product_id in sparse_results.keys() | dense_results.keys():
+        score = sparse_results.get(product_id, 0) + dense_results.get(product_id, 0)
+        result = Result(product=id_to_product[product_id], score=score)
+        results.append(result)
+
+    results = sorted(results, key=lambda result: (result.score, result.product["product_id"]), reverse=True)
+    return Response(results=results, total_hits=len(results))
+
+
+def _normalize_scores(response: Response) -> Response:
+    scores = [result.score for result in response.results]
+    normalized_scores = min_max_scale(scores)
+    results = [
+        Result(product=result.product, score=normalized_score)
+        for result, normalized_score in zip(response.results, normalized_scores, strict=True)
+    ]
+    return Response(results=results, total_hits=response.total_hits)
+
+
+def _rrf_scores(response: Response, k: int = 60) -> Response:
+    adjusted_scores = []
+    for i in range(len(response.results)):
+        adjusted_scores.append(1 / (k + i + 1))
+    results = [
+        Result(product=result.product, score=adjusted_score)
+        for result, adjusted_score in zip(response.results, adjusted_scores, strict=True)
+    ]
+    return Response(results=results, total_hits=response.total_hits)
+
+
+def _normalize(sparse_response: Response, dense_response: Response) -> Response:
+    sparse_response = _normalize_scores(sparse_response)
+    dense_response = _normalize_scores(dense_response)
+    return _merge_responses_by_score(sparse_response, dense_response)
+
+
+def _rrf(sparse_response: Response, dense_response: Response, rrf: bool | int) -> Response:
+    if isinstance(rrf, bool):
+        sparse_response = _rrf_scores(sparse_response)
+        dense_response = _rrf_scores(dense_response)
+    else:
+        sparse_response = _rrf_scores(sparse_response, k=rrf)
+        dense_response = _rrf_scores(dense_response, k=rrf)
+    return _merge_responses_by_score(sparse_response, dense_response)
+
+
 class Retriever:
     def __init__(self, es_client: EsClient | None = None, query_builder: QueryBuilder | None = None) -> None:
         if es_client:
@@ -36,29 +98,6 @@ class Retriever:
         else:
             self.query_builder = QueryBuilder()
 
-    def _rrf(self, sparse_response: Response, dense_response: Response, k: int = 60) -> Response:
-        id_to_product: dict[str, dict[str, Any]] = {}
-        sparse_results: dict[str, float] = {}
-        dense_results: dict[str, float] = {}
-
-        for i, result in enumerate(sparse_response.results):
-            product_id = result.product["product_id"]
-            id_to_product[product_id] = result.product
-            sparse_results[product_id] = 1 / (k + i + 1)
-        for i, result in enumerate(dense_response.results):
-            product_id = result.product["product_id"]
-            id_to_product[product_id] = result.product
-            dense_results[product_id] = 1 / (k + i + 1)
-
-        results: list[Result] = []
-        for product_id in sparse_results.keys() | dense_results.keys():
-            score = sparse_results.get(product_id, 0) + dense_results.get(product_id, 0)
-            result = Result(product=id_to_product[product_id], score=score)
-            results.append(result)
-
-        results = sorted(results, key=lambda result: (result.score, result.product["product_id"]), reverse=True)
-        return Response(results=results, total_hits=len(results))
-
     def search(
         self,
         index_name: str,
@@ -69,6 +108,7 @@ class Retriever:
         product_ids: list[str] | None = None,
         sparse_boost: float = 1.0,
         dense_boost: float = 1.0,
+        enable_score_normalization: bool = False,
         rrf: bool | int = False,
         size: int = 20,
     ):
@@ -93,7 +133,7 @@ class Retriever:
                 boost=dense_boost,
             )
 
-        if not rrf:
+        if not enable_score_normalization and not rrf:
             return self.es_client.search(
                 index_name=index_name,
                 query=sparse_query,
@@ -116,6 +156,8 @@ class Retriever:
             size=size,
             explain=True,
         )
-        if isinstance(rrf, bool):
-            return self._rrf(sparse_response, dense_response)
-        return self._rrf(sparse_response, dense_response, rrf)
+
+        if enable_score_normalization:
+            return _normalize(sparse_response, dense_response)
+        else:
+            return _rrf(sparse_response, dense_response, rrf)
