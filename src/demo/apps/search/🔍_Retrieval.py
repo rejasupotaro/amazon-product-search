@@ -100,7 +100,7 @@ def main() -> None:
 
         draw_es_query(sparse_query, dense_query, size)
 
-    label_dict = query_to_label.get(form_input.query, {})
+    label_dict: dict[str, str] = query_to_label.get(form_input.query, {})
     if label_dict:
         with st.expander("Labels", expanded=False):
             st.write(label_dict)
@@ -120,7 +120,7 @@ def main() -> None:
     response.results = reranker.rerank(normalized_query, response.results)
 
     query_vector = query_builder.encode(normalized_query)
-    draw_response_stats(response, query_vector)
+    draw_response_stats(response, query_vector, label_dict)
 
     header = f"{response.total_hits} products found"
     if label_dict:

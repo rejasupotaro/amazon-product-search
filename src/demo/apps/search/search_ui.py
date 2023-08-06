@@ -71,7 +71,7 @@ def draw_input_form(indices: list[str], queries: list[str] | None = None) -> For
     )
 
 
-def draw_response_stats(response: Response, query_vector: np.ndarray) -> None:
+def draw_response_stats(response: Response, query_vector: np.ndarray, label_dict: dict[str, str]) -> None:
     rows = []
     for result in response.results:
         sparse_score, dense_score = result.get_scores_in_explanation()
@@ -80,6 +80,7 @@ def draw_response_stats(response: Response, query_vector: np.ndarray) -> None:
             "total_score": result.score,
             "sprase_score": sparse_score,
             "dense_score": dense_score,
+            "label": label_dict.get(result.product["product_id"], ("-", ""))[0],
         }
         rows.append(row)
 
