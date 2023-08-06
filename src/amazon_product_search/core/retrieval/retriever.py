@@ -26,6 +26,15 @@ def split_fields(fields: list[str]) -> tuple[list[str], list[str]]:
 
 
 def _merge_responses_by_score(sparse_response: Response, dense_response: Response) -> Response:
+    """Merge two responses by score.
+
+    Args:
+        sparse_response (Response): A response from sparse retrieval.
+        dense_response (Response): A response from dense retrieval.
+
+    Returns:
+        Response: A merged response.
+    """
     id_to_product: dict[str, dict[str, Any]] = {}
     sparse_results: dict[str, float] = {}
     dense_results: dict[str, float] = {}
@@ -50,6 +59,14 @@ def _merge_responses_by_score(sparse_response: Response, dense_response: Respons
 
 
 def _normalize_scores(response: Response) -> Response:
+    """Normalize scores in a response.
+
+    Args:
+        response (Response): A response from retrieval.
+
+    Returns:
+        Response: A response with normalized scores.
+    """
     scores = [result.score for result in response.results]
     normalized_scores = min_max_scale(scores)
     results = [
@@ -60,6 +77,15 @@ def _normalize_scores(response: Response) -> Response:
 
 
 def _rrf_scores(response: Response, k: int = 60) -> Response:
+    """Adjust scores in a response using RRF (Reciprocal Rank Fusion).
+
+    Args:
+        response (Response): A response from retrieval.
+        k (int, optional): The ranking constant. Defaults to 60.
+
+    Returns:
+        Response: A response with adjusted scores.
+    """
     adjusted_scores = []
     for i in range(len(response.results)):
         adjusted_scores.append(1 / (k + i + 1))
