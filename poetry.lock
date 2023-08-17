@@ -179,7 +179,7 @@ pytest = "^7.3.1"
 pytorch-lightning = "^2.0.3"
 sentence-transformers = "^2.2.2"
 sentencepiece = "^0.1.99"
-torch = "^2.0.1"
+torch = "^2.0.0"
 transformers = "^4.28.1"
 unidic-lite = "^1.0.8"
 
@@ -187,7 +187,7 @@ unidic-lite = "^1.0.8"
 type = "git"
 url = "https://github.com/rejasupotaro/amazon-product-search-dense-retrieval.git"
 reference = "HEAD"
-resolved_reference = "60884ceef227152530fb60d09503b481e7aeaba6"
+resolved_reference = "8f9e186c041d1d79bbabf5480c2d5fd278478e0c"
 
 [[package]]
 name = "annoy"
