@@ -78,7 +78,7 @@ def draw_response_stats(response: Response, query_vector: np.ndarray, label_dict
         row = {
             "product_title": result.product["product_title"],
             "total_score": result.score,
-            "sprase_score": sparse_score,
+            "sparse_score": sparse_score,
             "dense_score": dense_score,
             "label": label_dict.get(result.product["product_id"], ("-", ""))[0],
         }
