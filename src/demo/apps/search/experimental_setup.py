@@ -143,7 +143,7 @@ EXPERIMENTS = {
         index_name="products_jp",
         locale="jp",
         task="retrieval",
-        num_queries=5,
+        num_queries=5000,
         variants=[
             Variant(name="sparse only", fields=SPARSE_FIELDS),
             Variant(name="dense only", fields=["product_vector"]),
