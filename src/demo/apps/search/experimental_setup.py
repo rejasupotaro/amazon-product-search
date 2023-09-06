@@ -24,6 +24,7 @@ Task = Literal["retrieval", "reranking"]
 
 @dataclass
 class RankFusion:
+    fuser: Literal["search_engine", "own"] = "search_engine"
     enable_score_normalization: bool = False
     rrf: bool | int = False
 
@@ -170,6 +171,7 @@ EXPERIMENTS = {
                 name="Min-Max Normalization",
                 fields=ALL_FIELDS,
                 rank_fusion=RankFusion(
+                    fuser="own",
                     enable_score_normalization=True,
                 ),
             ),
@@ -177,6 +179,7 @@ EXPERIMENTS = {
                 name="RRF (10)",
                 fields=ALL_FIELDS,
                 rank_fusion=RankFusion(
+                    fuser="own",
                     rrf=10,
                 ),
             ),
@@ -184,6 +187,7 @@ EXPERIMENTS = {
                 name="RRF (60)",
                 fields=ALL_FIELDS,
                 rank_fusion=RankFusion(
+                    fuser="own",
                     rrf=60,
                 ),
             ),

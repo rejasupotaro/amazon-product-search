@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Literal
 
 from amazon_product_search.core.es.es_client import EsClient
 from amazon_product_search.core.es.query_builder import QueryBuilder
@@ -134,6 +134,7 @@ class Retriever:
         product_ids: list[str] | None = None,
         sparse_boost: float = 1.0,
         dense_boost: float = 1.0,
+        fuser: Literal["search_engine", "own"] = "search_engine",
         enable_score_normalization: bool = False,
         rrf: bool | int = False,
         size: int = 20,
@@ -159,7 +160,7 @@ class Retriever:
                 boost=dense_boost,
             )
 
-        if not enable_score_normalization and not rrf:
+        if fuser == "search_engine":
             return self.es_client.search(
                 index_name=index_name,
                 query=sparse_query,
@@ -185,5 +186,7 @@ class Retriever:
 
         if enable_score_normalization:
             return _normalize(sparse_response, dense_response)
-        else:
+        elif rrf:
             return _rrf(sparse_response, dense_response, rrf)
+        else:
+            return _merge_responses_by_score(sparse_response, dense_response)
