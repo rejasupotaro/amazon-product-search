@@ -61,7 +61,8 @@ def search(index_name: str, query: str, variant: Variant, labeled_ids: list[str]
         is_synonym_expansion_enabled=variant.enable_synonym_expansion,
         product_ids=labeled_ids,
         dense_boost=variant.dense_boost,
-        rrf=variant.rrf,
+        enable_score_normalization=variant.rank_fusion.enable_score_normalization,
+        rrf=variant.rank_fusion.rrf,
         size=variant.top_k,
     )
 

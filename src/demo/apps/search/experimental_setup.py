@@ -23,6 +23,12 @@ Task = Literal["retrieval", "reranking"]
 
 
 @dataclass
+class RankFusion:
+    enable_score_normalization: bool = False
+    rrf: bool | int = False
+
+
+@dataclass
 class Variant:
     name: str
     fields: list[str] = field(default_factory=lambda: ["product_title"])
@@ -30,8 +36,7 @@ class Variant:
     dense_boost: float = 1.0
     enable_synonym_expansion: bool = False
     top_k: int = 100
-    enable_score_normalization: bool = False
-    rrf: bool | int = False
+    rank_fusion: RankFusion = field(default_factory=lambda: RankFusion())
     reranker: Reranker = field(default_factory=lambda: NoOpReranker())
 
 
@@ -137,7 +142,7 @@ EXPERIMENTS = {
         index_name="products_jp",
         locale="jp",
         task="retrieval",
-        num_queries=5000,
+        num_queries=5,
         variants=[
             Variant(name="sparse only", fields=SPARSE_FIELDS),
             Variant(name="dense only", fields=["product_vector"]),
@@ -164,17 +169,23 @@ EXPERIMENTS = {
             Variant(
                 name="Min-Max Normalization",
                 fields=ALL_FIELDS,
-                enable_score_normalization=True,
+                rank_fusion=RankFusion(
+                    enable_score_normalization=True,
+                ),
             ),
             Variant(
                 name="RRF (10)",
                 fields=ALL_FIELDS,
-                rrf=10,
+                rank_fusion=RankFusion(
+                    rrf=10,
+                ),
             ),
             Variant(
                 name="RRF (60)",
                 fields=ALL_FIELDS,
-                rrf=60,
+                rank_fusion=RankFusion(
+                    rrf=60,
+                ),
             ),
         ],
     ),
