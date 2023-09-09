@@ -68,7 +68,7 @@ def _normalize_scores(response: Response) -> Response:
         Response: A response with normalized scores.
     """
     scores = [result.score for result in response.results]
-    normalized_scores = min_max_scale(scores)
+    normalized_scores = min_max_scale(scores, min_val=0)
     results = [
         Result(product=result.product, score=normalized_score)
         for result, normalized_score in zip(response.results, normalized_scores, strict=True)
