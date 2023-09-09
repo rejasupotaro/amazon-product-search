@@ -96,16 +96,6 @@ def _rrf_scores(response: Response, k: int = 60) -> Response:
     return Response(results=results, total_hits=response.total_hits)
 
 
-def _rrf(sparse_response: Response, dense_response: Response, rrf: bool | int) -> Response:
-    if isinstance(rrf, bool):
-        sparse_response = _rrf_scores(sparse_response)
-        dense_response = _rrf_scores(dense_response)
-    else:
-        sparse_response = _rrf_scores(sparse_response, k=rrf)
-        dense_response = _rrf_scores(dense_response, k=rrf)
-    return _merge_responses_by_score(sparse_response, dense_response)
-
-
 class Retriever:
     def __init__(self, es_client: EsClient | None = None, query_builder: QueryBuilder | None = None) -> None:
         if es_client:
