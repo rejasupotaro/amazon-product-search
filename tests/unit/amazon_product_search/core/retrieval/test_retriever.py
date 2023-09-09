@@ -82,9 +82,9 @@ def test_merge_responses_by_score(sparse_results, dense_results, expected_total_
     ("scores", "expected_scores"),
     [
         ([], []),
-        ([1], [0.5]),
-        ([2, 1], [1, 0]),
-        ([3, 2, 1], [1, 0.5, 0]),
+        ([1], [1]),
+        ([2, 1], [1, 0.5]),
+        ([2, 1, 0], [1, 0.5, 0]),
     ],
 )
 def test_normalize_scores(scores, expected_scores):
