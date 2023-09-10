@@ -194,6 +194,32 @@ EXPERIMENTS = {
             ),
         ],
     ),
+    "weighting_strategy": ExperimentalSetup(
+        index_name="products_jp",
+        locale="jp",
+        task="retrieval",
+        num_queries=5000,
+        variants=[
+            Variant(
+                name="FixedWeighting",
+                fields=ALL_FIELDS,
+                rank_fusion=RankFusion(
+                    fuser="own",
+                    enable_score_normalization=True,
+                    weighting_strategy="fixed",
+                ),
+            ),
+            Variant(
+                name="DynamicWeighting",
+                fields=ALL_FIELDS,
+                rank_fusion=RankFusion(
+                    fuser="own",
+                    enable_score_normalization=True,
+                    weighting_strategy="dynamic",
+                ),
+            ),
+        ],
+    ),
     "reranking": ExperimentalSetup(
         index_name="products_jp",
         locale="jp",
@@ -229,32 +255,6 @@ EXPERIMENTS = {
                 fields=["product_title", "product_description", "product_bullet_point"],
                 enable_synonym_expansion=True,
                 reranker=SpladeReranker(),
-            ),
-        ],
-    ),
-    "hybrid_search": ExperimentalSetup(
-        index_name="products_jp",
-        locale="jp",
-        task="retrieval",
-        num_queries=5000,
-        variants=[
-            Variant(
-                name="norm + fixed",
-                fields=ALL_FIELDS,
-                rank_fusion=RankFusion(
-                    fuser="own",
-                    enable_score_normalization=True,
-                    weighting_strategy="fixed",
-                ),
-            ),
-            Variant(
-                name="norm + dynamic",
-                fields=ALL_FIELDS,
-                rank_fusion=RankFusion(
-                    fuser="own",
-                    enable_score_normalization=True,
-                    weighting_strategy="dynamic",
-                ),
             ),
         ],
     ),
