@@ -26,7 +26,7 @@ def split_fields(fields: list[str]) -> tuple[list[str], list[str]]:
     return sparse_fields, dense_fields
 
 
-def _merge_responses_by_score(sparse_response: Response, dense_response: Response) -> Response:
+def _merge_responses_by_score(sparse_response: Response, dense_response: Response, size: int) -> Response:
     """Merge two responses by score.
 
     Args:
@@ -55,7 +55,7 @@ def _merge_responses_by_score(sparse_response: Response, dense_response: Respons
         result = Result(product=id_to_product[product_id], score=score)
         results.append(result)
 
-    results = sorted(results, key=lambda result: (result.score, result.product["product_id"]), reverse=True)
+    results = sorted(results, key=lambda result: (result.score, result.product["product_id"]), reverse=True)[:size]
     return Response(results=results, total_hits=len(results))
 
 
@@ -187,4 +187,4 @@ class Retriever:
             for result in dense_response.results:
                 result.score *= weighting_strategy.apply(MatchingMethod.DENSE, query)
 
-        return _merge_responses_by_score(sparse_response, dense_response)
+        return _merge_responses_by_score(sparse_response, dense_response, size)
