@@ -84,7 +84,7 @@ def test_merge_responses_by_score_with_size():
     dense_results = [Result(product={"product_id": str(i)}, score=0) for i in range(3, 6)]
     dense_response = Response(results=dense_results, total_hits=len(dense_results))
     response = _merge_responses_by_score(sparse_response, dense_response, size=4)
-    assert response.total_hits == 4
+    assert response.total_hits == 6
     assert len(response.results) == 4
 
 

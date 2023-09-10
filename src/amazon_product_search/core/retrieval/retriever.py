@@ -54,9 +54,10 @@ def _merge_responses_by_score(sparse_response: Response, dense_response: Respons
         score = sparse_results.get(product_id, 0) + dense_results.get(product_id, 0)
         result = Result(product=id_to_product[product_id], score=score)
         results.append(result)
+    total_hits = max(sparse_response.total_hits, dense_response.total_hits, len(results))
 
     results = sorted(results, key=lambda result: (result.score, result.product["product_id"]), reverse=True)[:size]
-    return Response(results=results, total_hits=len(results))
+    return Response(results=results, total_hits=total_hits)
 
 
 def _normalize_scores(response: Response) -> Response:
