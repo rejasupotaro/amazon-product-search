@@ -18,6 +18,8 @@ class FormInput:
     dense_boost: float
     query_type: str | None
     is_synonym_expansion_enabled: bool
+    fuser: str
+    weighting_strategy: str
     reranker_str: str | None
 
 
@@ -57,6 +59,10 @@ def draw_input_form(indices: list[str], queries: list[str] | None = None) -> For
 
     is_synonym_expansion_enabled = st.checkbox("enable_synonym_expansion")
 
+    fuser = st.selectbox("fuser:", ["search_engine", "own"])
+
+    weighting_strategy = st.selectbox("weighting_strategy:", ["fixed", "dynamic"])
+
     reranker_str = st.selectbox("reranker:", ["NoOpReranker", "RandomReranker", "DotReranker"])
 
     return FormInput(
@@ -67,7 +73,9 @@ def draw_input_form(indices: list[str], queries: list[str] | None = None) -> For
         dense_boost,
         query_type,
         is_synonym_expansion_enabled,
-        reranker_str,
+        fuser=fuser,
+        weighting_strategy=weighting_strategy,
+        reranker_str=reranker_str,
     )
 
 

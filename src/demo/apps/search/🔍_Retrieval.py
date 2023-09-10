@@ -9,9 +9,9 @@ from amazon_product_search.core.metrics import (
     compute_precision,
     compute_recall,
 )
-from amazon_product_search.core.nlp.normalizer import normalize_query
 from amazon_product_search.core.reranking.reranker import from_string
-from amazon_product_search.core.retrieval.retriever import split_fields
+from amazon_product_search.core.retrieval.options import DynamicWeighting, FixedWeighting, MatchingMethod
+from amazon_product_search.core.retrieval.retriever import Retriever
 from demo.apps.search.search_ui import (
     draw_input_form,
     draw_products,
@@ -22,6 +22,7 @@ from demo.utils import load_merged
 
 es_client = EsClient()
 query_builder = QueryBuilder()
+retriever = Retriever(es_client, query_builder)
 
 
 @st.cache_data
@@ -70,35 +71,28 @@ def main() -> None:
         if not st.form_submit_button("Search"):
             return
 
-    size = 20
-    normalized_query = normalize_query(form_input.query)
-    sparse_fields, dense_fields = split_fields(form_input.fields)
-    sparse_query = None
-    if sparse_fields:
-        sparse_query = query_builder.build_sparse_search_query(
-            query=normalized_query,
-            fields=sparse_fields,
-            query_type=form_input.query_type,
-            boost=form_input.sparse_boost,
-            is_synonym_expansion_enabled=form_input.is_synonym_expansion_enabled,
-        )
-    dense_query = None
-    if normalized_query and dense_fields:
-        dense_query = query_builder.build_dense_search_query(
-            normalized_query,
-            field=dense_fields[0],
-            top_k=size,
-            boost=form_input.dense_boost,
-        )
+    weighting_strategy = (
+        FixedWeighting({MatchingMethod.SPARSE: form_input.sparse_boost, MatchingMethod.DENSE: form_input.dense_boost})
+        if form_input.weighting_strategy == "fixed"
+        else DynamicWeighting()
+    )
+    response = retriever.search(
+        index_name=form_input.index_name,
+        query=form_input.query,
+        fields=form_input.fields,
+        query_type=form_input.query_type,
+        is_synonym_expansion_enabled=form_input.is_synonym_expansion_enabled,
+        sparse_boost=form_input.sparse_boost,
+        dense_boost=form_input.dense_boost,
+        size=20,
+        fuser=form_input.fuser,
+        enable_score_normalization=True,
+        rrf=False,
+        weighting_strategy=weighting_strategy,
+    )
     reranker = from_string(form_input.reranker_str)
 
     st.write("----")
-
-    with st.expander("Query Details", expanded=False):
-        st.write("Normalized Query:")
-        st.write(normalized_query)
-
-        draw_es_query(sparse_query, dense_query, size)
 
     label_dict: dict[str, str] = query_to_label.get(form_input.query, {})
     if label_dict:
@@ -108,18 +102,11 @@ def main() -> None:
     st.write("----")
 
     st.write("#### Output")
-    response = es_client.search(
-        index_name=form_input.index_name,
-        query=sparse_query,
-        knn_query=dense_query,
-        size=size,
-        explain=True,
-    )
     if not response.results:
         return
-    response.results = reranker.rerank(normalized_query, response.results)
+    response.results = reranker.rerank(form_input.query, response.results)
 
-    query_vector = query_builder.encode(normalized_query)
+    query_vector = query_builder.encode(form_input.query)
     draw_response_stats(response, query_vector, label_dict)
 
     header = f"{response.total_hits} products found"
