@@ -35,6 +35,7 @@ class Variant:
     name: str
     fields: list[str] = field(default_factory=lambda: ["product_title"])
     query_type: str = "combined_fields"
+    sparse_boost: float = 1.0
     dense_boost: float = 1.0
     enable_synonym_expansion: bool = False
     top_k: int = 100
@@ -198,11 +199,24 @@ EXPERIMENTS = {
         index_name="products_jp",
         locale="jp",
         task="retrieval",
-        num_queries=5000,
+        num_queries=500,
         variants=[
             Variant(
-                name="FixedWeighting",
+                name="FixedWeighting (0.5, 0.5)",
                 fields=ALL_FIELDS,
+                sparse_boost=0.5,
+                dense_boost=0.5,
+                rank_fusion=RankFusion(
+                    fuser="own",
+                    enable_score_normalization=True,
+                    weighting_strategy="fixed",
+                ),
+            ),
+            Variant(
+                name="FixedWeighting (0.8, 0.2)",
+                fields=ALL_FIELDS,
+                sparse_boost=0.8,
+                dense_boost=0.2,
                 rank_fusion=RankFusion(
                     fuser="own",
                     enable_score_normalization=True,

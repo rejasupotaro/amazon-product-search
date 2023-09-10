@@ -14,7 +14,7 @@ from amazon_product_search.core.metrics import (
     compute_zero_hit_rate,
 )
 from amazon_product_search.core.reranking import reranker
-from amazon_product_search.core.retrieval.options import DynamicWeighting, FixedWeighting
+from amazon_product_search.core.retrieval.options import DynamicWeighting, FixedWeighting, MatchingMethod
 from amazon_product_search.core.retrieval.retriever import Retriever
 from demo import utils
 from demo.apps.search.experimental_setup import EXPERIMENTS, ExperimentalSetup, Variant
@@ -54,7 +54,16 @@ def draw_variants(variants: list[Variant]) -> None:
 
 
 def search(index_name: str, query: str, variant: Variant, labeled_ids: list[str] | None) -> Response:
-    weighting_strategy = FixedWeighting() if variant.rank_fusion.weighting_strategy == "fixed" else DynamicWeighting()
+    weighting_strategy = (
+        FixedWeighting(
+            {
+                MatchingMethod.SPARSE: variant.sparse_boost,
+                MatchingMethod.DENSE: variant.dense_boost,
+            }
+        )
+        if variant.rank_fusion.weighting_strategy == "fixed"
+        else DynamicWeighting()
+    )
     return retriever.search(
         index_name=index_name,
         query=query,
@@ -62,6 +71,7 @@ def search(index_name: str, query: str, variant: Variant, labeled_ids: list[str]
         query_type=variant.query_type,
         is_synonym_expansion_enabled=variant.enable_synonym_expansion,
         product_ids=labeled_ids,
+        sparse_boost=variant.sparse_boost,
         dense_boost=variant.dense_boost,
         size=variant.top_k,
         fuser=variant.rank_fusion.fuser,
