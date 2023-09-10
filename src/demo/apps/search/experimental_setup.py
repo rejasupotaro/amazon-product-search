@@ -199,7 +199,7 @@ EXPERIMENTS = {
         index_name="products_jp",
         locale="jp",
         task="retrieval",
-        num_queries=500,
+        num_queries=1000,
         variants=[
             Variant(
                 name="FixedWeighting (0.5, 0.5)",
