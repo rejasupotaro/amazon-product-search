@@ -10,7 +10,7 @@ from amazon_product_search.core.metrics import (
     compute_recall,
 )
 from amazon_product_search.core.reranking.reranker import from_string
-from amazon_product_search.core.retrieval.options import DynamicWeighting, FixedWeighting, MatchingMethod
+from amazon_product_search.core.retrieval.options import DynamicWeighting, FixedWeighting
 from amazon_product_search.core.retrieval.retriever import Retriever
 from demo.apps.search.search_ui import (
     draw_input_form,
@@ -72,7 +72,7 @@ def main() -> None:
             return
 
     weighting_strategy = (
-        FixedWeighting({MatchingMethod.SPARSE: form_input.sparse_boost, MatchingMethod.DENSE: form_input.dense_boost})
+        FixedWeighting({"sparse": form_input.sparse_boost, "dense": form_input.dense_boost})
         if form_input.weighting_strategy == "fixed"
         else DynamicWeighting()
     )

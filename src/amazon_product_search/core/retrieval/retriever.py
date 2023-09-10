@@ -4,7 +4,7 @@ from amazon_product_search.core.es.es_client import EsClient
 from amazon_product_search.core.es.query_builder import QueryBuilder
 from amazon_product_search.core.es.response import Response, Result
 from amazon_product_search.core.nlp.normalizer import normalize_query
-from amazon_product_search.core.retrieval.options import MatchingMethod, WeightingStrategy
+from amazon_product_search.core.retrieval.options import WeightingStrategy
 from amazon_product_search.core.retrieval.score_normalizer import min_max_scale
 
 
@@ -184,8 +184,8 @@ class Retriever:
 
         if weighting_strategy:
             for result in sparse_response.results:
-                result.score *= weighting_strategy.apply(MatchingMethod.SPARSE, query)
+                result.score *= weighting_strategy.apply("sparse", query)
             for result in dense_response.results:
-                result.score *= weighting_strategy.apply(MatchingMethod.DENSE, query)
+                result.score *= weighting_strategy.apply("dense", query)
 
         return _merge_responses_by_score(sparse_response, dense_response, size)

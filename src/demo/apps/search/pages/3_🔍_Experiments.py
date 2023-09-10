@@ -14,7 +14,7 @@ from amazon_product_search.core.metrics import (
     compute_zero_hit_rate,
 )
 from amazon_product_search.core.reranking import reranker
-from amazon_product_search.core.retrieval.options import DynamicWeighting, FixedWeighting, MatchingMethod
+from amazon_product_search.core.retrieval.options import DynamicWeighting, FixedWeighting
 from amazon_product_search.core.retrieval.retriever import Retriever
 from demo import utils
 from demo.apps.search.experimental_setup import EXPERIMENTS, ExperimentalSetup, Variant
@@ -55,12 +55,7 @@ def draw_variants(variants: list[Variant]) -> None:
 
 def search(index_name: str, query: str, variant: Variant, labeled_ids: list[str] | None) -> Response:
     weighting_strategy = (
-        FixedWeighting(
-            {
-                MatchingMethod.SPARSE: variant.sparse_boost,
-                MatchingMethod.DENSE: variant.dense_boost,
-            }
-        )
+        FixedWeighting({"sparse": variant.sparse_boost, "dense": variant.dense_boost})
         if variant.rank_fusion.weighting_strategy == "fixed"
         else DynamicWeighting()
     )
