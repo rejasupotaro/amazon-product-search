@@ -4,6 +4,7 @@ from amazon_product_search.core.es.es_client import EsClient
 from amazon_product_search.core.es.query_builder import QueryBuilder
 from amazon_product_search.core.es.response import Response, Result
 from amazon_product_search.core.nlp.normalizer import normalize_query
+from amazon_product_search.core.retrieval.options import MatchingMethod, WeightingStrategy
 from amazon_product_search.core.retrieval.score_normalizer import min_max_scale
 
 
@@ -118,10 +119,11 @@ class Retriever:
         product_ids: list[str] | None = None,
         sparse_boost: float = 1.0,
         dense_boost: float = 1.0,
+        size: int = 20,
         fuser: Literal["search_engine", "own"] = "search_engine",
         enable_score_normalization: bool = False,
         rrf: bool | int = False,
-        size: int = 20,
+        weighting_strategy: WeightingStrategy | None = None,
     ):
         normalized_query = normalize_query(query)
         sparse_fields, dense_fields = split_fields(fields)
@@ -178,4 +180,11 @@ class Retriever:
             else:
                 sparse_response = _rrf_scores(sparse_response, k=rrf)
                 dense_response = _rrf_scores(dense_response, k=rrf)
+
+        if weighting_strategy:
+            for result in sparse_response.results:
+                result.score *= weighting_strategy.apply(MatchingMethod.SPARSE, query)
+            for result in dense_response.results:
+                result.score *= weighting_strategy.apply(MatchingMethod.DENSE, query)
+
         return _merge_responses_by_score(sparse_response, dense_response)
