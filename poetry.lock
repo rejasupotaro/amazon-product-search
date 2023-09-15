@@ -4598,14 +4598,14 @@ tzdata = {version = "*", markers = "python_version >= \"3.6\""}
 
 [[package]]
 name = "pyvespa"
-version = "0.33.0"
+version = "0.37.1"
 description = "Python API for vespa.ai"
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.8"
 files = [
-    {file = "pyvespa-0.33.0-py3-none-any.whl", hash = "sha256:2681910b3ac5f0259a9e41e6e2649caba2801e836b4c295cc2e48ab25b09672c"},
-    {file = "pyvespa-0.33.0.tar.gz", hash = "sha256:be3da9022276555b6b25c40b6e846db6e9dbf617486001ba92235ccfab6c9353"},
+    {file = "pyvespa-0.37.1-py3-none-any.whl", hash = "sha256:9ee63b5bf6f9ccffcd5fe210c0784a117ae8b7fd7f95cbe99df29b6e48aa8705"},
+    {file = "pyvespa-0.37.1.tar.gz", hash = "sha256:59ced69f8da03f3b488baeda28c08ca5077925c44afa2a234915241d9de342ff"},
 ]
 
 [package.dependencies]
@@ -4616,10 +4616,7 @@ jinja2 = "*"
 pandas = "*"
 requests = "*"
 tenacity = "*"
-
-[package.extras]
-full = ["keras-tuner", "onnxruntime", "tensorflow", "tensorflow-ranking", "torch (<1.13)", "transformers"]
-ml = ["keras-tuner", "tensorflow", "tensorflow-ranking", "torch (<1.13)", "transformers"]
+typing-extensions = "*"
 
 [[package]]
 name = "pywin32"
@@ -6425,4 +6422,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "3.10.8"
-content-hash = "8ee856076a671b439eec03b9f58c992dcbd0e43427fe130314e668d5d65d8725"
+content-hash = "e2de3597b6b158f39e7fe0bacda57b5e89363ecb969426f75a2dd9749592c73d"
