@@ -11,7 +11,7 @@ class VespaClient:
     def __init__(
         self,
         host: str = "",
-        app_package: Optional[ApplicationPackage] = None,
+        app_package: ApplicationPackage | None = None,
     ) -> None:
         self.vespa_app = vespa_service.connect(host, app_package)
 

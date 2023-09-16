@@ -38,13 +38,12 @@ def stop(name_or_id: str = "amazon") -> None:
         container.stop()
 
 
-def connect(host: str, app_package: Optional[ApplicationPackage] = None) -> Vespa:
+def connect(host: str, app_package: ApplicationPackage | None = None) -> Vespa:
     """Connect to an existing Vespa app.
 
     Args:
         host (str): The hostname of the Vespa app to connect.
-        app_package (Optional[ApplicationPackage], optional): The ApplicationPackage to deploy.
-            When it is not given, ApplicationPackage(name="amazon") is used.
+        app_package (ApplicationPackage, optional): The ApplicationPackage to deploy.
 
     Returns:
         Vespa: The Vespa app.
@@ -52,10 +51,6 @@ def connect(host: str, app_package: Optional[ApplicationPackage] = None) -> Vesp
     if not host:
         host = "http://localhost:8080"
 
-    if app_package:
-        vespa_app = Vespa(host, application_package=app_package)
-    else:
-        vespa_app = Vespa(host, application_package=create_package())
-
+    vespa_app = Vespa(host, application_package=app_package)
     vespa_app.wait_for_application_up(max_wait=50)
     return vespa_app
