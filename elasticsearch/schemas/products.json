@@ -1,17 +1,4 @@
 {
-  "settings": {
-    "analysis": {
-      "analyzer": {
-        "text_pre_analyzed_analyzer": {
-          "type": "custom",
-          "tokenizer": "whitespace",
-          "filter": [
-            "asciifolding"
-          ]
-        }
-      }
-    }
-  },
   "mappings": {
     "properties": {
       "product_id": {
@@ -19,23 +6,23 @@
       },
       "product_title": {
         "type": "text",
-        "analyzer": "text_pre_analyzed_analyzer",
-        "search_analyzer": "text_pre_analyzed_analyzer"
+        "analyzer": "whitespace",
+        "search_analyzer": "whitespace"
       },
       "product_description": {
         "type": "text",
-        "analyzer": "text_pre_analyzed_analyzer",
-        "search_analyzer": "text_pre_analyzed_analyzer"
+        "analyzer": "whitespace",
+        "search_analyzer": "whitespace"
       },
       "product_bullet_point": {
         "type": "text",
-        "analyzer": "text_pre_analyzed_analyzer",
-        "search_analyzer": "text_pre_analyzed_analyzer"
+        "analyzer": "whitespace",
+        "search_analyzer": "whitespace"
       },
       "product_brand": {
         "type": "text",
-        "analyzer": "text_pre_analyzed_analyzer",
-        "search_analyzer": "text_pre_analyzed_analyzer",
+        "analyzer": "whitespace",
+        "search_analyzer": "whitespace",
         "fields": {
           "keyword": {
             "type": "keyword",
@@ -45,8 +32,8 @@
       },
       "product_color": {
         "type": "text",
-        "analyzer": "text_pre_analyzed_analyzer",
-        "search_analyzer": "text_pre_analyzed_analyzer",
+        "analyzer": "whitespace",
+        "search_analyzer": "whitespace",
         "fields": {
           "keyword": {
             "type": "keyword",
@@ -56,8 +43,8 @@
       },
       "product_keybert": {
         "type": "text",
-        "analyzer": "text_pre_analyzed_analyzer",
-        "search_analyzer": "text_pre_analyzed_analyzer"
+        "analyzer": "whitespace",
+        "search_analyzer": "whitespace"
       },
       "product_vector": {
         "type": "dense_vector",
