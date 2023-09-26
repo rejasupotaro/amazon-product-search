@@ -1,48 +1,73 @@
 {
-    "mappings": {
-      "properties": {
-        "product_id": {
-          "type": "keyword"
-        },
-        "product_title": {
-          "type": "text"
-        },
-        "product_description": {
-          "type": "text"
-        },
-        "product_bullet_point": {
-          "type": "text"
-        },
-        "product_brand": {
-          "type": "text",
-          "fields": {
-            "keyword": {
-              "type": "keyword",
-              "ignore_above": 256
-            }
-          }
-        },
-        "product_color": {
-          "type": "text",
-          "fields": {
-            "keyword": {
-              "type": "keyword",
-              "ignore_above": 256
-            }
-          }
-        },
-        "product_keybert": {
-          "type": "text"
-        },
-        "product_vector": {
-          "type": "dense_vector",
-          "dims": 768,
-          "index": true,
-          "similarity": "cosine"
-        },
-        "product_locale": {
-          "type": "keyword"
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "text_pre_analyzed_analyzer": {
+          "type": "custom",
+          "tokenizer": "whitespace",
+          "filter": [
+            "asciifolding"
+          ]
         }
       }
     }
+  },
+  "mappings": {
+    "properties": {
+      "product_id": {
+        "type": "keyword"
+      },
+      "product_title": {
+        "type": "text",
+        "analyzer": "text_pre_analyzed_analyzer",
+        "search_analyzer": "text_pre_analyzed_analyzer"
+      },
+      "product_description": {
+        "type": "text",
+        "analyzer": "text_pre_analyzed_analyzer",
+        "search_analyzer": "text_pre_analyzed_analyzer"
+      },
+      "product_bullet_point": {
+        "type": "text",
+        "analyzer": "text_pre_analyzed_analyzer",
+        "search_analyzer": "text_pre_analyzed_analyzer"
+      },
+      "product_brand": {
+        "type": "text",
+        "analyzer": "text_pre_analyzed_analyzer",
+        "search_analyzer": "text_pre_analyzed_analyzer",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "product_color": {
+        "type": "text",
+        "analyzer": "text_pre_analyzed_analyzer",
+        "search_analyzer": "text_pre_analyzed_analyzer",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "product_keybert": {
+        "type": "text",
+        "analyzer": "text_pre_analyzed_analyzer",
+        "search_analyzer": "text_pre_analyzed_analyzer"
+      },
+      "product_vector": {
+        "type": "dense_vector",
+        "dims": 768,
+        "index": true,
+        "similarity": "cosine"
+      },
+      "product_locale": {
+        "type": "keyword"
+      }
+    }
   }
+}
