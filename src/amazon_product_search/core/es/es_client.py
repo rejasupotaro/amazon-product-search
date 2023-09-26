@@ -170,6 +170,57 @@ class EsClient:
     def analyze(self, text: str) -> dict[str, Any]:
         return self.es.indices.analyze(text=text).body
 
+    def get_termvectors(self, index_name: str, fields: list[str], text: str) -> dict[str, Any]:
+        """Return term vectors of the given text.
+
+        This function call the following API:
+        https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-termvectors.html
+
+        An example response is as follows:
+
+        ```
+        {
+          "_index": "products_jp",
+          "_version": 0,
+          "found": true,
+          "took": 0,
+          "term_vectors": {
+            "product_title": {
+              "field_statistics": {
+                "sum_doc_freq": 7414978,
+                "doc_count": 339055,
+                "sum_ttf": 8573921
+              },
+              "terms": {
+                "nike": {
+                  "doc_freq": 420,
+                  "ttf": 424,
+                  "term_freq": 1
+                }
+              }
+            }
+          }
+        }
+        ```
+
+        Args:
+            index_name (str): An index name to analyze.
+            text (str): A text to analyze.
+
+        Returns:
+            dict[str, Any]: A term vector response.
+        """
+        doc = {field: text for field in fields}
+        es_response = self.es.termvectors(
+            index=index_name,
+            doc=doc,
+            term_statistics=True,
+            field_statistics=True,
+            positions=False,
+            offsets=False,
+        )
+        return es_response["term_vectors"]
+
     def search(
         self,
         index_name: str,
