@@ -8,6 +8,8 @@ client = VespaClient()
 
 def main() -> None:
     endpoints = [
+        "http://localhost:8080/state/v1",
+        "http://localhost:8080/metrics/v2/values",
         "http://localhost:19071/ApplicationStatus",
         "http://localhost:8080/document/v1/amazon/product/docid",
     ]
