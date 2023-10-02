@@ -1,0 +1,14 @@
+version: "3"
+services:
+  vespa:
+    image: vespaengine/vespa
+    ports:
+      - 8080:8080
+      - 19071:19071
+    volumes:
+      - vespa-data:/opt/vespa/var
+    # command: ["bash", "-c", " vespa deploy --wait 300"]
+
+volumes:
+  vespa-data:
+    driver: local
