@@ -29,7 +29,7 @@ schema product {
         field product_vector type tensor<float>(x[768]) {
             indexing: attribute | index
             attribute {
-                distance-metric: euclidean
+                distance-metric: angular
             }
             index {
                 hnsw {
@@ -71,9 +71,10 @@ schema product {
             }
         }
     }
-    rank-profile semantic-similarity inherits default {
+    rank-profile semantic_similarity inherits default {
         inputs {
-            query(query_vector) tensor<float>(x[768])         }
+            query(query_vector) tensor<float>(x[768])
+        }
         first-phase {
             expression {
                 closeness(product_vector)

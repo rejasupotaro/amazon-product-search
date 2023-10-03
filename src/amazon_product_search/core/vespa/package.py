@@ -54,7 +54,7 @@ def create_package() -> ApplicationPackage:
                 type="tensor<float>(x[768])",
                 indexing=["attribute", "index"],
                 ann=HNSW(
-                    distance_metric="euclidean",
+                    distance_metric="angular",
                     max_links_per_node=16,
                     neighbors_to_explore_at_insert=500,
                 ),
@@ -101,7 +101,7 @@ def create_package() -> ApplicationPackage:
                 first_phase="nativeRank(product_title, product_description)",
             ),
             RankProfile(
-                name="semantic-similarity",
+                name="semantic_similarity",
                 inherits="default",
                 first_phase="closeness(product_vector)",
                 inputs=[("query(query_vector)", "tensor<float>(x[768])")],

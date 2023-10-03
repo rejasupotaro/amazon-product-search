@@ -46,7 +46,7 @@ def search(c):
         "yql": "select * from sources * where ({targetHits:10}nearestNeighbor(product_vector,query_vector))",
         "hits": 10,
         "input.query(query_vector)": query_vector,
-        "ranking.profile": "semantic-similarity",
+        "ranking.profile": "semantic_similarity",
     }
     res = client.search(query)
     print(res.json)
