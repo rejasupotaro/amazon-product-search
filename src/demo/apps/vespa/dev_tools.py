@@ -1,3 +1,5 @@
+import json
+
 import requests
 import streamlit as st
 
@@ -20,20 +22,22 @@ def main() -> None:
 
     st.write("# Search")
 
-    query = st.text_input("Query:")
-    vespa_query = {
-        "yql": "select * from sources * where userQuery()",
-        "query": query,
-        "type": "any",
-        "ranking": "random",
-        "hits": 10,
-    }
-    st.write(vespa_query)
+    query_str = """
+{
+    "yql": "select * from sources * where @query",
+    "query": "query",
+    "type": "any",
+    "ranking": "random",
+    "hits": 10
+}
+    """.strip()
+    query_str = st.text_area("Query:", value=query_str, height=300)
+    query = json.loads(query_str)
 
     if not st.button("Search"):
         return
 
-    response = client.search(vespa_query)
+    response = client.search(query)
     st.write(response.json)
 
 
