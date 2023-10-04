@@ -1,8 +1,8 @@
+from pathlib import Path
 from typing import Optional
 
 from docker.models.containers import Container
 
-from amazon_product_search.core.vespa.package import create_package
 from vespa.application import ApplicationPackage
 from vespa.deployment import Vespa, VespaDocker
 
@@ -21,8 +21,7 @@ def start(name_or_id: Optional[str] = None, app_package: Optional[ApplicationPac
     vespa_docker = VespaDocker.from_container_name_or_id(name_or_id) if name_or_id else VespaDocker()
     if app_package:
         return vespa_docker.deploy(app_package)
-    else:
-        return vespa_docker.deploy(create_package())
+    return vespa_docker.deploy_from_disk(application_name="amazon", application_root=Path("vespa"))
 
 
 def stop(name_or_id: str = "amazon") -> None:
