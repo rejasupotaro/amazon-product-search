@@ -39,17 +39,19 @@ schema product {
             }
         }
     }
+
     fieldset default {
         fields: product_title, product_brand, product_description, product_brand, product_color
     }
+
     onnx-model sbert {
         file: models/sbert.onnx
         input input_ids: input_ids
         input token_type_ids: token_type_ids
         input attention_mask: attention_mask
         output output_0: output_0
-        output output_1: output_1
     }
+
     rank-profile random inherits default {
         first-phase {
             expression {
@@ -57,28 +59,33 @@ schema product {
             }
         }
     }
-    rank-profile bm25 inherits default {
+
+    rank-profile sparse inherits default {
         first-phase {
             expression {
                 bm25(product_title) + bm25(product_description)
             }
         }
     }
-    rank-profile native_rank inherits default {
-        first-phase {
-            expression {
-                nativeRank(product_title, product_description)
-            }
-        }
-    }
-    rank-profile semantic_similarity inherits default {
+
+    rank-profile dense inherits default {
+        match-features: distance(field, product_vector)
         inputs {
             query(query_vector) tensor<float>(x[768])
         }
         first-phase {
             expression {
-                closeness(product_vector)
+                closeness(field, product_vector)
             }
+        }
+    }
+
+    rank-profile hybrid inherits default {
+        inputs {
+            query(query_vector) tensor<float>(x[768])
+        }
+        first-phase {
+            expression: closeness(field, product_vector) + bm25(product_title) + bm25(product_description)
         }
     }
 }
