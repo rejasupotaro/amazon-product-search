@@ -52,7 +52,7 @@ schema product {
         output output_0: output_0
     }
 
-    rank-profile random inherits default {
+    rank-profile random {
         first-phase {
             expression {
                 random
@@ -60,32 +60,45 @@ schema product {
         }
     }
 
-    rank-profile sparse inherits default {
-        first-phase {
-            expression {
-                bm25(product_title) + bm25(product_description)
-            }
-        }
-    }
-
-    rank-profile dense inherits default {
-        match-features: distance(field, product_vector)
+    rank-profile ranking_base {
         inputs {
             query(query_vector) tensor<float>(x[768])
         }
-        first-phase {
-            expression {
-                closeness(field, product_vector)
-            }
+
+        function lexical_score() {
+            expression: bm25(product_title) + bm25(product_description)
+        }
+
+        function semantic_score() {
+            expression: closeness(field, product_vector)
         }
     }
 
-    rank-profile hybrid inherits default {
-        inputs {
-            query(query_vector) tensor<float>(x[768])
-        }
+    rank-profile lexical inherits ranking_base {
         first-phase {
-            expression: closeness(field, product_vector) + bm25(product_title) + bm25(product_description)
+            expression: lexical_score
+        }
+        summary-features {
+            lexical_score
+        }
+    }
+
+    rank-profile semantic inherits ranking_base {
+        first-phase {
+            expression: semantic_score
+        }
+        summary-features {
+            semantic_score
+        }
+    }
+
+    rank-profile hybrid inherits ranking_base {
+        first-phase {
+            expression: lexical_score + semantic_score
+        }
+        summary-features {
+            lexical_score
+            semantic_score
         }
     }
 }

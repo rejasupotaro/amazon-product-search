@@ -24,7 +24,7 @@ def main() -> None:
 
     query_str = """
 {
-    "yql": "select * from sources * where @query",
+    "yql": "select * from sources * where userQuery()",
     "query": "query",
     "type": "any",
     "ranking": "random",

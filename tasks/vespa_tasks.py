@@ -1,3 +1,5 @@
+import json
+
 from invoke import task
 
 import amazon_product_search.core.vespa.service as vespa_service
@@ -42,17 +44,23 @@ def search(c):
     # https://docs.vespa.ai/en/embedding.html
     # https://docs.vespa.ai/en/phased-ranking.html
     client = VespaClient()
-    query_str = input("query: ")
-    query_vector = SBERTEncoder(HF.JP_SLUKE_MEAN).encode(query_str)
-    query_vector = [float(v) for v in query_vector]
-    query = {
-        "yql": "select * from sources * where ({targetHits:10}nearestNeighbor(product_vector,query_vector))",
-        "input.query(query_vector)": query_vector,
-        "ranking.profile": "hybrid",
-        "hits": 10,
-    }
-    res = client.search(query)
-    print(res.json)
+    encoder = SBERTEncoder(HF.JP_SLUKE_MEAN)
+    while True:
+        query_str = input("query: ")
+        if not query_str:
+            break
+        query_vector = encoder.encode(query_str)
+        query_vector = [float(v) for v in query_vector]
+        query = {
+            "yql": "select * from sources * where ({targetHits:1}nearestNeighbor(product_vector,query_vector))",
+            "input.query(query_vector)": query_vector,
+            "ranking.profile": "hybrid",
+            "hits": 10,
+        }
+        res = client.search(query)
+        json_str = json.dumps(res.json, indent=4, ensure_ascii=False)
+        print(json_str)
+        print()
 
 
 @task
