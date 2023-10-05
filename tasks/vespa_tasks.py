@@ -1,4 +1,5 @@
 import json
+from textwrap import dedent
 
 from invoke import task
 
@@ -51,8 +52,15 @@ def search(c):
             break
         query_vector = encoder.encode(query_str)
         query_vector = [float(v) for v in query_vector]
+        yql = dedent(
+            """
+        select *
+        from sources *
+        where userQuery() or ({targetHits:1}nearestNeighbor(product_vector,query_vector))
+        """
+        ).strip()
         query = {
-            "yql": "select * from sources * where userQuery() or ({targetHits:1}nearestNeighbor(product_vector,query_vector))",
+            "yql": yql,
             "query": query_str,
             "input.query(query_vector)": query_vector,
             "ranking.profile": "hybrid",
