@@ -33,7 +33,6 @@ class VespaClient:
             list[VespaResponse]: A list of VespaResponses.
         """
         batch = [{"id": id_fn(doc), "fields": doc} for doc in docs]
-        print(batch)
         return self.vespa_app.feed_batch(schema=schema, batch=batch)
 
     def search(self, query: Optional[dict[str, Any]] = None) -> VespaQueryResponse:
