@@ -24,7 +24,7 @@ def main() -> None:
 
     query_str = """
 {
-    "yql": "select * from sources * where userQuery()",
+    "yql": "select * from product where userQuery()",
     "query": "query",
     "type": "any",
     "ranking": "random",

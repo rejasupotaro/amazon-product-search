@@ -55,7 +55,7 @@ def search(c):
         yql = dedent(
             """
         select *
-        from sources *
+        from product
         where userQuery() or ({targetHits:1}nearestNeighbor(product_vector,query_vector))
         """
         ).strip()
