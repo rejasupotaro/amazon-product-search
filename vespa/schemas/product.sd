@@ -44,12 +44,11 @@ schema product {
         fields: product_title, product_brand, product_description, product_brand, product_color
     }
 
-    onnx-model sbert {
-        file: models/sbert.onnx
+    onnx-model model {
+        file: models/model-quantized.onnx
         input input_ids: input_ids
-        input token_type_ids: token_type_ids
         input attention_mask: attention_mask
-        output output_0: output_0
+        output vector: vector
     }
 
     rank-profile random {
