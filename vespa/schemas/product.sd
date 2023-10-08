@@ -45,7 +45,7 @@ schema product {
     }
 
     onnx-model model {
-        file: models/model-quantized.onnx
+        file: models/model_quantized.onnx
         input input_ids: input_ids
         input attention_mask: attention_mask
         output vector: vector

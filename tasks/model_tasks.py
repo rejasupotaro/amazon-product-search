@@ -42,7 +42,7 @@ def export(c):
     tokenizer = AutoTokenizer.from_pretrained(hf_model_name)
     model_name = "model"
     onnx_model_filepath = f"{MODELS_DIR}/{model_name}.onnx"
-    quantized_onnx_model_filepath = f"{MODELS_DIR}/{model_name}-quantized.onnx"
+    quantized_onnx_model_filepath = f"{MODELS_DIR}/{model_name}_quantized.onnx"
 
     with torch.no_grad():
         sample_tokenized = tokenizer("dummy_text", return_tensors="pt")
