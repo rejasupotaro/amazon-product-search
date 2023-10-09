@@ -7,6 +7,7 @@ from apache_beam.transforms.ptransform import PTransform
 from apache_beam.transforms.util import BatchElements
 from apache_beam.utils.shared import Shared
 
+from amazon_product_search.constants import HF
 from amazon_product_search.core import source
 from amazon_product_search.core.source import Locale
 from amazon_product_search.indexing.io.elasticsearch_io import WriteToElasticsearch
@@ -24,7 +25,7 @@ def get_input_source(data_dir: str, locale: Locale, nrows: int = -1) -> PTransfo
     products_df = source.load_products(locale, nrows, data_dir)
     products_df = products_df.with_columns(pl.col("*").fill_null(pl.lit("")))
     products = products_df.to_dicts()
-    logging.info(f"We have {len(products)} products to index")
+    logging.info(f"{len(products)} products are going to be indexed")
     return beam.Create(products)
 
 
@@ -47,6 +48,9 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
     data_dir = options.data_dir
     nrows = options.nrows
     text_fields = ["product_title", "product_description", "product_bullet_point"]
+    hf_model_name = {
+        "jp": HF.JP_SLUKE_MEAN,
+    }[locale]
 
     pipeline = beam.Pipeline(options=options)
     products = (
@@ -63,7 +67,13 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
         branches["product_vector"] = (
             products
             | "Batch products for encoding" >> BatchElements(min_batch_size=8)
-            | "Encode products" >> beam.ParDo(BatchEncodeFn(shared_handle=Shared()))
+            | "Encode products"
+            >> beam.ParDo(
+                BatchEncodeFn(
+                    shared_handle=Shared(),
+                    hf_model_name=hf_model_name,
+                )
+            )
         )
     if branches:
         branches["product"] = products | beam.WithKeys(lambda product: product["product_id"])
