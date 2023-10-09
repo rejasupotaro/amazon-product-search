@@ -15,6 +15,6 @@ def test_analyze(text_fields, expected):
         "field": "HELLO WORLD",
     }
 
-    analyzer = Analyzer(text_fields)
+    analyzer = Analyzer(text_fields, locale="jp")
     actual = analyzer.analyze(product)
     assert actual == expected

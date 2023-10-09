@@ -5,8 +5,8 @@ import polars as pl
 from tqdm import tqdm
 
 from amazon_product_search.constants import DATA_DIR
+from amazon_product_search.core.nlp.japanese_tokenizer import JapaneseTokenizer
 from amazon_product_search.core.nlp.normalizer import normalize_doc
-from amazon_product_search.core.nlp.tokenizer import Tokenizer
 from amazon_product_search.core.source import Locale, load_merged
 from amazon_product_search.core.synonyms.filters.similarity_filter import SimilarityFilter
 
@@ -30,7 +30,7 @@ def preprocess_query_title_pairs(df: pl.DataFrame) -> pl.DataFrame:
 
 def generate_candidates(pairs: list[list[str]]) -> pl.DataFrame:
     """Generate synonyms based on cooccurrence."""
-    tokenizer = Tokenizer()
+    tokenizer = JapaneseTokenizer()
     word_counter: Counter = Counter()
     pair_counter: Counter = Counter()
 

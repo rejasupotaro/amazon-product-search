@@ -57,7 +57,7 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
         pipeline
         | get_input_source(data_dir, locale, nrows)
         | "Filter products" >> beam.Filter(is_indexable)
-        | "Analyze products" >> beam.ParDo(AnalyzeFn(text_fields))
+        | "Analyze products" >> beam.ParDo(AnalyzeFn(text_fields, locale))
     )
 
     branches = {}
