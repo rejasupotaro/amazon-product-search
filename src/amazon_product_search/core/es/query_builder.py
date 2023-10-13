@@ -6,7 +6,7 @@ from torch import Tensor
 from amazon_product_search.constants import DATA_DIR, HF, PROJECT_DIR
 from amazon_product_search.core.cache import weak_lru_cache
 from amazon_product_search.core.es.templates.template_loader import TemplateLoader
-from amazon_product_search.core.nlp.japanese_tokenizer import JapaneseTokenizer
+from amazon_product_search.core.nlp.tokenizers.japanese_tokenizer import JapaneseTokenizer
 from amazon_product_search.core.synonyms.synonym_dict import SynonymDict
 from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 

@@ -1,17 +1,15 @@
-from typing import TYPE_CHECKING, Any, Dict, cast
+from typing import Any, Dict, cast
 
-from amazon_product_search.core.nlp.japanese_tokenizer import JapaneseTokenizer
 from amazon_product_search.core.nlp.normalizer import normalize_doc
+from amazon_product_search.core.nlp.tokenizers import EnglishTokenizer, JapaneseTokenizer, Tokenizer
 from amazon_product_search.core.source import Locale
-
-if TYPE_CHECKING:
-    from amazon_product_search.core.nlp.tokenizer import Tokenizer
 
 
 class Analyzer:
     def __init__(self, text_fields: list[str], locale: Locale) -> None:
         self.text_fields = text_fields
         self.tokenizer: Tokenizer = {
+            "us": EnglishTokenizer(),
             "jp": JapaneseTokenizer(),
         }[locale]
 

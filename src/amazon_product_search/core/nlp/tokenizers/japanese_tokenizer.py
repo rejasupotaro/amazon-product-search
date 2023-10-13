@@ -4,6 +4,8 @@ from typing import TypeAlias
 import ipadic
 from fugashi import GenericTagger, Tagger
 
+from amazon_product_search.core.nlp.tokenizers.tokenizer import Tokenizer
+
 TAGGER: TypeAlias = Tagger | GenericTagger
 
 
@@ -37,7 +39,7 @@ class POSTag(Enum):
     WHITESPACE = "空白"
 
 
-class JapaneseTokenizer:
+class JapaneseTokenizer(Tokenizer):
     def __init__(
         self,
         dic_type: DicType = DicType.UNIDIC,
@@ -61,7 +63,7 @@ class JapaneseTokenizer:
             case _:
                 raise ValueError(f"Unsupported dic_type was given: {dic_type}")
 
-    def tokenize(self, s: str) -> list[str | tuple[str, str]]:
+    def tokenize(self, s: str) -> list[str] | list[tuple[str, str]]:
         """Tokenize a given string into tokens.
 
         Args:

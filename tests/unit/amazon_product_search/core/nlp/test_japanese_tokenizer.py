@@ -1,6 +1,6 @@
 import pytest
 
-from amazon_product_search.core.nlp.japanese_tokenizer import DicType, JapaneseTokenizer, OutputFormat
+from amazon_product_search.core.nlp.tokenizers.japanese_tokenizer import DicType, JapaneseTokenizer, OutputFormat
 
 
 @pytest.mark.parametrize(

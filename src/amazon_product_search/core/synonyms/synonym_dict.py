@@ -4,7 +4,7 @@ from typing import cast
 import polars as pl
 
 from amazon_product_search.constants import DATA_DIR
-from amazon_product_search.core.nlp.japanese_tokenizer import JapaneseTokenizer
+from amazon_product_search.core.nlp.tokenizers.japanese_tokenizer import JapaneseTokenizer
 
 
 class SynonymDict:

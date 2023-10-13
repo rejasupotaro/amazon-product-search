@@ -3,7 +3,7 @@ import streamlit as st
 from st_aggrid import AgGrid, GridOptionsBuilder
 
 from amazon_product_search.core.nlp.normalizer import normalize_doc
-from amazon_product_search.core.nlp.tokenizer import Tokenizer
+from amazon_product_search.core.nlp.tokenizers.tokenizer import Tokenizer
 from amazon_product_search.core.retrieval.keyword_generator import KeywordGenerator
 from demo.page_config import set_page_config
 from demo.utils import load_products

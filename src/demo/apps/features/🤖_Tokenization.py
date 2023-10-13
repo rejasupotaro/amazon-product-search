@@ -2,7 +2,7 @@ import polars as pl
 import streamlit as st
 from st_aggrid import AgGrid, GridOptionsBuilder
 
-from amazon_product_search.core.nlp.tokenizer import DicType, OutputFormat, Tokenizer
+from amazon_product_search.core.nlp.tokenizers.tokenizer import DicType, OutputFormat, Tokenizer
 from demo.page_config import set_page_config
 from demo.utils import load_products
 
