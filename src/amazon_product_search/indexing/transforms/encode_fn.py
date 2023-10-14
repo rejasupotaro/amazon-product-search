@@ -40,9 +40,9 @@ class BatchEncodeFn(beam.DoFn):
     def _encode(self, texts: list[str]) -> Tensor:
         return self._weak_reference.ref.encode(texts)
 
-    def process(self, products: List[Dict[str, Any]]) -> Iterator[Tuple[str, Tensor]]:
+    def process(self, products: List[Dict[str, Any]]) -> Iterator[Tuple[str, List[float]]]:
         logging.info(f"Encode {len(products)} products in a batch")
         texts = [product["product_title"] + " " + product["product_brand"] for product in products]
         product_vectors = self._encode(texts)
         for product, product_vector in zip(products, product_vectors, strict=True):
-            yield product["product_id"], product_vector
+            yield product["product_id"], [float(v) for v in list(product_vector)]
