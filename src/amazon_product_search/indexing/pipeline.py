@@ -1,8 +1,10 @@
 import logging
+import os
 from typing import Any, Dict, Tuple
 
 import apache_beam as beam
 import polars as pl
+from apache_beam.io.gcp.bigquery import WriteToBigQuery
 from apache_beam.transforms.ptransform import PTransform
 from apache_beam.transforms.util import BatchElements
 from apache_beam.utils.shared import Shared
@@ -116,6 +118,18 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
                     )
                 )
             )
+        case "bq":
+            dataset_id = "amazon"
+            table_id = "docs"
+            (
+                products
+                | WriteToBigQuery(
+                    f"{dataset_id}.{table_id}",
+                    schema=beam.io.SCHEMA_AUTODETECT,
+                    write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
+                    create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
+                )
+            )
     return pipeline
 
 
@@ -127,5 +141,16 @@ def run(options: IndexerOptions) -> None:
 
 if __name__ == "__main__":
     logging.getLogger().setLevel(logging.INFO)
+
+    # Disable the warning as suggested:
+    # ```
+    # huggingface/tokenizers: The current process just got forked,
+    # after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+    # To disable this warning, you can either:
+    # - Avoid using `tokenizers` before the fork if possible
+    # - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+    # ```
+    os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
     options = IndexerOptions()
     run(options)
