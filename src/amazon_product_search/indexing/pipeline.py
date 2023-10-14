@@ -48,8 +48,9 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
     data_dir = options.data_dir
     nrows = options.nrows
     text_fields = ["product_title", "product_description", "product_bullet_point"]
-    hf_model_name = {
-        "jp": HF.JP_SLUKE_MEAN,
+    hf_model_name, pooling_mode = {
+        "us": (HF.EN_MULTIQA, "cls"),
+        "jp": (HF.JP_SLUKE_MEAN, "mean"),
     }[locale]
 
     pipeline = beam.Pipeline(options=options)
@@ -72,6 +73,7 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
                 BatchEncodeFn(
                     shared_handle=Shared(),
                     hf_model_name=hf_model_name,
+                    pooling_mode=pooling_mode,
                 )
             )
         )

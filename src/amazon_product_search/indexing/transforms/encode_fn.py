@@ -7,6 +7,7 @@ from torch import Tensor
 
 from amazon_product_search.indexing.transforms.weak_reference import WeakReference
 from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
+from amazon_product_search_dense_retrieval.encoders.modules.pooler import PoolingMode
 
 
 class EncodeFn(beam.DoFn):
@@ -24,14 +25,15 @@ class EncodeFn(beam.DoFn):
 
 
 class BatchEncodeFn(beam.DoFn):
-    def __init__(self, shared_handle: Shared, hf_model_name: str) -> None:
+    def __init__(self, shared_handle: Shared, hf_model_name: str, pooling_mode: PoolingMode) -> None:
         self._shared_handle = shared_handle
         self._hf_model_name = hf_model_name
+        self._pooling_mode = pooling_mode
 
     def setup(self) -> None:
         def initialize_encoder() -> WeakReference[SBERTEncoder]:
             # Load a potentially large model in memory. Executed once per process.
-            return WeakReference[SBERTEncoder](SBERTEncoder(self._hf_model_name))
+            return WeakReference[SBERTEncoder](SBERTEncoder(self._hf_model_name, self._pooling_mode))
 
         self._weak_reference: WeakReference[SBERTEncoder] = self._shared_handle.acquire(initialize_encoder)
 

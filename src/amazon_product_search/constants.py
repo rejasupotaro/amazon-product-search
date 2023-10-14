@@ -22,6 +22,7 @@ class HF:
     EN_ELECTRA = "cross-encoder/ms-marco-electra-base"
     EN_MSMARCO = "cross-encoder/ms-marco-MiniLM-L-12-v2"
     EN_ROBERTA = "sentence-transformers/msmarco-roberta-base-v3"
+    EN_MULTIQA = "sentence-transformers/multi-qa-mpnet-base-dot-v1"
 
     # For Japanese
     JP_BERT = "cl-tohoku/bert-base-japanese-v2"
