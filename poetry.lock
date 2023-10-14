@@ -259,11 +259,30 @@ files = [
 ]
 
 [package.dependencies]
+cachetools = {version = ">=3.1.0,<6", optional = true, markers = "extra == \"gcp\""}
 cloudpickle = ">=2.2.1,<2.3.0"
 crcmod = ">=1.7,<2.0"
 dill = ">=0.3.1.1,<0.3.2"
 fastavro = ">=0.23.6,<2"
 fasteners = ">=0.3,<1.0"
+google-api-core = {version = ">=2.0.0,<3", optional = true, markers = "extra == \"gcp\""}
+google-apitools = {version = ">=0.5.31,<0.5.32", optional = true, markers = "extra == \"gcp\""}
+google-auth = {version = ">=1.18.0,<3", optional = true, markers = "extra == \"gcp\""}
+google-auth-httplib2 = {version = ">=0.1.0,<0.2.0", optional = true, markers = "extra == \"gcp\""}
+google-cloud-aiplatform = {version = ">=1.26.0,<2.0", optional = true, markers = "extra == \"gcp\""}
+google-cloud-bigquery = {version = ">=2.0.0,<4", optional = true, markers = "extra == \"gcp\""}
+google-cloud-bigquery-storage = {version = ">=2.6.3,<3", optional = true, markers = "extra == \"gcp\""}
+google-cloud-bigtable = {version = ">=2.19.0,<3", optional = true, markers = "extra == \"gcp\""}
+google-cloud-core = {version = ">=2.0.0,<3", optional = true, markers = "extra == \"gcp\""}
+google-cloud-datastore = {version = ">=2.0.0,<3", optional = true, markers = "extra == \"gcp\""}
+google-cloud-dlp = {version = ">=3.0.0,<4", optional = true, markers = "extra == \"gcp\""}
+google-cloud-language = {version = ">=2.0,<3", optional = true, markers = "extra == \"gcp\""}
+google-cloud-pubsub = {version = ">=2.1.0,<3", optional = true, markers = "extra == \"gcp\""}
+google-cloud-pubsublite = {version = ">=1.2.0,<2", optional = true, markers = "extra == \"gcp\""}
+google-cloud-recommendations-ai = {version = ">=0.1.0,<0.11.0", optional = true, markers = "extra == \"gcp\""}
+google-cloud-spanner = {version = ">=3.0.0,<4", optional = true, markers = "extra == \"gcp\""}
+google-cloud-videointelligence = {version = ">=2.0,<3", optional = true, markers = "extra == \"gcp\""}
+google-cloud-vision = {version = ">=2,<4", optional = true, markers = "extra == \"gcp\""}
 grpcio = ">=1.33.1,<1.48.0 || >1.48.0,<2"
 hdfs = ">=2.1.0,<3.0.0"
 httplib2 = ">=0.8,<0.23.0"
@@ -1605,6 +1624,28 @@ grpcgcp = ["grpcio-gcp (>=0.2.2,<1.0dev)"]
 grpcio-gcp = ["grpcio-gcp (>=0.2.2,<1.0dev)"]
 
 [[package]]
+name = "google-apitools"
+version = "0.5.31"
+description = "client libraries for humans"
+category = "main"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+files = [
+    {file = "google-apitools-0.5.31.tar.gz", hash = "sha256:4af0dd6dd4582810690251f0b57a97c1873dadfda54c5bc195844c8907624170"},
+    {file = "google_apitools-0.5.31-py2-none-any.whl", hash = "sha256:6be92c1c3e93485450420bb0e365d47eb4d8a835d03ebe1963dc6da4d39a7b0e"},
+]
+
+[package.dependencies]
+fasteners = ">=0.14"
+httplib2 = ">=0.8"
+oauth2client = ">=1.4.12"
+six = ">=1.12.0"
+
+[package.extras]
+cli = ["python-gflags (>=3.0.6)"]
+testing = ["mock (>=1.0.1)"]
+
+[[package]]
 name = "google-auth"
 version = "2.15.0"
 description = "Google Authentication Library"
@@ -1629,6 +1670,22 @@ pyopenssl = ["cryptography (>=38.0.3)", "pyopenssl (>=20.0.0)"]
 reauth = ["pyu2f (>=0.1.5)"]
 
 [[package]]
+name = "google-auth-httplib2"
+version = "0.1.1"
+description = "Google Authentication Library: httplib2 transport"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "google-auth-httplib2-0.1.1.tar.gz", hash = "sha256:c64bc555fdc6dd788ea62ecf7bccffcf497bf77244887a3f3d7a5a02f8e3fc29"},
+    {file = "google_auth_httplib2-0.1.1-py2.py3-none-any.whl", hash = "sha256:42c50900b8e4dcdf8222364d1f0efe32b8421fb6ed72f2613f12f75cc933478c"},
+]
+
+[package.dependencies]
+google-auth = "*"
+httplib2 = ">=0.19.0"
+
+[[package]]
 name = "google-auth-oauthlib"
 version = "0.4.6"
 description = "Google Authentication Library"
@@ -1649,14 +1706,14 @@ tool = ["click (>=6.0.0)"]
 
 [[package]]
 name = "google-cloud-aiplatform"
-version = "1.25.0"
+version = "1.35.0"
 description = "Vertex AI API client library"
 category = "main"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "google-cloud-aiplatform-1.25.0.tar.gz", hash = "sha256:766d545890bee7fa15bc76ef363089fd7a2964e9a0abc2e1bbca1f32055da3cf"},
-    {file = "google_cloud_aiplatform-1.25.0-py2.py3-none-any.whl", hash = "sha256:a0fa7e58e5d5a3f7b29d0698216d79babc8402da7c19a4ee83a6ef590a8fe14f"},
+    {file = "google-cloud-aiplatform-1.35.0.tar.gz", hash = "sha256:37fba7528739097463331d19695aab636286b029c7d0a0c021620d30d314015c"},
+    {file = "google_cloud_aiplatform-1.35.0-py2.py3-none-any.whl", hash = "sha256:95c8e16d3beb296b2d47d3899226f1bfc9663bc4c9eea8260c5fb7612b9b44b9"},
 ]
 
 [package.dependencies]
@@ -1667,22 +1724,24 @@ google-cloud-storage = ">=1.32.0,<3.0.0dev"
 packaging = ">=14.3"
 proto-plus = ">=1.22.0,<2.0.0dev"
 protobuf = ">=3.19.5,<3.20.0 || >3.20.0,<3.20.1 || >3.20.1,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<5.0.0dev"
-shapely = "<2.0.0"
+shapely = "<3.0.0dev"
 
 [package.extras]
 autologging = ["mlflow (>=1.27.0,<=2.1.1)"]
 cloud-profiler = ["tensorboard-plugin-profile (>=2.4.0,<3.0.0dev)", "tensorflow (>=2.4.0,<3.0.0dev)", "werkzeug (>=2.0.0,<2.1.0dev)"]
-datasets = ["pyarrow (>=3.0.0,<8.0dev)"]
+datasets = ["pyarrow (>=10.0.1)", "pyarrow (>=3.0.0,<8.0dev)"]
 endpoint = ["requests (>=2.28.1)"]
-full = ["docker (>=5.0.3)", "explainable-ai-sdk (>=1.0.0)", "fastapi (>=0.71.0,<0.76.0)", "google-cloud-bigquery-storage", "google-vizier (==0.0.4)", "lit-nlp (==0.4.0)", "mlflow (>=1.27.0,<=2.1.1)", "numpy (>=1.15.0)", "pandas (>=1.0.0)", "pyarrow (>=3.0.0,<8.0dev)", "pyarrow (>=6.0.1)", "pyyaml (>=5.3,<6)", "requests (>=2.28.1)", "starlette (>=0.17.1)", "tensorflow (>=2.3.0,<3.0.0dev)", "urllib3 (>=1.21.1,<1.27)", "uvicorn[standard] (>=0.16.0)"]
+full = ["cloudpickle (<3.0)", "docker (>=5.0.3)", "explainable-ai-sdk (>=1.0.0)", "fastapi (>=0.71.0,<0.103.1)", "google-cloud-bigquery", "google-cloud-bigquery-storage", "google-cloud-logging (<4.0)", "google-vizier (==0.0.11)", "google-vizier (==0.0.11)", "google-vizier (==0.0.4)", "google-vizier (>=0.1.6)", "httpx (>=0.23.0,<0.25.0)", "lit-nlp (==0.4.0)", "mlflow (>=1.27.0,<=2.1.1)", "numpy (>=1.15.0)", "pandas (>=1.0.0)", "pyarrow (>=10.0.1)", "pyarrow (>=3.0.0,<8.0dev)", "pyarrow (>=6.0.1)", "pydantic (<2)", "pyyaml (==5.3.1)", "ray[default] (>=2.4,<2.5)", "ray[default] (>=2.5,<2.5.1)", "requests (>=2.28.1)", "starlette (>=0.17.1)", "tensorflow (>=2.3.0,<3.0.0dev)", "urllib3 (>=1.21.1,<1.27)", "uvicorn[standard] (>=0.16.0)"]
 lit = ["explainable-ai-sdk (>=1.0.0)", "lit-nlp (==0.4.0)", "pandas (>=1.0.0)", "tensorflow (>=2.3.0,<3.0.0dev)"]
 metadata = ["numpy (>=1.15.0)", "pandas (>=1.0.0)"]
-pipelines = ["pyyaml (>=5.3,<6)"]
-prediction = ["docker (>=5.0.3)", "fastapi (>=0.71.0,<0.76.0)", "starlette (>=0.17.1)", "uvicorn[standard] (>=0.16.0)"]
+pipelines = ["pyyaml (==5.3.1)"]
+prediction = ["docker (>=5.0.3)", "fastapi (>=0.71.0,<0.103.1)", "httpx (>=0.23.0,<0.25.0)", "starlette (>=0.17.1)", "uvicorn[standard] (>=0.16.0)"]
+preview = ["cloudpickle (<3.0)", "google-cloud-logging (<4.0)"]
 private-endpoints = ["requests (>=2.28.1)", "urllib3 (>=1.21.1,<1.27)"]
+ray = ["google-cloud-bigquery", "google-cloud-bigquery-storage", "pandas (>=1.0.0)", "pyarrow (>=6.0.1)", "pydantic (<2)", "ray[default] (>=2.4,<2.5)", "ray[default] (>=2.5,<2.5.1)"]
 tensorboard = ["tensorflow (>=2.3.0,<3.0.0dev)"]
-testing = ["docker (>=5.0.3)", "explainable-ai-sdk (>=1.0.0)", "fastapi (>=0.71.0,<0.76.0)", "google-cloud-bigquery-storage", "google-vizier (==0.0.4)", "grpcio-testing", "ipython", "kfp", "lit-nlp (==0.4.0)", "mlflow (>=1.27.0,<=2.1.1)", "numpy (>=1.15.0)", "pandas (>=1.0.0)", "pyarrow (>=3.0.0,<8.0dev)", "pyarrow (>=6.0.1)", "pytest-asyncio", "pytest-xdist", "pyyaml (>=5.3,<6)", "requests (>=2.28.1)", "scikit-learn", "starlette (>=0.17.1)", "tensorboard-plugin-profile (>=2.4.0,<3.0.0dev)", "tensorflow (>=2.3.0,<3.0.0dev)", "tensorflow (>=2.4.0,<3.0.0dev)", "urllib3 (>=1.21.1,<1.27)", "uvicorn[standard] (>=0.16.0)", "werkzeug (>=2.0.0,<2.1.0dev)", "xgboost"]
-vizier = ["google-vizier (==0.0.4)"]
+testing = ["bigframes", "cloudpickle (<3.0)", "docker (>=5.0.3)", "explainable-ai-sdk (>=1.0.0)", "fastapi (>=0.71.0,<0.103.1)", "google-cloud-bigquery", "google-cloud-bigquery-storage", "google-cloud-logging (<4.0)", "google-vizier (==0.0.11)", "google-vizier (==0.0.11)", "google-vizier (==0.0.4)", "google-vizier (>=0.1.6)", "grpcio-testing", "httpx (>=0.23.0,<0.25.0)", "ipython", "kfp", "lit-nlp (==0.4.0)", "mlflow (>=1.27.0,<=2.1.1)", "numpy (>=1.15.0)", "pandas (>=1.0.0)", "pyarrow (>=10.0.1)", "pyarrow (>=3.0.0,<8.0dev)", "pyarrow (>=6.0.1)", "pydantic (<2)", "pyfakefs", "pytest-asyncio", "pytest-xdist", "pyyaml (==5.3.1)", "ray[default] (>=2.4,<2.5)", "ray[default] (>=2.5,<2.5.1)", "requests (>=2.28.1)", "requests-toolbelt (<1.0.0)", "scikit-learn", "starlette (>=0.17.1)", "tensorboard-plugin-profile (>=2.4.0,<3.0.0dev)", "tensorflow (>=2.3.0,<3.0.0dev)", "tensorflow (>=2.3.0,<=2.12.0)", "tensorflow (>=2.4.0,<3.0.0dev)", "torch (>=2.0.0,<2.1.0)", "urllib3 (>=1.21.1,<1.27)", "uvicorn[standard] (>=0.16.0)", "werkzeug (>=2.0.0,<2.1.0dev)", "xgboost", "xgboost-ray"]
+vizier = ["google-vizier (==0.0.11)", "google-vizier (==0.0.11)", "google-vizier (==0.0.4)", "google-vizier (>=0.1.6)"]
 xai = ["tensorflow (>=2.3.0,<3.0.0dev)"]
 
 [[package]]
@@ -1719,6 +1778,50 @@ pandas = ["db-dtypes (>=0.3.0,<2.0.0dev)", "pandas (>=1.1.0)", "pyarrow (>=3.0.0
 tqdm = ["tqdm (>=4.7.4,<5.0.0dev)"]
 
 [[package]]
+name = "google-cloud-bigquery-storage"
+version = "2.22.0"
+description = "Google Cloud Bigquery Storage API client library"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "google-cloud-bigquery-storage-2.22.0.tar.gz", hash = "sha256:f6d8c7b3ab9b574c66977fcee9d336e334ad1a3843a722be19123640e7808ea3"},
+    {file = "google_cloud_bigquery_storage-2.22.0-py2.py3-none-any.whl", hash = "sha256:7f11b2ae590a5b3874fb6ddf705a66a070340db238f971cf7b53349eee9ca317"},
+]
+
+[package.dependencies]
+google-api-core = {version = ">=1.34.0,<2.0.0 || >=2.11.0,<3.0.0dev", extras = ["grpc"]}
+proto-plus = ">=1.22.0,<2.0.0dev"
+protobuf = ">=3.19.5,<3.20.0 || >3.20.0,<3.20.1 || >3.20.1,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<5.0.0dev"
+
+[package.extras]
+fastavro = ["fastavro (>=0.21.2)"]
+pandas = ["pandas (>=0.21.1)"]
+pyarrow = ["pyarrow (>=0.15.0)"]
+
+[[package]]
+name = "google-cloud-bigtable"
+version = "2.21.0"
+description = "Google Cloud Bigtable API client library"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "google-cloud-bigtable-2.21.0.tar.gz", hash = "sha256:d9f0efbf940ca392f07d13787fc2da76d1e168dedafae0f8f1b4208e0c1132dc"},
+    {file = "google_cloud_bigtable-2.21.0-py2.py3-none-any.whl", hash = "sha256:219d39f2787b76394b045603bbd0b13dfc37645ca855022e646b8ecbfbe9ad1f"},
+]
+
+[package.dependencies]
+google-api-core = {version = ">=1.34.0,<2.0.0 || >=2.11.0,<3.0.0dev", extras = ["grpc"]}
+google-cloud-core = ">=1.4.1,<3.0.0dev"
+grpc-google-iam-v1 = ">=0.12.4,<1.0.0dev"
+proto-plus = ">=1.22.0,<2.0.0dev"
+protobuf = ">=3.19.5,<3.20.0 || >3.20.0,<3.20.1 || >3.20.1,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<5.0.0dev"
+
+[package.extras]
+libcst = ["libcst (>=0.2.5)"]
+
+[[package]]
 name = "google-cloud-core"
 version = "2.3.2"
 description = "Google Cloud API client core library"
@@ -1738,6 +1841,120 @@ google-auth = ">=1.25.0,<3.0dev"
 grpc = ["grpcio (>=1.38.0,<2.0dev)"]
 
 [[package]]
+name = "google-cloud-datastore"
+version = "2.18.0"
+description = "Google Cloud Datastore API client library"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "google-cloud-datastore-2.18.0.tar.gz", hash = "sha256:63b31b676dcb2786a650d23d324d8f886c4e14586afdd0cfe6e260a73f12448e"},
+    {file = "google_cloud_datastore-2.18.0-py2.py3-none-any.whl", hash = "sha256:369df0653128fe63f0fb1b5a1cd5a05edae49a805f79f9b639ca9d58833bc6b5"},
+]
+
+[package.dependencies]
+google-api-core = {version = ">=1.34.0,<2.0.0 || >=2.11.0,<3.0.0dev", extras = ["grpc"]}
+google-cloud-core = ">=1.4.0,<3.0.0dev"
+proto-plus = ">=1.22.0,<2.0.0dev"
+protobuf = ">=3.19.5,<3.20.0 || >3.20.0,<3.20.1 || >3.20.1,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<5.0.0dev"
+
+[package.extras]
+libcst = ["libcst (>=0.2.5)"]
+
+[[package]]
+name = "google-cloud-dlp"
+version = "3.12.3"
+description = "Google Cloud Dlp API client library"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "google-cloud-dlp-3.12.3.tar.gz", hash = "sha256:73880f2a8bfa60049576fb94d85698aa2367d32ac901b76278fe50b75663440b"},
+    {file = "google_cloud_dlp-3.12.3-py2.py3-none-any.whl", hash = "sha256:db263305466d0fb22b756043c8a7e1cc2842e3ed6b59fb800b9e9af63a8b0ec8"},
+]
+
+[package.dependencies]
+google-api-core = {version = ">=1.34.0,<2.0.0 || >=2.11.0,<3.0.0dev", extras = ["grpc"]}
+proto-plus = ">=1.22.0,<2.0.0dev"
+protobuf = ">=3.19.5,<3.20.0 || >3.20.0,<3.20.1 || >3.20.1,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<5.0.0dev"
+
+[[package]]
+name = "google-cloud-language"
+version = "2.11.1"
+description = "Google Cloud Language API client library"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "google-cloud-language-2.11.1.tar.gz", hash = "sha256:5f184409f040c0c73057c2616e6bd2e86e45aeb646180d19c189df4aa3d02dba"},
+    {file = "google_cloud_language-2.11.1-py2.py3-none-any.whl", hash = "sha256:beb5dd1344a6ed00dd04b1eb05a967e7f83fc1b51471f9bd51f238f63f46f9d4"},
+]
+
+[package.dependencies]
+google-api-core = {version = ">=1.34.0,<2.0.0 || >=2.11.0,<3.0.0dev", extras = ["grpc"]}
+proto-plus = ">=1.22.0,<2.0.0dev"
+protobuf = ">=3.19.5,<3.20.0 || >3.20.0,<3.20.1 || >3.20.1,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<5.0.0dev"
+
+[[package]]
+name = "google-cloud-pubsub"
+version = "2.16.0"
+description = "Google Cloud Pub/Sub API client library"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "google-cloud-pubsub-2.16.0.tar.gz", hash = "sha256:587da7d535ca858ceeed7036205355e5a6dd3e44ea4abc96f4e50d1abfd8843b"},
+    {file = "google_cloud_pubsub-2.16.0-py2.py3-none-any.whl", hash = "sha256:e41ec9635cc68dbd238f572f295b3d0bae6340c66ba31a70dfb890950ab33c2b"},
+]
+
+[package.dependencies]
+google-api-core = {version = ">=1.34.0,<2.0.0 || >=2.11.0,<3.0.0dev", extras = ["grpc"]}
+grpc-google-iam-v1 = ">=0.12.4,<1.0.0dev"
+grpcio = ">=1.38.1,<2.0dev"
+grpcio-status = ">=1.33.2"
+proto-plus = ">=1.22.0,<2.0.0dev"
+protobuf = ">=3.19.5,<3.20.0 || >3.20.0,<3.20.1 || >3.20.1,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<5.0.0dev"
+
+[package.extras]
+libcst = ["libcst (>=0.3.10)"]
+
+[[package]]
+name = "google-cloud-pubsublite"
+version = "1.8.3"
+description = "Google Cloud Pubsublite API client library"
+category = "main"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "google-cloud-pubsublite-1.8.3.tar.gz", hash = "sha256:8b36d73c3e71f4e4211c10b34ab8dc1bc74d17ca51bde450433a8ce81eacf9c6"},
+    {file = "google_cloud_pubsublite-1.8.3-py2.py3-none-any.whl", hash = "sha256:395e67d18e111fde4c063f3acc1648e795cac6be43ee679765fddf507b8445a5"},
+]
+
+[package.dependencies]
+google-api-core = {version = ">=1.33.2,<2.0.0 || >=2.8.0,<3.0.0dev", extras = ["grpc"]}
+google-cloud-pubsub = ">=2.10.0,<3.0.0dev"
+grpcio = ">=1.38.1,<2.0.0dev"
+grpcio-status = ">=1.38.1,<2.0.0dev"
+overrides = ">=6.0.1,<7.0.0"
+
+[[package]]
+name = "google-cloud-recommendations-ai"
+version = "0.10.5"
+description = "Google Cloud Recommendations Ai API client library"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "google-cloud-recommendations-ai-0.10.5.tar.gz", hash = "sha256:06cfcadf27c1d9fb7e39b68f63eb45d44478e15541744e2fffb17a69d9a65531"},
+    {file = "google_cloud_recommendations_ai-0.10.5-py2.py3-none-any.whl", hash = "sha256:db798b85104cd2f96bb84494eb771cc9bc59bf3048a88459479427cba2be6f72"},
+]
+
+[package.dependencies]
+google-api-core = {version = ">=1.34.0,<2.0.0 || >=2.11.0,<3.0.0dev", extras = ["grpc"]}
+proto-plus = ">=1.22.0,<2.0.0dev"
+protobuf = ">=3.19.5,<3.20.0 || >3.20.0,<3.20.1 || >3.20.1,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<5.0.0dev"
+
+[[package]]
 name = "google-cloud-resource-manager"
 version = "1.10.1"
 description = "Google Cloud Resource Manager API client library"
@@ -1754,6 +1971,30 @@ google-api-core = {version = ">=1.34.0,<2.0.0 || >=2.11.0,<3.0.0dev", extras = [
 grpc-google-iam-v1 = ">=0.12.4,<1.0.0dev"
 proto-plus = ">=1.22.0,<2.0.0dev"
 protobuf = ">=3.19.5,<3.20.0 || >3.20.0,<3.20.1 || >3.20.1,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<5.0.0dev"
+
+[[package]]
+name = "google-cloud-spanner"
+version = "3.40.1"
+description = "Google Cloud Spanner API client library"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "google-cloud-spanner-3.40.1.tar.gz", hash = "sha256:616b07c86cdae6c78bad27b8ab39d8ce7a273511f2b91fe260f170d926653c2e"},
+    {file = "google_cloud_spanner-3.40.1-py2.py3-none-any.whl", hash = "sha256:0c5825bb5956df83ee1d732e1851467be97bbc4502ccd91ed0c5e7fb4b3f4ccb"},
+]
+
+[package.dependencies]
+google-api-core = {version = ">=1.34.0,<2.0.0 || >=2.11.0,<3.0.0dev", extras = ["grpc"]}
+google-cloud-core = ">=1.4.1,<3.0dev"
+grpc-google-iam-v1 = ">=0.12.4,<1.0.0dev"
+proto-plus = ">=1.22.0,<2.0.0dev"
+protobuf = ">=3.19.5,<3.20.0 || >3.20.0,<3.20.1 || >3.20.1,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<5.0.0dev"
+sqlparse = ">=0.4.4"
+
+[package.extras]
+libcst = ["libcst (>=0.2.5)"]
+tracing = ["opentelemetry-api (>=1.1.0)", "opentelemetry-instrumentation (>=0.20b0,<0.23dev)", "opentelemetry-sdk (>=1.1.0)"]
 
 [[package]]
 name = "google-cloud-storage"
@@ -1776,6 +2017,40 @@ requests = ">=2.18.0,<3.0.0dev"
 
 [package.extras]
 protobuf = ["protobuf (<5.0.0dev)"]
+
+[[package]]
+name = "google-cloud-videointelligence"
+version = "2.11.4"
+description = "Google Cloud Videointelligence API client library"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "google-cloud-videointelligence-2.11.4.tar.gz", hash = "sha256:07ace299a63f5b3d4441375634853b55ce8f90c62c6a24f8a47eb054149f6f99"},
+    {file = "google_cloud_videointelligence-2.11.4-py2.py3-none-any.whl", hash = "sha256:4d62f7b074f6f1eae4efd8697b5a93fb59b3b22f9934e383b4f6fbed69f49eb6"},
+]
+
+[package.dependencies]
+google-api-core = {version = ">=1.34.0,<2.0.0 || >=2.11.0,<3.0.0dev", extras = ["grpc"]}
+proto-plus = ">=1.22.0,<2.0.0dev"
+protobuf = ">=3.19.5,<3.20.0 || >3.20.0,<3.20.1 || >3.20.1,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<5.0.0dev"
+
+[[package]]
+name = "google-cloud-vision"
+version = "3.4.4"
+description = "Google Cloud Vision API client library"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "google-cloud-vision-3.4.4.tar.gz", hash = "sha256:405744ae50852034cc47b32a9b1bae50d3fb09cd1e2160014182891ef5766695"},
+    {file = "google_cloud_vision-3.4.4-py2.py3-none-any.whl", hash = "sha256:49617c2b31544095151a051839a32a8864e5e12db3169f5c63b2b23500f91665"},
+]
+
+[package.dependencies]
+google-api-core = {version = ">=1.34.0,<2.0.0 || >=2.11.0,<3.0.0dev", extras = ["grpc"]}
+proto-plus = ">=1.22.0,<2.0.0dev"
+protobuf = ">=3.19.5,<3.20.0 || >3.20.0,<3.20.1 || >3.20.1,<4.21.0 || >4.21.0,<4.21.1 || >4.21.1,<4.21.2 || >4.21.2,<4.21.3 || >4.21.3,<4.21.4 || >4.21.4,<4.21.5 || >4.21.5,<5.0.0dev"
 
 [[package]]
 name = "google-crc32c"
@@ -3515,6 +3790,25 @@ setuptools = "*"
 wheel = "*"
 
 [[package]]
+name = "oauth2client"
+version = "4.1.3"
+description = "OAuth 2.0 client library"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "oauth2client-4.1.3-py2.py3-none-any.whl", hash = "sha256:b8a81cc5d60e2d364f0b1b98f958dbd472887acaf1a5b05e21c28c31a2d6d3ac"},
+    {file = "oauth2client-4.1.3.tar.gz", hash = "sha256:d486741e451287f69568a4d26d70d9acd73a2bbfa275746c535b4209891cccc6"},
+]
+
+[package.dependencies]
+httplib2 = ">=0.9.1"
+pyasn1 = ">=0.1.7"
+pyasn1-modules = ">=0.0.5"
+rsa = ">=3.1.4"
+six = ">=1.6.1"
+
+[[package]]
 name = "oauthlib"
 version = "3.2.2"
 description = "A generic, spec-compliant, thorough implementation of the OAuth request-signing logic"
@@ -3689,6 +3983,18 @@ files = [
     {file = "orjson-3.8.3-cp39-cp39-musllinux_1_1_x86_64.whl", hash = "sha256:4b0c13e05da5bc1a6b2e1d3b117cc669e2267ce0a131e94845056d506ef041c6"},
     {file = "orjson-3.8.3-cp39-none-win_amd64.whl", hash = "sha256:4fff44ca121329d62e48582850a247a487e968cfccd5527fab20bd5b650b78c3"},
     {file = "orjson-3.8.3.tar.gz", hash = "sha256:eda1534a5289168614f21422861cbfb1abb8a82d66c00a8ba823d863c0797178"},
+]
+
+[[package]]
+name = "overrides"
+version = "6.5.0"
+description = "A decorator to automatically detect mismatch when overriding a method."
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "overrides-6.5.0-py3-none-any.whl", hash = "sha256:005ce7cf550b4f896624ba08c386a1262699ec8b4e3a609375edafb0f0652589"},
+    {file = "overrides-6.5.0.tar.gz", hash = "sha256:2668159c39bc02e1fbd3cbd2cf7c51c1700cb4c35c1326b156dd07199d0ce159"},
 ]
 
 [[package]]
@@ -5360,6 +5666,23 @@ files = [
 ]
 
 [[package]]
+name = "sqlparse"
+version = "0.4.4"
+description = "A non-validating SQL parser."
+category = "main"
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "sqlparse-0.4.4-py3-none-any.whl", hash = "sha256:5430a4fe2ac7d0f93e66f1efc6e1338a41884b7ddf2a350cedd20ccc4d9d28f3"},
+    {file = "sqlparse-0.4.4.tar.gz", hash = "sha256:d446183e84b8349fa3061f0fe7f06ca94ba65b426946ffebe6e3e8295332420c"},
+]
+
+[package.extras]
+dev = ["build", "flake8"]
+doc = ["sphinx"]
+test = ["pytest", "pytest-cov"]
+
+[[package]]
 name = "stack-data"
 version = "0.6.2"
 description = "Extract data from python stack frames and tracebacks for informative displays"
@@ -6422,4 +6745,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "3.10.8"
-content-hash = "95356c17c0311bbf6d8e6194733e28dcdbcf5f2aa9024d6e6464fb77c7c21fd6"
+content-hash = "a4d6e93b4a54f3049db95b21f7aa1f984739091a966316e332eaa2dcbf67f712"
