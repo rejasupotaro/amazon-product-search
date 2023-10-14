@@ -47,7 +47,13 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
     locale = options.locale
     data_dir = options.data_dir
     nrows = options.nrows
-    text_fields = ["product_title", "product_description", "product_bullet_point"]
+    text_fields = [
+        "product_title",
+        "product_brand",
+        "product_color",
+        "product_bullet_point",
+        "product_description",
+    ]
     hf_model_name, pooling_mode = {
         "us": (HF.EN_MULTIQA, "cls"),
         "jp": (HF.JP_SLUKE_MEAN, "mean"),
