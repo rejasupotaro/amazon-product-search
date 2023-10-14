@@ -9,7 +9,7 @@ python = "3.10.8"
 invoke = "^1.7.3"
 streamlit = "1.21.0"
 pandas = "^1.5.0"
-apache-beam = "2.49.0"
+apache-beam = "2.50.0"
 fugashi = {extras = ["unidic"], version = "^1.2.0"}
 ipadic = "^1.0.0"
 elasticsearch = "8.8.0"
