@@ -9,7 +9,7 @@ from apache_beam.transforms.ptransform import PTransform
 from apache_beam.transforms.util import BatchElements
 from apache_beam.utils.shared import Shared
 
-from amazon_product_search.constants import HF
+from amazon_product_search.constants import HF, PROJECT_ID
 from amazon_product_search.core import source
 from amazon_product_search.core.source import Locale
 from amazon_product_search.indexing.io.elasticsearch_io import WriteToElasticsearch
@@ -45,10 +45,7 @@ def join_branches(kv: Tuple[str, Dict[str, Any]]) -> Dict[str, Any]:
 
 
 def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
-    index_name = options.index_name
     locale = options.locale
-    data_dir = options.data_dir
-    nrows = options.nrows
     text_fields = [
         "product_title",
         "product_brand",
@@ -61,33 +58,40 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
         "jp": (HF.JP_SLUKE_MEAN, "mean"),
     }[locale]
 
-    pipeline = beam.Pipeline(options=options)
-    products = (
-        pipeline
-        | get_input_source(data_dir, locale, nrows)
-        | "Filter products" >> beam.Filter(is_indexable)
-        | "Analyze products" >> beam.ParDo(AnalyzeFn(text_fields, locale))
-    )
+    dataset_id = "amazon"
+    table_id = f"docs_{locale}"
+    table_spec = f"{PROJECT_ID}:{dataset_id}.{table_id}"
 
-    branches = {}
-    if options.extract_keywords:
-        branches["extracted_keywords"] = products | "Extract keywords" >> beam.ParDo(ExtractKeywordsFn())
-    if options.encode_text:
-        branches["product_vector"] = (
-            products
-            | "Batch products for encoding" >> BatchElements(min_batch_size=8)
-            | "Encode products"
-            >> beam.ParDo(
-                EncodeInBatchFn(
-                    shared_handle=Shared(),
-                    hf_model_name=hf_model_name,
-                    pooling_mode=pooling_mode,
-                )
+    pipeline = beam.Pipeline(options=options)
+    match options.source:
+        case "file":
+            products = (
+                pipeline
+                | get_input_source(options.data_dir, locale, options.nrows)
+                | "Filter products" >> beam.Filter(is_indexable)
+                | "Analyze products" >> beam.ParDo(AnalyzeFn(text_fields, locale))
             )
-        )
-    if branches:
-        branches["product"] = products | beam.WithKeys(lambda product: product["product_id"])
-        products = branches | beam.CoGroupByKey() | beam.Map(join_branches)
+            branches = {}
+            if options.extract_keywords:
+                branches["extracted_keywords"] = products | "Extract keywords" >> beam.ParDo(ExtractKeywordsFn())
+            if options.encode_text:
+                branches["product_vector"] = (
+                    products
+                    | "Batch products for encoding" >> BatchElements(min_batch_size=8)
+                    | "Encode products"
+                    >> beam.ParDo(
+                        EncodeInBatchFn(
+                            shared_handle=Shared(),
+                            hf_model_name=hf_model_name,
+                            pooling_mode=pooling_mode,
+                        )
+                    )
+                )
+            if branches:
+                branches["product"] = products | beam.WithKeys(lambda product: product["product_id"])
+                products = branches | beam.CoGroupByKey() | beam.Map(join_branches)
+        case "bq":
+            products = pipeline | "Read table" >> beam.io.ReadFromBigQuery(table=table_spec)
 
     batched_products = products | "Batch products for indexing" >> BatchElements()
 
@@ -101,7 +105,7 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
                 >> beam.ParDo(
                     WriteToElasticsearch(
                         es_host=options.dest_host,
-                        index_name=index_name,
+                        index_name=options.index_name,
                         id_fn=lambda doc: doc["product_id"],
                     )
                 )
@@ -113,18 +117,16 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
                 >> beam.ParDo(
                     WriteToVespa(
                         host=options.dest_host,
-                        schema=index_name,
+                        schema=options.index_name,
                         id_fn=lambda doc: doc["product_id"],
                     )
                 )
             )
         case "bq":
-            dataset_id = "amazon"
-            table_id = "docs"
             (
                 products
                 | WriteToBigQuery(
-                    f"{dataset_id}.{table_id}",
+                    table=table_spec,
                     schema=beam.io.SCHEMA_AUTODETECT,
                     write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
                     create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
