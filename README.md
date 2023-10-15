@@ -11,8 +11,8 @@ The details and results of experiments can be found in this wiki: https://github
 Copy `.envrc.example` and fill in the necessary environment variables. Afterwards, proceed with installing the dependencies.
 
 ```shell
-$ pyenv install 3.10.8
-$ pyenv local 3.10.8
+$ pyenv install 3.10.12
+$ pyenv local 3.10.12
 $ pip install poetry
 $ poetry env use python
 $ poetry install
