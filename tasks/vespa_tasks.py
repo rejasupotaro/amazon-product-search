@@ -4,13 +4,7 @@ from textwrap import dedent
 from invoke import task
 
 import amazon_product_search.core.vespa.service as vespa_service
-from amazon_product_search.constants import (
-    HF,
-    PROJECT_ID,
-    PROJECT_NAME,
-    REGION,
-    VESPA_DIR,
-)
+from amazon_product_search.constants import HF, VESPA_DIR
 from amazon_product_search.core.vespa.vespa_client import VespaClient
 from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 
@@ -70,50 +64,3 @@ def search(c):
         json_str = json.dumps(res.json, indent=4, ensure_ascii=False)
         print(json_str)
         print()
-
-
-@task
-def index(
-    c,
-    schema,
-    locale="jp",
-    dest_host="",
-    extract_keywords=False,
-    encode_text=False,
-    nrows=None,
-    runner="DirectRunner",
-):
-    command = [
-        "poetry run python src/amazon_product_search/indexing/pipeline.py",
-        f"--runner={runner}",
-        f"--index_name={schema}",
-        f"--locale={locale}",
-    ]
-
-    if dest_host:
-        command.append("--dest=vespa")
-        command.append(f"--dest_host={dest_host}")
-
-    if extract_keywords:
-        command.append("--extract_keywords")
-
-    if encode_text:
-        command.append("--encode_text")
-
-    if runner == "DirectRunner":
-        command += [
-            # https://github.com/apache/beam/blob/master/sdks/python/apache_beam/options/pipeline_options.py#L617-L621
-            "--direct_num_workers=0",
-        ]
-    elif runner == "DataflowRunner":
-        command += [
-            f"--project={PROJECT_ID}",
-            f"--region={REGION}",
-            f"--temp_location=gs://{PROJECT_NAME}/temp",
-            f"--staging_location=gs://{PROJECT_NAME}/staging",
-        ]
-
-    if nrows:
-        command.append(f"--nrows={int(nrows)}")
-
-    c.run(" ".join(command))
