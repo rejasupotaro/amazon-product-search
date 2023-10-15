@@ -16,7 +16,7 @@ from amazon_product_search.indexing.io.elasticsearch_io import WriteToElasticsea
 from amazon_product_search.indexing.io.vespa_io import WriteToVespa
 from amazon_product_search.indexing.options import IndexerOptions
 from amazon_product_search.indexing.transforms.analyze_fn import AnalyzeFn
-from amazon_product_search.indexing.transforms.encode_fn import BatchEncodeFn
+from amazon_product_search.indexing.transforms.encode_fn import EncodeInBatchFn
 from amazon_product_search.indexing.transforms.extract_keywords_fn import (
     ExtractKeywordsFn,
 )
@@ -78,7 +78,7 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
             | "Batch products for encoding" >> BatchElements(min_batch_size=8)
             | "Encode products"
             >> beam.ParDo(
-                BatchEncodeFn(
+                EncodeInBatchFn(
                     shared_handle=Shared(),
                     hf_model_name=hf_model_name,
                     pooling_mode=pooling_mode,

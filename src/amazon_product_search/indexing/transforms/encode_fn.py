@@ -24,7 +24,7 @@ class EncodeFn(beam.DoFn):
         yield product
 
 
-class BatchEncodeFn(beam.DoFn):
+class EncodeInBatchFn(beam.DoFn):
     def __init__(self, shared_handle: Shared, hf_model_name: str, pooling_mode: PoolingMode) -> None:
         self._shared_handle = shared_handle
         self._hf_model_name = hf_model_name
