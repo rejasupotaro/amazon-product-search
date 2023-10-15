@@ -93,14 +93,13 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
         case "bq":
             products = pipeline | "Read table" >> beam.io.ReadFromBigQuery(table=table_spec)
 
-    batched_products = products | "Batch products for indexing" >> BatchElements()
-
     match options.dest:
         case "stdout":
             products | beam.Map(lambda batched_products: logging.info(batched_products))
         case "es":
             (
-                batched_products
+                products
+                | "Batch products for indexing" >> BatchElements()
                 | "Index products"
                 >> beam.ParDo(
                     WriteToElasticsearch(
@@ -112,7 +111,8 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
             )
         case "vespa":
             (
-                batched_products
+                products
+                | "Batch products for indexing" >> BatchElements()
                 | "Index products"
                 >> beam.ParDo(
                     WriteToVespa(

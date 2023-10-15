@@ -65,6 +65,15 @@ def run(
             # https://github.com/apache/beam/blob/master/sdks/python/apache_beam/options/pipeline_options.py#L617-L621
             "--direct_num_workers=0",
         ]
+    elif runner == "DataflowRunner":
+        command += [
+            "--num_workers=1",
+            "--worker_machine_type=n2-highmem-8",
+            "--sdk_location=container",
+            f"--sdk_container_image=gcr.io/{PROJECT_ID}/{PROJECT_NAME}/indexing",
+            f"--worker_zone={REGION}-c",
+        ]
+
     if (runner == "DataflowRunner") or (source == "bq") or (dest == "bq"):
         command += [
             f"--project={PROJECT_ID}",
