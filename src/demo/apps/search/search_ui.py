@@ -11,7 +11,6 @@ from amazon_product_search.core.metrics import compute_cosine_similarity
 
 @dataclass
 class FormInput:
-    index_name: str | None
     query: str | None
     fields: list[str]
     sparse_boost: float
@@ -23,9 +22,7 @@ class FormInput:
     reranker_str: str | None
 
 
-def draw_input_form(indices: list[str], queries: list[str] | None = None) -> FormInput:
-    index_name = st.selectbox("Index:", indices)
-
+def draw_input_form(queries: list[str] | None = None) -> FormInput:
     query = st.selectbox("Query:", queries) if queries else st.text_input("Query:")
 
     fields = st.multiselect(
@@ -66,7 +63,6 @@ def draw_input_form(indices: list[str], queries: list[str] | None = None) -> For
     reranker_str = st.selectbox("reranker:", ["NoOpReranker", "RandomReranker", "DotReranker"])
 
     return FormInput(
-        index_name,
         query,
         fields,
         sparse_boost,

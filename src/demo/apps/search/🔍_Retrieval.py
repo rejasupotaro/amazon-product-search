@@ -2,6 +2,7 @@ from typing import Any, Optional
 
 import streamlit as st
 
+from amazon_product_search.constants import HF
 from amazon_product_search.core.es.es_client import EsClient
 from amazon_product_search.core.es.query_builder import QueryBuilder
 from amazon_product_search.core.metrics import (
@@ -12,6 +13,7 @@ from amazon_product_search.core.metrics import (
 from amazon_product_search.core.reranking.reranker import from_string
 from amazon_product_search.core.retrieval.options import DynamicWeighting, FixedWeighting
 from amazon_product_search.core.retrieval.retriever import Retriever
+from amazon_product_search.core.source import Locale
 from demo.apps.search.search_ui import (
     draw_input_form,
     draw_products,
@@ -21,13 +23,24 @@ from demo.page_config import set_page_config
 from demo.utils import load_merged
 
 es_client = EsClient()
-query_builder = QueryBuilder()
-retriever = Retriever(es_client, query_builder)
+
+
+@st.cache_resource
+def get_query_builder(locale: str) -> QueryBuilder:
+    hf_model_name = {
+        "us": HF.EN_MULTIQA,
+        "jp": HF.JP_SLUKE_MEAN,
+    }[locale]
+    return QueryBuilder(hf_model_name=hf_model_name)
+
+
+def get_retriever(es_client: EsClient, query_builder: QueryBuilder) -> Retriever:
+    return Retriever(es_client, query_builder)
 
 
 @st.cache_data
-def load_dataset() -> dict[str, dict[str, tuple[str, str]]]:
-    df = load_merged(locale="jp").to_pandas()
+def load_dataset(locale: Locale) -> dict[str, dict[str, tuple[str, str]]]:
+    df = load_merged(locale).to_pandas()
     df = df[df["split"] == "test"]
     query_to_label: dict[str, dict[str, tuple[str, str]]] = {}
     for query, group in df.groupby("query"):
@@ -59,15 +72,19 @@ def main() -> None:
     set_page_config()
     st.write("## Search")
 
-    queries, query_to_label = None, {}
-    use_dataset = st.checkbox("Use Dataset:", value=True)
-    if use_dataset:
-        query_to_label = load_dataset()
-        queries = query_to_label.keys()
+    with st.sidebar:
+        locale = st.selectbox("Locale", ["us", "jp"], index=1)
+        index_name = st.selectbox("Index:", es_client.list_indices())
+
+        queries, query_to_label = None, {}
+        use_dataset = st.checkbox("Use Dataset:", value=True)
+        if use_dataset:
+            query_to_label = load_dataset(locale)
+            queries = query_to_label.keys()
 
     st.write("#### Input")
     with st.form("input"):
-        form_input = draw_input_form(es_client.list_indices(), queries)
+        form_input = draw_input_form(queries)
         if not st.form_submit_button("Search"):
             return
 
@@ -76,8 +93,8 @@ def main() -> None:
         if form_input.weighting_strategy == "fixed"
         else DynamicWeighting()
     )
-    response = retriever.search(
-        index_name=form_input.index_name,
+    response = get_retriever(es_client, get_query_builder(locale)).search(
+        index_name=index_name,
         query=form_input.query,
         fields=form_input.fields,
         query_type=form_input.query_type,
@@ -106,7 +123,7 @@ def main() -> None:
         return
     response.results = reranker.rerank(form_input.query, response.results)
 
-    query_vector = query_builder.encode(form_input.query)
+    query_vector = get_query_builder(locale).encode(form_input.query)
     draw_response_stats(response, query_vector, label_dict)
 
     header = f"{response.total_hits} products found"

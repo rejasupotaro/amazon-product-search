@@ -12,10 +12,12 @@ from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 
 
 class QueryBuilder:
-    def __init__(self, data_dir: str = DATA_DIR, project_dir: str = PROJECT_DIR) -> None:
+    def __init__(
+        self, data_dir: str = DATA_DIR, project_dir: str = PROJECT_DIR, hf_model_name: str = HF.JP_SLUKE_MEAN
+    ) -> None:
         self.synonym_dict = SynonymDict(data_dir)
         self.tokenizer = JapaneseTokenizer()
-        self.encoder: SBERTEncoder = SBERTEncoder(HF.JP_SLUKE_MEAN)
+        self.encoder: SBERTEncoder = SBERTEncoder(hf_model_name)
         self.template_loader = TemplateLoader(project_dir)
 
     def match_all(self) -> dict[str, Any]:
