@@ -5,7 +5,9 @@ import plotly.express as px
 import polars as pl
 import streamlit as st
 
+from amazon_product_search.constants import HF
 from amazon_product_search.core.es.es_client import EsClient
+from amazon_product_search.core.es.query_builder import QueryBuilder
 from amazon_product_search.core.es.response import Response
 from amazon_product_search.core.metrics import (
     compute_ndcg,
@@ -16,12 +18,22 @@ from amazon_product_search.core.metrics import (
 from amazon_product_search.core.reranking import reranker
 from amazon_product_search.core.retrieval.options import DynamicWeighting, FixedWeighting
 from amazon_product_search.core.retrieval.retriever import Retriever
+from amazon_product_search.core.source import Locale
 from demo import utils
 from demo.apps.search.experimental_setup import EXPERIMENTS, ExperimentalSetup, Variant
 from demo.page_config import set_page_config
 
 es_client = EsClient()
-retriever = Retriever(es_client=es_client)
+
+
+@st.cache_resource
+def get_retriever(locale: Locale) -> Retriever:
+    hf_model_name = {
+        "us": HF.EN_MULTIQA,
+        "jp": HF.JP_SLUKE_MEAN,
+    }[locale]
+    query_builder = QueryBuilder(hf_model_name=hf_model_name)
+    return Retriever(es_client=es_client, query_builder=query_builder)
 
 
 @st.cache_data
@@ -53,13 +65,13 @@ def draw_variants(variants: list[Variant]) -> None:
     st.write(variants_df.to_pandas())
 
 
-def search(index_name: str, query: str, variant: Variant, labeled_ids: list[str] | None) -> Response:
+def search(locale: Locale, index_name: str, query: str, variant: Variant, labeled_ids: list[str] | None) -> Response:
     weighting_strategy = (
         FixedWeighting({"sparse": variant.sparse_boost, "dense": variant.dense_boost})
         if variant.rank_fusion.weighting_strategy == "fixed"
         else DynamicWeighting()
     )
-    return retriever.search(
+    return get_retriever(locale).search(
         index_name=index_name,
         query=query,
         fields=variant.fields,
@@ -85,7 +97,7 @@ def compute_metrics(
     labeled_ids = None
     if experimental_setup.task == "reranking":
         labeled_ids = labels_df.get_column("product_id").to_list()
-    response = search(experimental_setup.index_name, query, variant, labeled_ids)
+    response = search(experimental_setup.locale, experimental_setup.index_name, query, variant, labeled_ids)
     response.results = variant.reranker.rerank(query, response.results)
 
     retrieved_ids = [result.product["product_id"] for result in response.results]
