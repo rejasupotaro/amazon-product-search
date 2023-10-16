@@ -1,5 +1,6 @@
 import streamlit as st
 
+from amazon_product_search.constants import HF
 from amazon_product_search.core.es.es_client import EsClient
 from amazon_product_search.core.es.query_builder import QueryBuilder
 from amazon_product_search.core.es.response import Response
@@ -10,17 +11,26 @@ from amazon_product_search.core.metrics import (
     compute_recall,
 )
 from amazon_product_search.core.nlp.normalizer import normalize_query
+from amazon_product_search.core.source import Locale
 from demo.apps.search.search_ui import draw_products
 from demo.page_config import set_page_config
 from demo.utils import load_merged
 
 es_client = EsClient()
-query_builder = QueryBuilder()
+
+
+@st.cache_resource
+def get_query_builder(locale: Locale) -> QueryBuilder:
+    hf_model_name = {
+        "us": HF.EN_MULTIQA,
+        "jp": HF.JP_SLUKE_MEAN,
+    }[locale]
+    return QueryBuilder(hf_model_name=hf_model_name)
 
 
 @st.cache_data
-def load_dataset() -> dict[str, dict[str, tuple[str, str]]]:
-    df = load_merged(locale="jp").to_pandas()
+def load_dataset(locale: Locale) -> dict[str, dict[str, tuple[str, str]]]:
+    df = load_merged(locale).to_pandas()
     df = df[df["split"] == "test"]
     query_to_label: dict[str, dict[str, tuple[str, str]]] = {}
     for query, group in df.groupby("query"):
@@ -34,6 +44,7 @@ def load_dataset() -> dict[str, dict[str, tuple[str, str]]]:
 
 
 def search(
+    locale: Locale,
     index_name: str,
     query: str,
     sparse_fields: list[str],
@@ -42,14 +53,14 @@ def search(
     size: int = 20,
 ) -> tuple[Response, Response]:
     normalized_query = normalize_query(query)
-    sparse_query = query_builder.build_sparse_search_query(
+    sparse_query = get_query_builder(locale).build_sparse_search_query(
         query=normalized_query,
         fields=sparse_fields,
         query_type=query_type,
         is_synonym_expansion_enabled=is_synonym_expansion_enabled,
     )
 
-    query_vector = query_builder.encode(normalized_query)
+    query_vector = get_query_builder(locale).encode(normalized_query)
     dense_query = {
         "query_vector": query_vector,
         "field": "product_vector",
@@ -67,16 +78,17 @@ def main() -> None:
     set_page_config()
     st.write("## Search")
 
-    queries, query_to_label = None, {}
-    use_dataset = st.checkbox("Use Dataset:", value=True)
-    if use_dataset:
-        query_to_label = load_dataset()
-        queries = query_to_label.keys()
+    with st.sidebar:
+        locale = st.selectbox("Locale", ["us", "jp"], index=1)
+        index_name = str(st.selectbox("Index:", es_client.list_indices()))
+        queries, query_to_label = None, {}
+        use_dataset = st.checkbox("Use Dataset:", value=True)
+        if use_dataset:
+            query_to_label = load_dataset(locale)
+            queries = query_to_label.keys()
 
     st.write("#### Input")
     with st.form("input"):
-        index_name = str(st.selectbox("Index:", es_client.list_indices()))
-
         query = st.selectbox("Query:", queries) if queries else st.text_input("Query:")
         assert query is not None
 
@@ -121,7 +133,9 @@ def main() -> None:
     st.write("#### Output")
 
     relevant_ids = {product_id for product_id, (label, product_title) in label_dict.items() if label == "E"}
-    sparse_response, dense_response = search(index_name, query, sparse_fields, query_type, is_synonym_expansion_enabled)
+    sparse_response, dense_response = search(
+        locale, index_name, query, sparse_fields, query_type, is_synonym_expansion_enabled
+    )
     sparse_retrieved_ids = [result.product["product_id"] for result in sparse_response.results]
     dense_retrieved_ids = [result.product["product_id"] for result in dense_response.results]
     sparse_relevant_ids = [retrieved_id for retrieved_id in sparse_retrieved_ids if retrieved_id in relevant_ids]

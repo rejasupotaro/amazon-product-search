@@ -26,7 +26,7 @@ es_client = EsClient()
 
 
 @st.cache_resource
-def get_query_builder(locale: str) -> QueryBuilder:
+def get_query_builder(locale: Locale) -> QueryBuilder:
     hf_model_name = {
         "us": HF.EN_MULTIQA,
         "jp": HF.JP_SLUKE_MEAN,
