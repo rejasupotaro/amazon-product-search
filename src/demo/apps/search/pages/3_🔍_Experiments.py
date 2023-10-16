@@ -43,8 +43,8 @@ def _load_labels(locale: str) -> pl.DataFrame:
     return df
 
 
-def load_labels(experimental_setup: ExperimentalSetup) -> pl.DataFrame:
-    df = _load_labels(experimental_setup.locale)
+def load_labels(locale: Locale, experimental_setup: ExperimentalSetup) -> pl.DataFrame:
+    df = _load_labels(locale)
     if experimental_setup.num_queries:
         queries = df.get_column("query").sample(frac=1).unique()[: experimental_setup.num_queries]
         df = df.filter(pl.col("query").is_in(queries))
@@ -89,6 +89,8 @@ def search(locale: Locale, index_name: str, query: str, variant: Variant, labele
 
 
 def compute_metrics(
+    locale: Locale,
+    index_name: str,
     experimental_setup: ExperimentalSetup,
     variant: Variant,
     query: str,
@@ -97,7 +99,7 @@ def compute_metrics(
     labeled_ids = None
     if experimental_setup.task == "reranking":
         labeled_ids = labels_df.get_column("product_id").to_list()
-    response = search(experimental_setup.locale, experimental_setup.index_name, query, variant, labeled_ids)
+    response = search(locale, index_name, query, variant, labeled_ids)
     response.results = variant.reranker.rerank(query, response.results)
 
     retrieved_ids = [result.product["product_id"] for result in response.results]
@@ -120,7 +122,9 @@ def compute_metrics(
     return metric_dict
 
 
-def perform_search(experimental_setup: ExperimentalSetup, query_dict: dict[str, pl.DataFrame]) -> list[dict[str, Any]]:
+def perform_search(
+    locale: Locale, index_name: str, experimental_setup: ExperimentalSetup, query_dict: dict[str, pl.DataFrame]
+) -> list[dict[str, Any]]:
     total_examples = len(query_dict)
     n = 0
     progress_text = st.empty()
@@ -131,7 +135,7 @@ def perform_search(experimental_setup: ExperimentalSetup, query_dict: dict[str, 
         progress_text.text(f"Query ({n} / {total_examples}): {query}")
         progress_bar.progress(n / total_examples)
         for variant in experimental_setup.variants:
-            metrics.append(compute_metrics(experimental_setup, variant, query, query_labels_df))
+            metrics.append(compute_metrics(locale, index_name, experimental_setup, variant, query, query_labels_df))
     progress_text.text(f"Done ({n} / {total_examples})")
     return metrics
 
@@ -174,19 +178,23 @@ def main() -> None:
     set_page_config()
     st.write("## Experiments")
 
+    with st.sidebar:
+        locale = st.selectbox("Locale", ["us", "jp"], index=1)
+        index_name = st.selectbox("Index:", es_client.list_indices())
+
     experiment_name = st.selectbox("Experiment:", EXPERIMENTS.keys())
     experimental_setup = EXPERIMENTS[experiment_name]
 
-    num_docs = count_docs(experimental_setup.index_name)
+    num_docs = count_docs(index_name)
 
-    labels_df = load_labels(experimental_setup)
+    labels_df = load_labels(locale, experimental_setup)
     query_dict = {}
     for query, query_labels_df in labels_df.groupby("query"):
         query_dict[str(query)] = query_labels_df
 
     st.write("### Experimental Setup")
     content = f"""
-    The experiment is conducted on `{experimental_setup.index_name}` containing `{num_docs}` docs in total.
+    The experiment is conducted on `{index_name}` containing `{num_docs}` docs in total.
     We send `{len(query_dict)}` queries to the index with different parameters shown below.
     Then, we compute Total Hits, Zero Hit Rate, Precision, Recall, NDCG, and NDCG' on each variant.
     """
@@ -200,7 +208,7 @@ def main() -> None:
     if not clicked:
         return
 
-    metrics = perform_search(experimental_setup, query_dict)
+    metrics = perform_search(locale, index_name, experimental_setup, query_dict)
 
     st.write("----")
 

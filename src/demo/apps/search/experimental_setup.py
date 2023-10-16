@@ -9,7 +9,6 @@ from amazon_product_search.core.reranking.reranker import (
     Reranker,
     SpladeReranker,
 )
-from amazon_product_search.core.source import Locale
 
 SPARSE_FIELDS = [
     "product_title",
@@ -45,8 +44,6 @@ class Variant:
 
 @dataclass
 class ExperimentalSetup:
-    index_name: str
-    locale: Locale
     task: Task
     num_queries: Optional[int] = None
     variants: list[Variant] = field(default_factory=list)
@@ -54,8 +51,6 @@ class ExperimentalSetup:
 
 EXPERIMENTS = {
     "query_types": ExperimentalSetup(
-        index_name="products_jp",
-        locale="jp",
         task="retrieval",
         num_queries=5000,
         variants=[
@@ -74,8 +69,6 @@ EXPERIMENTS = {
         ],
     ),
     "different_fields": ExperimentalSetup(
-        index_name="products_jp",
-        locale="jp",
         task="retrieval",
         num_queries=5000,
         variants=[
@@ -94,8 +87,6 @@ EXPERIMENTS = {
         ],
     ),
     "different_weights": ExperimentalSetup(
-        index_name="products_jp",
-        locale="jp",
         task="retrieval",
         num_queries=5000,
         variants=[
@@ -119,8 +110,6 @@ EXPERIMENTS = {
         ],
     ),
     "synonym_expansion": ExperimentalSetup(
-        index_name="products_jp",
-        locale="jp",
         task="retrieval",
         num_queries=5000,
         variants=[
@@ -142,10 +131,8 @@ EXPERIMENTS = {
         ],
     ),
     "sparse_vs_dense": ExperimentalSetup(
-        index_name="products_jp",
-        locale="jp",
         task="retrieval",
-        num_queries=5000,
+        num_queries=5,
         variants=[
             Variant(name="sparse only", fields=SPARSE_FIELDS),
             Variant(name="dense only", fields=["product_vector"]),
@@ -196,8 +183,6 @@ EXPERIMENTS = {
         ],
     ),
     "weighting_strategy": ExperimentalSetup(
-        index_name="products_jp",
-        locale="jp",
         task="retrieval",
         num_queries=1000,
         variants=[
@@ -235,8 +220,6 @@ EXPERIMENTS = {
         ],
     ),
     "reranking": ExperimentalSetup(
-        index_name="products_jp",
-        locale="jp",
         task="reranking",
         num_queries=500,
         variants=[
