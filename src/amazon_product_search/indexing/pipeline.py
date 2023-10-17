@@ -5,6 +5,7 @@ from typing import Any, Dict, Tuple
 import apache_beam as beam
 import polars as pl
 from apache_beam.io.gcp.bigquery import WriteToBigQuery
+from apache_beam.options.pipeline_options import GoogleCloudOptions
 from apache_beam.transforms.ptransform import PTransform
 from apache_beam.transforms.util import BatchElements
 from apache_beam.utils.shared import Shared
@@ -60,7 +61,8 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
 
     dataset_id = "amazon"
     table_id = f"docs_{locale}"
-    table_spec = f"{PROJECT_ID}:{dataset_id}.{table_id}"
+    project_id = PROJECT_ID if PROJECT_ID else options.view_as(GoogleCloudOptions).project
+    table_spec = f"{project_id}:{dataset_id}.{table_id}"
 
     pipeline = beam.Pipeline(options=options)
     match options.source:
