@@ -25,7 +25,7 @@ def get_query_builder(locale: Locale) -> QueryBuilder:
         "us": HF.EN_MULTIQA,
         "jp": HF.JP_SLUKE_MEAN,
     }[locale]
-    return QueryBuilder(hf_model_name=hf_model_name)
+    return QueryBuilder(locale=locale, hf_model_name=hf_model_name)
 
 
 @st.cache_data

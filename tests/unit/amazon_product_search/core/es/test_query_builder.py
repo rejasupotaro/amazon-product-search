@@ -4,12 +4,12 @@ from amazon_product_search.core.es.query_builder import QueryBuilder
 
 
 def test_match_all():
-    query_builder = QueryBuilder()
+    query_builder = QueryBuilder(locale="us")
     assert query_builder.match_all() == {"match_all": {}}
 
 
 def test_build_search_query():
-    query_builder = QueryBuilder()
+    query_builder = QueryBuilder(locale="us")
     es_query = query_builder.build_sparse_search_query(
         query="query", fields=["product_title"], query_type="combined_fields"
     )
@@ -34,7 +34,7 @@ def test_build_search_query():
 def test_build_search_query_with_synonym_expansion_enabled(mock_method):
     mock_method.return_value = {"query": [("synonym", 1.0), ("antonym", 0.1)]}
 
-    query_builder = QueryBuilder()
+    query_builder = QueryBuilder(locale="us")
     es_query = query_builder.build_sparse_search_query(
         query="query",
         fields=["product_title"],
@@ -67,7 +67,7 @@ def test_build_search_query_with_synonym_expansion_enabled(mock_method):
 
 
 def test_build_search_query_with_product_ids():
-    query_builder = QueryBuilder()
+    query_builder = QueryBuilder(locale="us")
     es_query = query_builder.build_sparse_search_query(
         query="query",
         fields=["product_title"],
@@ -110,7 +110,7 @@ def test_build_search_query_with_synonym_expansion_enabled_with_product_ids(
 ):
     mock_method.return_value = {"query": [("synonym", 1.0), ("antonym", 0.1)]}
 
-    query_builder = QueryBuilder()
+    query_builder = QueryBuilder(locale="us")
     es_query = query_builder.build_sparse_search_query(
         query="query",
         fields=["product_title"],
@@ -157,13 +157,13 @@ def test_build_search_query_with_synonym_expansion_enabled_with_product_ids(
 
 
 def test_build_knn_search_query():
-    query_builder = QueryBuilder()
+    query_builder = QueryBuilder(locale="us")
     es_query = query_builder.build_dense_search_query(query="query", field="product_vector", top_k=10)
     assert es_query.keys() == {"query_vector", "field", "k", "num_candidates", "boost"}
 
 
 def test_build_knn_search_query_with_product_id():
-    query_builder = QueryBuilder()
+    query_builder = QueryBuilder(locale="us")
     es_query = query_builder.build_dense_search_query(
         query="query", field="product_vector", top_k=10, product_ids=["1", "2", "3"]
     )

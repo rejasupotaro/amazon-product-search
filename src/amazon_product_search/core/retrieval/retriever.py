@@ -6,6 +6,7 @@ from amazon_product_search.core.es.response import Response, Result
 from amazon_product_search.core.nlp.normalizer import normalize_query
 from amazon_product_search.core.retrieval.options import WeightingStrategy
 from amazon_product_search.core.retrieval.score_normalizer import min_max_scale
+from amazon_product_search.core.source import Locale
 
 
 def split_fields(fields: list[str]) -> tuple[list[str], list[str]]:
@@ -99,7 +100,9 @@ def _rrf_scores(response: Response, k: int = 60) -> Response:
 
 
 class Retriever:
-    def __init__(self, es_client: EsClient | None = None, query_builder: QueryBuilder | None = None) -> None:
+    def __init__(
+        self, locale: Locale, es_client: EsClient | None = None, query_builder: QueryBuilder | None = None
+    ) -> None:
         if es_client:
             self.es_client = es_client
         else:
@@ -108,7 +111,7 @@ class Retriever:
         if query_builder:
             self.query_builder = query_builder
         else:
-            self.query_builder = QueryBuilder()
+            self.query_builder = QueryBuilder(locale)
 
     def search(
         self,

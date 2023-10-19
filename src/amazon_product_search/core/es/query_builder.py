@@ -6,17 +6,26 @@ from torch import Tensor
 from amazon_product_search.constants import DATA_DIR, HF, PROJECT_DIR
 from amazon_product_search.core.cache import weak_lru_cache
 from amazon_product_search.core.es.templates.template_loader import TemplateLoader
+from amazon_product_search.core.nlp.tokenizers.english_tokenizer import EnglishTokenizer
 from amazon_product_search.core.nlp.tokenizers.japanese_tokenizer import JapaneseTokenizer
+from amazon_product_search.core.source import Locale
 from amazon_product_search.core.synonyms.synonym_dict import SynonymDict
 from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 
 
 class QueryBuilder:
     def __init__(
-        self, data_dir: str = DATA_DIR, project_dir: str = PROJECT_DIR, hf_model_name: str = HF.JP_SLUKE_MEAN
+        self,
+        locale: Locale,
+        data_dir: str = DATA_DIR,
+        project_dir: str = PROJECT_DIR,
+        hf_model_name: str = HF.JP_SLUKE_MEAN,
     ) -> None:
         self.synonym_dict = SynonymDict(data_dir)
-        self.tokenizer = JapaneseTokenizer()
+        self.tokenizer = {
+            "us": EnglishTokenizer,
+            "jp": JapaneseTokenizer,
+        }[locale]()
         self.encoder: SBERTEncoder = SBERTEncoder(hf_model_name)
         self.template_loader = TemplateLoader(project_dir)
 

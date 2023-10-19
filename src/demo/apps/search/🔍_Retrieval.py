@@ -31,11 +31,11 @@ def get_query_builder(locale: Locale) -> QueryBuilder:
         "us": HF.EN_MULTIQA,
         "jp": HF.JP_SLUKE_MEAN,
     }[locale]
-    return QueryBuilder(hf_model_name=hf_model_name)
+    return QueryBuilder(locale=locale, hf_model_name=hf_model_name)
 
 
-def get_retriever(es_client: EsClient, query_builder: QueryBuilder) -> Retriever:
-    return Retriever(es_client, query_builder)
+def get_retriever(locale: Locale, es_client: EsClient, query_builder: QueryBuilder) -> Retriever:
+    return Retriever(locale, es_client, query_builder)
 
 
 @st.cache_data
@@ -93,7 +93,7 @@ def main() -> None:
         if form_input.weighting_strategy == "fixed"
         else DynamicWeighting()
     )
-    response = get_retriever(es_client, get_query_builder(locale)).search(
+    response = get_retriever(locale, es_client, get_query_builder(locale)).search(
         index_name=index_name,
         query=form_input.query,
         fields=form_input.fields,
