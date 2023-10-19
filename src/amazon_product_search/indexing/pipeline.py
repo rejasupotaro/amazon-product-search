@@ -97,11 +97,11 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
 
     match options.dest:
         case "stdout":
-            products | beam.Map(lambda batched_products: logging.info(batched_products))
+            products | beam.Map(logging.info)
         case "es":
             (
                 products
-                | "Batch products for indexing" >> BatchElements()
+                | "Batch products for WriteToElasticsearch" >> BatchElements()
                 | "Index products"
                 >> beam.ParDo(
                     WriteToElasticsearch(
@@ -114,7 +114,7 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
         case "vespa":
             (
                 products
-                | "Batch products for indexing" >> BatchElements()
+                | "Batch products for WriteToVespa" >> BatchElements()
                 | "Index products"
                 >> beam.ParDo(
                     WriteToVespa(
