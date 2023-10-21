@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Any, Dict, Iterator, List, cast
+from typing import Any, Dict, Iterator, List
 
 import apache_beam as beam
 from apache_beam.io.gcp.bigquery import WriteToBigQuery
@@ -13,7 +13,6 @@ from torch import Tensor
 from amazon_product_search.constants import DATASET_ID, HF, PROJECT_ID
 from amazon_product_search.core import source
 from amazon_product_search.core.nlp.normalizer import normalize_query
-from amazon_product_search.core.nlp.tokenizers import EnglishTokenizer, JapaneseTokenizer, Tokenizer
 from amazon_product_search.core.source import Locale
 from amazon_product_search.indexing.options import IndexerOptions
 from amazon_product_search.indexing.transforms.weak_reference import WeakReference
@@ -30,21 +29,9 @@ def get_input_source(data_dir: str, locale: Locale, nrows: int = -1) -> PTransfo
     return beam.Create(query_dicts)
 
 
-class AnalyzeQueryFn(beam.DoFn):
-    def __init__(self, locale: Locale) -> None:
-        self.locale = locale
-
-    def setup(self) -> None:
-        self.tokenizer: Tokenizer = {
-            "us": EnglishTokenizer,
-            "jp": JapaneseTokenizer,
-        }[self.locale]()
-
+class NormalizeQueryFn(beam.DoFn):
     def process(self, query_dict: Dict[str, Any]) -> Iterator[Dict[str, Any]]:
-        query = query_dict["query"]
-        query = normalize_query(query)
-        tokens = self.tokenizer.tokenize(query)
-        query_dict["query"] = " ".join(cast(list, tokens))
+        query_dict["query"] = normalize_query(query_dict["query"])
         yield query_dict
 
 
@@ -87,7 +74,7 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
     queries = (
         pipeline
         | get_input_source(options.data_dir, locale, options.nrows)
-        | "Analyze queries" >> beam.ParDo(AnalyzeQueryFn(locale))
+        | "Analyze queries" >> beam.ParDo(NormalizeQueryFn())
         | "Filter queries" >> beam.Filter(lambda query_dict: bool(query_dict["query"]))
         | "Batch queries for encoding" >> BatchElements(min_batch_size=8)
         | "Encode queries"
