@@ -9,9 +9,9 @@ class Analyzer:
     def __init__(self, text_fields: list[str], locale: Locale) -> None:
         self.text_fields = text_fields
         self.tokenizer: Tokenizer = {
-            "us": EnglishTokenizer(),
-            "jp": JapaneseTokenizer(),
-        }[locale]
+            "us": EnglishTokenizer,
+            "jp": JapaneseTokenizer,
+        }[locale]()
 
     def _normalize(self, s: str) -> str:
         s = normalize_doc(s)
