@@ -12,7 +12,7 @@ from amazon_product_search.indexing.doc_transformation_pipeline import get_input
 from amazon_product_search.indexing.io.elasticsearch_io import WriteToElasticsearch
 from amazon_product_search.indexing.io.vespa_io import WriteToVespa
 from amazon_product_search.indexing.options import IndexerOptions
-from amazon_product_search.indexing.transforms.analyze_fn import AnalyzeFn
+from amazon_product_search.indexing.transforms.analyze_doc_fn import AnalyzeDocFn
 from amazon_product_search.indexing.transforms.encode_fn import EncodeInBatchFn
 from amazon_product_search.indexing.transforms.extract_keywords_fn import (
     ExtractKeywordsFn,
@@ -45,7 +45,7 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
                 pipeline
                 | get_input_source(options.data_dir, locale, options.nrows)
                 | "Filter products" >> beam.Filter(is_indexable)
-                | "Analyze products" >> beam.ParDo(AnalyzeFn(text_fields, locale))
+                | "Analyze products" >> beam.ParDo(AnalyzeDocFn(text_fields, locale))
             )
             branches = {}
             if options.extract_keywords:

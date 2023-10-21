@@ -7,7 +7,7 @@ from amazon_product_search.core.nlp.tokenizers import EnglishTokenizer, Japanese
 from amazon_product_search.core.source import Locale
 
 
-class AnalyzeFn(beam.DoFn):
+class AnalyzeDocFn(beam.DoFn):
     def __init__(self, text_fields: list[str], locale: Locale) -> None:
         self.text_fields = text_fields
         self.locale = locale
