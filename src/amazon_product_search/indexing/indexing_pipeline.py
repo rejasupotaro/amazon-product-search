@@ -1,18 +1,14 @@
 import logging
 import os
-from typing import Any, Dict, Tuple
 
 import apache_beam as beam
-import polars as pl
 from apache_beam.io.gcp.bigquery import WriteToBigQuery
 from apache_beam.options.pipeline_options import GoogleCloudOptions
-from apache_beam.transforms.ptransform import PTransform
 from apache_beam.transforms.util import BatchElements
 from apache_beam.utils.shared import Shared
 
 from amazon_product_search.constants import DATASET_ID, HF, PROJECT_ID
-from amazon_product_search.core import source
-from amazon_product_search.core.source import Locale
+from amazon_product_search.indexing.doc_transformation_pipeline import get_input_source, join_branches
 from amazon_product_search.indexing.io.elasticsearch_io import WriteToElasticsearch
 from amazon_product_search.indexing.io.vespa_io import WriteToVespa
 from amazon_product_search.indexing.options import IndexerOptions
@@ -22,27 +18,6 @@ from amazon_product_search.indexing.transforms.extract_keywords_fn import (
     ExtractKeywordsFn,
 )
 from amazon_product_search.indexing.transforms.filters import is_indexable
-
-
-def get_input_source(data_dir: str, locale: Locale, nrows: int = -1) -> PTransform:
-    products_df = source.load_products(locale, nrows, data_dir)
-    products_df = products_df.with_columns(pl.col("*").fill_null(pl.lit("")))
-    products = products_df.to_dicts()
-    logging.info(f"{len(products)} products are going to be indexed")
-    return beam.Create(products)
-
-
-def join_branches(kv: Tuple[str, Dict[str, Any]]) -> Dict[str, Any]:
-    (product_id, group) = kv
-    product = group["product"][-1]
-
-    if "extracted_keywords" in group:
-        product |= group["extracted_keywords"][-1]
-
-    if "product_vector" in group:
-        product["product_vector"] = group["product_vector"][-1]
-
-    return product
 
 
 def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
