@@ -5,7 +5,7 @@ from apache_beam.io.gcp.bigquery import WriteToBigQuery
 from apache_beam.options.pipeline_options import GoogleCloudOptions
 from apache_beam.transforms.util import BatchElements
 
-from amazon_product_search.constants import PROJECT_ID
+from amazon_product_search.constants import DATASET_ID, PROJECT_ID
 from amazon_product_search.indexing.io.elasticsearch_io import WriteToElasticsearch
 from amazon_product_search.indexing.io.vespa_io import WriteToVespa
 from amazon_product_search.indexing.options import IndexerOptions
@@ -13,10 +13,9 @@ from amazon_product_search.indexing.options import IndexerOptions
 
 def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
     locale = options.locale
-    dataset_id = "amazon"
     table_id = f"docs_{locale}"
     project_id = PROJECT_ID if PROJECT_ID else options.view_as(GoogleCloudOptions).project
-    table_spec = f"{project_id}:{dataset_id}.{table_id}"
+    table_spec = f"{project_id}:{DATASET_ID}.{table_id}"
 
     pipeline = beam.Pipeline(options=options)
     products = pipeline | "Read table" >> beam.io.ReadFromBigQuery(table=table_spec)
