@@ -6,6 +6,7 @@ from amazon_product_search.core.cache import weak_lru_cache
 from amazon_product_search.core.es.templates.template_loader import TemplateLoader
 from amazon_product_search.core.nlp.tokenizers.english_tokenizer import EnglishTokenizer
 from amazon_product_search.core.nlp.tokenizers.japanese_tokenizer import JapaneseTokenizer
+from amazon_product_search.core.retrieval.query_vector_cache import QueryVectorCache
 from amazon_product_search.core.source import Locale
 from amazon_product_search.core.synonyms.synonym_dict import SynonymDict
 from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
@@ -18,7 +19,7 @@ class QueryBuilder:
         data_dir: str = DATA_DIR,
         project_dir: str = PROJECT_DIR,
         hf_model_name: str = HF.JP_SLUKE_MEAN,
-        vector_cache: dict[str, list[float]] | None = None,
+        vector_cache: QueryVectorCache | None = None,
     ) -> None:
         self.synonym_dict = SynonymDict(data_dir)
         self.locale = locale
@@ -28,8 +29,8 @@ class QueryBuilder:
         }[locale]()
         self.encoder: SBERTEncoder = SBERTEncoder(hf_model_name)
         self.template_loader = TemplateLoader(project_dir)
-        if not vector_cache:
-            vector_cache = {}
+        if vector_cache is None:
+            vector_cache = QueryVectorCache()
         self.vector_cache = vector_cache
 
     def match_all(self) -> dict[str, Any]:
@@ -91,7 +92,7 @@ class QueryBuilder:
 
     @weak_lru_cache(maxsize=128)
     def encode(self, query: str) -> list[float]:
-        query_vector = self.vector_cache.get(query)
+        query_vector = self.vector_cache[query]
         if query_vector is not None:
             return query_vector
         return [float(v) for v in list(self.encoder.encode(query))]

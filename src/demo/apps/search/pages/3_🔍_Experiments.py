@@ -4,9 +4,8 @@ from typing import Any
 import plotly.express as px
 import polars as pl
 import streamlit as st
-from google.cloud import bigquery
 
-from amazon_product_search.constants import DATASET_ID, HF, PROJECT_ID
+from amazon_product_search.constants import HF
 from amazon_product_search.core.es.es_client import EsClient
 from amazon_product_search.core.es.query_builder import QueryBuilder
 from amazon_product_search.core.es.response import Response
@@ -18,6 +17,7 @@ from amazon_product_search.core.metrics import (
 )
 from amazon_product_search.core.reranking import reranker
 from amazon_product_search.core.retrieval.options import DynamicWeighting, FixedWeighting
+from amazon_product_search.core.retrieval.query_vector_cache import QueryVectorCache
 from amazon_product_search.core.retrieval.retriever import Retriever
 from amazon_product_search.core.source import Locale
 from demo import utils
@@ -33,19 +33,7 @@ def get_retriever(locale: Locale) -> Retriever:
         "us": HF.EN_MULTIQA,
         "jp": HF.JP_SLUKE_MEAN,
     }[locale]
-    sql = f"""
-    SELECT
-        query,
-        query_vector,
-    FROM
-        `{PROJECT_ID}.{DATASET_ID}.queries_{locale}`
-    LIMIT
-        1000000
-    """
-    rows_df = bigquery.Client().query(sql).to_dataframe()
-    vector_cache = {}
-    for row in rows_df.to_dict(orient="records"):
-        vector_cache[row["query"]] = row["query_vector"]
+    vector_cache = QueryVectorCache().load(locale)
     query_builder = QueryBuilder(locale=locale, hf_model_name=hf_model_name, vector_cache=vector_cache)
     return Retriever(locale=locale, es_client=es_client, query_builder=query_builder)
 
