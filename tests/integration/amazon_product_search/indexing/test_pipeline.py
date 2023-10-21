@@ -6,8 +6,8 @@ import polars as pl
 import pytest
 
 from amazon_product_search.core.es.es_client import EsClient
+from amazon_product_search.indexing.indexing_pipeline import create_pipeline
 from amazon_product_search.indexing.options import IndexerOptions
-from amazon_product_search.indexing.pipeline import create_pipeline
 from tests.integration.amazon_product_search.indexing.es_docker import EsDocker
 
 
