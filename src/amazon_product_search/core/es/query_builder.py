@@ -1,8 +1,6 @@
 import json
 from typing import Any, cast
 
-from torch import Tensor
-
 from amazon_product_search.constants import DATA_DIR, HF, PROJECT_DIR
 from amazon_product_search.core.cache import weak_lru_cache
 from amazon_product_search.core.es.templates.template_loader import TemplateLoader
@@ -20,14 +18,19 @@ class QueryBuilder:
         data_dir: str = DATA_DIR,
         project_dir: str = PROJECT_DIR,
         hf_model_name: str = HF.JP_SLUKE_MEAN,
+        vector_cache: dict[str, list[float]] | None = None,
     ) -> None:
         self.synonym_dict = SynonymDict(data_dir)
+        self.locale = locale
         self.tokenizer = {
             "us": EnglishTokenizer,
             "jp": JapaneseTokenizer,
         }[locale]()
         self.encoder: SBERTEncoder = SBERTEncoder(hf_model_name)
         self.template_loader = TemplateLoader(project_dir)
+        if not vector_cache:
+            vector_cache = {}
+        self.vector_cache = vector_cache
 
     def match_all(self) -> dict[str, Any]:
         es_query_str = self.template_loader.load("match_all.j2").render()
@@ -87,8 +90,11 @@ class QueryBuilder:
         }
 
     @weak_lru_cache(maxsize=128)
-    def encode(self, query: str) -> Tensor:
-        return self.encoder.encode(query)
+    def encode(self, query: str) -> list[float]:
+        query_vector = self.vector_cache.get(query)
+        if query_vector is not None:
+            return query_vector
+        return [float(v) for v in list(self.encoder.encode(query))]
 
     def build_dense_search_query(
         self,
@@ -108,7 +114,7 @@ class QueryBuilder:
         Returns:
             dict[str, Any]: The constructed ES query.
         """
-        query_vector = self.encode(query).tolist()
+        query_vector = self.encode(query)
         es_query_str = self.template_loader.load("dense.j2").render(
             query_vector=query_vector,
             field=field,

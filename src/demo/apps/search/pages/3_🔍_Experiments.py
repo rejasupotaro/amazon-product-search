@@ -4,8 +4,9 @@ from typing import Any
 import plotly.express as px
 import polars as pl
 import streamlit as st
+from google.cloud import bigquery
 
-from amazon_product_search.constants import HF
+from amazon_product_search.constants import DATASET_ID, HF, PROJECT_ID
 from amazon_product_search.core.es.es_client import EsClient
 from amazon_product_search.core.es.query_builder import QueryBuilder
 from amazon_product_search.core.es.response import Response
@@ -32,7 +33,20 @@ def get_retriever(locale: Locale) -> Retriever:
         "us": HF.EN_MULTIQA,
         "jp": HF.JP_SLUKE_MEAN,
     }[locale]
-    query_builder = QueryBuilder(locale=locale, hf_model_name=hf_model_name)
+    sql = f"""
+    SELECT
+        query,
+        query_vector,
+    FROM
+        `{PROJECT_ID}.{DATASET_ID}.queries_{locale}`
+    LIMIT
+        1000000
+    """
+    rows_df = bigquery.Client().query(sql).to_dataframe()
+    vector_cache = {}
+    for row in rows_df.to_dict(orient="records"):
+        vector_cache[row["query"]] = row["query_vector"]
+    query_builder = QueryBuilder(locale=locale, hf_model_name=hf_model_name, vector_cache=vector_cache)
     return Retriever(locale=locale, es_client=es_client, query_builder=query_builder)
 
 
