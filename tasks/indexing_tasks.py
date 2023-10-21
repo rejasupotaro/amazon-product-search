@@ -86,3 +86,193 @@ def run(
         command.append(f"--nrows={int(nrows)}")
 
     c.run(" ".join(command))
+
+
+@task
+def tranform(
+    c,
+    index_name="",
+    locale="jp",
+    dest="stdout",
+    dest_host="",
+    extract_keywords=False,
+    encode_text=False,
+    nrows=None,
+    runner="DirectRunner",
+):
+    """A task to run doc transformation pipeline.
+
+    An example sequence of commands to index products from File => BigQuery => Elasticsearch:
+
+    ```
+    # File => BigQuery
+    poetry run inv indexing.run \
+      --locale=us \
+      --encode-text \
+      --nrows=10 \
+      --dest=bq
+    ```
+    """
+    command = [
+        "poetry run python src/amazon_product_search/indexing/doc_transformation_pipeline.py",
+        f"--runner={runner}",
+        f"--locale={locale}",
+        f"--dest={dest}",
+        f"--dest_host={dest_host}",
+        f"--index_name={index_name}",
+    ]
+
+    if extract_keywords:
+        command.append("--extract_keywords")
+
+    if encode_text:
+        command.append("--encode_text")
+
+    if runner == "DirectRunner":
+        command += [
+            # https://github.com/apache/beam/blob/master/sdks/python/apache_beam/options/pipeline_options.py#L617-L621
+            "--direct_num_workers=0",
+        ]
+    elif runner == "DataflowRunner":
+        command += [
+            "--num_workers=1",
+            "--worker_machine_type=n2-highmem-8",
+            "--sdk_location=container",
+            f"--sdk_container_image=gcr.io/{PROJECT_ID}/{PROJECT_NAME}/indexing",
+            f"--worker_zone={REGION}-c",
+        ]
+
+    if (runner == "DataflowRunner") or (dest == "bq"):
+        command += [
+            f"--project={PROJECT_ID}",
+            f"--region={REGION}",
+            f"--temp_location=gs://{PROJECT_NAME}/temp",
+            f"--staging_location=gs://{PROJECT_NAME}/staging",
+        ]
+
+    if nrows:
+        command.append(f"--nrows={int(nrows)}")
+
+    c.run(" ".join(command))
+
+
+@task
+def feed(
+    c,
+    index_name="",
+    locale="jp",
+    dest="stdout",
+    dest_host="",
+    nrows=None,
+    runner="DirectRunner",
+):
+    """A task to run feeding pipeline.
+
+    Ensure that an index is created in Elasticsearch before running the following command.
+    ```
+    poetry run inv es.recreate-index --index-name=products_us
+    ```
+
+    ```
+    # BigQuery => Elasticsearch
+    poetry run inv indexing.run \
+      --locale=us \
+      --dest=es \
+      --dest-host=http://localhost:9200 \
+      --index-name=products_us
+    ```
+    """
+    command = [
+        "poetry run python src/amazon_product_search/indexing/feeding_pipeline.py",
+        f"--runner={runner}",
+        f"--locale={locale}",
+        f"--dest={dest}",
+        f"--dest_host={dest_host}",
+        f"--index_name={index_name}",
+    ]
+
+    if runner == "DirectRunner":
+        command += [
+            # https://github.com/apache/beam/blob/master/sdks/python/apache_beam/options/pipeline_options.py#L617-L621
+            "--direct_num_workers=0",
+        ]
+    elif runner == "DataflowRunner":
+        command += [
+            "--num_workers=1",
+            "--worker_machine_type=n2-highmem-8",
+            "--sdk_location=container",
+            f"--sdk_container_image=gcr.io/{PROJECT_ID}/{PROJECT_NAME}/indexing",
+            f"--worker_zone={REGION}-c",
+        ]
+
+    if (runner == "DataflowRunner") or (dest == "bq"):
+        command += [
+            f"--project={PROJECT_ID}",
+            f"--region={REGION}",
+            f"--temp_location=gs://{PROJECT_NAME}/temp",
+            f"--staging_location=gs://{PROJECT_NAME}/staging",
+        ]
+
+    if nrows:
+        command.append(f"--nrows={int(nrows)}")
+
+    c.run(" ".join(command))
+
+
+@task
+def encode(
+    c,
+    index_name="",
+    locale="jp",
+    dest="stdout",
+    dest_host="",
+    nrows=None,
+    runner="DirectRunner",
+):
+    """A task to run query encoding pipeline.
+
+    ```
+    # File => BigQuery
+    poetry run inv indexing.encode \
+      --locale=us \
+      --dest=bq \
+      --dest-host=http://localhost:9200 \
+      --index-name=products_us \
+      --nrows=10
+    ```
+    """
+    command = [
+        "poetry run python src/amazon_product_search/indexing/query_encoding_pipeline.py",
+        f"--runner={runner}",
+        f"--locale={locale}",
+        f"--dest={dest}",
+        f"--dest_host={dest_host}",
+        f"--index_name={index_name}",
+    ]
+
+    if runner == "DirectRunner":
+        command += [
+            # https://github.com/apache/beam/blob/master/sdks/python/apache_beam/options/pipeline_options.py#L617-L621
+            "--direct_num_workers=0",
+        ]
+    elif runner == "DataflowRunner":
+        command += [
+            "--num_workers=1",
+            "--worker_machine_type=n2-highmem-8",
+            "--sdk_location=container",
+            f"--sdk_container_image=gcr.io/{PROJECT_ID}/{PROJECT_NAME}/indexing",
+            f"--worker_zone={REGION}-c",
+        ]
+
+    if (runner == "DataflowRunner") or (dest == "bq"):
+        command += [
+            f"--project={PROJECT_ID}",
+            f"--region={REGION}",
+            f"--temp_location=gs://{PROJECT_NAME}/temp",
+            f"--staging_location=gs://{PROJECT_NAME}/staging",
+        ]
+
+    if nrows:
+        command.append(f"--nrows={int(nrows)}")
+
+    c.run(" ".join(command))

@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Any, Dict, Iterator, List
+from typing import Any, Dict, Iterator, List, cast
 
 import apache_beam as beam
 from apache_beam.io.gcp.bigquery import WriteToBigQuery
@@ -12,11 +12,40 @@ from torch import Tensor
 
 from amazon_product_search.constants import HF, PROJECT_ID
 from amazon_product_search.core import source
+from amazon_product_search.core.nlp.normalizer import normalize_query
+from amazon_product_search.core.nlp.tokenizers import EnglishTokenizer, JapaneseTokenizer, Tokenizer
 from amazon_product_search.core.source import Locale
 from amazon_product_search.indexing.options import IndexerOptions
 from amazon_product_search.indexing.transforms.weak_reference import WeakReference
 from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 from amazon_product_search_dense_retrieval.encoders.modules.pooler import PoolingMode
+
+
+def get_input_source(data_dir: str, locale: Locale, nrows: int = -1) -> PTransform:
+    df = source.load_labels(locale=locale, data_dir=data_dir)
+    queries = df.get_column("query").unique()
+    if nrows:
+        queries = queries[:nrows]
+    query_dicts = [{"query": query} for query in queries]
+    return beam.Create(query_dicts)
+
+
+class AnalyzeQueryFn(beam.DoFn):
+    def __init__(self, locale: Locale) -> None:
+        self.locale = locale
+
+    def setup(self) -> None:
+        self.tokenizer: Tokenizer = {
+            "us": EnglishTokenizer,
+            "jp": JapaneseTokenizer,
+        }[self.locale]()
+
+    def process(self, query_dict: Dict[str, Any]) -> Iterator[Dict[str, Any]]:
+        query = query_dict["query"]
+        query = normalize_query(query)
+        tokens = self.tokenizer.tokenize(query)
+        query_dict["query"] = " ".join(cast(list, tokens))
+        yield query_dict
 
 
 class EncodeQueriesInBatchFn(beam.DoFn):
@@ -43,14 +72,6 @@ class EncodeQueriesInBatchFn(beam.DoFn):
             yield query_dict
 
 
-def get_input_source(data_dir: str, locale: Locale, nrows: int = -1) -> PTransform:
-    df = source.load_labels(locale, nrows, data_dir)
-    queries = df.get_column("query").sample(frac=1).unique()
-    query_dicts = {"query": query for query in queries}
-    logging.info(f"{len(query_dicts)} queries are going to be encoded")
-    return beam.Create(query_dicts)
-
-
 def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
     locale = options.locale
     hf_model_name, pooling_mode = {
@@ -67,9 +88,10 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
     products = (
         pipeline
         | get_input_source(options.data_dir, locale, options.nrows)
-        | "Filter products" >> beam.Filter(lambda query_dict: bool(query_dict["query"]))
-        | "Batch products for encoding" >> BatchElements(min_batch_size=8)
-        | "Encode products"
+        | "Analyze queries" >> beam.ParDo(AnalyzeQueryFn(locale))
+        | "Filter queries" >> beam.Filter(lambda query_dict: bool(query_dict["query"]))
+        | "Batch queries for encoding" >> BatchElements(min_batch_size=8)
+        | "Encode queries"
         >> beam.ParDo(
             EncodeQueriesInBatchFn(
                 shared_handle=Shared(),
