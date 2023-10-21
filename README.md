@@ -67,11 +67,11 @@ $ poetry run inv demo.search
 
 ## Experimentation
 
-The demo application allows for the execution of experiments with different experimental settings.
+The demo application allows for the execution of experiments with different experiment settings.
 
 ```python
-# src/demo/experimental_setup.py
-"sparse_vs_dense": ExperimentalSetup(
+# src/demo/experiment_setup.py
+"sparse_vs_dense": ExperimentSetup(
     index_name="products_jp",
     locale="jp",
     num_queries=5000,

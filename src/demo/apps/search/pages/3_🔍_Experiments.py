@@ -20,7 +20,7 @@ from amazon_product_search.core.retrieval.options import DynamicWeighting, Fixed
 from amazon_product_search.core.retrieval.retriever import Retriever
 from amazon_product_search.core.source import Locale
 from demo import utils
-from demo.apps.search.experimental_setup import EXPERIMENTS, ExperimentalSetup, Variant
+from demo.apps.search.experiment_setup import EXPERIMENTS, ExperimentSetup, Variant
 from demo.page_config import set_page_config
 
 es_client = EsClient()
@@ -43,10 +43,10 @@ def _load_labels(locale: str) -> pl.DataFrame:
     return df
 
 
-def load_labels(locale: Locale, experimental_setup: ExperimentalSetup) -> pl.DataFrame:
+def load_labels(locale: Locale, experiment_setup: ExperimentSetup) -> pl.DataFrame:
     df = _load_labels(locale)
-    if experimental_setup.num_queries:
-        queries = df.get_column("query").sample(frac=1).unique()[: experimental_setup.num_queries]
+    if experiment_setup.num_queries:
+        queries = df.get_column("query").sample(frac=1).unique()[: experiment_setup.num_queries]
         df = df.filter(pl.col("query").is_in(queries))
     return df
 
@@ -91,13 +91,13 @@ def search(locale: Locale, index_name: str, query: str, variant: Variant, labele
 def compute_metrics(
     locale: Locale,
     index_name: str,
-    experimental_setup: ExperimentalSetup,
+    experiment_setup: ExperimentSetup,
     variant: Variant,
     query: str,
     labels_df: pl.DataFrame,
 ) -> dict[str, Any]:
     labeled_ids = None
-    if experimental_setup.task == "reranking":
+    if experiment_setup.task == "reranking":
         labeled_ids = labels_df.get_column("product_id").to_list()
     response = search(locale, index_name, query, variant, labeled_ids)
     response.results = variant.reranker.rerank(query, response.results)
@@ -114,7 +114,7 @@ def compute_metrics(
         "NDCG@10": compute_ndcg(retrieved_ids, judgements, k=10),
         "NDCG@100": compute_ndcg(retrieved_ids, judgements, k=100),
     }
-    if experimental_setup.task == "retrieval":
+    if experiment_setup.task == "retrieval":
         precision_at_10 = compute_precision(retrieved_ids, relevant_ids, k=10)
         metric_dict["P@10"] = precision_at_10 if precision_at_10 is not None else 0
         precision_at_100 = compute_precision(retrieved_ids, relevant_ids, k=100)
@@ -123,7 +123,7 @@ def compute_metrics(
 
 
 def perform_search(
-    locale: Locale, index_name: str, experimental_setup: ExperimentalSetup, query_dict: dict[str, pl.DataFrame]
+    locale: Locale, index_name: str, experiment_setup: ExperimentSetup, query_dict: dict[str, pl.DataFrame]
 ) -> list[dict[str, Any]]:
     total_examples = len(query_dict)
     n = 0
@@ -134,13 +134,13 @@ def perform_search(
         n += 1
         progress_text.text(f"Query ({n} / {total_examples}): {query}")
         progress_bar.progress(n / total_examples)
-        for variant in experimental_setup.variants:
-            metrics.append(compute_metrics(locale, index_name, experimental_setup, variant, query, query_labels_df))
+        for variant in experiment_setup.variants:
+            metrics.append(compute_metrics(locale, index_name, experiment_setup, variant, query, query_labels_df))
     progress_text.text(f"Done ({n} / {total_examples})")
     return metrics
 
 
-def compute_stats(experimental_setup: ExperimentalSetup, metrics_df: pl.DataFrame) -> pl.DataFrame:
+def compute_stats(experiment_setup: ExperimentSetup, metrics_df: pl.DataFrame) -> pl.DataFrame:
     stats_df = metrics_df.groupby("variant").agg(
         [
             pl.col("total_hits").mean().cast(int),
@@ -151,7 +151,7 @@ def compute_stats(experimental_setup: ExperimentalSetup, metrics_df: pl.DataFram
                 pl.col("P@10").mean().round(4),
                 pl.col("P@100").mean().round(4),
             ]
-            if experimental_setup.task == "retrieval"
+            if experiment_setup.task == "retrieval"
             else []
         )
         + [
@@ -183,16 +183,16 @@ def main() -> None:
         index_name = st.selectbox("Index:", es_client.list_indices())
 
     experiment_name = st.selectbox("Experiment:", EXPERIMENTS.keys())
-    experimental_setup = EXPERIMENTS[experiment_name]
+    experiment_setup = EXPERIMENTS[experiment_name]
 
     num_docs = count_docs(index_name)
 
-    labels_df = load_labels(locale, experimental_setup)
+    labels_df = load_labels(locale, experiment_setup)
     query_dict = {}
     for query, query_labels_df in labels_df.groupby("query"):
         query_dict[str(query)] = query_labels_df
 
-    st.write("### Experimental Setup")
+    st.write("### Experiment Setup")
     content = f"""
     The experiment is conducted on `{index_name}` containing `{num_docs}` docs in total.
     We send `{len(query_dict)}` queries to the index with different parameters shown below.
@@ -201,18 +201,18 @@ def main() -> None:
     st.write(content)
 
     st.write("#### Variants")
-    draw_variants(experimental_setup.variants)
+    draw_variants(experiment_setup.variants)
 
     clicked = st.button("Run")
 
     if not clicked:
         return
 
-    metrics = perform_search(locale, index_name, experimental_setup, query_dict)
+    metrics = perform_search(locale, index_name, experiment_setup, query_dict)
 
     st.write("----")
 
-    st.write("### Experimental Results")
+    st.write("### Experiment Results")
     metrics_df = pl.from_dicts(metrics)
 
     st.write("#### Metrics by query")
@@ -220,7 +220,7 @@ def main() -> None:
         st.write(metrics_df.to_pandas())
 
     st.write("#### Metrics by variant")
-    stats_df = compute_stats(experimental_setup, metrics_df).to_pandas()
+    stats_df = compute_stats(experiment_setup, metrics_df).to_pandas()
     stats_df = stats_df.sort_values("NDCG@100", ascending=False)
     st.write(stats_df)
     with st.expander("Metrics in markdown"):

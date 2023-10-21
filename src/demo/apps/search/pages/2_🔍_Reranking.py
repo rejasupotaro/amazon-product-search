@@ -181,7 +181,7 @@ def main() -> None:
     draw_examples(query, results)
 
     st.write("### Comparison")
-    with st.form("experimental_setup"):
+    with st.form("experiment_setup"):
         num_queries = int(st.number_input("Num Queries:", value=100, min_value=1, max_value=1000))
         reranker_names = st.multiselect("Rerankers:", RERANKER_NAMES, default=RERANKER_NAMES)
         if not st.form_submit_button("Run"):

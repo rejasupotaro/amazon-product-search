@@ -43,14 +43,14 @@ class Variant:
 
 
 @dataclass
-class ExperimentalSetup:
+class ExperimentSetup:
     task: Task
     num_queries: Optional[int] = None
     variants: list[Variant] = field(default_factory=list)
 
 
 EXPERIMENTS = {
-    "query_types": ExperimentalSetup(
+    "query_types": ExperimentSetup(
         task="retrieval",
         num_queries=5000,
         variants=[
@@ -68,7 +68,7 @@ EXPERIMENTS = {
             ),
         ],
     ),
-    "different_fields": ExperimentalSetup(
+    "different_fields": ExperimentSetup(
         task="retrieval",
         num_queries=5000,
         variants=[
@@ -86,7 +86,7 @@ EXPERIMENTS = {
             Variant(name="all", fields=SPARSE_FIELDS),
         ],
     ),
-    "different_weights": ExperimentalSetup(
+    "different_weights": ExperimentSetup(
         task="retrieval",
         num_queries=5000,
         variants=[
@@ -109,7 +109,7 @@ EXPERIMENTS = {
             ),
         ],
     ),
-    "synonym_expansion": ExperimentalSetup(
+    "synonym_expansion": ExperimentSetup(
         task="retrieval",
         num_queries=5000,
         variants=[
@@ -130,7 +130,7 @@ EXPERIMENTS = {
             ),
         ],
     ),
-    "sparse_vs_dense": ExperimentalSetup(
+    "sparse_vs_dense": ExperimentSetup(
         task="retrieval",
         num_queries=5,
         variants=[
@@ -182,7 +182,7 @@ EXPERIMENTS = {
             ),
         ],
     ),
-    "weighting_strategy": ExperimentalSetup(
+    "weighting_strategy": ExperimentSetup(
         task="retrieval",
         num_queries=1000,
         variants=[
@@ -219,7 +219,7 @@ EXPERIMENTS = {
             ),
         ],
     ),
-    "reranking": ExperimentalSetup(
+    "reranking": ExperimentSetup(
         task="reranking",
         num_queries=500,
         variants=[
