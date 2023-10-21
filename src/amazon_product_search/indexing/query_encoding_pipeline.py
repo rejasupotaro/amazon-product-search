@@ -65,7 +65,7 @@ class EncodeQueriesInBatchFn(beam.DoFn):
         return self._weak_reference.ref.encode(texts)
 
     def process(self, query_dicts: List[Dict[str, Any]]) -> Iterator[Dict[str, Any]]:
-        logging.info(f"Encode {len(query_dicts)} products in a batch")
+        logging.info(f"Encode {len(query_dicts)} queries in a batch")
         query_vectors = self._encode([query_dict["query"] for query_dict in query_dicts])
         for query_dict, query_vector in zip(query_dicts, query_vectors, strict=True):
             query_dict["query_vector"] = [float(v) for v in list(query_vector)]
@@ -85,7 +85,7 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
     table_spec = f"{project_id}:{dataset_id}.{table_id}"
 
     pipeline = beam.Pipeline(options=options)
-    products = (
+    queries = (
         pipeline
         | get_input_source(options.data_dir, locale, options.nrows)
         | "Analyze queries" >> beam.ParDo(AnalyzeQueryFn(locale))
@@ -103,10 +103,10 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
 
     match options.dest:
         case "stdout":
-            products | beam.Map(logging.info)
+            queries | beam.Map(logging.info)
         case "bq":
             (
-                products
+                queries
                 | WriteToBigQuery(
                     table=table_spec,
                     schema=beam.io.SCHEMA_AUTODETECT,
