@@ -10,20 +10,6 @@ from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 from amazon_product_search_dense_retrieval.encoders.modules.pooler import PoolingMode
 
 
-class EncodeFn(beam.DoFn):
-    def __init__(self, hf_model_name: str) -> None:
-        self._hf_model_name = hf_model_name
-
-    def setup(self) -> None:
-        self.encoder: SBERTEncoder = SBERTEncoder(self._hf_model_name)
-
-    def process(self, product: Dict[str, Any]) -> Iterator[Dict[str, Any]]:
-        text = product["product_title"] + " " + product["product_brand"]
-        product_vectors = self.encoder.encode([text])
-        product["product_vector"] = product_vectors[0]
-        yield product
-
-
 class EncodeInBatchFn(beam.DoFn):
     def __init__(self, shared_handle: Shared, hf_model_name: str, pooling_mode: PoolingMode) -> None:
         self._shared_handle = shared_handle
