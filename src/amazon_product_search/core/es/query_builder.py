@@ -4,8 +4,7 @@ from typing import Any, cast
 from amazon_product_search.constants import DATA_DIR, HF, PROJECT_DIR
 from amazon_product_search.core.cache import weak_lru_cache
 from amazon_product_search.core.es.templates.template_loader import TemplateLoader
-from amazon_product_search.core.nlp.tokenizers.english_tokenizer import EnglishTokenizer
-from amazon_product_search.core.nlp.tokenizers.japanese_tokenizer import JapaneseTokenizer
+from amazon_product_search.core.nlp.tokenizers import Tokenizer, locale_to_tokenizer
 from amazon_product_search.core.retrieval.query_vector_cache import QueryVectorCache
 from amazon_product_search.core.source import Locale
 from amazon_product_search.core.synonyms.synonym_dict import SynonymDict
@@ -23,10 +22,7 @@ class QueryBuilder:
     ) -> None:
         self.synonym_dict = SynonymDict(data_dir)
         self.locale = locale
-        self.tokenizer = {
-            "us": EnglishTokenizer,
-            "jp": JapaneseTokenizer,
-        }[locale]()
+        self.tokenizer: Tokenizer = locale_to_tokenizer(locale)
         self.encoder: SBERTEncoder = SBERTEncoder(hf_model_name)
         self.template_loader = TemplateLoader(project_dir)
         if vector_cache is None:

@@ -48,10 +48,10 @@ def search(c):
         query_vector = [float(v) for v in query_vector]
         yql = dedent(
             """
-        select *
-        from product
-        where userQuery() or ({targetHits:1}nearestNeighbor(product_vector,query_vector))
-        """
+            select *
+            from product
+            where userQuery() or ({targetHits:1}nearestNeighbor(product_vector,query_vector))
+            """
         ).strip()
         query = {
             "yql": yql,
