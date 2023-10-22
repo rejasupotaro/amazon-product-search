@@ -128,7 +128,7 @@ class Retriever:
         enable_score_normalization: bool = False,
         rrf: bool | int = False,
         weighting_strategy: WeightingStrategy | None = None,
-    ):
+    ) -> Response:
         normalized_query = normalize_query(query)
         sparse_fields, dense_fields = split_fields(fields)
         sparse_query = None
