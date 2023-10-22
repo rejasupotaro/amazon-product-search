@@ -45,7 +45,7 @@ def run(
     ```
     """
     command = [
-        "poetry run python src/amazon_product_search/indexing/pipeline.py",
+        "poetry run python src/amazon_product_search/indexing/indexing_pipeline.py",
         f"--runner={runner}",
         f"--locale={locale}",
         f"--source={source}",
@@ -106,7 +106,7 @@ def tranform(
 
     ```
     # File => BigQuery
-    poetry run inv indexing.run \
+    poetry run inv indexing.transform \
       --locale=us \
       --encode-text \
       --nrows=10 \
@@ -175,7 +175,7 @@ def feed(
 
     ```
     # BigQuery => Elasticsearch
-    poetry run inv indexing.run \
+    poetry run inv indexing.feed \
       --locale=us \
       --dest=es \
       --dest-host=http://localhost:9200 \
@@ -205,13 +205,12 @@ def feed(
             f"--worker_zone={REGION}-c",
         ]
 
-    if (runner == "DataflowRunner") or (dest == "bq"):
-        command += [
-            f"--project={PROJECT_ID}",
-            f"--region={REGION}",
-            f"--temp_location=gs://{PROJECT_NAME}/temp",
-            f"--staging_location=gs://{PROJECT_NAME}/staging",
-        ]
+    command += [
+        f"--project={PROJECT_ID}",
+        f"--region={REGION}",
+        f"--temp_location=gs://{PROJECT_NAME}/temp",
+        f"--staging_location=gs://{PROJECT_NAME}/staging",
+    ]
 
     if nrows:
         command.append(f"--nrows={int(nrows)}")
