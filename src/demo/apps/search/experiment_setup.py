@@ -132,7 +132,7 @@ EXPERIMENTS = {
     ),
     "sparse_vs_dense": ExperimentSetup(
         task="retrieval",
-        num_queries=5,
+        num_queries=10,
         variants=[
             Variant(name="sparse only", fields=SPARSE_FIELDS),
             Variant(name="dense only", fields=["product_vector"]),

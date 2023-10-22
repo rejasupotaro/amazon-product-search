@@ -1,5 +1,7 @@
+import asyncio
+from asyncio import Semaphore
 from dataclasses import asdict
-from typing import Any
+from typing import Any, Coroutine
 
 import plotly.express as px
 import polars as pl
@@ -90,6 +92,19 @@ def search(locale: Locale, index_name: str, query: str, variant: Variant, labele
     )
 
 
+def limit_concurrency(
+    coroutines: list[Coroutine],
+    max_concurrency: int,
+) -> list[Coroutine]:
+    semaphore = Semaphore(max_concurrency)
+
+    async def with_concurrency_limit(coroutine):
+        async with semaphore:
+            return await coroutine
+
+    return [with_concurrency_limit(c) for c in coroutines]
+
+
 def compute_metrics(
     locale: Locale,
     index_name: str,
@@ -124,20 +139,38 @@ def compute_metrics(
     return metric_dict
 
 
-def perform_search(
+async def compute_metrics_by_variant(
+    locale: Locale,
+    index_name: str,
+    experiment_setup: ExperimentSetup,
+    query: str,
+    query_labels_df: pl.DataFrame,
+) -> tuple[str, list[dict[str, Any]]]:
+    metrics = []
+    for variant in experiment_setup.variants:
+        ms = compute_metrics(locale, index_name, experiment_setup, variant, query, query_labels_df)
+        metrics.append(ms)
+    await asyncio.sleep(0.1)
+    return query, metrics
+
+
+async def perform_search(
     locale: Locale, index_name: str, experiment_setup: ExperimentSetup, query_dict: dict[str, pl.DataFrame]
 ) -> list[dict[str, Any]]:
-    total_examples = len(query_dict)
-    n = 0
-    progress_text = st.empty()
-    progress_bar = st.progress(0)
-    metrics = []
+    coroutines = []
     for query, query_labels_df in query_dict.items():
+        coroutine = compute_metrics_by_variant(locale, index_name, experiment_setup, query, query_labels_df)
+        coroutines.append(coroutine)
+
+    n, total_examples = 0, len(query_dict)
+    progress_text, progress_bar = st.empty(), st.progress(0)
+    metrics = []
+    for task in asyncio.as_completed(limit_concurrency(coroutines, max_concurrency=4)):
+        query, ms = await task
         n += 1
         progress_text.text(f"Query ({n} / {total_examples}): {query}")
         progress_bar.progress(n / total_examples)
-        for variant in experiment_setup.variants:
-            metrics.append(compute_metrics(locale, index_name, experiment_setup, variant, query, query_labels_df))
+        metrics.extend(ms)
     progress_text.text(f"Done ({n} / {total_examples})")
     return metrics
 
@@ -176,7 +209,26 @@ def draw_figures(metrics_df: pl.DataFrame) -> None:
                 st.plotly_chart(fig)
 
 
-def main() -> None:
+async def f(count: int):
+    container = st.empty()
+    for i in range(11):
+        v = count + i
+        container.write(f"{v}")
+        await asyncio.sleep(1)
+    return v
+
+
+async def runner():
+    tasks = []
+    for i in range(4):
+        t = asyncio.create_task(f(10**i))
+        tasks.append(t)
+        await asyncio.sleep(1)
+    values = await asyncio.gather(*tasks)
+    return values
+
+
+async def main() -> None:
     set_page_config()
     st.write("## Experiments")
 
@@ -210,7 +262,7 @@ def main() -> None:
     if not clicked:
         return
 
-    metrics = perform_search(locale, index_name, experiment_setup, query_dict)
+    metrics = await perform_search(locale, index_name, experiment_setup, query_dict)
 
     st.write("----")
 
@@ -233,4 +285,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
