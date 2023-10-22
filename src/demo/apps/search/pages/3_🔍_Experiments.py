@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from asyncio import Semaphore
 from dataclasses import asdict
 from typing import Any, Coroutine
@@ -147,9 +148,12 @@ async def compute_metrics_by_variant(
     query_labels_df: pl.DataFrame,
 ) -> tuple[str, list[dict[str, Any]]]:
     metrics = []
-    for variant in experiment_setup.variants:
-        ms = compute_metrics(locale, index_name, experiment_setup, variant, query, query_labels_df)
-        metrics.append(ms)
+    try:
+        for variant in experiment_setup.variants:
+            ms = compute_metrics(locale, index_name, experiment_setup, variant, query, query_labels_df)
+            metrics.append(ms)
+    except Exception as e:
+        logging.error(e)
     await asyncio.sleep(0.1)
     return query, metrics
 
@@ -165,12 +169,13 @@ async def perform_search(
     n, total_examples = 0, len(query_dict)
     progress_text, progress_bar = st.empty(), st.progress(0)
     metrics = []
-    for task in asyncio.as_completed(limit_concurrency(coroutines, max_concurrency=4)):
+    for task in asyncio.as_completed(limit_concurrency(coroutines, max_concurrency=10)):
         query, ms = await task
         n += 1
         progress_text.text(f"Query ({n} / {total_examples}): {query}")
         progress_bar.progress(n / total_examples)
-        metrics.extend(ms)
+        if ms:
+            metrics.extend(ms)
     progress_text.text(f"Done ({n} / {total_examples})")
     return metrics
 
