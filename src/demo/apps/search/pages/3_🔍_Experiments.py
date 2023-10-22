@@ -1,8 +1,7 @@
 import asyncio
 import logging
-from asyncio import Semaphore
 from dataclasses import asdict
-from typing import Any, Coroutine
+from typing import Any
 
 import plotly.express as px
 import polars as pl
@@ -18,6 +17,7 @@ from amazon_product_search.core.metrics import (
     compute_recall,
     compute_zero_hit_rate,
 )
+from amazon_product_search.core.parallel import limit_concurrency
 from amazon_product_search.core.reranking import reranker
 from amazon_product_search.core.retrieval.options import DynamicWeighting, FixedWeighting
 from amazon_product_search.core.retrieval.query_vector_cache import QueryVectorCache
@@ -91,19 +91,6 @@ def search(locale: Locale, index_name: str, query: str, variant: Variant, labele
         rrf=variant.rank_fusion.rrf,
         weighting_strategy=weighting_strategy,
     )
-
-
-def limit_concurrency(
-    coroutines: list[Coroutine],
-    max_concurrency: int,
-) -> list[Coroutine]:
-    semaphore = Semaphore(max_concurrency)
-
-    async def with_concurrency_limit(coroutine):
-        async with semaphore:
-            return await coroutine
-
-    return [with_concurrency_limit(c) for c in coroutines]
 
 
 def compute_metrics(
