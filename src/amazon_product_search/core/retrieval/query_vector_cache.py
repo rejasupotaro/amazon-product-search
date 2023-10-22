@@ -27,7 +27,7 @@ class QueryVectorCache:
         self._cache = self._load_cache_from_file(locale, data_dir)
         if self._cache:
             return
-        self._cache = self._load_cache_from_bq(locale, project_id, dataset_id)
+        self._cache = self._load_cache_from_bq(locale, project_id, dataset_id, data_dir)
 
     def _load_cache_from_file(self, locale: Locale, data_dir: str) -> dict[str, list[float]] | None:
         filepath = f"{data_dir}/query_vector_cache_{locale}.parquet"
@@ -38,7 +38,9 @@ class QueryVectorCache:
         logging.info(f"Query vector cache loaded from {filepath} with {len(df)} rows.")
         return self._df_to_cache_dict(df)
 
-    def _load_cache_from_bq(self, locale: Locale, project_id: str, dataset_id: str) -> dict[str, list[float]]:
+    def _load_cache_from_bq(
+        self, locale: Locale, project_id: str, dataset_id: str, data_dir: str
+    ) -> dict[str, list[float]]:
         sql = f"""
         SELECT
             query,
@@ -52,14 +54,14 @@ class QueryVectorCache:
         try:
             df = bigquery.Client().query(sql).to_dataframe()
             logging.info(f"Query vector cache loaded from BigQuery with {len(df)} rows.")
-            self._save_cache_to_file(df, locale)
+            self._save_cache_to_file(df, locale, data_dir)
             cache = self._df_to_cache_dict(df)
         except Exception as e:
             logging.error(e)
         return cache
 
-    def _save_cache_to_file(self, df: DataFrame, locale: Locale) -> None:
-        filepath = f"{DATA_DIR}/query_vector_cache_{locale}.parquet"
+    def _save_cache_to_file(self, df: DataFrame, locale: Locale, data_dir: str) -> None:
+        filepath = f"{data_dir}/query_vector_cache_{locale}.parquet"
         df.to_parquet(filepath)
         logging.info(f"Query vector cache saved to {filepath}")
 
