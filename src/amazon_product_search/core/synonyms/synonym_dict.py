@@ -4,12 +4,13 @@ from typing import cast
 import polars as pl
 
 from amazon_product_search.constants import DATA_DIR
-from amazon_product_search.core.nlp.tokenizers.japanese_tokenizer import JapaneseTokenizer
+from amazon_product_search.core.nlp.tokenizers import locale_to_tokenizer
+from amazon_product_search.core.source import Locale
 
 
 class SynonymDict:
-    def __init__(self, data_dir: str = DATA_DIR, synonym_filename: str = "synonyms_jp_sbert.csv") -> None:
-        self.tokenizer = JapaneseTokenizer()
+    def __init__(self, locale: Locale, synonym_filename: str, data_dir: str = DATA_DIR) -> None:
+        self.tokenizer = locale_to_tokenizer(locale)
         self._entry_dict: dict[str, list[tuple[str, float]]] = self.load_synonym_dict(data_dir, synonym_filename)
 
     @staticmethod

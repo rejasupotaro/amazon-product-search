@@ -8,6 +8,6 @@ def test_find_synonyms(mock_method):
     mock_method.return_value = {"query": [("synonym", 1.0), ("antonym", 0.1)]}
 
     for query, expected in [("", []), ("query", ["synonym"])]:
-        synonym_dict = SynonymDict()
+        synonym_dict = SynonymDict(locale="us", synonym_filename="dummy.csv")
         actual = synonym_dict.find_synonyms(query)
         assert actual == expected

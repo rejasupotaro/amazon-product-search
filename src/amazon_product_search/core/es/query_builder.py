@@ -20,7 +20,7 @@ class QueryBuilder:
         hf_model_name: str = HF.JP_SLUKE_MEAN,
         vector_cache: QueryVectorCache | None = None,
     ) -> None:
-        self.synonym_dict = SynonymDict(data_dir)
+        self.synonym_dict = SynonymDict(locale=locale, synonym_filename="synonyms_jp_sbert.csv", data_dir=data_dir)
         self.locale = locale
         self.tokenizer: Tokenizer = locale_to_tokenizer(locale)
         self.encoder: SBERTEncoder = SBERTEncoder(hf_model_name)
