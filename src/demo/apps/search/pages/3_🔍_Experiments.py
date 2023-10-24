@@ -19,7 +19,6 @@ from amazon_product_search.core.metrics import (
 )
 from amazon_product_search.core.parallel import limit_concurrency
 from amazon_product_search.core.reranking import reranker
-from amazon_product_search.core.retrieval.options import DynamicWeighting, FixedWeighting
 from amazon_product_search.core.retrieval.query_vector_cache import QueryVectorCache
 from amazon_product_search.core.retrieval.retriever import Retriever
 from amazon_product_search.core.source import Locale
@@ -71,11 +70,6 @@ def draw_variants(variants: list[Variant]) -> None:
 
 
 def search(locale: Locale, index_name: str, query: str, variant: Variant, labeled_ids: list[str] | None) -> Response:
-    weighting_strategy = (
-        FixedWeighting({"sparse": variant.sparse_boost, "dense": variant.dense_boost})
-        if variant.rank_fusion.weighting_strategy == "fixed"
-        else DynamicWeighting()
-    )
     return get_retriever(locale).search(
         index_name=index_name,
         query=query,
@@ -86,10 +80,7 @@ def search(locale: Locale, index_name: str, query: str, variant: Variant, labele
         sparse_boost=variant.sparse_boost,
         dense_boost=variant.dense_boost,
         size=variant.top_k,
-        fuser=variant.rank_fusion.fuser,
-        enable_score_normalization=variant.rank_fusion.enable_score_normalization,
-        rrf=variant.rank_fusion.rrf,
-        weighting_strategy=weighting_strategy,
+        rank_fusion=variant.rank_fusion,
     )
 
 

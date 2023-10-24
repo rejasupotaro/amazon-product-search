@@ -11,7 +11,6 @@ from amazon_product_search.core.metrics import (
     compute_recall,
 )
 from amazon_product_search.core.reranking.reranker import from_string
-from amazon_product_search.core.retrieval.options import DynamicWeighting, FixedWeighting
 from amazon_product_search.core.retrieval.retriever import Retriever
 from amazon_product_search.core.source import Locale
 from demo.apps.search.search_ui import (
@@ -88,11 +87,6 @@ def main() -> None:
         if not st.form_submit_button("Search"):
             return
 
-    weighting_strategy = (
-        FixedWeighting({"sparse": form_input.sparse_boost, "dense": form_input.dense_boost})
-        if form_input.weighting_strategy == "fixed"
-        else DynamicWeighting()
-    )
     response = get_retriever(locale, es_client, get_query_builder(locale)).search(
         index_name=index_name,
         query=form_input.query,
@@ -102,10 +96,6 @@ def main() -> None:
         sparse_boost=form_input.sparse_boost,
         dense_boost=form_input.dense_boost,
         size=20,
-        fuser=form_input.fuser,
-        enable_score_normalization=True,
-        rrf=False,
-        weighting_strategy=weighting_strategy,
     )
     reranker = from_string(form_input.reranker_str)
 

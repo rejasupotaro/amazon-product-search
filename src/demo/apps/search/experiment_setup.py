@@ -9,6 +9,7 @@ from amazon_product_search.core.reranking.reranker import (
     Reranker,
     SpladeReranker,
 )
+from amazon_product_search.core.retrieval.rank_fusion import RankFusion
 
 SPARSE_FIELDS = [
     "product_title",
@@ -19,14 +20,6 @@ SPARSE_FIELDS = [
 ]
 ALL_FIELDS = [*SPARSE_FIELDS, "product_vector"]
 Task = Literal["retrieval", "reranking"]
-
-
-@dataclass
-class RankFusion:
-    fuser: Literal["search_engine", "own"] = "search_engine"
-    enable_score_normalization: bool = False
-    rrf: bool | int = False
-    weighting_strategy: Literal["fixed", "dynamic"] = "fixed"
 
 
 @dataclass
@@ -132,7 +125,7 @@ EXPERIMENTS = {
     ),
     "sparse_vs_dense": ExperimentSetup(
         task="retrieval",
-        num_queries=1000,
+        num_queries=10,
         variants=[
             Variant(name="sparse only", fields=SPARSE_FIELDS),
             Variant(name="dense only", fields=["product_vector"]),
@@ -178,6 +171,14 @@ EXPERIMENTS = {
                 rank_fusion=RankFusion(
                     fuser="own",
                     rrf=60,
+                ),
+            ),
+            Variant(
+                name="append semantic results",
+                fields=ALL_FIELDS,
+                rank_fusion=RankFusion(
+                    fuser="own",
+                    fusion_strategy="append",
                 ),
             ),
         ],

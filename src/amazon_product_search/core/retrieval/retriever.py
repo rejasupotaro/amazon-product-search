@@ -1,10 +1,11 @@
-from typing import Any, Literal
+from typing import Any
 
 from amazon_product_search.core.es.es_client import EsClient
 from amazon_product_search.core.es.query_builder import QueryBuilder
 from amazon_product_search.core.es.response import Response, Result
 from amazon_product_search.core.nlp.normalizer import normalize_query
-from amazon_product_search.core.retrieval.options import WeightingStrategy
+from amazon_product_search.core.retrieval.options import DynamicWeighting, FixedWeighting
+from amazon_product_search.core.retrieval.rank_fusion import RankFusion
 from amazon_product_search.core.retrieval.score_normalizer import min_max_scale
 from amazon_product_search.core.source import Locale
 
@@ -25,6 +26,25 @@ def split_fields(fields: list[str]) -> tuple[list[str], list[str]]:
     for field in fields:
         (dense_fields if "vector" in field else sparse_fields).append(field)
     return sparse_fields, dense_fields
+
+
+def _append_results(original_response: Response, alternative_response: Response, size: int) -> Response:
+    """Return a response with results from alternative_response appended to original_response.
+
+    Args:
+        original_response (Response): The original response.
+        alternative_response (Response): An alternative response to append if necessary.
+        size (int): The number of results to return.
+
+    Returns:
+        Response: The response with results from alternative_response appended to original_response.
+    """
+    results = original_response.results
+    total_hits = original_response.total_hits
+    if len(results) < size:
+        results += alternative_response.results[: size - len(results)]
+        total_hits = len(results)
+    return Response(results=results, total_hits=total_hits)
 
 
 def _merge_responses_by_score(sparse_response: Response, dense_response: Response, size: int) -> Response:
@@ -124,10 +144,7 @@ class Retriever:
         sparse_boost: float = 1.0,
         dense_boost: float = 1.0,
         size: int = 20,
-        fuser: Literal["search_engine", "own"] = "search_engine",
-        enable_score_normalization: bool = False,
-        rrf: bool | int = False,
-        weighting_strategy: WeightingStrategy | None = None,
+        rank_fusion: RankFusion | None = None,
     ) -> Response:
         normalized_query = normalize_query(query)
         sparse_fields, dense_fields = split_fields(fields)
@@ -150,7 +167,10 @@ class Retriever:
                 boost=dense_boost,
             )
 
-        if fuser == "search_engine":
+        if not rank_fusion:
+            rank_fusion = RankFusion()
+
+        if rank_fusion.fuser == "search_engine":
             return self.es_client.search(
                 index_name=index_name,
                 query=sparse_query,
@@ -173,19 +193,38 @@ class Retriever:
             size=size,
             explain=True,
         )
+        return self.fuse(query, sparse_response, dense_response, sparse_boost, dense_boost, rank_fusion, size)
 
-        if enable_score_normalization:
+    @staticmethod
+    def fuse(
+        query: str,
+        sparse_response: Response,
+        dense_response: Response,
+        sparse_boost: float,
+        dense_boost: float,
+        rank_fusion: RankFusion,
+        size: int,
+    ) -> Response:
+        if rank_fusion.fusion_strategy == "append":
+            return _append_results(sparse_response, dense_response, size)
+
+        if rank_fusion.enable_score_normalization:
             sparse_response = _normalize_scores(sparse_response)
             dense_response = _normalize_scores(dense_response)
-        elif rrf:
-            if isinstance(rrf, bool):
+        elif rank_fusion.rrf:
+            if isinstance(rank_fusion.rrf, bool):
                 sparse_response = _rrf_scores(sparse_response)
                 dense_response = _rrf_scores(dense_response)
             else:
-                sparse_response = _rrf_scores(sparse_response, k=rrf)
-                dense_response = _rrf_scores(dense_response, k=rrf)
+                sparse_response = _rrf_scores(sparse_response, k=rank_fusion.rrf)
+                dense_response = _rrf_scores(dense_response, k=rank_fusion.rrf)
 
-        if weighting_strategy:
+        if rank_fusion.weighting_strategy:
+            weighting_strategy = (
+                FixedWeighting({"sparse": sparse_boost, "dense": dense_boost})
+                if rank_fusion.weighting_strategy == "fixed"
+                else DynamicWeighting()
+            )
             for result in sparse_response.results:
                 result.score *= weighting_strategy.apply("sparse", query)
             for result in dense_response.results:
