@@ -4,9 +4,9 @@ from amazon_product_search.core.es.es_client import EsClient
 from amazon_product_search.core.es.query_builder import QueryBuilder
 from amazon_product_search.core.es.response import Response, Result
 from amazon_product_search.core.nlp.normalizer import normalize_query
-from amazon_product_search.core.retrieval.options import DynamicWeighting, FixedWeighting
 from amazon_product_search.core.retrieval.rank_fusion import RankFusion
 from amazon_product_search.core.retrieval.score_normalizer import min_max_scale
+from amazon_product_search.core.retrieval.weighting_strategy import DynamicWeighting, FixedWeighting
 from amazon_product_search.core.source import Locale
 
 
