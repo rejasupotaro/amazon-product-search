@@ -18,6 +18,7 @@ class FormInput:
     query_type: str | None
     is_synonym_expansion_enabled: bool
     fuser: str
+    fusion_strategy: str
     weighting_strategy: str
     reranker_str: str | None
 
@@ -58,6 +59,8 @@ def draw_input_form(queries: list[str] | None = None) -> FormInput:
 
     fuser = st.selectbox("fuser:", ["search_engine", "own"])
 
+    fusion_strategy = st.selectbox("fusion_strategy:", ["fuse", "append"])
+
     weighting_strategy = st.selectbox("weighting_strategy:", ["fixed", "dynamic"])
 
     reranker_str = st.selectbox("reranker:", ["NoOpReranker", "RandomReranker", "DotReranker"])
@@ -70,6 +73,7 @@ def draw_input_form(queries: list[str] | None = None) -> FormInput:
         query_type,
         is_synonym_expansion_enabled,
         fuser=fuser,
+        fusion_strategy=fusion_strategy,
         weighting_strategy=weighting_strategy,
         reranker_str=reranker_str,
     )

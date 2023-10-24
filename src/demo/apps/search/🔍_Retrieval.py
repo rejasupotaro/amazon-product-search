@@ -11,6 +11,7 @@ from amazon_product_search.core.metrics import (
     compute_recall,
 )
 from amazon_product_search.core.reranking.reranker import from_string
+from amazon_product_search.core.retrieval.rank_fusion import RankFusion
 from amazon_product_search.core.retrieval.retriever import Retriever
 from amazon_product_search.core.source import Locale
 from demo.apps.search.search_ui import (
@@ -96,6 +97,11 @@ def main() -> None:
         sparse_boost=form_input.sparse_boost,
         dense_boost=form_input.dense_boost,
         size=20,
+        rank_fusion=RankFusion(
+            fuser=form_input.fuser,
+            fusion_strategy=form_input.fusion_strategy,
+            weighting_strategy=form_input.weighting_strategy,
+        ),
     )
     reranker = from_string(form_input.reranker_str)
 
