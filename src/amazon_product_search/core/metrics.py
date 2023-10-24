@@ -2,7 +2,7 @@ from typing import Optional
 
 import numpy as np
 
-LABEL_TO_GAIN: dict[str, float] = {
+LABEL_TO_REL: dict[str, float] = {
     "E": 1.0,
     "S": 0.1,
     "C": 0.01,
@@ -82,9 +82,9 @@ def compute_ndcg(
     if k:
         retrieved_ids = retrieved_ids[:k]
     if prime:
-        y_pred = [LABEL_TO_GAIN[id_to_label[doc_id]] for doc_id in retrieved_ids if doc_id in id_to_label]
+        y_pred = [LABEL_TO_REL[id_to_label[doc_id]] for doc_id in retrieved_ids if doc_id in id_to_label]
     else:
-        y_pred = [LABEL_TO_GAIN[id_to_label[doc_id]] if doc_id in id_to_label else 0 for doc_id in retrieved_ids]
+        y_pred = [LABEL_TO_REL[id_to_label[doc_id]] if doc_id in id_to_label else 0 for doc_id in retrieved_ids]
     y_true = sorted(y_pred, reverse=True)
     idcg_val = compute_dcg(y_true)
     dcg_val = compute_dcg(y_pred)
