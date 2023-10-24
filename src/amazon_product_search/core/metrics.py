@@ -85,7 +85,7 @@ def compute_ndcg(
         y_pred = [LABEL_TO_GAIN[id_to_label[doc_id]] for doc_id in retrieved_ids if doc_id in id_to_label]
     else:
         y_pred = [LABEL_TO_GAIN[id_to_label[doc_id]] if doc_id in id_to_label else 0 for doc_id in retrieved_ids]
-    y_true = sorted([LABEL_TO_GAIN[label] for label in id_to_label.values()], reverse=True)
+    y_true = sorted(y_pred, reverse=True)
     idcg_val = compute_dcg(y_true)
     dcg_val = compute_dcg(y_pred)
     ndcg = round(dcg_val / idcg_val, 4) if idcg_val != 0 else None
