@@ -47,10 +47,10 @@ def _load_labels(locale: str) -> pl.DataFrame:
     return df
 
 
-def load_labels(locale: Locale, experiment_setup: ExperimentSetup) -> pl.DataFrame:
+def load_labels(locale: Locale, num_queries: int) -> pl.DataFrame:
     df = _load_labels(locale)
-    if experiment_setup.num_queries:
-        queries = df.get_column("query").sample(frac=1).unique()[: experiment_setup.num_queries]
+    if num_queries:
+        queries = df.get_column("query").sample(frac=1).unique()[:num_queries]
         df = df.filter(pl.col("query").is_in(queries))
     return df
 
@@ -216,15 +216,16 @@ async def main() -> None:
     st.write("## Experiments")
 
     with st.sidebar:
-        locale = st.selectbox("Locale", ["us", "jp"], index=1)
+        locale = st.selectbox("Locale:", ["us", "jp"], index=1)
         index_name = st.selectbox("Index:", es_client.list_indices())
+        num_queries = st.number_input("Number of queries:", min_value=1, max_value=1000000, value=10)
 
     experiment_name = st.selectbox("Experiment:", EXPERIMENTS.keys())
     experiment_setup = EXPERIMENTS[experiment_name]
 
     num_docs = count_docs(index_name)
 
-    labels_df = load_labels(locale, experiment_setup)
+    labels_df = load_labels(locale, num_queries)
     query_dict = {}
     for query, query_labels_df in labels_df.groupby("query"):
         query_dict[str(query)] = query_labels_df

@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Literal, Optional
+from typing import Literal
 
 from amazon_product_search.core.reranking.reranker import (
     ColBERTReranker,
@@ -38,14 +38,12 @@ class Variant:
 @dataclass
 class ExperimentSetup:
     task: Task
-    num_queries: Optional[int] = None
     variants: list[Variant] = field(default_factory=list)
 
 
 EXPERIMENTS = {
     "query_types": ExperimentSetup(
         task="retrieval",
-        num_queries=5000,
         variants=[
             Variant(name="best_fields", fields=SPARSE_FIELDS, query_type="best_fields"),
             Variant(name="cross_fields", fields=SPARSE_FIELDS, query_type="cross_fields"),
@@ -63,7 +61,6 @@ EXPERIMENTS = {
     ),
     "different_fields": ExperimentSetup(
         task="retrieval",
-        num_queries=5000,
         variants=[
             Variant(name="title", fields=["product_title"]),
             Variant(
@@ -81,7 +78,6 @@ EXPERIMENTS = {
     ),
     "different_weights": ExperimentSetup(
         task="retrieval",
-        num_queries=5000,
         variants=[
             Variant(name="title", fields=["product_title"]),
             Variant(
@@ -104,7 +100,6 @@ EXPERIMENTS = {
     ),
     "synonym_expansion": ExperimentSetup(
         task="retrieval",
-        num_queries=5000,
         variants=[
             Variant(name="title", fields=["product_title"], enable_synonym_expansion=False),
             Variant(
@@ -125,7 +120,6 @@ EXPERIMENTS = {
     ),
     "sparse_vs_dense": ExperimentSetup(
         task="retrieval",
-        num_queries=10,
         variants=[
             Variant(name="sparse only", fields=SPARSE_FIELDS),
             Variant(name="dense only", fields=["product_vector"]),
@@ -185,7 +179,6 @@ EXPERIMENTS = {
     ),
     "weighting_strategy": ExperimentSetup(
         task="retrieval",
-        num_queries=1000,
         variants=[
             Variant(
                 name="FixedWeighting (0.5, 0.5)",
@@ -222,7 +215,6 @@ EXPERIMENTS = {
     ),
     "reranking": ExperimentSetup(
         task="reranking",
-        num_queries=500,
         variants=[
             Variant(
                 name="title,bullet_point",
