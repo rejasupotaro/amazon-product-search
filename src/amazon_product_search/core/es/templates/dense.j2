@@ -6,7 +6,7 @@
         }
     },
     {% endif %}
-    "query_vector": {{ query_vector }},
+    "query_vector": {{ query_vector | tojson }},
     "field": "{{ field }}",
     "k": {{ k }},
     "num_candidates": {{ num_candidates }},

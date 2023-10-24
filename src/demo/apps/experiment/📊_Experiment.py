@@ -217,7 +217,7 @@ async def main() -> None:
     st.write("## Experiments")
 
     with st.sidebar:
-        locale = st.selectbox("Locale:", ["us", "jp"], index=1)
+        locale = st.selectbox("Locale:", ["us", "jp"])
         index_name = st.selectbox("Index:", es_client.list_indices())
         num_queries = st.number_input("Number of queries:", min_value=1, max_value=1000000, value=10)
 
