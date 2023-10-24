@@ -88,8 +88,17 @@ def compute_ndcg(
     y_true = sorted(y_pred, reverse=True)
     idcg_val = compute_dcg(y_true)
     dcg_val = compute_dcg(y_pred)
-    ndcg = round(dcg_val / idcg_val, 4) if idcg_val != 0 else None
-    return ndcg
+
+    if idcg_val > 0:
+        # If IDCG > 0, it means that the search results contain relevant documents.
+        # In this case, calculate NDCG as usual.
+        return round(dcg_val / idcg_val, 4)
+    elif any(label for label in id_to_label.values() if label != "I"):
+        # If IDCG == 0 and the products labeled as E, S, or C exist in the dataset,
+        # it means that the search results do not contain any relevant documents.
+        # In this case, NDCG is 0.
+        return 0.0
+    return None
 
 
 def compute_cosine_similarity(query_vector: np.ndarray, product_vectors: np.ndarray) -> np.ndarray:
