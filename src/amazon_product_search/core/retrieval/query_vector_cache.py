@@ -11,7 +11,7 @@ from amazon_product_search.core.source import Locale
 
 class QueryVectorCache:
     def __init__(self) -> None:
-        self._cache = {}
+        self._cache: dict[str, list[float]] = {}
 
     def load(
         self, locale: Locale, project_id: str = PROJECT_ID, dataset_id: str = DATASET_ID, data_dir: str = DATA_DIR
@@ -29,12 +29,13 @@ class QueryVectorCache:
             return
         self._cache = self._load_cache_from_bq(locale, project_id, dataset_id, data_dir)
 
-    def _load_cache_from_file(self, locale: Locale, data_dir: str) -> dict[str, list[float]] | None:
+    def _load_cache_from_file(self, locale: Locale, data_dir: str) -> dict[str, list[float]]:
         filepath = f"{data_dir}/query_vector_cache_{locale}.parquet"
         if not os.path.isfile(filepath):
             logging.info(f"Attempted to load query vector cache from {filepath} but file does not exist.")
-            return None
+            return {}
         df = pd.read_parquet(filepath)
+        df["query_vector"] = df["query_vector"].apply(lambda v: v.tolist())
         logging.info(f"Query vector cache loaded from {filepath} with {len(df)} rows.")
         return self._df_to_cache_dict(df)
 
