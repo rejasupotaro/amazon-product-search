@@ -34,14 +34,14 @@ def test_pipeline(tmp_path: Path, es_docker):
             "product_title": "title",
             "product_description": "description",
             "product_bullet_point": "bullet point",
-            "product_brand": "Brand",
-            "product_color": "Color",
+            "product_brand": "brand",
+            "product_color": "color",
             "product_description_keybert": "description point bullet",
         },
     ]
 
     index_name = "test"
-    locale = "jp"
+    locale = "us"
     dest_host = "http://localhost:9200"
 
     client = EsClient(es_host=dest_host)
