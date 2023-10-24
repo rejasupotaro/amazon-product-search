@@ -45,11 +45,7 @@ es_client = EsClient()
 rerankers = init_rerankers()
 
 
-def extract_judgements(df: pl.DataFrame) -> dict[str, str]:
-    return {row["product_id"]: row["esci_label"] for row in df.select(["product_id", "esci_label"]).to_dicts()}
-
-
-def search(query: str, doc_ids: list[str], all_judgements: dict[str, str]) -> list[Result]:
+def search(query: str, doc_ids: list[str], id_to_label: dict[str, str]) -> list[Result]:
     doc_id_filter_clauses = [{"term": {"product_id": doc_id}} for doc_id in doc_ids]
     es_query = {
         "bool": {
@@ -74,14 +70,14 @@ def search(query: str, doc_ids: list[str], all_judgements: dict[str, str]) -> li
     response = es_client.search(index_name="products_jp", query=es_query)
     for result in response.results:
         result.product["query"] = query
-        result.product["esci_label"] = all_judgements[result.product["product_id"]]
+        result.product["esci_label"] = id_to_label[result.product["product_id"]]
     return response.results
 
 
 def compute_ndcg(products: list[dict[str, Any]]) -> Optional[float]:
     retrieved_ids = [product["product_id"] for product in products]
-    judgements: dict[str, str] = {product["product_id"]: product["esci_label"] for product in products}
-    return metrics.compute_ndcg(retrieved_ids, judgements)
+    id_to_label: dict[str, str] = {product["product_id"]: product["esci_label"] for product in products}
+    return metrics.compute_ndcg(retrieved_ids, id_to_label)
 
 
 def draw_results(results: list[Result]) -> None:
@@ -106,7 +102,7 @@ def draw_examples(query: str, results: list[Result]) -> None:
 
 def run_comparison(
     df: pl.DataFrame,
-    all_judgements: dict[str, str],
+    id_to_label: dict[str, str],
     num_queries: int,
     reranker_names: list[str],
 ) -> None:
@@ -133,7 +129,7 @@ def run_comparison(
                         for result in search(
                             query,
                             doc_ids=[result.product["product_id"] for result in results],
-                            all_judgements=all_judgements,
+                            id_to_label=id_to_label,
                         )
                     ]
                 ),
@@ -167,7 +163,7 @@ def main() -> None:
     merged_df = load_merged(locale="jp")
     split = st.selectbox("split", ["-", "train", "test"], index=2)
     df = merged_df if split == "-" else merged_df.filter(pl.col("split") == split)
-    all_judgements = extract_judgements(df)
+    id_to_label = {row["product_id"]: row["esci_label"] for row in df.select(["product_id", "esci_label"]).to_dicts()}
 
     st.write("### Example")
 
@@ -186,7 +182,7 @@ def main() -> None:
         reranker_names = st.multiselect("Rerankers:", RERANKER_NAMES, default=RERANKER_NAMES)
         if not st.form_submit_button("Run"):
             return
-    run_comparison(df, all_judgements, num_queries, reranker_names)
+    run_comparison(df, id_to_label, num_queries, reranker_names)
 
 
 if __name__ == "__main__":

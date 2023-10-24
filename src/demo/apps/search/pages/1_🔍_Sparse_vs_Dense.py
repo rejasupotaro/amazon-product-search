@@ -148,13 +148,13 @@ def main() -> None:
     st.write(f"{all_iou_text}, {relevant_iou_text}")
 
     columns = st.columns(2)
-    judgements = {product_id: label for product_id, (label, product_title) in label_dict.items()}
+    id_to_label = {product_id: label for product_id, (label, product_title) in label_dict.items()}
     with columns[0]:
         header = f"{sparse_response.total_hits} products found"
         if label_dict:
             precision = compute_precision(sparse_retrieved_ids, relevant_ids)
             recall = compute_recall(sparse_retrieved_ids, relevant_ids)
-            ndcg = compute_ndcg(sparse_retrieved_ids, judgements)
+            ndcg = compute_ndcg(sparse_retrieved_ids, id_to_label)
             header = f"{header} (Precision: {precision}, Recall: {recall}, NDCG: {ndcg})"
         st.write(header)
         draw_products(sparse_response.results, label_dict)
@@ -163,7 +163,7 @@ def main() -> None:
         if label_dict:
             precision = compute_precision(dense_retrieved_ids, relevant_ids)
             recall = compute_recall(dense_retrieved_ids, relevant_ids)
-            ndcg = compute_ndcg(dense_retrieved_ids, judgements)
+            ndcg = compute_ndcg(dense_retrieved_ids, id_to_label)
             header = f"{header} (Preicison: {precision}, Recall: {recall}, NDCG: {ndcg})"
         st.write(header)
         draw_products(dense_response.results, label_dict)

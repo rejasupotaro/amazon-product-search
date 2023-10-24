@@ -119,11 +119,11 @@ def main() -> None:
     header = f"{response.total_hits} products found"
     if label_dict:
         retrieved_ids = [result.product["product_id"] for result in response.results]
-        judgements = {product_id: label for product_id, (label, product_title) in label_dict.items()}
+        id_to_label = {product_id: label for product_id, (label, product_title) in label_dict.items()}
         relevant_ids = {product_id for product_id, (label, product_title) in label_dict.items() if label == "E"}
         precision = compute_precision(retrieved_ids, relevant_ids)
         recall = compute_recall(retrieved_ids, relevant_ids)
-        ndcg = compute_ndcg(retrieved_ids, judgements)
+        ndcg = compute_ndcg(retrieved_ids, id_to_label)
         header = f"{header} (Precision: {precision}, Recall: {recall}, NDCG: {ndcg})"
     st.write(header)
     draw_products(response.results, label_dict)

@@ -101,15 +101,15 @@ def compute_metrics(
 
     retrieved_ids = [result.product["product_id"] for result in response.results]
     relevant_ids = set(labels_df.filter(pl.col("esci_label") == "E").get_column("product_id").to_list())
-    judgements: dict[str, str] = {row["product_id"]: row["esci_label"] for row in labels_df.to_dicts()}
+    id_to_label: dict[str, str] = {row["product_id"]: row["esci_label"] for row in labels_df.to_dicts()}
     metric_dict = {
         "variant": variant.name,
         "query": query,
         "total_hits": response.total_hits,
         "R@10": compute_recall(retrieved_ids, relevant_ids, k=10),
         "R@100": compute_recall(retrieved_ids, relevant_ids, k=100),
-        "NDCG@10": compute_ndcg(retrieved_ids, judgements, k=10),
-        "NDCG@100": compute_ndcg(retrieved_ids, judgements, k=100),
+        "NDCG@10": compute_ndcg(retrieved_ids, id_to_label, k=10),
+        "NDCG@100": compute_ndcg(retrieved_ids, id_to_label, k=100),
     }
     if experiment_setup.task == "retrieval":
         precision_at_10 = compute_precision(retrieved_ids, relevant_ids, k=10)

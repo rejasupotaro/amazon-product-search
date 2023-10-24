@@ -54,16 +54,16 @@ def compute_ap(retrieved_ids: list[str], relevant_ids: set[str]) -> Optional[flo
     return round(gain / num_relevant_docs, 4)
 
 
-def compute_dcg(gains: list[float]) -> float:
+def compute_dcg(rels: list[float]) -> float:
     result = 0.0
-    for i, gain in enumerate(gains):
-        result += gain / np.log2(i + 2)
+    for i, rel in enumerate(rels):
+        result += rel / np.log2(i + 2)
     return result
 
 
 def compute_ndcg(
     retrieved_ids: list[str],
-    judgements: dict[str, str],
+    id_to_label: dict[str, str],
     prime: bool = False,
     k: Optional[int] = None,
 ) -> Optional[float]:
@@ -73,7 +73,7 @@ def compute_ndcg(
 
     Args:
         retrieved_ids (list[str]): Document IDs retrieved from a search engine.
-        judgements (dict[str, str]): An annotation set for the query.
+        id_to_label (dict[str, str]): A dict composed of document IDs and their relevance judgements (ESCI).
         prime (bool, optional): True to skip unseen documents. Defaults to False.
 
     Returns:
@@ -82,10 +82,10 @@ def compute_ndcg(
     if k:
         retrieved_ids = retrieved_ids[:k]
     if prime:
-        y_pred = [LABEL_TO_GAIN[judgements[doc_id]] for doc_id in retrieved_ids if doc_id in judgements]
+        y_pred = [LABEL_TO_GAIN[id_to_label[doc_id]] for doc_id in retrieved_ids if doc_id in id_to_label]
     else:
-        y_pred = [LABEL_TO_GAIN[judgements[doc_id]] if doc_id in judgements else 0 for doc_id in retrieved_ids]
-    y_true = sorted([LABEL_TO_GAIN[label] for label in judgements.values()], reverse=True)
+        y_pred = [LABEL_TO_GAIN[id_to_label[doc_id]] if doc_id in id_to_label else 0 for doc_id in retrieved_ids]
+    y_true = sorted([LABEL_TO_GAIN[label] for label in id_to_label.values()], reverse=True)
     idcg_val = compute_dcg(y_true)
     dcg_val = compute_dcg(y_pred)
     ndcg = round(dcg_val / idcg_val, 4) if idcg_val != 0 else None
