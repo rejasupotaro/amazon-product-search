@@ -35,7 +35,8 @@ def get_retriever(locale: Locale) -> Retriever:
         "us": HF.EN_MULTIQA,
         "jp": HF.JP_SLUKE_MEAN,
     }[locale]
-    vector_cache = QueryVectorCache().load(locale)
+    vector_cache = QueryVectorCache()
+    vector_cache.load(locale)
     query_builder = QueryBuilder(locale=locale, hf_model_name=hf_model_name, vector_cache=vector_cache)
     return Retriever(locale=locale, es_client=es_client, query_builder=query_builder)
 
