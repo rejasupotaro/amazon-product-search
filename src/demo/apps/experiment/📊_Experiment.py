@@ -23,7 +23,7 @@ from amazon_product_search.core.retrieval.query_vector_cache import QueryVectorC
 from amazon_product_search.core.retrieval.retriever import Retriever
 from amazon_product_search.core.source import Locale
 from demo import utils
-from demo.apps.search.experiment_setup import EXPERIMENTS, ExperimentSetup, Variant
+from demo.apps.experiment.experiment_setup import EXPERIMENTS, ExperimentSetup, Variant
 from demo.page_config import set_page_config
 
 es_client = EsClient()
