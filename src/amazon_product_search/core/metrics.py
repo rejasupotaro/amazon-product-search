@@ -57,7 +57,7 @@ def compute_ap(retrieved_ids: list[str], relevant_ids: set[str]) -> Optional[flo
 def compute_dcg(rels: list[float]) -> float:
     result = 0.0
     for i, rel in enumerate(rels):
-        result += rel / np.log2(i + 2)
+        result += (2**rel - 1) / np.log2(i + 2)
     return result
 
 
