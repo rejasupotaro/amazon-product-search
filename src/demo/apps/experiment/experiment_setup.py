@@ -121,42 +121,22 @@ EXPERIMENTS = {
     "sparse_vs_dense": ExperimentSetup(
         task="retrieval",
         variants=[
-            Variant(name="sparse only", fields=SPARSE_FIELDS),
-            Variant(name="dense only", fields=["product_vector"]),
+            Variant(name="Sparse only", fields=SPARSE_FIELDS),
+            Variant(name="Dense only", fields=["product_vector"]),
             Variant(
-                name="sparse * 1.0 + dense * 1.0",
+                name="Sparse + Dense (without normalization)",
                 fields=ALL_FIELDS,
-                dense_boost=1.0,
-            ),
-            Variant(
-                name="sparse * 1.0 + dense * 5.0",
-                fields=ALL_FIELDS,
-                dense_boost=5.0,
-            ),
-            Variant(
-                name="sparse * 1.0 + dense * 10.0",
-                fields=ALL_FIELDS,
-                dense_boost=10.0,
-            ),
-            Variant(
-                name="sparse * 1.0 + dense * 20.0",
-                fields=ALL_FIELDS,
-                dense_boost=20.0,
+                rank_fusion=RankFusion(
+                    fuser="own",
+                    normalization_strategy=None,
+                ),
             ),
             Variant(
                 name="Min-Max Normalization",
                 fields=ALL_FIELDS,
                 rank_fusion=RankFusion(
                     fuser="own",
-                    enable_score_normalization=True,
-                ),
-            ),
-            Variant(
-                name="RRF (10)",
-                fields=ALL_FIELDS,
-                rank_fusion=RankFusion(
-                    fuser="own",
-                    rrf=10,
+                    normalization_strategy="min_max",
                 ),
             ),
             Variant(
@@ -164,11 +144,11 @@ EXPERIMENTS = {
                 fields=ALL_FIELDS,
                 rank_fusion=RankFusion(
                     fuser="own",
-                    rrf=60,
+                    normalization_strategy="rrf",
                 ),
             ),
             Variant(
-                name="append semantic results",
+                name="Append semantic results",
                 fields=ALL_FIELDS,
                 rank_fusion=RankFusion(
                     fuser="own",
@@ -181,24 +161,35 @@ EXPERIMENTS = {
         task="retrieval",
         variants=[
             Variant(
-                name="FixedWeighting (0.5, 0.5)",
-                fields=ALL_FIELDS,
-                sparse_boost=0.5,
-                dense_boost=0.5,
-                rank_fusion=RankFusion(
-                    fuser="own",
-                    enable_score_normalization=True,
-                    weighting_strategy="fixed",
-                ),
-            ),
-            Variant(
                 name="FixedWeighting (0.8, 0.2)",
                 fields=ALL_FIELDS,
                 sparse_boost=0.8,
                 dense_boost=0.2,
                 rank_fusion=RankFusion(
                     fuser="own",
-                    enable_score_normalization=True,
+                    normalization_strategy="min_max",
+                    weighting_strategy="fixed",
+                ),
+            ),
+            Variant(
+                name="FixedWeighting (0.5, 0.5)",
+                fields=ALL_FIELDS,
+                sparse_boost=0.5,
+                dense_boost=0.5,
+                rank_fusion=RankFusion(
+                    fuser="own",
+                    normalization_strategy="min_max",
+                    weighting_strategy="fixed",
+                ),
+            ),
+            Variant(
+                name="FixedWeighting (0.2, 0.8)",
+                fields=ALL_FIELDS,
+                sparse_boost=0.2,
+                dense_boost=0.8,
+                rank_fusion=RankFusion(
+                    fuser="own",
+                    normalization_strategy="min_max",
                     weighting_strategy="fixed",
                 ),
             ),
@@ -207,7 +198,7 @@ EXPERIMENTS = {
                 fields=ALL_FIELDS,
                 rank_fusion=RankFusion(
                     fuser="own",
-                    enable_score_normalization=True,
+                    normalization_strategy="min_max",
                     weighting_strategy="dynamic",
                 ),
             ),

@@ -9,10 +9,10 @@ from amazon_product_search.core.retrieval.weighting_strategy import DynamicWeigh
 @dataclass
 class RankFusion:
     fuser: Literal["search_engine", "own"] = "search_engine"
+    # When `fuser == "own"`, the following options are available.
     fusion_strategy: Literal["fuse", "append"] = "fuse"
-    # When fusion_strategy is "fuse", the following options are available.
-    enable_score_normalization: bool = False
-    rrf: bool | int = False
+    # When `fusion_strategy == "fuse"`, the following options are available.
+    normalization_strategy: Literal["min_max", "rrf"] | None = "min_max"
     weighting_strategy: Literal["fixed", "dynamic"] = "fixed"
 
 
@@ -119,16 +119,13 @@ def fuse(
     if rank_fusion.fusion_strategy == "append":
         return _append_results(sparse_response, dense_response, size)
 
-    if rank_fusion.enable_score_normalization:
-        sparse_response = _normalize_scores(sparse_response)
-        dense_response = _normalize_scores(dense_response)
-    elif rank_fusion.rrf:
-        if isinstance(rank_fusion.rrf, bool):
+    match rank_fusion.normalization_strategy:
+        case "min_max":
+            sparse_response = _normalize_scores(sparse_response)
+            dense_response = _normalize_scores(dense_response)
+        case "rrf":
             sparse_response = _rrf_scores(sparse_response)
             dense_response = _rrf_scores(dense_response)
-        else:
-            sparse_response = _rrf_scores(sparse_response, k=rank_fusion.rrf)
-            dense_response = _rrf_scores(dense_response, k=rank_fusion.rrf)
 
     if rank_fusion.weighting_strategy:
         weighting_strategy = (
