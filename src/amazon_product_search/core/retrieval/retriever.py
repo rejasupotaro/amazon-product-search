@@ -70,6 +70,7 @@ class Retriever:
                 field=dense_fields[0],
                 top_k=size,
                 boost=dense_boost,
+                product_ids=product_ids,
             )
 
         if not rank_fusion:
