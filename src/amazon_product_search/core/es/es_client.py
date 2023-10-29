@@ -7,6 +7,7 @@ from eland.ml.pytorch.transformers import TransformerModel
 
 from amazon_product_search.constants import MODELS_DIR
 from amazon_product_search.core.es.response import Response, Result
+from amazon_product_search.core.source import Locale
 from elasticsearch import Elasticsearch, helpers
 
 
@@ -22,13 +23,13 @@ class EsClient:
     def delete_index(self, index_name: str) -> None:
         self.es.indices.delete(index=index_name)
 
-    def create_index(self, index_name: str, schema_filename: str = "products.json") -> None:
-        """Create a new index using a mapping file (`elasticsearch/schemas/products.json`).
+    def create_index(self, locale: Locale, index_name: str) -> None:
+        """Create a new index using a mapping file (`elasticsearch/schemas/products_{locale}.json`).
 
         Args:
             index_name (str): An index name to create.
         """
-        with open(f"elasticsearch/schemas/{schema_filename}") as file:
+        with open(f"elasticsearch/schemas/products_{locale}.json") as file:
             schema = json.load(file)
             print(schema)
         self.es.indices.create(index=index_name, settings=schema.get("settings"), mappings=schema.get("mappings"))

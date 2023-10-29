@@ -10,24 +10,24 @@ from elasticsearch import NotFoundError
 @task
 def delete_index(c, index_name):
     es_client = EsClient()
-    es_client.delete_index(index_name=index_name)
+    es_client.delete_index(index_name)
     print(f"{index_name} was deleted.")
 
 
 @task
-def create_index(c, index_name):
+def create_index(c, locale, index_name):
     es_client = EsClient()
-    es_client.create_index(index_name=index_name)
+    es_client.create_index(locale, index_name)
     print(f"{index_name} was created.")
 
 
 @task
-def recreate_index(c, index_name):
+def recreate_index(c, locale, index_name):
     es_client = EsClient()
     with contextlib.suppress(NotFoundError):
-        es_client.delete_index(index_name=index_name)
+        es_client.delete_index(index_name)
 
-    es_client.create_index(index_name=index_name)
+    es_client.create_index(locale, index_name)
 
 
 @task

@@ -1,0 +1,60 @@
+{
+  "mappings": {
+    "properties": {
+      "product_id": {
+        "type": "keyword"
+      },
+      "product_title": {
+        "type": "text",
+        "analyzer": "whitespace",
+        "search_analyzer": "whitespace"
+      },
+      "product_description": {
+        "type": "text",
+        "analyzer": "whitespace",
+        "search_analyzer": "whitespace"
+      },
+      "product_bullet_point": {
+        "type": "text",
+        "analyzer": "whitespace",
+        "search_analyzer": "whitespace"
+      },
+      "product_brand": {
+        "type": "text",
+        "analyzer": "whitespace",
+        "search_analyzer": "whitespace",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "product_color": {
+        "type": "text",
+        "analyzer": "whitespace",
+        "search_analyzer": "whitespace",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "product_keybert": {
+        "type": "text",
+        "analyzer": "whitespace",
+        "search_analyzer": "whitespace"
+      },
+      "product_vector": {
+        "type": "dense_vector",
+        "dims": 768,
+        "index": true,
+        "similarity": "cosine"
+      },
+      "product_locale": {
+        "type": "keyword"
+      }
+    }
+  }
+}
