@@ -22,10 +22,10 @@ class FixedWeighting(WeightingStrategy):
 
 class DynamicWeighting(WeightingStrategy):
     def apply(self, matching_method: MatchingMethod, query: str) -> float:
-        weight = (len(query) * 0.015) + 0.2
-        weight = min(weight, 0.8)
+        weight = -(len(query) * 0.004) + 0.5
+        weight = max(weight, 0.2)
         match matching_method:
             case "sparse":
-                return 1 - weight
-            case "dense":
                 return weight
+            case "dense":
+                return 1 - weight

@@ -172,6 +172,28 @@ EXPERIMENTS = {
                 ),
             ),
             Variant(
+                name="FixedWeighting (0.7, 0.3)",
+                fields=ALL_FIELDS,
+                sparse_boost=0.7,
+                dense_boost=0.3,
+                rank_fusion=RankFusion(
+                    fuser="own",
+                    normalization_strategy="min_max",
+                    weighting_strategy="fixed",
+                ),
+            ),
+            Variant(
+                name="FixedWeighting (0.6, 0.4)",
+                fields=ALL_FIELDS,
+                sparse_boost=0.6,
+                dense_boost=0.4,
+                rank_fusion=RankFusion(
+                    fuser="own",
+                    normalization_strategy="min_max",
+                    weighting_strategy="fixed",
+                ),
+            ),
+            Variant(
                 name="FixedWeighting (0.5, 0.5)",
                 fields=ALL_FIELDS,
                 sparse_boost=0.5,
@@ -183,10 +205,10 @@ EXPERIMENTS = {
                 ),
             ),
             Variant(
-                name="FixedWeighting (0.2, 0.8)",
+                name="FixedWeighting (0.4, 0.6)",
                 fields=ALL_FIELDS,
-                sparse_boost=0.2,
-                dense_boost=0.8,
+                sparse_boost=0.4,
+                dense_boost=0.6,
                 rank_fusion=RankFusion(
                     fuser="own",
                     normalization_strategy="min_max",
