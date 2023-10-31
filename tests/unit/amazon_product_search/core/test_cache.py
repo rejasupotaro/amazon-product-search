@@ -1,4 +1,14 @@
-from amazon_product_search.core.cache import weak_lru_cache
+from amazon_product_search.core.cache import LRUCache, weak_lru_cache
+
+
+def test_lru_cache():
+    cache = LRUCache[str, str](max_size=2)
+    assert cache.get("key") is None
+    cache.set("key", "value")
+    assert cache.get("key") == "value"
+    cache.set("key2", "value2")
+    cache.set("key3", "value3")
+    assert cache.get("key") is None
 
 
 class Counter:
