@@ -146,16 +146,15 @@ async def perform_search(
         coroutines.append(coroutine)
 
     n, total_examples = 0, len(query_dict)
-    progress_text, progress_bar = st.empty(), st.progress(0)
+    progress_bar, progress_text = st.progress(0), st.empty()
     metrics = []
     for task in asyncio.as_completed(limit_concurrency(coroutines, max_concurrency=10)):
         query, ms = await task
         n += 1
-        progress_text.text(f"Query ({n} / {total_examples}): {query}")
         progress_bar.progress(n / total_examples)
+        progress_text.text(f"{n} / {total_examples} | query: {query}")
         if ms:
             metrics.extend(ms)
-    progress_text.text(f"Done ({n} / {total_examples})")
     return metrics
 
 
