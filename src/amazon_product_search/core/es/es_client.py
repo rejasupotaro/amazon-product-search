@@ -229,6 +229,7 @@ class EsClient:
         knn_query: dict[str, Any] | None = None,
         size: int = 20,
         explain: bool = False,
+        request_cache: bool | None = None,
     ) -> Response:
         """Perform a search and return a Response object.
 
@@ -239,11 +240,14 @@ class EsClient:
             size (int, optional): The number of hits to return. Defaults to 20.
             explain (bool, optional): If True, returns detailed information about score computation
                 as part of a hit if True. Defaults to False.
+            request_cache (bool | None, optional): If True, the request is cached. Defaults to None.
 
         Returns:
             Response: A Response object.
         """
-        es_response = self.es.search(index=index_name, query=query, knn=knn_query, size=size, explain=explain)
+        es_response = self.es.search(
+            index=index_name, query=query, knn=knn_query, size=size, explain=explain, request_cache=request_cache
+        )
         return self._convert_es_response_to_response(es_response)
 
     def close(self) -> None:
