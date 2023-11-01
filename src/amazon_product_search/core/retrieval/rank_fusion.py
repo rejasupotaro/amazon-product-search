@@ -98,8 +98,13 @@ def _merge_responses_by_score(sparse_response: Response, dense_response: Respons
 
     results: list[Result] = []
     for product_id in sparse_results.keys() | dense_results.keys():
-        score = sparse_results.get(product_id, 0) + dense_results.get(product_id, 0)
-        result = Result(product=id_to_product[product_id], score=score)
+        sparse_score, dense_score = sparse_results.get(product_id, 0), dense_results.get(product_id, 0)
+        score = sparse_score + dense_score
+        explanation = {
+            "sparse_score": sparse_score,
+            "dense_score": dense_score,
+        }
+        result = Result(product=id_to_product[product_id], score=score, explanation=explanation)
         results.append(result)
     total_hits = max(sparse_response.total_hits, dense_response.total_hits, len(results))
 
