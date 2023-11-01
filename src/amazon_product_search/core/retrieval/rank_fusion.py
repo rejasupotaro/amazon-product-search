@@ -127,10 +127,8 @@ def fuse(
     match rank_fusion.normalization_strategy:
         case "min_max":
             sparse_response = _normalize_scores(sparse_response)
-            dense_response = _normalize_scores(dense_response)
         case "rrf":
             sparse_response = _rrf_scores(sparse_response)
-            dense_response = _rrf_scores(dense_response)
 
     if rank_fusion.weighting_strategy:
         weighting_strategy = (
