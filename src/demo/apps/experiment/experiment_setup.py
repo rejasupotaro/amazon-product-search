@@ -118,7 +118,7 @@ EXPERIMENTS = {
             ),
         ],
     ),
-    "sparse_vs_dense": ExperimentSetup(
+    "rank_fusion": ExperimentSetup(
         task="retrieval",
         variants=[
             Variant(name="Sparse only", fields=SPARSE_FIELDS),
@@ -157,9 +157,31 @@ EXPERIMENTS = {
             ),
         ],
     ),
-    "weighting_strategy": ExperimentSetup(
+    "sparse_vs_dense": ExperimentSetup(
         task="retrieval",
         variants=[
+            Variant(
+                name="FixedWeighting (1.0, 0.0)",
+                fields=ALL_FIELDS,
+                sparse_boost=1.0,
+                dense_boost=0.0,
+                rank_fusion=RankFusion(
+                    fuser="own",
+                    normalization_strategy="min_max",
+                    weighting_strategy="fixed",
+                ),
+            ),
+            Variant(
+                name="FixedWeighting (0.9, 0.1)",
+                fields=ALL_FIELDS,
+                sparse_boost=0.9,
+                dense_boost=0.1,
+                rank_fusion=RankFusion(
+                    fuser="own",
+                    normalization_strategy="min_max",
+                    weighting_strategy="fixed",
+                ),
+            ),
             Variant(
                 name="FixedWeighting (0.8, 0.2)",
                 fields=ALL_FIELDS,
@@ -209,6 +231,66 @@ EXPERIMENTS = {
                 fields=ALL_FIELDS,
                 sparse_boost=0.4,
                 dense_boost=0.6,
+                rank_fusion=RankFusion(
+                    fuser="own",
+                    normalization_strategy="min_max",
+                    weighting_strategy="fixed",
+                ),
+            ),
+            Variant(
+                name="FixedWeighting (0.3, 0.7)",
+                fields=ALL_FIELDS,
+                sparse_boost=0.3,
+                dense_boost=0.7,
+                rank_fusion=RankFusion(
+                    fuser="own",
+                    normalization_strategy="min_max",
+                    weighting_strategy="fixed",
+                ),
+            ),
+            Variant(
+                name="FixedWeighting (0.2, 0.8)",
+                fields=ALL_FIELDS,
+                sparse_boost=0.2,
+                dense_boost=0.8,
+                rank_fusion=RankFusion(
+                    fuser="own",
+                    normalization_strategy="min_max",
+                    weighting_strategy="fixed",
+                ),
+            ),
+            Variant(
+                name="FixedWeighting (0.1, 0.9)",
+                fields=ALL_FIELDS,
+                sparse_boost=0.1,
+                dense_boost=0.9,
+                rank_fusion=RankFusion(
+                    fuser="own",
+                    normalization_strategy="min_max",
+                    weighting_strategy="fixed",
+                ),
+            ),
+            Variant(
+                name="FixedWeighting (0.0, 1.0)",
+                fields=ALL_FIELDS,
+                sparse_boost=0.0,
+                dense_boost=1.0,
+                rank_fusion=RankFusion(
+                    fuser="own",
+                    normalization_strategy="min_max",
+                    weighting_strategy="fixed",
+                ),
+            ),
+        ],
+    ),
+    "weighting_strategy": ExperimentSetup(
+        task="retrieval",
+        variants=[
+            Variant(
+                name="FixedWeighting (0.5, 0.5)",
+                fields=ALL_FIELDS,
+                sparse_boost=0.5,
+                dense_boost=0.5,
                 rank_fusion=RankFusion(
                     fuser="own",
                     normalization_strategy="min_max",
