@@ -53,13 +53,18 @@ class Retriever:
     ) -> Response:
         normalized_query = normalize_query(query)
         sparse_fields, dense_fields = split_fields(fields)
+
+        if not rank_fusion:
+            rank_fusion = RankFusion()
+
         sparse_query = None
         if sparse_fields:
             sparse_query = self.query_builder.build_sparse_search_query(
                 query=normalized_query,
                 fields=sparse_fields,
                 query_type=query_type,
-                boost=sparse_boost,
+                # Boost should be 1.0 if fuser == "own" because boost will be applied later.
+                boost=1.0 if rank_fusion.fuser == "own" else sparse_boost,
                 is_synonym_expansion_enabled=is_synonym_expansion_enabled,
                 product_ids=product_ids,
             )
@@ -69,12 +74,10 @@ class Retriever:
                 normalized_query,
                 field=dense_fields[0],
                 top_k=size,
-                boost=dense_boost,
+                # Boost should be 1.0 if fuser == "own" because boost will be applied later.
+                boost=1.0 if rank_fusion.fuser == "own" else dense_boost,
                 product_ids=product_ids,
             )
-
-        if not rank_fusion:
-            rank_fusion = RankFusion()
 
         if rank_fusion.fuser == "search_engine":
             return self.es_client.search(
