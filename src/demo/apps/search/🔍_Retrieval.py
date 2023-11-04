@@ -96,7 +96,7 @@ def main() -> None:
         is_synonym_expansion_enabled=form_input.is_synonym_expansion_enabled,
         sparse_boost=form_input.sparse_boost,
         dense_boost=form_input.dense_boost,
-        size=20,
+        size=form_input.size,
         rank_fusion=RankFusion(
             fuser=form_input.fuser,
             fusion_strategy=form_input.fusion_strategy,
