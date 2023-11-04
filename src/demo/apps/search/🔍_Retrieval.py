@@ -3,6 +3,7 @@ from typing import Any, Optional
 import streamlit as st
 
 from amazon_product_search.constants import HF
+from amazon_product_search.core import source
 from amazon_product_search.core.es.es_client import EsClient
 from amazon_product_search.core.es.query_builder import QueryBuilder
 from amazon_product_search.core.metrics import (
@@ -20,7 +21,6 @@ from demo.apps.search.search_ui import (
     draw_response_stats,
 )
 from demo.page_config import set_page_config
-from demo.utils import load_merged
 
 es_client = EsClient()
 
@@ -40,7 +40,7 @@ def get_retriever(locale: Locale, es_client: EsClient, query_builder: QueryBuild
 
 @st.cache_data
 def load_dataset(locale: Locale) -> dict[str, dict[str, tuple[str, str]]]:
-    df = load_merged(locale).to_pandas()
+    df = source.load_merged(locale).to_pandas()
     df = df[df["split"] == "test"]
     query_to_label: dict[str, dict[str, tuple[str, str]]] = {}
     for query, group in df.groupby("query"):

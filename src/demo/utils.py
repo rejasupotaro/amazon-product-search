@@ -15,11 +15,6 @@ def load_labels(locale: Locale, nrows: int = -1) -> pl.DataFrame:
     return source.load_labels(locale, nrows)
 
 
-@st.cache_data
-def load_merged(locale: Locale, nrows: int = -1) -> pl.DataFrame:
-    return source.load_merged(locale, nrows)
-
-
 def analyze_dataframe(df: pl.DataFrame) -> pl.DataFrame:
     """Calculate the basic statistics for a given DataFrame.
 

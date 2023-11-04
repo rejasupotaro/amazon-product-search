@@ -1,13 +1,13 @@
 import random
 from os import path
-from typing import Any, Optional
+from typing import Any, Literal, Optional
 
 import polars as pl
 import streamlit as st
 from more_itertools import chunked
 
 from amazon_product_search.constants import HF
-from amazon_product_search.core import metrics
+from amazon_product_search.core import metrics, source
 from amazon_product_search.core.es.es_client import EsClient
 from amazon_product_search.core.es.response import Result
 from amazon_product_search.core.reranking.reranker import (
@@ -19,7 +19,6 @@ from amazon_product_search.core.reranking.reranker import (
     SpladeReranker,
 )
 from demo.page_config import set_page_config
-from demo.utils import load_merged
 
 RERANKER_NAMES = [
     "Random Reranker",
@@ -43,6 +42,13 @@ def init_rerankers() -> dict[str, Reranker]:
 
 es_client = EsClient()
 rerankers = init_rerankers()
+
+
+@st.cache_data
+def load_dataset(split: Literal["-", "train", "test"]) -> pl.DataaFrame:
+    merged_df = source.load_merged(locale="jp")
+    df = merged_df if split == "-" else merged_df.filter(pl.col("split") == split)
+    return df
 
 
 def search(query: str, doc_ids: list[str], id_to_label: dict[str, str]) -> list[Result]:
@@ -160,9 +166,8 @@ def main() -> None:
     set_page_config()
     st.write("## Reranking")
 
-    merged_df = load_merged(locale="jp")
     split = st.selectbox("split", ["-", "train", "test"], index=2)
-    df = merged_df if split == "-" else merged_df.filter(pl.col("split") == split)
+    df = load_dataset(split)
     id_to_label = {row["product_id"]: row["esci_label"] for row in df.select(["product_id", "esci_label"]).to_dicts()}
 
     st.write("### Example")

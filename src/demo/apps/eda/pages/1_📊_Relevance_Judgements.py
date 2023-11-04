@@ -2,8 +2,9 @@ import plotly.express as px
 import polars as pl
 import streamlit as st
 
+from amazon_product_search.core import source
 from demo.page_config import set_page_config
-from demo.utils import analyze_dataframe, load_merged
+from demo.utils import analyze_dataframe
 
 
 def main():
@@ -11,7 +12,7 @@ def main():
     st.write("## Relevance Judgements")
 
     locale = st.selectbox("Locale:", ["jp", "us", "es"])
-    df = load_merged(locale)
+    df = source.load_merged(locale)
 
     st.write("### Columns")
     analyzed_df = analyze_dataframe(df)
