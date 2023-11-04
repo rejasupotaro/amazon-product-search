@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Literal
 
 import numpy as np
 import pandas as pd
@@ -19,6 +20,7 @@ class FormInput:
     is_synonym_expansion_enabled: bool
     fuser: str
     fusion_strategy: str
+    normalization_strategy: Literal["min_max", "rrf"] | None
     weighting_strategy: str
     reranker_str: str | None
 
@@ -57,9 +59,11 @@ def draw_input_form(queries: list[str] | None = None) -> FormInput:
 
     is_synonym_expansion_enabled = st.checkbox("enable_synonym_expansion")
 
-    fuser = st.selectbox("fuser:", ["search_engine", "own"])
+    fuser = st.selectbox("fuser:", ["own", "search_engine"])
 
     fusion_strategy = st.selectbox("fusion_strategy:", ["fuse", "append"])
+
+    normalization_strategy = st.selectbox("normalization_strategy:", ["min_max", "rrf"])
 
     weighting_strategy = st.selectbox("weighting_strategy:", ["fixed", "dynamic"])
 
@@ -74,6 +78,7 @@ def draw_input_form(queries: list[str] | None = None) -> FormInput:
         is_synonym_expansion_enabled,
         fuser=fuser,
         fusion_strategy=fusion_strategy,
+        normalization_strategy=normalization_strategy,
         weighting_strategy=weighting_strategy,
         reranker_str=reranker_str,
     )
