@@ -148,4 +148,5 @@ def draw_products(results: list[Result], label_dict: dict[str, tuple[str, str]])
             header = f"{label}{header}"
         with st.expander(header):
             st.write(result.product)
-            st.write(result.explanation)
+            if result.explanation:
+                st.write(result.explanation)
