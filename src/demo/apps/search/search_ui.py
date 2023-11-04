@@ -100,10 +100,30 @@ def draw_response_stats(response: Response, query_vector: np.ndarray, label_dict
             "label": label_dict.get(result.product["product_id"], ("-", ""))[0],
         }
         rows.append(row)
-
     df = pd.DataFrame(rows)
+
     with st.expander("Response Stats"):
         st.write(df)
+
+        rows = []
+        for i, row in enumerate(df.to_dict(orient="records")):
+            rows.append(
+                {
+                    "retrieval": "sparse",
+                    "rank": i,
+                    "score": row["sparse_score"],
+                }
+            )
+            rows.append(
+                {
+                    "retrieval": "dense",
+                    "rank": i,
+                    "score": row["dense_score"],
+                }
+            )
+        scores_df = pd.DataFrame(rows)
+        fig = px.bar(scores_df, x="rank", y="score", color="retrieval")
+        st.plotly_chart(fig, use_container_width=True)
 
         product_vectors = np.array([result.product["product_vector"] for result in response.results])
         scores = compute_cosine_similarity(query_vector, product_vectors)
