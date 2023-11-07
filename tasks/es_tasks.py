@@ -23,6 +23,14 @@ def create_index(c, locale, index_name):
 
 @task
 def recreate_index(c, locale, index_name):
+    """Recreate index with the given locale and index name.
+
+    ```
+    poetry run inv es.recreate-index \
+      --locale=us \
+      --index-name=products_us
+    ```
+    """
     es_client = EsClient()
     with contextlib.suppress(NotFoundError):
         es_client.delete_index(index_name)

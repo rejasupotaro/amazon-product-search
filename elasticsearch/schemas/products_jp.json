@@ -1,5 +1,10 @@
 {
   "mappings": {
+    "_source": {
+      "excludes": [
+        "product_vector"
+      ]
+    },
     "properties": {
       "product_id": {
         "type": "keyword"
