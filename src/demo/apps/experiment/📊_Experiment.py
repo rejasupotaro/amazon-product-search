@@ -234,7 +234,7 @@ async def main() -> None:
     content = f"""
     The experiment is conducted on `{index_name}` containing `{num_docs}` docs in total.
     We send `{len(query_dict)}` queries to the index with different parameters shown below.
-    Then, we compute Total Hits, Zero Hit Rate, Precision, Recall, NDCG, and NDCG' on each variant.
+    Then, we compute Total Hits, Zero Hit Rate, Precision, Recall, and NDCG for each variant.
     """
     st.write(content)
 
