@@ -125,6 +125,10 @@ def draw_response_stats(response: Response, query_vector: np.ndarray, label_dict
         fig = px.bar(scores_df, x="rank", y="score", color="retrieval")
         st.plotly_chart(fig, use_container_width=True)
 
+        if not response.results:
+            return
+        if not response.results[0].product.get("product_vector"):
+            return
         product_vectors = np.array([result.product["product_vector"] for result in response.results])
         scores = compute_cosine_similarity(query_vector, product_vectors)
         scores_df = pd.DataFrame([{"i": i, "score": score} for i, score in enumerate(scores)])
