@@ -96,18 +96,25 @@ class Retriever:
                 explain=True,
             )
 
-        sparse_response = self.es_client.search(
-            index_name=index_name,
-            query=sparse_query,
-            knn_query=None,
-            size=size,
-            explain=True,
-        )
-        dense_response = self.es_client.search(
-            index_name=index_name,
-            query=None,
-            knn_query=dense_query,
-            size=size,
-            explain=True,
-        )
+        if sparse_query:
+            sparse_response = self.es_client.search(
+                index_name=index_name,
+                query=sparse_query,
+                knn_query=None,
+                size=size,
+                explain=True,
+            )
+        else:
+            sparse_response = Response(results=[], total_hits=0)
+        if dense_query:
+            dense_response = self.es_client.search(
+                index_name=index_name,
+                query=None,
+                knn_query=dense_query,
+                size=size,
+                explain=True,
+            )
+        else:
+            dense_response = Response(results=[], total_hits=0)
+
         return fuse(query, sparse_response, dense_response, sparse_boost, dense_boost, rank_fusion, size)
