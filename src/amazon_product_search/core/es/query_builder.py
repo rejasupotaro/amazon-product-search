@@ -116,7 +116,7 @@ class QueryBuilder:
             query_vector=query_vector,
             field=field,
             k=top_k,
-            num_candidates=100,
+            num_candidates=top_k,
             boost=boost,
             product_ids=product_ids,
         )

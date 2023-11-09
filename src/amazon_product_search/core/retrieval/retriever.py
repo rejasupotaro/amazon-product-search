@@ -49,10 +49,13 @@ class Retriever:
         sparse_boost: float = 1.0,
         dense_boost: float = 1.0,
         size: int = 20,
+        window_size: int | None = None,
         rank_fusion: RankFusion | None = None,
     ) -> Response:
         normalized_query = normalize_query(query)
         sparse_fields, dense_fields = split_fields(fields)
+        if window_size is None:
+            window_size = size
 
         if not rank_fusion:
             rank_fusion = RankFusion()
@@ -73,7 +76,7 @@ class Retriever:
             dense_query = self.query_builder.build_dense_search_query(
                 normalized_query,
                 field=dense_fields[0],
-                top_k=size,
+                top_k=window_size,
                 # Boost should be 1.0 if fuser == "own" because boost will be applied later.
                 boost=1.0 if rank_fusion.fuser == "own" else dense_boost,
                 product_ids=product_ids,
@@ -84,7 +87,7 @@ class Retriever:
             if rank_fusion.normalization_strategy == "rrf":
                 rank = {
                     "rrf": {
-                        "window_size": 100,
+                        "window_size": window_size,
                     }
                 }
             return self.es_client.search(
@@ -101,7 +104,7 @@ class Retriever:
                 index_name=index_name,
                 query=sparse_query,
                 knn_query=None,
-                size=size,
+                size=window_size,
                 explain=True,
             )
         else:
@@ -111,7 +114,7 @@ class Retriever:
                 index_name=index_name,
                 query=None,
                 knn_query=dense_query,
-                size=size,
+                size=window_size,
                 explain=True,
             )
         else:

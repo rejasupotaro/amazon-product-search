@@ -97,6 +97,7 @@ def main() -> None:
         sparse_boost=form_input.sparse_boost,
         dense_boost=form_input.dense_boost,
         size=form_input.size,
+        window_size=form_input.window_size,
         rank_fusion=RankFusion(
             fuser=form_input.fuser,
             fusion_strategy=form_input.fusion_strategy,

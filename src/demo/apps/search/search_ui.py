@@ -19,6 +19,7 @@ class FormInput:
     query_type: str | None
     is_synonym_expansion_enabled: bool
     size: int
+    window_size: int
     fuser: str
     fusion_strategy: str
     normalization_strategy: Literal["min_max", "rrf"] | None
@@ -62,6 +63,8 @@ def draw_input_form(queries: list[str] | None = None) -> FormInput:
 
     size = st.number_input("size", value=100)
 
+    window_size = st.number_input("window_size", value=100)
+
     fuser = st.selectbox("fuser:", ["own", "search_engine"])
 
     fusion_strategy = st.selectbox("fusion_strategy:", ["fuse", "append"])
@@ -80,6 +83,7 @@ def draw_input_form(queries: list[str] | None = None) -> FormInput:
         query_type,
         is_synonym_expansion_enabled,
         size=size,
+        window_size=window_size,
         fuser=fuser,
         fusion_strategy=fusion_strategy,
         normalization_strategy=normalization_strategy,
