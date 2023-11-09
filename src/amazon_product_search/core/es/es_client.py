@@ -227,6 +227,7 @@ class EsClient:
         index_name: str,
         query: dict[str, Any] | None = None,
         knn_query: dict[str, Any] | None = None,
+        rank: dict[str, Any] | None = None,
         size: int = 20,
         explain: bool = False,
         request_cache: bool | None = None,
@@ -235,8 +236,9 @@ class EsClient:
 
         Args:
             index_name (str): An index name to perform a search.
-            query (dict[str, Any]): an Elasticsearch query represented as a dict.
+            query (Optional[dict[str, Any]], optional): an Elasticsearch query represented as a dict.
             knn_query (Optional[dict[str, Any]], optional): A knn clause to perform a KNN search. Defaults to None.
+            rank (Optional[dict[str, Any]], optional): A rank clause to perform a rank fusion. Defaults to None.
             size (int, optional): The number of hits to return. Defaults to 20.
             explain (bool, optional): If True, returns detailed information about score computation
                 as part of a hit if True. Defaults to False.
@@ -246,7 +248,13 @@ class EsClient:
             Response: A Response object.
         """
         es_response = self.es.search(
-            index=index_name, query=query, knn=knn_query, size=size, explain=explain, request_cache=request_cache
+            index=index_name,
+            query=query,
+            knn=knn_query,
+            rank=rank,
+            size=size,
+            explain=explain,
+            request_cache=request_cache,
         )
         return self._convert_es_response_to_response(es_response)
 

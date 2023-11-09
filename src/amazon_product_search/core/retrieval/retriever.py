@@ -80,10 +80,18 @@ class Retriever:
             )
 
         if rank_fusion.fuser == "search_engine":
+            rank = None
+            if rank_fusion.normalization_strategy == "rrf":
+                rank = {
+                    "rrf": {
+                        "window_size": 100,
+                    }
+                }
             return self.es_client.search(
                 index_name=index_name,
                 query=sparse_query,
                 knn_query=dense_query,
+                rank=rank,
                 size=size,
                 explain=True,
             )
