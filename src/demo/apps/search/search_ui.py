@@ -127,7 +127,19 @@ def draw_response_stats(response: Response, query_vector: np.ndarray, label_dict
             )
         scores_df = pd.DataFrame(rows)
         fig = px.bar(scores_df, x="rank", y="score", color="retrieval")
+        fig.update_layout(title="Scores by Rank")
         st.plotly_chart(fig, use_container_width=True)
+
+        cols = st.columns(2)
+        with cols[0]:
+            fig = px.histogram(scores_df, x="score", color="retrieval", barmode="overlay")
+            fig.update_layout(title="Histogram of Scores by Retrieval")
+            st.plotly_chart(fig, use_container_width=True)
+        with cols[1]:
+            df["label"] = df["label"].astype("category")
+            fig = px.scatter(df, x="sparse_score", y="dense_score", color="label")
+            fig.update_layout(title="Scores and Labels")
+            st.plotly_chart(fig, use_container_width=True)
 
         if not response.results:
             return
