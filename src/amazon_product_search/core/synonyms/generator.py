@@ -4,9 +4,9 @@ from math import log
 import polars as pl
 from tqdm import tqdm
 
-from amazon_product_search.constants import DATA_DIR
+from amazon_product_search.constants import DATA_DIR, HF
 from amazon_product_search.core.nlp.normalizer import normalize_doc
-from amazon_product_search.core.nlp.tokenizers.japanese_tokenizer import JapaneseTokenizer
+from amazon_product_search.core.nlp.tokenizers import locale_to_tokenizer
 from amazon_product_search.core.source import Locale, load_merged
 from amazon_product_search.core.synonyms.filters.similarity_filter import SimilarityFilter
 
@@ -28,9 +28,9 @@ def preprocess_query_title_pairs(df: pl.DataFrame) -> pl.DataFrame:
     )
 
 
-def generate_candidates(pairs: list[list[str]]) -> pl.DataFrame:
+def generate_candidates(locale: Locale, pairs: list[list[str]]) -> pl.DataFrame:
     """Generate synonyms based on cooccurrence."""
-    tokenizer = JapaneseTokenizer()
+    tokenizer = locale_to_tokenizer(locale)
     word_counter: Counter = Counter()
     pair_counter: Counter = Counter()
 
@@ -83,7 +83,7 @@ def generate_candidates(pairs: list[list[str]]) -> pl.DataFrame:
 
 
 def generate(
-    model_name: str,
+    locale: Locale,
     output_filename: str,
     min_cooccurrence: int = 10,
     min_npmi: float = 0.5,
@@ -98,11 +98,16 @@ def generate(
     6. Save the generated synonyms to `{DATA_DIR}/includes/{output_filename}`.
 
     Args:
-        model_name (str): A HuggingFace model name for filtering.
+        locale (Locale): The target locale.
         output_filename (str): The output filename.
     """
+    hf_model_name = {
+        "us": HF.EN_MULTIQA,
+        "jp": HF.JP_SLUKE_MEAN,
+    }[locale]
+
     print("Load query-title pairs")
-    pairs_df = load_query_title_pairs(locale="jp", nrows=1000)
+    pairs_df = load_query_title_pairs(locale=locale, nrows=1000)
     print(f"{len(pairs_df)} pairs will be processed")
 
     print("Preprocess query-title pairs")
@@ -110,7 +115,7 @@ def generate(
 
     print("Generate candidates from query-title pairs")
     pairs = pairs_df.select(["query", "product_title"]).to_numpy().tolist()
-    candidates_df = generate_candidates(pairs)
+    candidates_df = generate_candidates(locale, pairs)
     print(f"{len(candidates_df)} candidates were generated")
 
     print("Filter synonyms by Mutual Information")
@@ -119,7 +124,7 @@ def generate(
     )
 
     print("Filter synonyms by Semantic Similarity")
-    filter = SimilarityFilter(model_name)
+    filter = SimilarityFilter(hf_model_name)
     synonyms_df = filter.apply(candidates_df)
 
     filepath = f"{DATA_DIR}/includes/{output_filename}"

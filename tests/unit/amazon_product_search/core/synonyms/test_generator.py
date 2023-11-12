@@ -20,7 +20,7 @@ def test_preprocess_query_title_pairs():
 
 def test_generate_candidates():
     pairs = [["a b", "a b"], ["a c", "b c"]]
-    candidates = generate_candidates(pairs).to_dicts()
+    candidates = generate_candidates(locale="us", pairs=pairs).to_dicts()
     assert len(candidates) == 4
     assert set(candidates[0].keys()) == {
         "cooccurrence",

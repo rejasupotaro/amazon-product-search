@@ -9,8 +9,8 @@ from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 
 
 class SimilarityFilter:
-    def __init__(self, model_name: str = HF.JP_SLUKE_MEAN, batch_size: int = 8) -> None:
-        self.encoder: SBERTEncoder = SBERTEncoder(model_name)
+    def __init__(self, hf_model_name: str = HF.JP_SLUKE_MEAN, batch_size: int = 8) -> None:
+        self.encoder: SBERTEncoder = SBERTEncoder(hf_model_name)
         self.batch_size = batch_size
 
     def calculate_score(self, left: list[str], right: list[str]) -> list[float]:
