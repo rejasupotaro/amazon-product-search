@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 
 from amazon_product_search.core.metrics import (
+    compute_alteration_count,
     compute_ap,
     compute_cosine_similarity,
     compute_iou,
@@ -136,3 +137,26 @@ def test_compute_cosine_similarity():
     product_vectors = np.array([[1.0, 1.0], [-1.0, -1.0]])
     actual = compute_cosine_similarity(query_vector, product_vectors).tolist()
     assert [round(e) for e in actual] == [1, -1]
+
+
+@pytest.mark.parametrize(
+    ("mixed_list", "expected"),
+    [
+        ([], 0),
+        ([None], 0),
+        (["a"], 0),
+        (["b"], 0),
+        (["a", "a"], 0),
+        (["a", "b"], 1),
+        (["b", "a"], 1),
+        (["a", "a", "b"], 1),
+        (["a", "b", "a"], 2),
+        ([None, "a", "b", "a"], 2),
+        (["a", None, "b", "a"], 2),
+        (["a", "b", None, "a"], 2),
+        (["a", "b", "a", None], 2),
+    ],
+)
+def test_compute_alteration_count(mixed_list, expected):
+    actual = compute_alteration_count(mixed_list)
+    assert actual == expected

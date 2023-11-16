@@ -105,3 +105,22 @@ def compute_cosine_similarity(query_vector: np.ndarray, product_vectors: np.ndar
     numerator = np.dot(query_vector, product_vectors.T)
     denominator = np.linalg.norm(query_vector) * np.linalg.norm(product_vectors, axis=1)
     return numerator / denominator
+
+
+def compute_alteration_count(mixed_list: list[str | None]):
+    if not mixed_list:
+        return 0
+
+    alternation_count = 0
+    current_source = mixed_list[0]
+
+    for element in mixed_list[1:]:
+        if element is None:
+            continue
+        if element == current_source:
+            continue
+        if current_source is not None:
+            alternation_count += 1
+        current_source = element
+
+    return alternation_count
