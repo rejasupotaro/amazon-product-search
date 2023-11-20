@@ -5,8 +5,8 @@ from amazon_product_search.core.es.response import Response, Result
 from amazon_product_search.core.retrieval.rank_fusion import (
     _append_results,
     _merge_responses_by_score,
-    _normalize_scores,
-    _rrf_scores,
+    _min_max_scores,
+    _rrf_scores_with_k,
 )
 
 
@@ -29,10 +29,10 @@ def _is_sorted(scores: list[float]) -> None:
         ([2, 1, 0], [1, 0.5, 0]),
     ],
 )
-def test_normalize_scores(scores, expected_scores):
+def test_min_max_scores(scores, expected_scores):
     results = [Result(product={"product_id": str(i)}, score=score) for i, score in enumerate(scores)]
     response = Response(results=results, total_hits=len(results))
-    response = _normalize_scores(response)
+    response = _min_max_scores(response)
     assert [result.score for result in response.results] == expected_scores
 
 
@@ -48,7 +48,7 @@ def test_normalize_scores(scores, expected_scores):
 def test_rrf_scores(scores, expected):
     results = [Result(product={"product_id": str(i)}, score=score) for i, score in enumerate(scores)]
     response = Response(results=results, total_hits=len(results))
-    response = _rrf_scores(response, k=0)
+    response = _rrf_scores_with_k(response, k=0)
     actual = [result.score for result in response.results]
     assert np.allclose(actual, expected, atol=1e-04)
 

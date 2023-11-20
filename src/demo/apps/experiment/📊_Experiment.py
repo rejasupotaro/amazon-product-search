@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import traceback
 from dataclasses import asdict
 from typing import Any
 
@@ -133,6 +134,7 @@ async def compute_metrics_by_variant(
             metrics.append(ms)
     except Exception as e:
         logging.error(e)
+        traceback.print_exc()
     await asyncio.sleep(0.1)
     return query, metrics
 

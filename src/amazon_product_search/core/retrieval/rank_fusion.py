@@ -5,6 +5,10 @@ from amazon_product_search.core.es.response import Response, Result
 from amazon_product_search.core.retrieval.score_normalizer import min_max_scale
 from amazon_product_search.core.retrieval.weighting_strategy import DynamicWeighting, FixedWeighting
 
+_NormalizationMethod = Literal["min_max", "rrf"]
+
+NormalizationMethod = _NormalizationMethod | list[_NormalizationMethod] | None  # type: ignore
+
 
 @dataclass
 class RankFusion:
@@ -12,11 +16,11 @@ class RankFusion:
     # When `fuser == "own"`, the following options are available.
     fusion_strategy: Literal["fuse", "append"] = "fuse"
     # When `fusion_method == "fuse"`, the following options are available.
-    normalization_method: Literal["min_max", "rrf"] | None = "min_max"
+    normalization_method: NormalizationMethod = "min_max"
     weighting_strategy: Literal["fixed", "dynamic"] = "fixed"
 
 
-def _normalize_scores(response: Response) -> Response:
+def _min_max_scores(response: Response) -> Response:
     """Normalize scores in a response.
 
     Args:
@@ -34,7 +38,11 @@ def _normalize_scores(response: Response) -> Response:
     return Response(results=results, total_hits=response.total_hits)
 
 
-def _rrf_scores(response: Response, k: int = 60) -> Response:
+def _rrf_scores(response: Response) -> Response:
+    return _rrf_scores_with_k(response)
+
+
+def _rrf_scores_with_k(response: Response, k: int = 60) -> Response:
     """Adjust scores in a response using RRF (Reciprocal Rank Fusion).
 
     Args:
@@ -52,6 +60,32 @@ def _rrf_scores(response: Response, k: int = 60) -> Response:
         for result, adjusted_score in zip(response.results, adjusted_scores, strict=True)
     ]
     return Response(results=results, total_hits=response.total_hits)
+
+
+def _apply_normalization(
+    sparse_response: Response, dense_response: Response, normalization_method: NormalizationMethod
+) -> tuple[Response, Response]:
+    if normalization_method is None:
+        return sparse_response, dense_response
+
+    normalization_method_dict = {
+        "min_max": _min_max_scores,
+        "rrf": _rrf_scores,
+        None: lambda response: response,
+    }
+
+    if isinstance(normalization_method, str):
+        sparse_response = normalization_method_dict[normalization_method](sparse_response)
+        dense_response = normalization_method_dict[normalization_method](dense_response)
+        return sparse_response, dense_response
+
+    if isinstance(normalization_method, list):
+        sparse_normalization_method, dense_normalization_method = tuple(normalization_method)
+        sparse_response = normalization_method_dict[sparse_normalization_method](sparse_response)
+        dense_response = normalization_method_dict[dense_normalization_method](dense_response)
+        return sparse_response, dense_response
+
+    raise ValueError(f"Invalid normalization_method: {normalization_method}")
 
 
 def _append_results(original_response: Response, alternative_response: Response, size: int) -> Response:
@@ -124,12 +158,9 @@ def fuse(
     if rank_fusion.fusion_strategy == "append":
         return _append_results(sparse_response, dense_response, size)
 
-    match rank_fusion.normalization_method:
-        case "min_max":
-            sparse_response = _normalize_scores(sparse_response)
-        case "rrf":
-            sparse_response = _rrf_scores(sparse_response)
-            dense_response = _rrf_scores(dense_response)
+    sparse_response, dense_response = _apply_normalization(
+        sparse_response, dense_response, rank_fusion.normalization_method
+    )
 
     if rank_fusion.weighting_strategy:
         weighting_strategy = (

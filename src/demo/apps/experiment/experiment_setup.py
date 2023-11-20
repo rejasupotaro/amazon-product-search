@@ -132,7 +132,15 @@ EXPERIMENTS = {
                 ),
             ),
             Variant(
-                name="Min-Max Normalization",
+                name="MM-LEX",
+                fields=ALL_FIELDS,
+                rank_fusion=RankFusion(
+                    fuser="own",
+                    normalization_method=["min_max", None],
+                ),
+            ),
+            Variant(
+                name="MM",
                 fields=ALL_FIELDS,
                 rank_fusion=RankFusion(
                     fuser="own",
