@@ -11,8 +11,8 @@ class RankFusion:
     fuser: Literal["search_engine", "own"] = "search_engine"
     # When `fuser == "own"`, the following options are available.
     fusion_strategy: Literal["fuse", "append"] = "fuse"
-    # When `fusion_strategy == "fuse"`, the following options are available.
-    normalization_strategy: Literal["min_max", "rrf"] | None = "min_max"
+    # When `fusion_method == "fuse"`, the following options are available.
+    normalization_method: Literal["min_max", "rrf"] | None = "min_max"
     weighting_strategy: Literal["fixed", "dynamic"] = "fixed"
 
 
@@ -124,7 +124,7 @@ def fuse(
     if rank_fusion.fusion_strategy == "append":
         return _append_results(sparse_response, dense_response, size)
 
-    match rank_fusion.normalization_strategy:
+    match rank_fusion.normalization_method:
         case "min_max":
             sparse_response = _normalize_scores(sparse_response)
         case "rrf":

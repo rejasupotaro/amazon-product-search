@@ -84,7 +84,7 @@ class Retriever:
 
         if rank_fusion.fuser == "search_engine":
             rank = None
-            if rank_fusion.normalization_strategy == "rrf":
+            if rank_fusion.normalization_method == "rrf":
                 rank = {
                     "rrf": {
                         "window_size": window_size,
