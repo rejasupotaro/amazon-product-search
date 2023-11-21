@@ -10,6 +10,19 @@ _NormalizationMethod = Literal["min_max", "rrf"]
 NormalizationMethod = _NormalizationMethod | list[_NormalizationMethod] | None  # type: ignore
 
 
+def normalization_method_to_str(normalization_method: NormalizationMethod) -> str:
+    if isinstance(normalization_method, str):
+        return {
+            "min_max": "MM",
+            "rrf": "RRF",
+        }[normalization_method]
+    if isinstance(normalization_method, list):
+        sparse_normalization_method, dense_normalization_method = tuple(normalization_method)
+        if sparse_normalization_method == "min_max" and dense_normalization_method is None:
+            return "MM-LEX"
+    return str(normalization_method)
+
+
 @dataclass
 class RankFusion:
     fuser: Literal["search_engine", "own"] = "search_engine"

@@ -7,6 +7,7 @@ from amazon_product_search.core.retrieval.rank_fusion import (
     _merge_responses_by_score,
     _min_max_scores,
     _rrf_scores_with_k,
+    normalization_method_to_str,
 )
 
 
@@ -18,6 +19,19 @@ def _is_sorted(scores: list[float]) -> None:
             i += 1
     except AssertionError as err:
         raise AssertionError(f"Given scores are not sorted: {scores}") from err
+
+
+@pytest.mark.parametrize(
+    ("normalization_method", "expected"),
+    [
+        (None, "None"),
+        ("min_max", "MM"),
+        ("rrf", "RRF"),
+        (["min_max", None], "MM-LEX"),
+    ],
+)
+def test_normalization_method_to_str(normalization_method, expected):
+    assert normalization_method_to_str(normalization_method) == expected
 
 
 @pytest.mark.parametrize(
