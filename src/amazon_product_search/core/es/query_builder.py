@@ -40,7 +40,7 @@ class QueryBuilder:
         fields: list[str],
         query_type: str = "combined_fields",
         boost: float = 1.0,
-        is_synonym_expansion_enabled: bool = False,
+        is_synonym_expansion_enabled: bool | float = False,
         product_ids: list[str] | None = None,
     ) -> dict[str, Any]:
         """Build a multi-match ES query.
@@ -60,7 +60,10 @@ class QueryBuilder:
 
         synonyms = []
         if is_synonym_expansion_enabled and self.synonym_dict:
-            synonyms = self.synonym_dict.find_synonyms(query)
+            if isinstance(is_synonym_expansion_enabled, float):
+                synonyms = self.synonym_dict.find_synonyms(query, threshold=is_synonym_expansion_enabled)
+            else:
+                synonyms = self.synonym_dict.find_synonyms(query)
 
         query_match = json.loads(
             self.template_loader.load("query_match.j2").render(
