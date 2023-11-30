@@ -107,7 +107,7 @@ def generate(
     }[locale]
 
     print("Load query-title pairs")
-    pairs_df = load_query_title_pairs(locale=locale, nrows=1000)
+    pairs_df = load_query_title_pairs(locale=locale)
     print(f"{len(pairs_df)} pairs will be processed")
 
     print("Preprocess query-title pairs")
