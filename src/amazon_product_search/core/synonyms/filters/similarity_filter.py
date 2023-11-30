@@ -32,12 +32,12 @@ class SimilarityFilter:
 
         Args:
             syonyms_df (pd.DataFrame): A dataframe that contains synonym pairs.
-            threshold (float):
+            threshold (float): The threshold for the similarity score.
         Returns:
             The filtered dataframe.
         """
         scores = []
-        chunks = chunked(synonyms_df.to_dicts(), len(synonyms_df) // self.batch_size)
+        chunks = chunked(synonyms_df.to_dicts(), self.batch_size)
         for batch in tqdm(list(chunks)):
             queries = [row["query"] for row in batch]
             titles = [row["title"] for row in batch]
