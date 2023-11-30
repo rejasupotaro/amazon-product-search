@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 from amazon_product_search.core.es.query_builder import QueryBuilder
+from amazon_product_search.core.synonyms.synonym_dict import SynonymDict
 
 
 def test_match_all():
@@ -34,7 +35,8 @@ def test_build_search_query():
 def test_build_search_query_with_synonym_expansion_enabled(mock_method):
     mock_method.return_value = {"query": [("synonym", 1.0), ("antonym", 0.1)]}
 
-    query_builder = QueryBuilder(locale="us")
+    synonym_dict = SynonymDict(locale="us", synonym_filename="synonyms_us_mpnet.csv")
+    query_builder = QueryBuilder(locale="us", synonym_dict=synonym_dict)
     es_query = query_builder.build_sparse_search_query(
         query="query",
         fields=["product_title"],
@@ -110,7 +112,8 @@ def test_build_search_query_with_synonym_expansion_enabled_with_product_ids(
 ):
     mock_method.return_value = {"query": [("synonym", 1.0), ("antonym", 0.1)]}
 
-    query_builder = QueryBuilder(locale="us")
+    synonym_dict = SynonymDict(locale="us", synonym_filename="synonyms_us_mpnet.csv")
+    query_builder = QueryBuilder(locale="us", synonym_dict=synonym_dict)
     es_query = query_builder.build_sparse_search_query(
         query="query",
         fields=["product_title"],

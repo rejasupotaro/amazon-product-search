@@ -18,9 +18,10 @@ class QueryBuilder:
         data_dir: str = DATA_DIR,
         project_dir: str = PROJECT_DIR,
         hf_model_name: str = HF.JP_SLUKE_MEAN,
+        synonym_dict: SynonymDict | None = None,
         vector_cache: QueryVectorCache | None = None,
     ) -> None:
-        self.synonym_dict = SynonymDict(locale=locale, synonym_filename="synonyms_jp_sbert.csv", data_dir=data_dir)
+        self.synonym_dict = synonym_dict
         self.locale = locale
         self.tokenizer: Tokenizer = locale_to_tokenizer(locale)
         self.encoder: SBERTEncoder = SBERTEncoder(hf_model_name)
@@ -58,7 +59,7 @@ class QueryBuilder:
         query = " ".join(tokens)
 
         synonyms = []
-        if is_synonym_expansion_enabled:
+        if is_synonym_expansion_enabled and self.synonym_dict:
             synonyms = self.synonym_dict.find_synonyms(query)
 
         query_match = json.loads(
