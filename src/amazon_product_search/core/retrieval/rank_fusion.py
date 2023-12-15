@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from typing import Any, Literal
+from functools import partial
+from typing import Any, Callable, Literal
 
 from amazon_product_search.core.es.response import Response, Result
 from amazon_product_search.core.retrieval.score_normalizer import min_max_scale
@@ -31,6 +32,7 @@ class RankFusion:
     # When `fusion_method == "fuse"`, the following options are available.
     normalization_method: NormalizationMethod = "min_max"
     weighting_strategy: Literal["fixed", "dynamic"] = "fixed"
+    ranking_constant: int = 60
 
 
 def _min_max_scores(response: Response) -> Response:
@@ -76,14 +78,15 @@ def _rrf_scores_with_k(response: Response, k: int = 60) -> Response:
 
 
 def _apply_normalization(
-    sparse_response: Response, dense_response: Response, normalization_method: NormalizationMethod
+    sparse_response: Response, dense_response: Response, rank_fusion: RankFusion
 ) -> tuple[Response, Response]:
+    normalization_method = rank_fusion.normalization_method
     if normalization_method is None:
         return sparse_response, dense_response
 
-    normalization_method_dict = {
+    normalization_method_dict: dict[str | None, Callable[[Response], Response]] = {
         "min_max": _min_max_scores,
-        "rrf": _rrf_scores,
+        "rrf": partial(_rrf_scores_with_k, k=rank_fusion.ranking_constant),
         None: lambda response: response,
     }
 
@@ -171,9 +174,7 @@ def fuse(
     if rank_fusion.fusion_strategy == "append":
         return _append_results(sparse_response, dense_response, size)
 
-    sparse_response, dense_response = _apply_normalization(
-        sparse_response, dense_response, rank_fusion.normalization_method
-    )
+    sparse_response, dense_response = _apply_normalization(sparse_response, dense_response, rank_fusion)
 
     if rank_fusion.weighting_strategy:
         weighting_strategy = (
