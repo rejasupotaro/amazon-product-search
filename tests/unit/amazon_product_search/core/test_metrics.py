@@ -9,6 +9,7 @@ from amazon_product_search.core.metrics import (
     compute_ndcg,
     compute_precision,
     compute_recall,
+    compute_rr,
     compute_zero_hit_rate,
 )
 
@@ -93,6 +94,24 @@ def test_compute_iou(a, b, expected):
 )
 def test_compute_ap(retrieved_ids, relevant_ids, expected):
     actual = compute_ap(retrieved_ids, relevant_ids)
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    ("retrieved_ids", "relevant_ids", "expected"),
+    [
+        ([], {}, None),
+        ([1, 2, 3, 4], {}, None),
+        ([], {1, 2, 3, 4}, 0),
+        ([1, 2, 3, 4], {1}, 1),
+        ([1, 2, 3, 4], {2}, 0.5),
+        ([1, 2, 3, 4], {1, 2}, 1),
+        ([1, 2, 3, 4], {2, 4}, 0.5),
+        ([1, 2, 3, 4], {4}, 0.25),
+    ],
+)
+def test_compute_rr(retrieved_ids, relevant_ids, expected):
+    actual = compute_rr(retrieved_ids, relevant_ids)
     assert actual == expected
 
 

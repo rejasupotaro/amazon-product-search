@@ -54,6 +54,17 @@ def compute_ap(retrieved_ids: list[str], relevant_ids: set[str]) -> Optional[flo
     return round(gain / num_relevant_docs, 4)
 
 
+def compute_rr(retrieved_ids: list[str], relevant_ids: set[str], k: Optional[int] = None) -> Optional[float]:
+    if not relevant_ids:
+        return None
+    if k:
+        retrieved_ids = retrieved_ids[:k]
+    for i, retrieved_id in enumerate(retrieved_ids):
+        if retrieved_id in relevant_ids:
+            return round(1 / (i + 1), 4)
+    return 0.0
+
+
 def compute_dcg(rels: list[float]) -> float:
     result = 0.0
     for i, rel in enumerate(rels):
