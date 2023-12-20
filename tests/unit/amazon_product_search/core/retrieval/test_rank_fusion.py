@@ -162,7 +162,7 @@ def test_append_results(original_results, alternative_results, expected_total_hi
 def test_merge_responses_by_score(sparse_results, dense_results, expected_total_hits, expected_product_ids):
     sparse_response = Response(results=sparse_results, total_hits=len(sparse_results))
     dense_response = Response(results=dense_results, total_hits=len(dense_results))
-    response = _merge_responses_by_score(sparse_response, dense_response, size=100)
+    response = _merge_responses_by_score(sparse_response, dense_response, fusion_strategy="sum", size=100)
     assert response.total_hits == expected_total_hits
     assert [result.product["product_id"] for result in response.results] == expected_product_ids
     _is_sorted([result.score for result in response.results])
@@ -173,6 +173,6 @@ def test_merge_responses_by_score_with_size():
     sparse_response = Response(results=sparse_results, total_hits=len(sparse_results))
     dense_results = [Result(product={"product_id": str(i)}, score=0) for i in range(3, 6)]
     dense_response = Response(results=dense_results, total_hits=len(dense_results))
-    response = _merge_responses_by_score(sparse_response, dense_response, size=4)
+    response = _merge_responses_by_score(sparse_response, dense_response, fusion_strategy="sum", size=4)
     assert response.total_hits == 6
     assert len(response.results) == 4

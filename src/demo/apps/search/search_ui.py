@@ -67,7 +67,7 @@ def draw_input_form(queries: list[str] | None = None) -> FormInput:
 
     fuser = st.selectbox("fuser:", ["own", "search_engine"])
 
-    fusion_strategy = st.selectbox("fusion_strategy:", ["fuse", "append"])
+    fusion_strategy = st.selectbox("fusion_strategy:", ["sum", "max", "append"])
 
     normalization_method = st.selectbox("normalization_method:", ["min_max", "rrf"])
 

@@ -10,12 +10,15 @@ _NormalizationMethod = Literal["min_max", "rrf"]
 
 NormalizationMethod = _NormalizationMethod | list[_NormalizationMethod] | None  # type: ignore
 
+FusionStrategy = Literal["sum", "max", "append"]
+
 
 def normalization_method_to_str(normalization_method: NormalizationMethod) -> str:
     if isinstance(normalization_method, str):
         return {
             "min_max": "MM",
             "rrf": "RRF",
+            "append": "Append",
         }[normalization_method]
     if isinstance(normalization_method, list):
         sparse_normalization_method, dense_normalization_method = tuple(normalization_method)
@@ -28,8 +31,8 @@ def normalization_method_to_str(normalization_method: NormalizationMethod) -> st
 class RankFusion:
     fuser: Literal["search_engine", "own"] = "search_engine"
     # When `fuser == "own"`, the following options are available.
-    fusion_strategy: Literal["fuse", "append"] = "fuse"
-    # When `fusion_method == "fuse"`, the following options are available.
+    fusion_strategy: FusionStrategy = "sum"
+    # When `fusion_method != "append"`, the following options are available.
     normalization_method: NormalizationMethod = "min_max"
     weighting_strategy: Literal["fixed", "dynamic"] = "fixed"
     ranking_constant: int = 60
@@ -123,7 +126,9 @@ def _append_results(original_response: Response, alternative_response: Response,
     return Response(results=results, total_hits=total_hits)
 
 
-def _merge_responses_by_score(sparse_response: Response, dense_response: Response, size: int) -> Response:
+def _merge_responses_by_score(
+    sparse_response: Response, dense_response: Response, fusion_strategy: FusionStrategy, size: int
+) -> Response:
     """Merge two responses by score.
 
     Args:
@@ -149,7 +154,7 @@ def _merge_responses_by_score(sparse_response: Response, dense_response: Respons
     results: list[Result] = []
     for product_id in sparse_results.keys() | dense_results.keys():
         sparse_score, dense_score = sparse_results.get(product_id, 0), dense_results.get(product_id, 0)
-        score = sparse_score + dense_score
+        score = max(sparse_score, dense_score) if fusion_strategy == "max" else sparse_score + dense_score
         explanation = {
             "sparse_score": sparse_score,
             "dense_score": dense_score,
@@ -187,4 +192,4 @@ def fuse(
         for result in dense_response.results:
             result.score *= weighting_strategy.apply("dense", query)
 
-    return _merge_responses_by_score(sparse_response, dense_response, size)
+    return _merge_responses_by_score(sparse_response, dense_response, rank_fusion.fusion_strategy, size)
