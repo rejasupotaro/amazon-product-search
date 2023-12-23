@@ -6,7 +6,7 @@ from amazon_product_search.core.es.response import Response, Result
 from amazon_product_search.core.retrieval.score_normalizer import min_max_scale
 from amazon_product_search.core.retrieval.weighting_strategy import DynamicWeighting, FixedWeighting
 
-_NormalizationMethod = Literal["min_max", "rrf"]
+_NormalizationMethod = Literal["min_max", "rrf", "borda"]
 
 NormalizationMethod = _NormalizationMethod | list[_NormalizationMethod] | None  # type: ignore
 
@@ -18,6 +18,7 @@ def normalization_method_to_str(normalization_method: NormalizationMethod) -> st
         return {
             "min_max": "MM",
             "rrf": "RRF",
+            "borda": "Borda",
             "append": "Append",
         }[normalization_method]
     if isinstance(normalization_method, list):
@@ -80,8 +81,19 @@ def _rrf_scores_with_k(response: Response, k: int = 60) -> Response:
     return Response(results=results, total_hits=response.total_hits)
 
 
+def _borda_counts(response: Response, n: int) -> Response:
+    new_scores = []
+    for i in range(len(response.results)):
+        new_scores.append(n - i)
+    results = [
+        Result(product=result.product, score=adjusted_score)
+        for result, adjusted_score in zip(response.results, new_scores, strict=True)
+    ]
+    return Response(results=results, total_hits=response.total_hits)
+
+
 def _apply_normalization(
-    sparse_response: Response, dense_response: Response, rank_fusion: RankFusion
+    sparse_response: Response, dense_response: Response, rank_fusion: RankFusion, size: int
 ) -> tuple[Response, Response]:
     normalization_method = rank_fusion.normalization_method
     if normalization_method is None:
@@ -90,6 +102,7 @@ def _apply_normalization(
     normalization_method_dict: dict[str | None, Callable[[Response], Response]] = {
         "min_max": _min_max_scores,
         "rrf": partial(_rrf_scores_with_k, k=rank_fusion.ranking_constant),
+        "borda": partial(_borda_counts, n=size),
         None: lambda response: response,
     }
 
@@ -179,7 +192,7 @@ def fuse(
     if rank_fusion.fusion_strategy == "append":
         return _append_results(sparse_response, dense_response, size)
 
-    sparse_response, dense_response = _apply_normalization(sparse_response, dense_response, rank_fusion)
+    sparse_response, dense_response = _apply_normalization(sparse_response, dense_response, rank_fusion, size)
 
     if rank_fusion.weighting_strategy:
         weighting_strategy = (

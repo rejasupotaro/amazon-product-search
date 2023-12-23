@@ -4,6 +4,7 @@ import pytest
 from amazon_product_search.core.es.response import Response, Result
 from amazon_product_search.core.retrieval.rank_fusion import (
     _append_results,
+    _borda_counts,
     _merge_responses_by_score,
     _min_max_scores,
     _rrf_scores_with_k,
@@ -63,6 +64,23 @@ def test_rrf_scores(scores, expected):
     results = [Result(product={"product_id": str(i)}, score=score) for i, score in enumerate(scores)]
     response = Response(results=results, total_hits=len(results))
     response = _rrf_scores_with_k(response, k=0)
+    actual = [result.score for result in response.results]
+    assert np.allclose(actual, expected, atol=1e-04)
+
+
+@pytest.mark.parametrize(
+    ("scores", "expected"),
+    [
+        ([], []),
+        ([1], [1]),
+        ([10, 1], [2, 1]),
+        ([100, 10, 1], [3, 2, 1]),
+    ],
+)
+def test_borda_counts(scores, expected):
+    results = [Result(product={"product_id": str(i)}, score=score) for i, score in enumerate(scores)]
+    response = Response(results=results, total_hits=len(results))
+    response = _borda_counts(response, n=len(results))
     actual = [result.score for result in response.results]
     assert np.allclose(actual, expected, atol=1e-04)
 
