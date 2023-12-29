@@ -160,7 +160,7 @@ EXPERIMENTS = {
                 fields=ALL_FIELDS,
                 rank_fusion=RankFusion(
                     fuser="own",
-                    fusion_strategy="append",
+                    combination_method="append",
                 ),
             ),
         ],
