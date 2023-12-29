@@ -19,7 +19,8 @@ class VespaClient:
         schema: str,
         docs: list[dict[str, Any]],
         id_fn: Callable[[Dict[str, Any]], str],
-    ) -> list[VespaResponse]:
+        callback_fn: Callable[[VespaResponse, str], None] | None = None,
+    ) -> None:
         """Feed a batch of data to Vespa.
 
         Args:
@@ -32,7 +33,7 @@ class VespaClient:
             list[VespaResponse]: A list of VespaResponses.
         """
         batch = [{"id": id_fn(doc), "fields": doc} for doc in docs]
-        return self.vespa_app.feed_batch(schema=schema, batch=batch)
+        self.vespa_app.feed_iterable(iter=batch, schema=schema, callback=callback_fn)
 
     @staticmethod
     def _convert_vespa_response_to_response(vespa_response: VespaQueryResponse) -> Response:

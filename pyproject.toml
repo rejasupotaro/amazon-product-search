@@ -25,7 +25,6 @@ more-itertools = "^9.0.0"
 scikit-learn = "^1.2.0"
 tabulate = "^0.9.0"
 tensorboard = "^2.11.0"
-pyvespa = ">=0.37.1,<0.38.0"
 unidic-lite = "^1.0.8"
 polars = {version = "^0.16.0", extras = ["numpy", "pandas", "pyarrow"]}
 types-requests = "^2.28.11.17"
@@ -37,6 +36,7 @@ kfp = {version = "^2.0.0rc1", allow-prereleases = true}
 gcsfs = "^2023.6.0"
 jinja2 = "^3.1.2"
 google-cloud-bigquery = {extras = ["pandas"], version = "^3.12.0"}
+pyvespa = "^0.39.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2"

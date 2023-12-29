@@ -4,6 +4,13 @@ from typing import Any, Callable, Dict, List
 import apache_beam as beam
 
 from amazon_product_search.core.vespa.vespa_client import VespaClient
+from vespa.io import VespaResponse
+
+
+def callback_fn(response: VespaResponse, id: str) -> None:
+    if response.status_code != 200:
+        logging.error(f"Failed to index doc: {id}")
+        logging.error(response.json)
 
 
 class WriteToVespa(beam.DoFn):
@@ -17,7 +24,4 @@ class WriteToVespa(beam.DoFn):
 
     def process(self, docs: List[Dict[str, Any]]) -> None:
         logging.info(f"Index {len(docs)} docs in a batch")
-        responses = self.client.feed(self.schema, docs, self.id_fn)
-        for response in responses:
-            if response.status_code != 200:
-                logging.error(response.json)
+        self.client.feed(self.schema, docs, self.id_fn, callback_fn)
