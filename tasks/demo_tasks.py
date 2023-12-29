@@ -23,4 +23,4 @@ def experiment(c):
 
 @task
 def vespa(c):
-    c.run("poetry run streamlit run src/demo/apps/vespa/dev_tools.py")
+    c.run("poetry run streamlit run src/demo/apps/vespa/🔍_Retrieval.py")
