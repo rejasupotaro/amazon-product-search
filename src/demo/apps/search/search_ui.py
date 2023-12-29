@@ -22,7 +22,7 @@ class FormInput:
     window_size: int
     fuser: str
     fusion_strategy: str
-    normalization_method: Literal["min_max", "rrf"] | None
+    score_transformation_method: Literal["min_max", "rrf"] | None
     weighting_strategy: str
     reranker_str: str | None
 
@@ -69,7 +69,7 @@ def draw_input_form(queries: list[str] | None = None) -> FormInput:
 
     fusion_strategy = st.selectbox("fusion_strategy:", ["sum", "max", "append"])
 
-    normalization_method = st.selectbox("normalization_method:", ["min_max", "rrf"])
+    score_transformation_method = st.selectbox("score_transformation_method:", ["min_max", "rrf", "borda"])
 
     weighting_strategy = st.selectbox("weighting_strategy:", ["fixed", "dynamic"])
 
@@ -86,7 +86,7 @@ def draw_input_form(queries: list[str] | None = None) -> FormInput:
         window_size=window_size,
         fuser=fuser,
         fusion_strategy=fusion_strategy,
-        normalization_method=normalization_method,
+        score_transformation_method=score_transformation_method,
         weighting_strategy=weighting_strategy,
         reranker_str=reranker_str,
     )

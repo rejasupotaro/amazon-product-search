@@ -6,26 +6,26 @@ from amazon_product_search.core.es.response import Response, Result
 from amazon_product_search.core.retrieval.score_normalizer import min_max_scale
 from amazon_product_search.core.retrieval.weighting_strategy import DynamicWeighting, FixedWeighting
 
-_NormalizationMethod = Literal["min_max", "rrf", "borda"]
+_ScoreTransformationMethod = Literal["min_max", "rrf", "borda"]
 
-NormalizationMethod = _NormalizationMethod | list[_NormalizationMethod] | None  # type: ignore
+ScoreTransformationMethod = _ScoreTransformationMethod | list[_ScoreTransformationMethod] | None  # type: ignore
 
 FusionStrategy = Literal["sum", "max", "append"]
 
 
-def normalization_method_to_str(normalization_method: NormalizationMethod) -> str:
-    if isinstance(normalization_method, str):
+def score_transformation_method_to_str(score_transformation_method: ScoreTransformationMethod) -> str:
+    if isinstance(score_transformation_method, str):
         return {
             "min_max": "MM",
             "rrf": "RRF",
             "borda": "Borda",
             "append": "Append",
-        }[normalization_method]
-    if isinstance(normalization_method, list):
-        sparse_normalization_method, dense_normalization_method = tuple(normalization_method)
-        if sparse_normalization_method == "min_max" and dense_normalization_method is None:
+        }[score_transformation_method]
+    if isinstance(score_transformation_method, list):
+        for_sparse, for_dense = tuple(score_transformation_method)
+        if for_sparse == "min_max" and for_dense is None:
             return "MM-LEX"
-    return str(normalization_method)
+    return str(score_transformation_method)
 
 
 @dataclass
@@ -34,7 +34,7 @@ class RankFusion:
     # When `fuser == "own"`, the following options are available.
     fusion_strategy: FusionStrategy = "sum"
     # When `fusion_method != "append"`, the following options are available.
-    normalization_method: NormalizationMethod = "min_max"
+    score_transformation_method: ScoreTransformationMethod = "min_max"
     weighting_strategy: Literal["fixed", "dynamic"] = "fixed"
     ranking_constant: int = 60
 
@@ -92,32 +92,32 @@ def _borda_counts(response: Response, n: int) -> Response:
     return Response(results=results, total_hits=response.total_hits)
 
 
-def _apply_normalization(
+def _apply_score_transformation(
     sparse_response: Response, dense_response: Response, rank_fusion: RankFusion, size: int
 ) -> tuple[Response, Response]:
-    normalization_method = rank_fusion.normalization_method
-    if normalization_method is None:
+    score_transformation_method = rank_fusion.score_transformation_method
+    if score_transformation_method is None:
         return sparse_response, dense_response
 
-    normalization_method_dict: dict[str | None, Callable[[Response], Response]] = {
+    score_transformation_method_dict: dict[str | None, Callable[[Response], Response]] = {
         "min_max": _min_max_scores,
         "rrf": partial(_rrf_scores_with_k, k=rank_fusion.ranking_constant),
         "borda": partial(_borda_counts, n=size),
         None: lambda response: response,
     }
 
-    if isinstance(normalization_method, str):
-        sparse_response = normalization_method_dict[normalization_method](sparse_response)
-        dense_response = normalization_method_dict[normalization_method](dense_response)
+    if isinstance(score_transformation_method, str):
+        sparse_response = score_transformation_method_dict[score_transformation_method](sparse_response)
+        dense_response = score_transformation_method_dict[score_transformation_method](dense_response)
         return sparse_response, dense_response
 
-    if isinstance(normalization_method, list):
-        sparse_normalization_method, dense_normalization_method = tuple(normalization_method)
-        sparse_response = normalization_method_dict[sparse_normalization_method](sparse_response)
-        dense_response = normalization_method_dict[dense_normalization_method](dense_response)
+    if isinstance(score_transformation_method, list):
+        for_sparse, for_dense = tuple(score_transformation_method)
+        sparse_response = score_transformation_method_dict[for_sparse](sparse_response)
+        dense_response = score_transformation_method_dict[for_dense](dense_response)
         return sparse_response, dense_response
 
-    raise ValueError(f"Invalid normalization_method: {normalization_method}")
+    raise ValueError(f"Invalid score_transformation_method: {score_transformation_method}")
 
 
 def _append_results(original_response: Response, alternative_response: Response, size: int) -> Response:
@@ -192,7 +192,7 @@ def fuse(
     if rank_fusion.fusion_strategy == "append":
         return _append_results(sparse_response, dense_response, size)
 
-    sparse_response, dense_response = _apply_normalization(sparse_response, dense_response, rank_fusion, size)
+    sparse_response, dense_response = _apply_score_transformation(sparse_response, dense_response, rank_fusion, size)
 
     if rank_fusion.weighting_strategy:
         weighting_strategy = (

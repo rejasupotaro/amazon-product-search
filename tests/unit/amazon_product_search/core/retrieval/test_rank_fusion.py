@@ -8,7 +8,7 @@ from amazon_product_search.core.retrieval.rank_fusion import (
     _merge_responses_by_score,
     _min_max_scores,
     _rrf_scores_with_k,
-    normalization_method_to_str,
+    score_transformation_method_to_str,
 )
 
 
@@ -23,7 +23,7 @@ def _is_sorted(scores: list[float]) -> None:
 
 
 @pytest.mark.parametrize(
-    ("normalization_method", "expected"),
+    ("score_transformation_method", "expected"),
     [
         (None, "None"),
         ("min_max", "MM"),
@@ -31,8 +31,8 @@ def _is_sorted(scores: list[float]) -> None:
         (["min_max", None], "MM-LEX"),
     ],
 )
-def test_normalization_method_to_str(normalization_method, expected):
-    assert normalization_method_to_str(normalization_method) == expected
+def test_score_transformation_method_to_str(score_transformation_method, expected):
+    assert score_transformation_method_to_str(score_transformation_method) == expected
 
 
 @pytest.mark.parametrize(

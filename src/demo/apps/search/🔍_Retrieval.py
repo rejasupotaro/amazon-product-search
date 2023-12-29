@@ -101,7 +101,7 @@ def main() -> None:
         rank_fusion=RankFusion(
             fuser=form_input.fuser,
             fusion_strategy=form_input.fusion_strategy,
-            normalization_method=form_input.normalization_method,
+            score_transformation_method=form_input.score_transformation_method,
             weighting_strategy=form_input.weighting_strategy,
         ),
     )

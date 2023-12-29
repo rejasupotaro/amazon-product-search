@@ -128,7 +128,7 @@ EXPERIMENTS = {
                 fields=ALL_FIELDS,
                 rank_fusion=RankFusion(
                     fuser="own",
-                    normalization_method=None,
+                    score_transformation_method=None,
                 ),
             ),
             Variant(
@@ -136,7 +136,7 @@ EXPERIMENTS = {
                 fields=ALL_FIELDS,
                 rank_fusion=RankFusion(
                     fuser="own",
-                    normalization_method=["min_max", None],
+                    score_transformation_method=["min_max", None],
                 ),
             ),
             Variant(
@@ -144,7 +144,7 @@ EXPERIMENTS = {
                 fields=ALL_FIELDS,
                 rank_fusion=RankFusion(
                     fuser="own",
-                    normalization_method="min_max",
+                    score_transformation_method="min_max",
                 ),
             ),
             Variant(
@@ -152,7 +152,7 @@ EXPERIMENTS = {
                 fields=ALL_FIELDS,
                 rank_fusion=RankFusion(
                     fuser="own",
-                    normalization_method="rrf",
+                    score_transformation_method="rrf",
                 ),
             ),
             Variant(
@@ -175,7 +175,7 @@ EXPERIMENTS = {
                 dense_boost=0.0,
                 rank_fusion=RankFusion(
                     fuser="own",
-                    normalization_method="min_max",
+                    score_transformation_method="min_max",
                     weighting_strategy="fixed",
                 ),
             ),
@@ -186,7 +186,7 @@ EXPERIMENTS = {
                 dense_boost=0.1,
                 rank_fusion=RankFusion(
                     fuser="own",
-                    normalization_method="min_max",
+                    score_transformation_method="min_max",
                     weighting_strategy="fixed",
                 ),
             ),
@@ -197,7 +197,7 @@ EXPERIMENTS = {
                 dense_boost=0.2,
                 rank_fusion=RankFusion(
                     fuser="own",
-                    normalization_method="min_max",
+                    score_transformation_method="min_max",
                     weighting_strategy="fixed",
                 ),
             ),
@@ -208,7 +208,7 @@ EXPERIMENTS = {
                 dense_boost=0.3,
                 rank_fusion=RankFusion(
                     fuser="own",
-                    normalization_method="min_max",
+                    score_transformation_method="min_max",
                     weighting_strategy="fixed",
                 ),
             ),
@@ -219,7 +219,7 @@ EXPERIMENTS = {
                 dense_boost=0.4,
                 rank_fusion=RankFusion(
                     fuser="own",
-                    normalization_method="min_max",
+                    score_transformation_method="min_max",
                     weighting_strategy="fixed",
                 ),
             ),
@@ -230,7 +230,7 @@ EXPERIMENTS = {
                 dense_boost=0.5,
                 rank_fusion=RankFusion(
                     fuser="own",
-                    normalization_method="min_max",
+                    score_transformation_method="min_max",
                     weighting_strategy="fixed",
                 ),
             ),
@@ -241,7 +241,7 @@ EXPERIMENTS = {
                 dense_boost=0.6,
                 rank_fusion=RankFusion(
                     fuser="own",
-                    normalization_method="min_max",
+                    score_transformation_method="min_max",
                     weighting_strategy="fixed",
                 ),
             ),
@@ -252,7 +252,7 @@ EXPERIMENTS = {
                 dense_boost=0.7,
                 rank_fusion=RankFusion(
                     fuser="own",
-                    normalization_method="min_max",
+                    score_transformation_method="min_max",
                     weighting_strategy="fixed",
                 ),
             ),
@@ -263,7 +263,7 @@ EXPERIMENTS = {
                 dense_boost=0.8,
                 rank_fusion=RankFusion(
                     fuser="own",
-                    normalization_method="min_max",
+                    score_transformation_method="min_max",
                     weighting_strategy="fixed",
                 ),
             ),
@@ -274,7 +274,7 @@ EXPERIMENTS = {
                 dense_boost=0.9,
                 rank_fusion=RankFusion(
                     fuser="own",
-                    normalization_method="min_max",
+                    score_transformation_method="min_max",
                     weighting_strategy="fixed",
                 ),
             ),
@@ -285,7 +285,7 @@ EXPERIMENTS = {
                 dense_boost=1.0,
                 rank_fusion=RankFusion(
                     fuser="own",
-                    normalization_method="min_max",
+                    score_transformation_method="min_max",
                     weighting_strategy="fixed",
                 ),
             ),
@@ -301,7 +301,7 @@ EXPERIMENTS = {
                 dense_boost=0.5,
                 rank_fusion=RankFusion(
                     fuser="own",
-                    normalization_method="min_max",
+                    score_transformation_method="min_max",
                     weighting_strategy="fixed",
                 ),
             ),
@@ -310,7 +310,7 @@ EXPERIMENTS = {
                 fields=ALL_FIELDS,
                 rank_fusion=RankFusion(
                     fuser="own",
-                    normalization_method="min_max",
+                    score_transformation_method="min_max",
                     weighting_strategy="dynamic",
                 ),
             ),
