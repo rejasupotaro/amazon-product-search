@@ -6,6 +6,12 @@
     </container>
     <content id="amazon_content" version="1.0">
         <redundancy reply-after="1">1</redundancy>
+        <tuning>
+            <resource-limits>
+                <disk>0.85</disk>
+                <memory>0.85</memory>
+            </resource-limits>
+        </tuning>
         <documents>
             <document type="product" mode="index"></document>
         </documents>
