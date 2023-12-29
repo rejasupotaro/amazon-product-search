@@ -64,16 +64,8 @@ schema product {
             query(query_vector) tensor<float>(x[768])
         }
 
-        function lexical_title_score() {
-            expression: bm25(product_title) * query(titleWeight)
-        }
-
-        function lexical_description_score() {
-            expression: bm25(product_description) * query(descriptionWeight)
-        }
-
         function lexical_score() {
-            expression: lexical_title_score + lexical_description_score
+            expression: bm25(product_title) + bm25(product_description)
         }
 
         function semantic_score() {
@@ -101,7 +93,7 @@ schema product {
 
     rank-profile hybrid inherits ranking_base {
         global-phase {
-            expression: reciprocal_rank(lexical_score) + reciprocal_rank(semantic_score)
+            expression: query(alpha) * reciprocal_rank(lexical_score) + (1 - query(alpha)) * reciprocal_rank(semantic_score)
         }
         summary-features {
             lexical_score

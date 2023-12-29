@@ -43,8 +43,7 @@ def main() -> None:
 
     query = {
         "query": query_str,
-        "input.query(titleWeight)": 1.0,
-        "input.query(descriptionWeight)": 1.0,
+        "input.query(alpha)": 0.5,
         "ranking.profile": rank_profile,
         "hits": size,
     }
@@ -76,8 +75,7 @@ def main() -> None:
         """
 
     _query = deepcopy(query)
-    if is_semantic_search_enabled:
-        del _query["input.query(query_vector)"]
+    if "input.query(query_vector)" in _query:
         _query["input.query(query_vector)"] = "..."
     st.write(_query)
 
