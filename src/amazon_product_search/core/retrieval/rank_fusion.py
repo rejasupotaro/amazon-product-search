@@ -13,21 +13,6 @@ ScoreTransformationMethod = _ScoreTransformationMethod | list[_ScoreTransformati
 FusionStrategy = Literal["sum", "max", "append"]
 
 
-def score_transformation_method_to_str(score_transformation_method: ScoreTransformationMethod) -> str:
-    if isinstance(score_transformation_method, str):
-        return {
-            "min_max": "MM",
-            "rrf": "RRF",
-            "borda": "Borda",
-            "append": "Append",
-        }[score_transformation_method]
-    if isinstance(score_transformation_method, list):
-        for_sparse, for_dense = tuple(score_transformation_method)
-        if for_sparse == "min_max" and for_dense is None:
-            return "MM-LEX"
-    return str(score_transformation_method)
-
-
 @dataclass
 class RankFusion:
     fuser: Literal["search_engine", "own"] = "search_engine"
