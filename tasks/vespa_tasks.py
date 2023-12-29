@@ -42,8 +42,8 @@ def restart(c):
 @task
 def delete_all_docs(c, schema):
     client = VespaClient()
-    res = client.delete_all_docs(content_cluster_name="amazon_content", schema=schema)
-    print(res.json)
+    response = client.delete_all_docs(content_cluster_name="amazon_content", schema=schema)
+    print(response)
 
 
 @task

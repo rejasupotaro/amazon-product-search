@@ -1,8 +1,7 @@
 from typing import Any, Callable, Dict, Optional
 
-from requests.models import Response
-
 import amazon_product_search.core.vespa.service as vespa_service
+from amazon_product_search.core.es.response import Response, Result
 from vespa.application import ApplicationPackage
 from vespa.io import VespaQueryResponse, VespaResponse
 
@@ -35,18 +34,42 @@ class VespaClient:
         batch = [{"id": id_fn(doc), "fields": doc} for doc in docs]
         return self.vespa_app.feed_batch(schema=schema, batch=batch)
 
-    def search(self, query: Optional[dict[str, Any]] = None) -> VespaQueryResponse:
+    @staticmethod
+    def _convert_vespa_response_to_response(vespa_response: VespaQueryResponse) -> Response:
+        """Map a raw Elasticsearch response to our Response class for convenience.
+
+        Args:
+            es_response (Any): An Elasticsearch response to convert.
+
+        Returns:
+            Response: Our Response object.
+        """
+        hits = vespa_response.hits
+        return Response(
+            results=[
+                Result(
+                    product=hit["fields"],
+                    score=hit["relevance"],
+                    explanation=hit["fields"].get("summaryfeatures", {}),
+                )
+                for hit in hits
+            ],
+            total_hits=vespa_response.json["root"]["fields"]["totalCount"],
+        )
+
+    def search(self, query: Optional[dict[str, Any]] = None) -> Response:
         """Send a search request to Vespa.
 
         Args:
             query (Optional[str], optional): A dict containing all the request params.
 
         Returns:
-            VespaQueryResponse: A response from Vespa.
+            Response: A Response object.
         """
-        return self.vespa_app.query(query)
+        vespa_response = self.vespa_app.query(query)
+        return self._convert_vespa_response_to_response(vespa_response)
 
-    def delete_all_docs(self, content_cluster_name: str, schema: str) -> Response:
+    def delete_all_docs(self, content_cluster_name: str, schema: str) -> Any:
         """Delete all docs associated with the given schema.
 
         Args:
@@ -56,4 +79,4 @@ class VespaClient:
         Returns:
             Response: The response of the HTTP DELETE request.
         """
-        return self.vespa_app.delete_all_docs(content_cluster_name, schema)
+        return self.vespa_app.delete_all_docs(content_cluster_name, schema).json()
