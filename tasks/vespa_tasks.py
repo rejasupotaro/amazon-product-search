@@ -8,6 +8,19 @@ from amazon_product_search.constants import HF, VESPA_DIR
 from amazon_product_search.core.vespa.vespa_client import VespaClient
 from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 
+"""
+To run Vespa locally, execute the following commands:
+```
+$ docker compose --profile vespa up
+$ vespa deploy ./vespa
+$ poetry run inv indexing.feed \
+    --locale=us \
+    --dest=vespa \
+    --dest-host=http://localhost:8080 \
+    --index-name=product
+```
+"""
+
 
 @task
 def start(c):

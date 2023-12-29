@@ -25,7 +25,7 @@ services:
       - elasticsearch
 
   vespa:
-    image: vespaengine/vespa
+    image: vespaengine/vespa:8.279.6
     container_name: amazon-product-search-vespa
     ports:
       - 8080:8080
