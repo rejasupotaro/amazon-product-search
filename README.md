@@ -39,15 +39,13 @@ $ poetry run inv data.merge-and-split
 This project involves indexing products into Elasticsearch. If you want to try it on your own machine, launch Elasticsearch locally and execute the document indexing pipeline against the created index.
 
 ```shell
-$ docker compose up
+$ docker compose --profile elasticsearch up
 $ poetry run inv es.create-index --index-name=products_jp
-$ poetry run inv es.index \
+$ poetry run inv indexing.feed \
   --index-name=products_jp \
   --locale=jp \
-  --dest-host=http://localhost:9200 \
-  --extract-keywords \
-  --encode-text \
-  --nrows=100
+  --dest=es \
+  --dest-host=http://localhost:9200
 ```
 
 See https://github.com/rejasupotaro/amazon-product-search/wiki/Indexing for more details.
@@ -58,7 +56,7 @@ The command below launches the [Streamlit](https://streamlit.io/) demo app.
 
 ```shell
 # Launch Elasticsearch beforehand
-$ docker compose up
+$ docker compose --profile elasticsearch up
 
 $ poetry run inv demo.search
 ```
