@@ -42,10 +42,6 @@ def _min_max_scores(response: Response) -> Response:
     return Response(results=results, total_hits=response.total_hits)
 
 
-def _rrf_scores(response: Response) -> Response:
-    return _rrf_scores_with_k(response)
-
-
 def _rrf_scores_with_k(response: Response, k: int = 60) -> Response:
     """Adjust scores in a response using RRF (Reciprocal Rank Fusion).
 
@@ -77,7 +73,7 @@ def _borda_counts(response: Response, n: int) -> Response:
     return Response(results=results, total_hits=response.total_hits)
 
 
-def _apply_score_transformation(
+def _transform_scores(
     sparse_response: Response, dense_response: Response, rank_fusion: RankFusion, size: int
 ) -> tuple[Response, Response]:
     score_transformation_method = rank_fusion.score_transformation_method
@@ -124,7 +120,7 @@ def _append_results(original_response: Response, alternative_response: Response,
     return Response(results=results, total_hits=total_hits)
 
 
-def _merge_responses_by_score(
+def _combine_responses(
     sparse_response: Response, dense_response: Response, combination_method: CombinationMethod, size: int
 ) -> Response:
     """Merge two responses by score.
@@ -179,7 +175,7 @@ def fuse(
     if rank_fusion.combination_method == "append":
         return _append_results(sparse_response, dense_response, size)
 
-    sparse_response, dense_response = _apply_score_transformation(sparse_response, dense_response, rank_fusion, size)
+    sparse_response, dense_response = _transform_scores(sparse_response, dense_response, rank_fusion, size)
 
     if rank_fusion.weighting_strategy:
         weighting_strategy = (
@@ -192,4 +188,4 @@ def fuse(
         for result in dense_response.results:
             result.score *= weighting_strategy.apply("dense", query)
 
-    return _merge_responses_by_score(sparse_response, dense_response, rank_fusion.combination_method, size)
+    return _combine_responses(sparse_response, dense_response, rank_fusion.combination_method, size)
