@@ -176,7 +176,6 @@ EXPERIMENTS = {
                 rank_fusion=RankFusion(
                     fuser="own",
                     score_transformation_method="min_max",
-                    weighting_strategy="fixed",
                 ),
             ),
             Variant(
@@ -187,7 +186,6 @@ EXPERIMENTS = {
                 rank_fusion=RankFusion(
                     fuser="own",
                     score_transformation_method="min_max",
-                    weighting_strategy="fixed",
                 ),
             ),
             Variant(
@@ -198,7 +196,6 @@ EXPERIMENTS = {
                 rank_fusion=RankFusion(
                     fuser="own",
                     score_transformation_method="min_max",
-                    weighting_strategy="fixed",
                 ),
             ),
             Variant(
@@ -209,7 +206,6 @@ EXPERIMENTS = {
                 rank_fusion=RankFusion(
                     fuser="own",
                     score_transformation_method="min_max",
-                    weighting_strategy="fixed",
                 ),
             ),
             Variant(
@@ -220,7 +216,6 @@ EXPERIMENTS = {
                 rank_fusion=RankFusion(
                     fuser="own",
                     score_transformation_method="min_max",
-                    weighting_strategy="fixed",
                 ),
             ),
             Variant(
@@ -231,7 +226,6 @@ EXPERIMENTS = {
                 rank_fusion=RankFusion(
                     fuser="own",
                     score_transformation_method="min_max",
-                    weighting_strategy="fixed",
                 ),
             ),
             Variant(
@@ -242,7 +236,6 @@ EXPERIMENTS = {
                 rank_fusion=RankFusion(
                     fuser="own",
                     score_transformation_method="min_max",
-                    weighting_strategy="fixed",
                 ),
             ),
             Variant(
@@ -253,7 +246,6 @@ EXPERIMENTS = {
                 rank_fusion=RankFusion(
                     fuser="own",
                     score_transformation_method="min_max",
-                    weighting_strategy="fixed",
                 ),
             ),
             Variant(
@@ -264,7 +256,6 @@ EXPERIMENTS = {
                 rank_fusion=RankFusion(
                     fuser="own",
                     score_transformation_method="min_max",
-                    weighting_strategy="fixed",
                 ),
             ),
             Variant(
@@ -275,7 +266,6 @@ EXPERIMENTS = {
                 rank_fusion=RankFusion(
                     fuser="own",
                     score_transformation_method="min_max",
-                    weighting_strategy="fixed",
                 ),
             ),
             Variant(
@@ -286,32 +276,6 @@ EXPERIMENTS = {
                 rank_fusion=RankFusion(
                     fuser="own",
                     score_transformation_method="min_max",
-                    weighting_strategy="fixed",
-                ),
-            ),
-        ],
-    ),
-    "weighting_strategy": ExperimentSetup(
-        task="retrieval",
-        variants=[
-            Variant(
-                name="FixedWeighting (0.5, 0.5)",
-                fields=ALL_FIELDS,
-                sparse_boost=0.5,
-                dense_boost=0.5,
-                rank_fusion=RankFusion(
-                    fuser="own",
-                    score_transformation_method="min_max",
-                    weighting_strategy="fixed",
-                ),
-            ),
-            Variant(
-                name="DynamicWeighting",
-                fields=ALL_FIELDS,
-                rank_fusion=RankFusion(
-                    fuser="own",
-                    score_transformation_method="min_max",
-                    weighting_strategy="dynamic",
                 ),
             ),
         ],

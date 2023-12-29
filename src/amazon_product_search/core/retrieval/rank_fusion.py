@@ -4,7 +4,7 @@ from typing import Any, Callable, Literal
 
 from amazon_product_search.core.es.response import Response, Result
 from amazon_product_search.core.retrieval.score_normalizer import min_max_scale
-from amazon_product_search.core.retrieval.weighting_strategy import DynamicWeighting, FixedWeighting
+from amazon_product_search.core.retrieval.weighting_strategy import FixedWeighting
 
 _ScoreTransformationMethod = Literal["min_max", "rrf", "borda"]
 
@@ -20,7 +20,7 @@ class RankFusion:
     combination_method: CombinationMethod = "sum"
     # When `combination_method != "append"`, the following options are available.
     score_transformation_method: ScoreTransformationMethod = "min_max"
-    weighting_strategy: Literal["fixed", "dynamic"] = "fixed"
+    weighting_strategy: Literal["fixed"] = "fixed"
     ranking_constant: int = 60
 
 
@@ -178,11 +178,7 @@ def fuse(
     sparse_response, dense_response = _transform_scores(sparse_response, dense_response, rank_fusion, size)
 
     if rank_fusion.weighting_strategy:
-        weighting_strategy = (
-            FixedWeighting({"sparse": sparse_boost, "dense": dense_boost})
-            if rank_fusion.weighting_strategy == "fixed"
-            else DynamicWeighting()
-        )
+        weighting_strategy = FixedWeighting({"sparse": sparse_boost, "dense": dense_boost})
         for result in sparse_response.results:
             result.score *= weighting_strategy.apply("sparse", query)
         for result in dense_response.results:

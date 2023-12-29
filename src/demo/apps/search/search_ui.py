@@ -23,7 +23,6 @@ class FormInput:
     fuser: str
     combination_method: Literal["sum", "max", "append"]
     score_transformation_method: Literal["min_max", "rrf"] | None
-    weighting_strategy: str
     reranker_str: str | None
 
 
@@ -71,8 +70,6 @@ def draw_input_form(queries: list[str] | None = None) -> FormInput:
 
     score_transformation_method = st.selectbox("score_transformation_method:", ["min_max", "rrf", "borda"])
 
-    weighting_strategy = st.selectbox("weighting_strategy:", ["fixed", "dynamic"])
-
     reranker_str = st.selectbox("reranker:", ["NoOpReranker", "RandomReranker", "DotReranker"])
 
     return FormInput(
@@ -87,7 +84,6 @@ def draw_input_form(queries: list[str] | None = None) -> FormInput:
         fuser=fuser,
         combination_method=combination_method,
         score_transformation_method=score_transformation_method,
-        weighting_strategy=weighting_strategy,
         reranker_str=reranker_str,
     )
 

@@ -102,7 +102,6 @@ def main() -> None:
             fuser=form_input.fuser,
             combination_method=form_input.combination_method,
             score_transformation_method=form_input.score_transformation_method,
-            weighting_strategy=form_input.weighting_strategy,
         ),
     )
     reranker = from_string(form_input.reranker_str)
