@@ -50,7 +50,7 @@ def search(
     sparse_fields: list[str],
     query_type: str,
     is_synonym_expansion_enabled: bool,
-    size: int = 20,
+    size: int = 100,
 ) -> tuple[Response, Response]:
     normalized_query = normalize_query(query)
     sparse_query = get_query_builder(locale).build_sparse_search_query(
