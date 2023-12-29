@@ -3203,6 +3203,22 @@ files = [
 traitlets = "*"
 
 [[package]]
+name = "matplotlib-venn"
+version = "0.11.9"
+description = "Functions for plotting area-proportional two- and three-way Venn diagrams in matplotlib."
+category = "dev"
+optional = false
+python-versions = "*"
+files = [
+    {file = "matplotlib-venn-0.11.9.tar.gz", hash = "sha256:bbf12f2a066c7f8448793b35a307b192004ba4bd8bba133bce09165dbdc9528b"},
+]
+
+[package.dependencies]
+matplotlib = "*"
+numpy = "*"
+scipy = "*"
+
+[[package]]
 name = "mistune"
 version = "2.0.4"
 description = "A sane Markdown parser with useful plugins and renderers"
@@ -6769,4 +6785,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "3.10.12"
-content-hash = "19e1a060e33de2b07fa0e2d31950020ac3b05d9a3ad140cee6fb679eef5f32dc"
+content-hash = "8e4e03b3f3d8d8be5d8c8ff874e7ca93e40115c81f3ab562ea7398848a4d8f24"
