@@ -42,7 +42,7 @@ def _min_max_scores(response: Response) -> Response:
     return Response(results=results, total_hits=response.total_hits)
 
 
-def _rrf_scores_with_k(response: Response, k: int = 60) -> Response:
+def _rrf_scores(response: Response, k: int = 60) -> Response:
     """Adjust scores in a response using RRF (Reciprocal Rank Fusion).
 
     Args:
@@ -82,7 +82,7 @@ def _transform_scores(
 
     score_transformation_method_dict: dict[str | None, Callable[[Response], Response]] = {
         "min_max": _min_max_scores,
-        "rrf": partial(_rrf_scores_with_k, k=rank_fusion.ranking_constant),
+        "rrf": partial(_rrf_scores, k=rank_fusion.ranking_constant),
         "borda": partial(_borda_counts, n=size),
         None: lambda response: response,
     }

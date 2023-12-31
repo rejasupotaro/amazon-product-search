@@ -7,7 +7,7 @@ from amazon_product_search.core.retrieval.rank_fusion import (
     _borda_counts,
     _combine_responses,
     _min_max_scores,
-    _rrf_scores_with_k,
+    _rrf_scores,
 )
 
 
@@ -49,7 +49,7 @@ def test_min_max_scores(scores, expected_scores):
 def test_rrf_scores(scores, expected):
     results = [Result(product={"product_id": str(i)}, score=score) for i, score in enumerate(scores)]
     response = Response(results=results, total_hits=len(results))
-    response = _rrf_scores_with_k(response, k=0)
+    response = _rrf_scores(response, k=0)
     actual = [result.score for result in response.results]
     assert np.allclose(actual, expected, atol=1e-04)
 
