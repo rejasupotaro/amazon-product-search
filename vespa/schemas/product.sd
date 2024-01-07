@@ -100,18 +100,4 @@ schema product {
             semantic_score
         }
     }
-
-    rank-profile lexical_then_semantic inherits ranking_base {
-        first-phase {
-            expression: lexical_score
-        }
-        second-phase {
-            expression: semantic_score
-            rerank-count: 1000
-        }
-        summary-features {
-            lexical_score
-            semantic_score
-        }
-    }
 }
