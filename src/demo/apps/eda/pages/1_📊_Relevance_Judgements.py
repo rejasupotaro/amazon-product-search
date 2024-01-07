@@ -7,7 +7,7 @@ from demo.page_config import set_page_config
 from demo.utils import analyze_dataframe
 
 
-def main():
+def main() -> None:
     set_page_config()
     st.write("## Relevance Judgements")
 

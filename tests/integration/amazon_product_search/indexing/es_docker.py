@@ -9,7 +9,7 @@ from docker.models.containers import Container
 
 
 class EsDocker:
-    def __init__(self, container_id: str):
+    def __init__(self, container_id: str) -> None:
         docker_client = docker.from_env()
         try:
             container = docker_client.containers.get(container_id=container_id)
@@ -30,7 +30,7 @@ class EsDocker:
             )
         self.wait_for_init()
 
-    def wait_for_init(self):
+    def wait_for_init(self) -> None:
         status = ""
         waited, max_wait = 0, 30
         while waited <= max_wait:
@@ -50,12 +50,12 @@ class EsDocker:
         if status != "green":
             raise Exception("Failed to start Elasticsearch")
 
-    def stop(self):
+    def stop(self) -> None:
         self.container.stop()
         self.container.remove()
 
-    def __enter__(self):
+    def __enter__(self) -> "EsDocker":
         return self
 
-    def __exit__(self, *exc):
+    def __exit__(self, *exc) -> None:
         self.stop()

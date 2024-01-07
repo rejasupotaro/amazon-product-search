@@ -25,7 +25,7 @@ class ColBERTer(nn.Module):
         self.stopword_reducer = nn.Linear(self.compression_dim, 1, bias=True)
         nn.init.constant_(self.stopword_reducer.bias, 1)
 
-    def forward(self, query: dict[str, Tensor], doc: dict[str, Any]):
+    def forward(self, query: dict[str, Tensor], doc: dict[str, Any]) -> tuple[Tensor, Tensor, Tensor]:
         query_cls_vec, query_vecs, query_mask = self.encode_query(query)
         doc_cls_vec, doc_vecs, doc_mask, token_importance = self.encode_doc(doc)
 

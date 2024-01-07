@@ -118,7 +118,7 @@ def compute_cosine_similarity(query_vector: np.ndarray, product_vectors: np.ndar
     return numerator / denominator
 
 
-def compute_alteration_count(mixed_list: list[str | None]):
+def compute_alteration_count(mixed_list: list[str | None]) -> int:
     if not mixed_list:
         return 0
 

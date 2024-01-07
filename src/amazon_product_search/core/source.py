@@ -42,7 +42,7 @@ def load_merged(locale: Locale, nrows: int = -1, data_dir: str = DATA_DIR) -> pl
         return pl.read_parquet(filename)
 
 
-def merge_and_split(data_dir: str = DATA_DIR):
+def merge_and_split(data_dir: str = DATA_DIR) -> None:
     """Load raw dataset and split it by locale for convenience.
 
     Raw data files need to be downloaded in the appropriate location in advance.

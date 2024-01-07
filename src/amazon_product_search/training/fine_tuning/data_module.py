@@ -37,7 +37,7 @@ class ProductMLMDataModule(LightningDataModule):
         batch_size: int,
         num_sentences: Optional[int] = None,
         prepend_tag: bool = False,
-    ):
+    ) -> None:
         super().__init__()
         self.train_df = df[df["split"] == "train"]
         self.val_df = df[df["split"] == "test"]
