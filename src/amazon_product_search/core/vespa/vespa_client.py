@@ -1,7 +1,7 @@
 from typing import Any, Callable, Dict, Optional
 
 import amazon_product_search.core.vespa.service as vespa_service
-from amazon_product_search.core.es.response import Response, Result
+from amazon_product_search.core.retrieval.response import Response, Result
 from vespa.application import ApplicationPackage
 from vespa.io import VespaQueryResponse, VespaResponse
 
