@@ -26,6 +26,7 @@ services:
       - elasticsearch
 
   # https://docs.vespa.ai/en/operations-selfhosted/multinode-systems.html
+  # https://docs.vespa.ai/en/operations-selfhosted/files-processes-and-ports.html
   vespa-0:
     image: vespaengine/vespa:8.279.6
     container_name: amazon-product-search-vespa-0
