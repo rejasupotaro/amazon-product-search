@@ -1,4 +1,3 @@
-import json
 from textwrap import dedent
 
 from invoke import task
@@ -74,6 +73,5 @@ def search(c):
             "hits": 10,
         }
         res = client.search(query)
-        json_str = json.dumps(res.json, indent=4, ensure_ascii=False)
-        print(json_str)
+        print(res)
         print()
