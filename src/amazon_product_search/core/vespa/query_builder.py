@@ -3,6 +3,7 @@ from typing import Any, cast
 from amazon_product_search.core.cache import weak_lru_cache
 from amazon_product_search.core.nlp.tokenizers import Tokenizer, locale_to_tokenizer
 from amazon_product_search.core.retrieval.query_vector_cache import QueryVectorCache
+from amazon_product_search.core.nlp.normalizer import normalize_query
 from amazon_product_search.core.source import Locale
 from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 
@@ -30,6 +31,7 @@ class QueryBuilder:
     def build_query(
         self, query_str: str, rank_profile: str, size: int, is_semantic_search_enabled: bool
     ) -> dict[str, Any]:
+        query_str = normalize_query(query_str)
         tokens = cast(list, self.tokenizer.tokenize(query_str))
         query_str = " ".join(tokens)
 
@@ -65,5 +67,11 @@ class QueryBuilder:
             """
         return query
 
+    def build_lexical_search_query(self, query_str: str, size: int) -> dict[str, Any]:
+        return self.build_query(query_str, rank_profile="lexical", size=size, is_semantic_search_enabled=False)
+
+    def build_semantic_search_query(self, query_str: str, size: int) -> dict[str, Any]:
+        return self.build_query(query_str, rank_profile="semantic", size=size, is_semantic_search_enabled=True)
+
     def build_hybrid_search_query(self, query_str: str, size: int) -> dict[str, Any]:
-        return self.build_query(query_str, "hybrid", size, True)
+        return self.build_query(query_str, rank_profile="hybrid", size=size, is_semantic_search_enabled=True)
