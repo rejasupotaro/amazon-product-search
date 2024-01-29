@@ -6,7 +6,7 @@ from eland.ml.pytorch import PyTorchModel
 from eland.ml.pytorch.transformers import TransformerModel
 
 from amazon_product_search.constants import MODELS_DIR
-from amazon_product_search.core.es.response import Response, Result
+from amazon_product_search.core.retrieval.response import Response, Result
 from amazon_product_search.core.source import Locale
 from elasticsearch import Elasticsearch, helpers
 

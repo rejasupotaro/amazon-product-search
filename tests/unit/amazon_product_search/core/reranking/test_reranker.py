@@ -1,11 +1,11 @@
 import pytest
 
-from amazon_product_search.core.es.response import Result
 from amazon_product_search.core.reranking.reranker import (
     ColBERTReranker,
     DotReranker,
     NoOpReranker,
 )
+from amazon_product_search.core.retrieval.response import Result
 
 
 def test_no_op_reranker():

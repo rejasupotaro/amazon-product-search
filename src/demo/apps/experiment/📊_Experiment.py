@@ -11,7 +11,6 @@ import streamlit as st
 from amazon_product_search.constants import HF
 from amazon_product_search.core.es.es_client import EsClient
 from amazon_product_search.core.es.query_builder import QueryBuilder
-from amazon_product_search.core.es.response import Response
 from amazon_product_search.core.metrics import (
     compute_ndcg,
     compute_precision,
@@ -21,6 +20,7 @@ from amazon_product_search.core.metrics import (
 from amazon_product_search.core.parallel import limit_concurrency
 from amazon_product_search.core.reranking import reranker
 from amazon_product_search.core.retrieval.query_vector_cache import QueryVectorCache
+from amazon_product_search.core.retrieval.response import Response
 from amazon_product_search.core.retrieval.retriever import Retriever
 from amazon_product_search.core.source import Locale
 from demo import utils

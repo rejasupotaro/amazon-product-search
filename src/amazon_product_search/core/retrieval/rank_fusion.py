@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from functools import partial
 from typing import Any, Callable, Literal
 
-from amazon_product_search.core.es.response import Response, Result
+from amazon_product_search.core.retrieval.response import Response, Result
 from amazon_product_search.core.retrieval.score_normalizer import min_max_scale
 from amazon_product_search.core.retrieval.weighting_strategy import FixedWeighting
 
@@ -152,8 +152,8 @@ def _combine_responses(
         sparse_score, dense_score = sparse_results.get(product_id, 0), dense_results.get(product_id, 0)
         score = max(sparse_score, dense_score) if combination_method == "max" else sparse_score + dense_score
         explanation = {
-            "sparse_score": sparse_score,
-            "dense_score": dense_score,
+            "lexical_score": sparse_score,
+            "semantic_score": dense_score,
         }
         result = Result(product=id_to_product[product_id], score=score, explanation=explanation)
         results.append(result)

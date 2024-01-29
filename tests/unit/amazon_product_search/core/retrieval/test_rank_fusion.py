@@ -1,7 +1,6 @@
 import numpy as np
 import pytest
 
-from amazon_product_search.core.es.response import Response, Result
 from amazon_product_search.core.retrieval.rank_fusion import (
     _append_results,
     _borda_counts,
@@ -9,6 +8,7 @@ from amazon_product_search.core.retrieval.rank_fusion import (
     _min_max_scores,
     _rrf_scores,
 )
+from amazon_product_search.core.retrieval.response import Response, Result
 
 
 def _is_sorted(scores: list[float]) -> None:

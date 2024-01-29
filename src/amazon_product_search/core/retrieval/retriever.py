@@ -1,8 +1,8 @@
 from amazon_product_search.core.es.es_client import EsClient
 from amazon_product_search.core.es.query_builder import QueryBuilder
-from amazon_product_search.core.es.response import Response
 from amazon_product_search.core.nlp.normalizer import normalize_query
 from amazon_product_search.core.retrieval.rank_fusion import RankFusion, fuse
+from amazon_product_search.core.retrieval.response import Response
 from amazon_product_search.core.source import Locale
 
 

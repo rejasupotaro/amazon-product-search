@@ -4,7 +4,6 @@ from amazon_product_search.constants import HF
 from amazon_product_search.core import source
 from amazon_product_search.core.es.es_client import EsClient
 from amazon_product_search.core.es.query_builder import QueryBuilder
-from amazon_product_search.core.es.response import Response
 from amazon_product_search.core.metrics import (
     compute_iou,
     compute_ndcg,
@@ -12,6 +11,7 @@ from amazon_product_search.core.metrics import (
     compute_recall,
 )
 from amazon_product_search.core.nlp.normalizer import normalize_query
+from amazon_product_search.core.retrieval.response import Response
 from amazon_product_search.core.source import Locale
 from demo.apps.search.search_ui import draw_products
 from demo.page_config import set_page_config

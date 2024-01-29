@@ -1,5 +1,5 @@
 from amazon_product_search.core.es.es_client import EsClient
-from amazon_product_search.core.es.response import Response, Result
+from amazon_product_search.core.retrieval.response import Response, Result
 
 
 def test_generate_actions():

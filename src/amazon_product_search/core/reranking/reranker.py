@@ -7,9 +7,9 @@ from transformers import AutoModel, AutoTokenizer
 from transformers.modeling_outputs import BaseModelOutput
 
 from amazon_product_search.constants import HF
-from amazon_product_search.core.es.response import Result
 from amazon_product_search.core.modules.colbert import ColBERTWrapper
 from amazon_product_search.core.modules.splade import Splade
+from amazon_product_search.core.retrieval.response import Result
 
 
 class Reranker(Protocol):
