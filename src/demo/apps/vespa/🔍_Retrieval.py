@@ -9,8 +9,8 @@ from amazon_product_search.constants import HF
 from amazon_product_search.core import source
 from amazon_product_search.core.retrieval.response import Response
 from amazon_product_search.core.source import Locale
+from amazon_product_search.core.vespa.query_builder import QueryBuilder
 from amazon_product_search.core.vespa.vespa_client import VespaClient
-from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 from demo.apps.es.search_ui import (
     draw_products,
 )
@@ -20,12 +20,12 @@ client = VespaClient()
 
 
 @st.cache_resource
-def get_encoder(locale: Locale) -> SBERTEncoder:
+def get_query_builder(locale: Locale) -> QueryBuilder:
     hf_model_name = {
         "us": HF.EN_MULTIQA,
         "jp": HF.JP_SLUKE_MEAN,
     }[locale]
-    return SBERTEncoder(hf_model_name)
+    return QueryBuilder(locale=locale, hf_model_name=hf_model_name)
 
 
 @st.cache_data
@@ -78,8 +78,6 @@ def main() -> None:
         query_to_label = load_dataset(locale)
         queries = query_to_label.keys()
 
-    encoder = get_encoder(locale)
-
     st.write("#### Input")
     with st.form("input"):
         query_str = st.selectbox("Query:", queries) if queries else st.text_input("Query:")
@@ -90,38 +88,7 @@ def main() -> None:
         if not st.form_submit_button("Search"):
             return
 
-    query = {
-        "query": query_str,
-        "input.query(alpha)": 0.5,
-        "ranking.profile": rank_profile,
-        "hits": size,
-    }
-    if is_semantic_search_enabled:
-        query[
-            "yql"
-        ] = """
-        select
-            *
-        from
-            product
-        where
-            userQuery()
-            or ({targetHits:100, approximate:true}nearestNeighbor(product_vector, query_vector))
-        """
-        query_vector = encoder.encode(query_str)
-        query_vector = [float(v) for v in query_vector]
-        query["input.query(query_vector)"] = query_vector
-    else:
-        query[
-            "yql"
-        ] = """
-        select
-            *
-        from
-            product
-        where
-            userQuery()
-        """
+    query = get_query_builder(locale).build_query(query_str, rank_profile, size, is_semantic_search_enabled)
 
     _query = deepcopy(query)
     if "input.query(query_vector)" in _query:

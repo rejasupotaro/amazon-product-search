@@ -1,0 +1,56 @@
+from typing import Any, cast
+
+from amazon_product_search.core.nlp.tokenizers import Tokenizer, locale_to_tokenizer
+from amazon_product_search.core.source import Locale
+from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
+
+
+class QueryBuilder:
+    def __init__(self, locale: Locale, hf_model_name: str) -> None:
+        self.tokenizer: Tokenizer = locale_to_tokenizer(locale)
+        self.encoder = SBERTEncoder(hf_model_name)
+
+    def encode(self, query_str: str) -> list[float]:
+        query_vector = self.encoder.encode(query_str)
+        return [float(v) for v in query_vector]
+
+    def build_query(
+        self, query_str: str, rank_profile: str, size: int, is_semantic_search_enabled: bool
+    ) -> dict[str, Any]:
+        tokens = cast(list, self.tokenizer.tokenize(query_str))
+        query_str = " ".join(tokens)
+
+        query = {
+            "query": query_str,
+            "input.query(alpha)": 0.5,
+            "ranking.profile": rank_profile,
+            "hits": size,
+        }
+        if is_semantic_search_enabled:
+            query[
+                "yql"
+            ] = """
+            select
+                *
+            from
+                product
+            where
+                userQuery()
+                or ({targetHits:100, approximate:true}nearestNeighbor(product_vector, query_vector))
+            """
+            query["input.query(query_vector)"] = self.encode(query_str)
+        else:
+            query[
+                "yql"
+            ] = """
+            select
+                *
+            from
+                product
+            where
+                userQuery()
+            """
+        return query
+
+    def build_hybrid_search_query(self, query_str: str, size: int) -> dict[str, Any]:
+        return self.build_query(query_str, "hybrid", size, True)
