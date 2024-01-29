@@ -58,7 +58,7 @@ The command below launches the [Streamlit](https://streamlit.io/) demo app.
 # Launch Elasticsearch beforehand
 $ docker compose --profile elasticsearch up
 
-$ poetry run inv demo.search
+$ poetry run inv demo.es
 ```
 
 ![](https://user-images.githubusercontent.com/883148/203654537-8b495c9c-f8af-4c3f-90f9-60edacf647b9.png)

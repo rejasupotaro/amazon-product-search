@@ -15,7 +15,7 @@ from amazon_product_search.core.reranking.reranker import from_string
 from amazon_product_search.core.retrieval.rank_fusion import RankFusion
 from amazon_product_search.core.retrieval.retriever import Retriever
 from amazon_product_search.core.source import Locale
-from demo.apps.search.search_ui import (
+from demo.apps.es.search_ui import (
     draw_input_form,
     draw_products,
     draw_response_stats,

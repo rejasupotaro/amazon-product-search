@@ -13,7 +13,7 @@ from amazon_product_search.core.metrics import (
 from amazon_product_search.core.nlp.normalizer import normalize_query
 from amazon_product_search.core.retrieval.response import Response
 from amazon_product_search.core.source import Locale
-from demo.apps.search.search_ui import draw_products
+from demo.apps.es.search_ui import draw_products
 from demo.page_config import set_page_config
 
 es_client = EsClient()

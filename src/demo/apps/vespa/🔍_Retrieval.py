@@ -11,7 +11,7 @@ from amazon_product_search.core.retrieval.response import Response
 from amazon_product_search.core.source import Locale
 from amazon_product_search.core.vespa.vespa_client import VespaClient
 from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
-from demo.apps.search.search_ui import (
+from demo.apps.es.search_ui import (
     draw_products,
 )
 from demo.page_config import set_page_config

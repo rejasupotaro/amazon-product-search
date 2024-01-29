@@ -12,8 +12,8 @@ def features(c):
 
 
 @task
-def search(c):
-    c.run("poetry run streamlit run src/demo/apps/search/🔍_Retrieval.py")
+def es(c):
+    c.run("poetry run streamlit run src/demo/apps/es/🔍_Retrieval.py")
 
 
 @task
