@@ -1,18 +1,31 @@
 from typing import Any, cast
 
+from amazon_product_search.core.cache import weak_lru_cache
 from amazon_product_search.core.nlp.tokenizers import Tokenizer, locale_to_tokenizer
+from amazon_product_search.core.retrieval.query_vector_cache import QueryVectorCache
 from amazon_product_search.core.source import Locale
 from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 
 
 class QueryBuilder:
-    def __init__(self, locale: Locale, hf_model_name: str) -> None:
+    def __init__(
+        self,
+        locale: Locale,
+        hf_model_name: str,
+        vector_cache: QueryVectorCache | None = None,
+    ) -> None:
         self.tokenizer: Tokenizer = locale_to_tokenizer(locale)
         self.encoder = SBERTEncoder(hf_model_name)
+        if vector_cache is None:
+            vector_cache = QueryVectorCache()
+        self.vector_cache = vector_cache
 
+    @weak_lru_cache(maxsize=128)
     def encode(self, query_str: str) -> list[float]:
-        query_vector = self.encoder.encode(query_str)
-        return [float(v) for v in query_vector]
+        query_vector = self.vector_cache[query_str]
+        if query_vector is not None:
+            return query_vector
+        return [float(v) for v in list(self.encoder.encode(query_str))]
 
     def build_query(
         self, query_str: str, rank_profile: str, size: int, is_semantic_search_enabled: bool
