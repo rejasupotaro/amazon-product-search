@@ -71,16 +71,15 @@ schema product {
         function semantic_score() {
             expression: closeness(field, product_vector)
         }
-
-        summary-features {
-            lexical_score
-            semantic_score
-        }
     }
 
     rank-profile lexical inherits ranking_base {
         first-phase {
             expression: lexical_score
+        }
+
+        summary-features {
+            lexical_score
         }
     }
 
@@ -88,11 +87,20 @@ schema product {
         first-phase {
             expression: semantic_score
         }
+
+        summary-features {
+            semantic_score
+        }
     }
 
     rank-profile hybrid inherits ranking_base {
         global-phase {
             expression: query(alpha) * reciprocal_rank(lexical_score) + (1 - query(alpha)) * reciprocal_rank(semantic_score)
+        }
+
+        summary-features {
+            lexical_score
+            semantic_score
         }
     }
 }
