@@ -1,9 +1,9 @@
 from typing import Any, cast
 
 from amazon_product_search.core.cache import weak_lru_cache
+from amazon_product_search.core.nlp.normalizer import normalize_query
 from amazon_product_search.core.nlp.tokenizers import Tokenizer, locale_to_tokenizer
 from amazon_product_search.core.retrieval.query_vector_cache import QueryVectorCache
-from amazon_product_search.core.nlp.normalizer import normalize_query
 from amazon_product_search.core.source import Locale
 from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 
