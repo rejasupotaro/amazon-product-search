@@ -12,10 +12,8 @@ from amazon_product_search.indexing.options import IndexerOptions
 
 
 def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
-    locale = options.locale
-    table_id = f"docs_{locale}"
     project_id = PROJECT_ID if PROJECT_ID else options.view_as(GoogleCloudOptions).project
-    table_spec = f"{project_id}:{DATASET_ID}.{table_id}"
+    table_spec = f"{project_id}:{DATASET_ID}.{options.table_id}"
 
     pipeline = beam.Pipeline(options=options)
     products = pipeline | "Read table" >> beam.io.ReadFromBigQuery(table=table_spec)

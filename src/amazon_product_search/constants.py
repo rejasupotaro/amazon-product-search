@@ -26,14 +26,14 @@ class HF:
     EN_ELECTRA = "cross-encoder/ms-marco-electra-base"
     EN_MSMARCO = "cross-encoder/ms-marco-MiniLM-L-12-v2"
     EN_ROBERTA = "sentence-transformers/msmarco-roberta-base-v3"
-    EN_MULTIQA = "sentence-transformers/multi-qa-mpnet-base-dot-v1"
-    EN_ALL_MINI = "sentence-transformers/all-MiniLM-L6-v2"
-    EN_FINE_TUNED_ALL_MINI = f"{MODELS_DIR}/all-MiniLM-L6-v2"
+    EN_MULTIQA = "sentence-transformers/multi-qa-mpnet-base-dot-v1"  # 768D
+    EN_ALL_MINI = "sentence-transformers/all-MiniLM-L6-v2"  # 384D
+    EN_FINE_TUNED_ALL_MINI = f"{MODELS_DIR}/all-MiniLM-L6-v2"  # 384D
 
     # For Japanese
-    JP_BERT = "cl-tohoku/bert-base-japanese-v2"
-    JP_SBERT_MEAN = "sonoisa/sentence-bert-base-ja-mean-tokens-v2"
-    JP_SLUKE_MEAN = "sonoisa/sentence-luke-japanese-base-lite"
+    JP_BERT = "cl-tohoku/bert-base-japanese-v2"  # 768D
+    JP_SBERT_MEAN = "sonoisa/sentence-bert-base-ja-mean-tokens-v2"  # 768D
+    JP_SLUKE_MEAN = "sonoisa/sentence-luke-japanese-base-lite"  # 768D
     JP_DISTILBERT = "line-corporation/line-distilbert-base-japanese"
     JP_DEBERTA = "ku-nlp/deberta-v2-base-japanese"
     JP_FINE_TUNED_SBERT = f"{MODELS_DIR}/jp_fine_tuned_sbert"

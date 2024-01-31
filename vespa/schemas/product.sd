@@ -26,7 +26,7 @@ schema product {
         field product_locale type string {
             indexing: attribute | index | summary
         }
-        field product_vector type tensor<float>(x[768]) {
+        field product_vector type tensor<float>(x[384]) {
             indexing: attribute | index
             attribute {
                 distance-metric: angular
@@ -61,7 +61,7 @@ schema product {
 
     rank-profile ranking_base {
         inputs {
-            query(query_vector) tensor<float>(x[768])
+            query(query_vector) tensor<float>(x[384])
         }
 
         function lexical_score() {

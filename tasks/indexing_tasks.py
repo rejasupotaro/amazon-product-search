@@ -172,6 +172,7 @@ def feed(
     dest_host="",
     nrows=None,
     runner="DirectRunner",
+    table_id="",
 ):
     """A task to run feeding pipeline.
 
@@ -186,7 +187,18 @@ def feed(
       --locale=us \
       --dest=es \
       --dest-host=http://localhost:9200 \
-      --index-name=products_us
+      --index-name=products_us \
+      --table-id=docs_all_minilm_v6_v2_us
+    ```
+
+    ```
+    # BigQuery => Vespa
+    poetry run inv indexing.feed \
+      --locale=us \
+      --dest=vespa \
+      --dest-host=http://localhost:8080 \
+      --index-name=products_us \
+      --table-id=docs_all_minilm_v6_v2_us
     ```
     """
     command = [
@@ -196,6 +208,7 @@ def feed(
         f"--dest={dest}",
         f"--dest_host={dest_host}",
         f"--index_name={index_name}",
+        f"--table_id={table_id}",
     ]
 
     if runner == "DirectRunner":
