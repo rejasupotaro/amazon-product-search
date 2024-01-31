@@ -66,9 +66,8 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
         "jp": (HF.JP_SLUKE_MEAN, "mean"),
     }[locale]
 
-    table_id = f"queries_{locale}"
     project_id = PROJECT_ID if PROJECT_ID else options.view_as(GoogleCloudOptions).project
-    table_spec = f"{project_id}:{DATASET_ID}.{table_id}"
+    table_spec = f"{project_id}:{DATASET_ID}.{options.table_id}"
 
     pipeline = beam.Pipeline(options=options)
     queries = (

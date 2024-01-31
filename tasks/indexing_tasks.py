@@ -98,8 +98,8 @@ def transform(
     extract_keywords=False,
     encode_text=False,
     nrows=None,
-    runner="DirectRunner",
     table_id="",
+    runner="DirectRunner",
 ):
     """A task to run doc transformation pipeline.
 
@@ -171,8 +171,8 @@ def feed(
     dest="stdout",
     dest_host="",
     nrows=None,
-    runner="DirectRunner",
     table_id="",
+    runner="DirectRunner",
 ):
     """A task to run feeding pipeline.
 
@@ -244,8 +244,8 @@ def encode(
     index_name="",
     locale="jp",
     dest="stdout",
-    dest_host="",
     nrows=None,
+    table_id="",
     runner="DirectRunner",
 ):
     """A task to run query encoding pipeline.
@@ -255,9 +255,8 @@ def encode(
     poetry run inv indexing.encode \
       --locale=us \
       --dest=bq \
-      --dest-host=http://localhost:9200 \
-      --index-name=products_us \
-      --nrows=10
+      --nrows=10 \
+      --table-id=queries_all_minilm_v6_v2_us
     ```
     """
     command = [
@@ -265,8 +264,7 @@ def encode(
         f"--runner={runner}",
         f"--locale={locale}",
         f"--dest={dest}",
-        f"--dest_host={dest_host}",
-        f"--index_name={index_name}",
+        f"--table_id={table_id}",
     ]
 
     if runner == "DirectRunner":
