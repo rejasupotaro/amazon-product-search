@@ -102,7 +102,7 @@ def main() -> None:
 
     header = f"{response.total_hits} products found"
     st.write(header)
-    draw_products(response.results, {})
+    draw_products(response.results, label_dict)
 
 
 if __name__ == "__main__":
