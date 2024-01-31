@@ -30,7 +30,7 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
         "product_description",
     ]
     hf_model_name, pooling_mode = {
-        "us": (HF.EN_MULTIQA, "cls"),
+        "us": (HF.EN_ALL_MINI, "mean"),
         "jp": (HF.JP_SLUKE_MEAN, "mean"),
     }[locale]
 

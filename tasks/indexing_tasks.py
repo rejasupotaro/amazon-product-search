@@ -197,7 +197,7 @@ def feed(
       --locale=us \
       --dest=vespa \
       --dest-host=http://localhost:8080 \
-      --index-name=products_us \
+      --index-name=product \
       --table-id=docs_all_minilm_v6_v2_us
     ```
     """
