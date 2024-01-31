@@ -55,13 +55,9 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
         "product_description",
     ]
     hf_model_name, pooling_mode = {
-        "us": (HF.EN_MULTIQA, "cls"),
+        "us": (HF.EN_ALL_MINI, "mean"),
         "jp": (HF.JP_SLUKE_MEAN, "mean"),
     }[locale]
-
-    table_id = f"docs_{locale}"
-    project_id = PROJECT_ID if PROJECT_ID else options.view_as(GoogleCloudOptions).project
-    table_spec = f"{project_id}:{DATASET_ID}.{table_id}"
 
     pipeline = beam.Pipeline(options=options)
     products = (
@@ -120,6 +116,8 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
                 )
             )
         case "bq":
+            project_id = PROJECT_ID if PROJECT_ID else options.view_as(GoogleCloudOptions).project
+            table_spec = f"{project_id}:{DATASET_ID}.{options.table_id}"
             (
                 products
                 | WriteToBigQuery(

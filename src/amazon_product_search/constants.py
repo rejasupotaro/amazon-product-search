@@ -27,7 +27,7 @@ class HF:
     EN_MSMARCO = "cross-encoder/ms-marco-MiniLM-L-12-v2"
     EN_ROBERTA = "sentence-transformers/msmarco-roberta-base-v3"
     EN_MULTIQA = "sentence-transformers/multi-qa-mpnet-base-dot-v1"
-    EN_ALL_MINI = "sentence_transformers/all-MiniLM-L6-v2"
+    EN_ALL_MINI = "sentence-transformers/all-MiniLM-L6-v2"
     EN_FINE_TUNED_ALL_MINI = f"{MODELS_DIR}/all-MiniLM-L6-v2"
 
     # For Japanese

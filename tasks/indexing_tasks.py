@@ -89,7 +89,7 @@ def run(
 
 
 @task
-def tranform(
+def transform(
     c,
     index_name="",
     locale="jp",
@@ -99,6 +99,7 @@ def tranform(
     encode_text=False,
     nrows=None,
     runner="DirectRunner",
+    table_id="",
 ):
     """A task to run doc transformation pipeline.
 
@@ -110,7 +111,8 @@ def tranform(
       --locale=us \
       --encode-text \
       --nrows=10 \
-      --dest=bq
+      --dest=bq \
+      --table-id=docs_all_minilm_v6_v2_us
     ```
     """
     command = [
@@ -148,6 +150,11 @@ def tranform(
             f"--region={REGION}",
             f"--temp_location=gs://{PROJECT_NAME}/temp",
             f"--staging_location=gs://{PROJECT_NAME}/staging",
+        ]
+
+    if dest == "bq" and table_id:
+        command += [
+            f"--table_id={table_id}",
         ]
 
     if nrows:

@@ -15,3 +15,4 @@ class IndexerOptions(PipelineOptions):
         parser.add_argument("--dest", type=str, default="stdout")
         parser.add_argument("--dest_host", type=str)
         parser.add_argument("--index_name", type=str)
+        parser.add_argument("--table_id", type=str)
