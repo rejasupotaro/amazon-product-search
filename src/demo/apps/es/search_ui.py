@@ -152,7 +152,7 @@ def draw_response_stats(response: Response, query_vector: np.ndarray, label_dict
 def draw_products(results: list[Result], label_dict: dict[str, tuple[str, str]]) -> None:
     for result in results:
         product = result.product
-        header = f"{result.product['product_title']} ({result.score})"
+        header = f"{result.product['product_title']} ({round(result.score, 4)})"
         if label_dict:
             label = {
                 "E": "[Exact] ",
