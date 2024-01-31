@@ -101,10 +101,7 @@ def generate(
         locale (Locale): The target locale.
         output_filename (str): The output filename.
     """
-    hf_model_name = {
-        "us": HF.EN_MULTIQA,
-        "jp": HF.JP_SLUKE_MEAN,
-    }[locale]
+    hf_model_name = HF.LOCALE_TO_MODEL_NAME[locale]
 
     print("Load query-title pairs")
     pairs_df = load_query_title_pairs(locale=locale)

@@ -21,10 +21,7 @@ client = VespaClient()
 
 @st.cache_resource
 def get_query_builder(locale: Locale) -> QueryBuilder:
-    hf_model_name = {
-        "us": HF.EN_MULTIQA,
-        "jp": HF.JP_SLUKE_MEAN,
-    }[locale]
+    hf_model_name = HF.LOCALE_TO_MODEL_NAME[locale]
     return QueryBuilder(locale=locale, hf_model_name=hf_model_name)
 
 

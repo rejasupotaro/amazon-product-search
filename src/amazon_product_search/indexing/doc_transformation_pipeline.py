@@ -54,10 +54,7 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
         "product_bullet_point",
         "product_description",
     ]
-    hf_model_name, pooling_mode = {
-        "us": (HF.EN_ALL_MINI, "mean"),
-        "jp": (HF.JP_SLUKE_MEAN, "mean"),
-    }[locale]
+    hf_model_name = HF.LOCALE_TO_MODEL_NAME[locale]
 
     pipeline = beam.Pipeline(options=options)
     products = (
@@ -78,7 +75,6 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
                 EncodeInBatchFn(
                     shared_handle=Shared(),
                     hf_model_name=hf_model_name,
-                    pooling_mode=pooling_mode,
                 )
             )
         )

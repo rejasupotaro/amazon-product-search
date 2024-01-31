@@ -36,7 +36,7 @@ class NormalizeQueryFn(beam.DoFn):
 
 
 class EncodeQueriesInBatchFn(beam.DoFn):
-    def __init__(self, shared_handle: Shared, hf_model_name: str, pooling_mode: PoolingMode) -> None:
+    def __init__(self, shared_handle: Shared, hf_model_name: str, pooling_mode: PoolingMode = "mean") -> None:
         self._shared_handle = shared_handle
         self._hf_model_name = hf_model_name
         self._pooling_mode = pooling_mode
@@ -61,10 +61,7 @@ class EncodeQueriesInBatchFn(beam.DoFn):
 
 def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
     locale = options.locale
-    hf_model_name, pooling_mode = {
-        "us": (HF.EN_ALL_MINI, "mean"),
-        "jp": (HF.JP_SLUKE_MEAN, "mean"),
-    }[locale]
+    hf_model_name = HF.LOCALE_TO_MODEL_NAME[locale]
 
     project_id = PROJECT_ID if PROJECT_ID else options.view_as(GoogleCloudOptions).project
     table_spec = f"{project_id}:{DATASET_ID}.{options.table_id}"
@@ -81,7 +78,6 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
             EncodeQueriesInBatchFn(
                 shared_handle=Shared(),
                 hf_model_name=hf_model_name,
-                pooling_mode=pooling_mode,
             )
         )
     )

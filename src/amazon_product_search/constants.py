@@ -43,3 +43,8 @@ class HF:
     # Multi-lingual
     ML_MPNET = "paraphrase-multilingual-mpnet-base-v2"
     ML_XLM = "stsb-xlm-r-multilingual"
+
+    LOCALE_TO_MODEL_NAME = {
+        "us": EN_ALL_MINI,
+        "jp": JP_SLUKE_MEAN,
+    }

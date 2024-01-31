@@ -11,7 +11,7 @@ from amazon_product_search_dense_retrieval.encoders.modules.pooler import Poolin
 
 
 class EncodeInBatchFn(beam.DoFn):
-    def __init__(self, shared_handle: Shared, hf_model_name: str, pooling_mode: PoolingMode) -> None:
+    def __init__(self, shared_handle: Shared, hf_model_name: str, pooling_mode: PoolingMode = "mean") -> None:
         self._shared_handle = shared_handle
         self._hf_model_name = hf_model_name
         self._pooling_mode = pooling_mode

@@ -32,10 +32,7 @@ es_client = EsClient()
 
 @st.cache_resource
 def get_retriever(locale: Locale) -> Retriever:
-    hf_model_name = {
-        "us": HF.EN_MULTIQA,
-        "jp": HF.JP_SLUKE_MEAN,
-    }[locale]
+    hf_model_name = HF.LOCALE_TO_MODEL_NAME[locale]
     vector_cache = QueryVectorCache()
     vector_cache.load(locale)
     query_builder = QueryBuilder(locale=locale, hf_model_name=hf_model_name, vector_cache=vector_cache)
