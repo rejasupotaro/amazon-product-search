@@ -80,11 +80,11 @@ def main() -> None:
         query_str = st.selectbox("Query:", queries) if queries else st.text_input("Query:")
         rank_profile = st.selectbox("Rank profile", ["hybrid", "lexical", "semantic"])
         size = st.number_input("size", value=100)
-        is_semantic_search_enabled = st.checkbox("Semantic Search Enabled:", value=True)
 
         if not st.form_submit_button("Search"):
             return
 
+    is_semantic_search_enabled = rank_profile != "lexical"
     query = get_query_builder(locale).build_query(query_str, rank_profile, size, is_semantic_search_enabled)
 
     _query = deepcopy(query)
