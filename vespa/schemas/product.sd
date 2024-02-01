@@ -65,7 +65,7 @@ schema product {
         }
 
         function lexical_score() {
-            expression: bm25(product_title) + bm25(product_description)
+            expression: bm25(product_title) + bm25(product_bullet_point) + bm25(product_brand) + bm25(product_color) + bm25(product_bullet_point)
         }
 
         function semantic_score() {
