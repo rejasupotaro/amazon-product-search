@@ -62,10 +62,21 @@ schema product {
     rank-profile ranking_base {
         inputs {
             query(query_vector) tensor<float>(x[384])
+            query(title_weight) double: 1.0
+            query(bullet_point_weight) double: 1.0
+            query(brand_weight) double: 1.0
+            query(color_weight) double: 1.0
+            query(description_weight) double: 1.0
         }
 
         function lexical_score() {
-            expression: bm25(product_title) + bm25(product_bullet_point) + bm25(product_brand) + bm25(product_color) + bm25(product_bullet_point)
+            expression {
+                bm25(product_title) * query(title_weight)
+                + bm25(product_bullet_point) * query(bullet_point_weight)
+                + bm25(product_brand) * query(brand_weight)
+                + bm25(product_color) * query(color_weight)
+                + bm25(product_description) * query(description_weight)
+            }
         }
 
         function semantic_score() {
