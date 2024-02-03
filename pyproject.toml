@@ -46,7 +46,7 @@ jupyterlab = "3.5.0"
 seaborn = "^0.12.1"
 ruff = "^0.0.265"
 black = "^23.3.0"
-matplotlib-venn = "^0.11.9"
+matplotlib-venn = "^0.11.10"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
