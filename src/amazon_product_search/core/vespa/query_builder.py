@@ -5,6 +5,7 @@ from amazon_product_search.core.nlp.normalizer import normalize_query
 from amazon_product_search.core.nlp.tokenizers import Tokenizer, locale_to_tokenizer
 from amazon_product_search.core.retrieval.query_vector_cache import QueryVectorCache
 from amazon_product_search.core.source import Locale
+from amazon_product_search.core.synonyms.synonym_dict import SynonymDict
 from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 
 
@@ -13,10 +14,14 @@ class QueryBuilder:
         self,
         locale: Locale,
         hf_model_name: str,
+        synonym_dict: SynonymDict | None = None,
         vector_cache: QueryVectorCache | None = None,
     ) -> None:
         self.tokenizer: Tokenizer = locale_to_tokenizer(locale)
         self.encoder = SBERTEncoder(hf_model_name)
+        if synonym_dict is None:
+            synonym_dict = SynonymDict(locale)
+        self.synonym_dict = synonym_dict
         if vector_cache is None:
             vector_cache = QueryVectorCache()
         self.vector_cache = vector_cache
@@ -28,13 +33,17 @@ class QueryBuilder:
             return query_vector
         return [float(v) for v in list(self.encoder.encode(query_str))]
 
-    @staticmethod
-    def _build_text_matching_query(tokens: list[str], fields: list[str]) -> str:
+    def _build_text_matching_query(self, tokens: list[str], fields: list[str]) -> str:
         and_conditions = []
         for token in tokens:
+            synonyms = self.synonym_dict.find_synonyms(token)
             or_conditions = []
             for field in fields:
-                or_conditions.append(f"{field} contains '{token}'")
+                if synonyms:
+                    equiv_query = ", ".join([f"'{token}'" for token in [token, *synonyms]])
+                    or_conditions.append(f"{field} contains equiv({equiv_query})")
+                else:
+                    or_conditions.append(f"{field} contains '{token}'")
             and_conditions.append(f"({' OR '.join(or_conditions)})")
         return " AND ".join(and_conditions)
 
@@ -53,7 +62,7 @@ class QueryBuilder:
 
         if not fields:
             fields = ["default"]
-        text_matching_query = QueryBuilder._build_text_matching_query(tokens, fields)
+        text_matching_query = self._build_text_matching_query(tokens, fields)
 
         query = {
             "query": query_str,

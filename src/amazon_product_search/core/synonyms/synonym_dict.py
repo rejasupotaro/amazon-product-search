@@ -9,9 +9,12 @@ from amazon_product_search.core.source import Locale
 
 
 class SynonymDict:
-    def __init__(self, locale: Locale, synonym_filename: str, data_dir: str = DATA_DIR) -> None:
+    def __init__(self, locale: Locale, synonym_filename: str | None = None, data_dir: str = DATA_DIR) -> None:
         self.tokenizer = locale_to_tokenizer(locale)
-        self._entry_dict: dict[str, list[tuple[str, float]]] = self.load_synonym_dict(data_dir, synonym_filename)
+        if synonym_filename:
+            self._entry_dict: dict[str, list[tuple[str, float]]] = self.load_synonym_dict(data_dir, synonym_filename)
+        else:
+            self._entry_dict = defaultdict(list)
 
     @staticmethod
     def load_synonym_dict(data_dir: str, synonym_filename: str) -> dict[str, list[tuple[str, float]]]:
