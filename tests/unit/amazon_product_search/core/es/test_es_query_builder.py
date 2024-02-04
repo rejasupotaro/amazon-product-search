@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 from amazon_product_search.core.es.query_builder import QueryBuilder
 from amazon_product_search.core.synonyms.synonym_dict import SynonymDict
 
@@ -31,11 +29,9 @@ def test_build_search_query():
     }
 
 
-@patch("amazon_product_search.core.synonyms.synonym_dict.SynonymDict.load_synonym_dict")
-def test_build_search_query_with_synonym_expansion_enabled(mock_method):
-    mock_method.return_value = {"query": [("synonym", 1.0), ("antonym", 0.1)]}
-
-    synonym_dict = SynonymDict(locale="us", synonym_filename="synonyms_us_mpnet.csv")
+def test_build_search_query_with_synonym_expansion_enabled():
+    synonym_dict = SynonymDict(locale="us")
+    synonym_dict._entry_dict = {"query": [("synonym", 1.0)]}
     query_builder = QueryBuilder(locale="us", synonym_dict=synonym_dict)
     es_query = query_builder.build_sparse_search_query(
         query="query",
@@ -106,13 +102,9 @@ def test_build_search_query_with_product_ids():
     }
 
 
-@patch("amazon_product_search.core.synonyms.synonym_dict.SynonymDict.load_synonym_dict")
-def test_build_search_query_with_synonym_expansion_enabled_with_product_ids(
-    mock_method,
-):
-    mock_method.return_value = {"query": [("synonym", 1.0), ("antonym", 0.1)]}
-
-    synonym_dict = SynonymDict(locale="us", synonym_filename="synonyms_us_mpnet.csv")
+def test_build_search_query_with_synonym_expansion_enabled_with_product_ids():
+    synonym_dict = SynonymDict(locale="us")
+    synonym_dict._entry_dict = {"query": [("synonym", 1.0)]}
     query_builder = QueryBuilder(locale="us", synonym_dict=synonym_dict)
     es_query = query_builder.build_sparse_search_query(
         query="query",

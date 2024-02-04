@@ -60,10 +60,7 @@ class QueryBuilder:
 
         synonyms = []
         if is_synonym_expansion_enabled and self.synonym_dict:
-            if isinstance(is_synonym_expansion_enabled, float):
-                synonyms = self.synonym_dict.find_synonyms(query, threshold=is_synonym_expansion_enabled)
-            else:
-                synonyms = self.synonym_dict.find_synonyms(query)
+            synonyms = self.synonym_dict.find_synonyms(query)
 
         query_match = json.loads(
             self.template_loader.load("query_match.j2").render(
