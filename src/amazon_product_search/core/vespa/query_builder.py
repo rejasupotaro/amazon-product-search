@@ -1,4 +1,4 @@
-from typing import Any, cast
+from typing import Any, Literal, cast
 
 from amazon_product_search.core.cache import weak_lru_cache
 from amazon_product_search.core.nlp.normalizer import normalize_query
@@ -7,6 +7,8 @@ from amazon_product_search.core.retrieval.query_vector_cache import QueryVectorC
 from amazon_product_search.core.source import Locale
 from amazon_product_search.core.synonyms.synonym_dict import SynonymDict
 from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
+
+Operator = Literal["and", "weakAnd"]
 
 
 class QueryBuilder:
@@ -33,7 +35,10 @@ class QueryBuilder:
             return query_vector
         return [float(v) for v in list(self.encoder.encode(query_str))]
 
-    def _build_text_matching_query(self, tokens: list[str], fields: list[str]) -> str:
+    def _build_text_matching_query(self, tokens: list[str], fields: list[str], operator: Operator) -> str:
+        if operator == "weakAnd":
+            return "userQuery()"
+
         and_conditions = []
         for token in tokens:
             synonyms = self.synonym_dict.find_synonyms(token)
@@ -54,6 +59,7 @@ class QueryBuilder:
         size: int,
         is_semantic_search_enabled: bool,
         fields: list[str] | None,
+        operator: Operator = "and",
         alpha: float = 0.5,
     ) -> dict[str, Any]:
         query_str = normalize_query(query_str)
@@ -62,7 +68,7 @@ class QueryBuilder:
 
         if not fields:
             fields = ["default"]
-        text_matching_query = self._build_text_matching_query(tokens, fields)
+        text_matching_query = self._build_text_matching_query(tokens, fields, operator)
 
         query = {
             "query": query_str,
@@ -96,18 +102,34 @@ class QueryBuilder:
             """
         return query
 
-    def build_lexical_search_query(self, query_str: str, size: int, fields: list[str] | None = None) -> dict[str, Any]:
+    def build_lexical_search_query(
+        self, query_str: str, size: int, fields: list[str] | None = None, operator: Operator = "and"
+    ) -> dict[str, Any]:
         return self.build_query(
-            query_str, rank_profile="lexical", size=size, is_semantic_search_enabled=False, fields=fields
+            query_str,
+            rank_profile="lexical",
+            size=size,
+            is_semantic_search_enabled=False,
+            fields=fields,
+            operator=operator,
         )
 
-    def build_semantic_search_query(self, query_str: str, size: int, fields: list[str] | None = None) -> dict[str, Any]:
+    def build_semantic_search_query(
+        self,
+        query_str: str,
+        size: int,
+        fields: list[str] | None = None,
+    ) -> dict[str, Any]:
         return self.build_query(
-            query_str, rank_profile="semantic", size=size, is_semantic_search_enabled=True, fields=fields
+            query_str,
+            rank_profile="semantic",
+            size=size,
+            is_semantic_search_enabled=True,
+            fields=fields,
         )
 
     def build_hybrid_search_query(
-        self, query_str: str, size: int, fields: list[str] | None = None, alpha: float = 0.5
+        self, query_str: str, size: int, fields: list[str] | None = None, operator: Operator = "and", alpha: float = 0.5
     ) -> dict[str, Any]:
         return self.build_query(
             query_str,
@@ -115,5 +137,6 @@ class QueryBuilder:
             size=size,
             is_semantic_search_enabled=True,
             fields=fields,
+            operator=operator,
             alpha=alpha,
         )
