@@ -4,8 +4,6 @@
 
 This repo showcases and compares various search algorithms and models using [Shopping Queries Dataset: A Large-Scale ESCI Benchmark for Improving Product Search](https://github.com/amazon-science/esci-data).
 
-The details and results of experiments can be found in this wiki: https://github.com/rejasupotaro/amazon-product-search/wiki
-
 ## Installation
 
 Copy `.envrc.example` and fill in the necessary environment variables. Afterwards, proceed with installing the dependencies.
@@ -36,7 +34,7 @@ $ poetry run inv data.merge-and-split
 
 ## Index Products
 
-This project involves indexing products into Elasticsearch. If you want to try it on your own machine, launch Elasticsearch locally and execute the document indexing pipeline against the created index.
+This project involves indexing products into search engines. If you'd like to test it on your own machine, you can start by launching Elasticsearch or Vespa locally. Then, execute the document indexing pipeline against the created index.
 
 ```shell
 $ docker compose --profile elasticsearch up
@@ -45,10 +43,9 @@ $ poetry run inv indexing.feed \
   --index-name=products_jp \
   --locale=jp \
   --dest=es \
-  --dest-host=http://localhost:9200
+  --dest-host=http://localhost:9200 \
+  --nrows=10
 ```
-
-See https://github.com/rejasupotaro/amazon-product-search/wiki/Indexing for more details.
 
 ## Demo
 
@@ -62,26 +59,6 @@ $ poetry run inv demo.es
 ```
 
 ![](https://user-images.githubusercontent.com/883148/203654537-8b495c9c-f8af-4c3f-90f9-60edacf647b9.png)
-
-## Experimentation
-
-The demo application allows for the execution of experiments with different experiment settings.
-
-```python
-# src/demo/experiment_setup.py
-"sparse_vs_dense": ExperimentSetup(
-    index_name="products_jp",
-    locale="jp",
-    num_queries=5000,
-    variants=[
-        Variant(name="sparse", fields=["product_title"]),
-        Variant(name="dense", fields=["product_vector"]),
-        Variant(name="hybrid", fields=["product_title", "product_vector"]),
-    ],
-),
-```
-
-![](https://user-images.githubusercontent.com/883148/199724869-f8c51c10-da16-42de-a2fe-bf112864c083.png)
 
 ## Development
 
