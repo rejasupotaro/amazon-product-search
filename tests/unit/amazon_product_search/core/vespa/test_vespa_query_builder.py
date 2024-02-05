@@ -22,7 +22,7 @@ from amazon_product_search.core.vespa.query_builder import QueryBuilder
         (
             "weakAnd",
             {"token1": [("synonym1", 1.0)]},
-            "userQuery()",
+            "weakAnd(field1 contains 'token1', field1 contains 'synonym1', field2 contains 'token1', field2 contains 'synonym1', field1 contains 'token2', field2 contains 'token2')",  # noqa: E501
         ),
     ],
 )

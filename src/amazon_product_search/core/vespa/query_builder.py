@@ -37,7 +37,14 @@ class QueryBuilder:
 
     def _build_text_matching_query(self, tokens: list[str], fields: list[str], operator: Operator) -> str:
         if operator == "weakAnd":
-            return "userQuery()"
+            conditions = []
+            for token in tokens:
+                synonyms = self.synonym_dict.find_synonyms(token)
+                for field in fields:
+                    conditions.append(f"{field} contains '{token}'")
+                    for synonym in synonyms:
+                        conditions.append(f"{field} contains '{synonym}'")
+            return f"weakAnd({', '.join(conditions)})"
 
         and_conditions = []
         for token in tokens:
