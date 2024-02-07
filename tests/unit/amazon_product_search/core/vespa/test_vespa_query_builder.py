@@ -33,7 +33,7 @@ def test_build_text_matching_query(operator, entry_dict, expected):
 
     query_builder = QueryBuilder(
         locale,
-        hf_model_name=HF.LOCALE_TO_MODEL_NAME[locale],
+        hf_model_name=HF.EN_ALL_MINILM,
         synonym_dict=synonym_dict,
         vector_cache=QueryVectorCache(),
     )

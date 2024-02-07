@@ -27,8 +27,8 @@ class HF:
     EN_MSMARCO = "cross-encoder/ms-marco-MiniLM-L-12-v2"
     EN_ROBERTA = "sentence-transformers/msmarco-roberta-base-v3"
     EN_MULTIQA = "sentence-transformers/multi-qa-mpnet-base-dot-v1"  # 768D
-    EN_ALL_MINI = "sentence-transformers/all-MiniLM-L6-v2"  # 384D
-    EN_FINE_TUNED_ALL_MINI = f"{MODELS_DIR}/all-MiniLM-L6-v2"  # 384D
+    EN_ALL_MINILM = "sentence-transformers/all-MiniLM-L6-v2"  # 384D
+    EN_FINE_TUNED_ALL_MINILM = f"{MODELS_DIR}/all-MiniLM-L6-v2"  # 384D
 
     # For Japanese
     JP_BERT = "cl-tohoku/bert-base-japanese-v2"  # 768D
@@ -45,6 +45,6 @@ class HF:
     ML_XLM = "stsb-xlm-r-multilingual"
 
     LOCALE_TO_MODEL_NAME = {
-        "us": EN_FINE_TUNED_ALL_MINI,
+        "us": EN_FINE_TUNED_ALL_MINILM,
         "jp": JP_SLUKE_MEAN,
     }
