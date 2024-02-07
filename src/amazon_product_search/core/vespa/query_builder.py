@@ -68,6 +68,11 @@ class QueryBuilder:
         fields: list[str] | None,
         operator: Operator = "and",
         alpha: float = 0.5,
+        title_weight: float = 1.0,
+        brand_weight: float = 1.0,
+        color_weight: float = 1.0,
+        bullet_point_weight: float = 1.0,
+        description_weight: float = 1.0,
     ) -> dict[str, Any]:
         query_str = normalize_query(query_str)
         tokens = cast(list, self.tokenizer.tokenize(query_str))
@@ -80,6 +85,11 @@ class QueryBuilder:
         query = {
             "query": query_str,
             "input.query(alpha)": alpha,
+            "input.query(title_weight)": title_weight,
+            "input.query(brand_weight)": brand_weight,
+            "input.query(color_weight)": color_weight,
+            "input.query(bullet_point_weight)": bullet_point_weight,
+            "input.query(description_weight)": description_weight,
             "ranking.profile": rank_profile,
             "hits": size,
         }
@@ -110,7 +120,16 @@ class QueryBuilder:
         return query
 
     def build_lexical_search_query(
-        self, query_str: str, size: int, fields: list[str] | None = None, operator: Operator = "and"
+        self,
+        query_str: str,
+        size: int,
+        fields: list[str] | None = None,
+        operator: Operator = "and",
+        title_weight: float = 1.0,
+        brand_weight: float = 1.0,
+        color_weight: float = 1.0,
+        bullet_point_weight: float = 1.0,
+        description_weight: float = 1.0,
     ) -> dict[str, Any]:
         return self.build_query(
             query_str,
@@ -119,6 +138,11 @@ class QueryBuilder:
             is_semantic_search_enabled=False,
             fields=fields,
             operator=operator,
+            title_weight=title_weight,
+            brand_weight=brand_weight,
+            color_weight=color_weight,
+            bullet_point_weight=bullet_point_weight,
+            description_weight=description_weight,
         )
 
     def build_semantic_search_query(
