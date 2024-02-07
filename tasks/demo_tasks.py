@@ -17,10 +17,5 @@ def es(c):
 
 
 @task
-def experiment(c):
-    c.run("poetry run streamlit run src/demo/apps/experiment/📊_Experiment.py")
-
-
-@task
 def vespa(c):
     c.run("poetry run streamlit run src/demo/apps/vespa/🔍_Retrieval.py")
