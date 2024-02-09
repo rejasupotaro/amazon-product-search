@@ -92,7 +92,7 @@ class QueryBuilder:
         query_vector = self.vector_cache[query]
         if query_vector is not None:
             return query_vector
-        return [float(v) for v in list(self.encoder.encode(query))]
+        return self.encoder.encode(query).tolist()
 
     def build_dense_search_query(
         self,

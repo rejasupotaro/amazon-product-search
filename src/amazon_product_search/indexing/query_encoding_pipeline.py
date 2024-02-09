@@ -55,7 +55,7 @@ class EncodeQueriesInBatchFn(beam.DoFn):
         logging.info(f"Encode {len(query_dicts)} queries in a batch")
         query_vectors = self._encode([query_dict["query"] for query_dict in query_dicts])
         for query_dict, query_vector in zip(query_dicts, query_vectors, strict=True):
-            query_dict["query_vector"] = [float(v) for v in list(query_vector)]
+            query_dict["query_vector"] = query_vector.tolist()
             yield query_dict
 
 

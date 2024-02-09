@@ -56,8 +56,7 @@ def search(c):
         query_str = input("query: ")
         if not query_str:
             break
-        query_vector = encoder.encode(query_str)
-        query_vector = [float(v) for v in query_vector]
+        query_vector = encoder.encode(query_str).tolist()
         yql = dedent(
             """
             select *

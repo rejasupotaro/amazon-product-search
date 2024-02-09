@@ -31,4 +31,4 @@ class EncodeInBatchFn(beam.DoFn):
         texts = [product["product_title"] + " " + product["product_brand"] for product in products]
         product_vectors = self._encode(texts)
         for product, product_vector in zip(products, product_vectors, strict=True):
-            yield product["product_id"], [float(v) for v in list(product_vector)]
+            yield product["product_id"], product_vector.tolist()

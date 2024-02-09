@@ -33,7 +33,7 @@ class QueryBuilder:
         query_vector = self.vector_cache[query_str]
         if query_vector is not None:
             return query_vector
-        return [float(v) for v in list(self.encoder.encode(query_str))]
+        return self.encoder.encode(query_str).tolist()
 
     def _build_text_matching_query(self, tokens: list[str], fields: list[str], operator: Operator) -> str:
         if operator == "weakAnd":
