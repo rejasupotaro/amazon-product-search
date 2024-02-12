@@ -28,7 +28,7 @@ services:
   # https://docs.vespa.ai/en/operations-selfhosted/multinode-systems.html
   # https://docs.vespa.ai/en/operations-selfhosted/files-processes-and-ports.html
   vespa-0:
-    image: vespaengine/vespa:8.279.6
+    image: vespaengine/vespa:8.301.19
     container_name: amazon-product-search-vespa-0
     hostname: vespa-0.vespanet
     networks:
@@ -52,7 +52,7 @@ services:
       - vespa
 
   vespa-1:
-    image: vespaengine/vespa:8.279.6
+    image: vespaengine/vespa:8.301.19
     container_name: amazon-product-search-vespa-1
     hostname: vespa-1.vespanet
     networks:
@@ -73,7 +73,7 @@ services:
       - vespa
 
   vespa-2:
-    image: vespaengine/vespa:8.279.6
+    image: vespaengine/vespa:8.301.19
     container_name: amazon-product-search-vespa-2
     hostname: vespa-2.vespanet
     networks:
