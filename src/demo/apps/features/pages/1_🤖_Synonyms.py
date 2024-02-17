@@ -1,7 +1,7 @@
 import polars as pl
 import streamlit as st
-from core.synonyms.synonym_dict import SynonymDict
 
+from amazon_product_search.core.synonyms.synonym_dict import SynonymDict
 from demo.page_config import set_page_config
 from demo.utils import load_labels
 
@@ -32,7 +32,7 @@ def main() -> None:
                     {
                         "query": query,
                         "variant": f"{synonym_source} ({threshold})",
-                        "synonyms": synonym_dict.find_synonyms(query, threshold),
+                        "synonyms": synonym_dict.expand_synonyms(query, threshold),
                     }
                 )
     df = pl.from_dicts(rows)

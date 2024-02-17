@@ -60,7 +60,7 @@ class SynonymDict:
             entry_dict[query].append((title, similarity))
         return entry_dict
 
-    def find_synonyms(self, query: str) -> list[str]:
+    def expand_synonyms(self, query: str) -> list[str]:
         """Return a list of synonyms for a given query.
 
         Args:

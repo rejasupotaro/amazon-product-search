@@ -39,7 +39,7 @@ class QueryBuilder:
         if operator == "weakAnd":
             conditions = []
             for token in tokens:
-                synonyms = self.synonym_dict.find_synonyms(token)
+                synonyms = self.synonym_dict.expand_synonyms(token)
                 for field in fields:
                     conditions.append(f"{field} contains '{token}'")
                     for synonym in synonyms:
@@ -48,7 +48,7 @@ class QueryBuilder:
 
         and_conditions = []
         for token in tokens:
-            synonyms = self.synonym_dict.find_synonyms(token)
+            synonyms = self.synonym_dict.expand_synonyms(token)
             or_conditions = []
             for field in fields:
                 if synonyms:
