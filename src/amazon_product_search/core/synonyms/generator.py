@@ -48,7 +48,7 @@ def generate_ngrams_all(tokens: list[str], n: int) -> list[str]:
 def count_words(
     locale: Locale,
     pairs: list[list[str]],
-    ngrams: int = 1,
+    ngrams: int = 2,
 ) -> tuple[Counter, Counter]:
     """Generate synonyms based on cooccurrence."""
     tokenizer = locale_to_tokenizer(locale)
@@ -136,7 +136,7 @@ def apply_fast_filters(
 def generate(
     locale: Locale,
     output_filename: str,
-    min_cooccurrence: int = 10,
+    min_cooccurrence: int = 30,
     min_npmi: float = 0.5,
 ) -> None:
     """Generate synonyms from query title pairs.
