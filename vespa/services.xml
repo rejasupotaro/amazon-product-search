@@ -15,7 +15,6 @@
         <document-api></document-api>
         <nodes>
             <node hostalias="vespa-1"/>
-            <node hostalias="vespa-2"/>
         </nodes>
     </container>
 
@@ -32,7 +31,6 @@
         </documents>
         <nodes>
             <node hostalias="vespa-1" distribution-key="0"></node>
-            <node hostalias="vespa-2" distribution-key="1"></node>
         </nodes>
     </content>
 </services>

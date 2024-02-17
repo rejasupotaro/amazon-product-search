@@ -72,35 +72,12 @@ services:
     profiles:
       - vespa
 
-  vespa-2:
-    image: vespaengine/vespa:8.301.19
-    container_name: amazon-product-search-vespa-2
-    hostname: vespa-2.vespanet
-    networks:
-      - vespanet
-    command: services
-    depends_on:
-      vespa-0:
-        condition: service_healthy
-    ports:
-      - 8081:8080
-      - 19108:19107
-      - 19093:19092
-    volumes:
-      - vespa-data-2:/opt/vespa/var
-    environment:
-      VESPA_CONFIGSERVERS: vespa-0.vespanet
-    profiles:
-      - vespa
-
 volumes:
   es-data:
     driver: local
   vespa-data-0:
     driver: local
   vespa-data-1:
-    driver: local
-  vespa-data-2:
     driver: local
 
 networks:

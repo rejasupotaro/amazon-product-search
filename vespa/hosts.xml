@@ -6,7 +6,4 @@
   <host name="vespa-1.vespanet">
     <alias>vespa-1</alias>
   </host>
-  <host name="vespa-2.vespanet">
-    <alias>vespa-2</alias>
-  </host>
 </hosts>
