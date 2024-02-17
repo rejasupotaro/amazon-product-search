@@ -36,26 +36,24 @@ def print_input_and_output_names(onnx_model: ModelProto) -> None:
 
 
 @task
-def export(c):
-    hf_model_name = HF.JP_SLUKE_MEAN
+def export(c, hf_model_name=HF.EN_ALL_MINILM, output_model_name="model"):
     torch_model = MeanPoolingEncoderONNX.from_pretrained(hf_model_name).eval()
     tokenizer = AutoTokenizer.from_pretrained(hf_model_name)
-    model_name = "model"
-    onnx_model_filepath = f"{MODELS_DIR}/{model_name}.onnx"
-    quantized_onnx_model_filepath = f"{MODELS_DIR}/{model_name}_quantized.onnx"
+    onnx_model_filepath = f"{MODELS_DIR}/{output_model_name}.onnx"
+    quantized_onnx_model_filepath = f"{MODELS_DIR}/{output_model_name}_quantized.onnx"
 
     with torch.no_grad():
-        sample_tokenized = tokenizer("dummy_text", return_tensors="pt")
+        encoded_text = tokenizer("dummy_text", return_tensors="pt")
 
     torch.onnx.export(
         torch_model,
-        args=tuple(sample_tokenized.values()),
+        args=tuple(encoded_text.values()),
         f=onnx_model_filepath,
         input_names=["input_ids", "attention_mask"],
-        output_names=["vector"],
+        output_names=["output"],
         dynamic_axes={
-            "input_ids": {0: "batch_size", 1: "sequence"},
-            "attention_mask": {0: "batch_size", 1: "sequence"},
+            "input_ids": {0: "batch_size"},
+            "attention_mask": {0: "batch_size"},
             "vector": {0: "batch_size"},
         },
         opset_version=17,
@@ -77,15 +75,18 @@ def export(c):
     print_input_and_output_names(quantized_onnx_model)
 
     session = InferenceSession(quantized_onnx_model_filepath)
-    inputs = {
-        k: v.numpy()
-        for k, v in tokenizer(
-            "dummy_text",
-            padding=True,
-            truncation=True,
-            max_length=512,
-            return_tensors="pt",
-        ).items()
-    }
-    mean_vector = session.run(None, inputs)
+    encoded_text = tokenizer(
+        "dummy_text",
+        padding=True,
+        truncation=True,
+        max_length=512,
+        return_tensors="np",
+    )
+    mean_vector = session.run(
+        output_names=["output"],
+        input_feed={
+            "input_ids": encoded_text["input_ids"],
+            "attention_mask": encoded_text["attention_mask"],
+        },
+    )
     print(mean_vector)
