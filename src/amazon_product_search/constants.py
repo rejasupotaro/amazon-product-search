@@ -45,6 +45,6 @@ class HF:
     ML_XLM = "stsb-xlm-r-multilingual"
 
     LOCALE_TO_MODEL_NAME = {
-        "us": EN_FINE_TUNED_ALL_MINILM,
+        "us": EN_ALL_MINILM,
         "jp": JP_SLUKE_MEAN,
     }

@@ -1,3 +1,4 @@
+import itertools
 from collections import Counter
 from math import log
 
@@ -8,6 +9,7 @@ from amazon_product_search.constants import DATA_DIR, HF
 from amazon_product_search.core.nlp.normalizer import normalize_doc
 from amazon_product_search.core.nlp.tokenizers import locale_to_tokenizer
 from amazon_product_search.core.source import Locale, load_merged
+from amazon_product_search.core.synonyms.filters import utils
 from amazon_product_search.core.synonyms.filters.similarity_filter import SimilarityFilter
 
 
@@ -31,7 +33,7 @@ def preprocess_query_title_pairs(df: pl.DataFrame) -> pl.DataFrame:
 def generate_ngrams(tokens: list[str], n: int) -> list[str]:
     ngrams = []
     for i in range(len(tokens) - n + 1):
-        ngram = " ".join(tokens[i:i+n])
+        ngram = " ".join(tokens[i : i + n])
         ngrams.append(ngram)
     return ngrams
 
@@ -43,7 +45,11 @@ def generate_ngrams_all(tokens: list[str], n: int) -> list[str]:
     return ngrams
 
 
-def generate_candidates(locale: Locale, pairs: list[list[str]]) -> pl.DataFrame:
+def count_words(
+    locale: Locale,
+    pairs: list[list[str]],
+    ngrams: int = 1,
+) -> tuple[Counter, Counter]:
     """Generate synonyms based on cooccurrence."""
     tokenizer = locale_to_tokenizer(locale)
     word_counter: Counter = Counter()
@@ -54,25 +60,50 @@ def generate_candidates(locale: Locale, pairs: list[list[str]]) -> pl.DataFrame:
         if not query or not title:
             continue
 
-        for query_word in tokenizer.tokenize(query):
+        query_tokens = [
+            token for token in tokenizer.tokenize(query) if isinstance(token, str) and token not in utils.STOPWORDS
+        ]
+        query_tokens = generate_ngrams_all(query_tokens, ngrams)
+        title_tokens = [
+            token for token in tokenizer.tokenize(title) if isinstance(token, str) and token not in utils.STOPWORDS
+        ]
+        title_tokens = generate_ngrams_all(title_tokens, ngrams)
+        for query_word, title_word in itertools.product(query_tokens, title_tokens):
             word_counter[query_word] += 1
-            for title_word in tokenizer.tokenize(title):
-                word_counter[title_word] += 1
-                if query_word != title_word:
-                    pair_counter[(query_word, title_word)] += 1
+            word_counter[title_word] += 1
+            if query_word != title_word:
+                pair_counter[(query_word, title_word)] += 1
+    return word_counter, pair_counter
 
+
+def apply_fast_filters(
+    word_counter: Counter,
+    pair_counter: Counter,
+    min_cooccurrence: int,
+    min_npmi: float,
+) -> pl.DataFrame:
     total_word_count = sum(word_counter.values())
     log_total_word_count = log(total_word_count)
 
     print("Calculating metrics...")
     rows = []
+    original_num_candidates = len(pair_counter)
     for key in tqdm(pair_counter):
         query, title = key
+
+        if utils.are_two_sets_identical(query, title):
+            continue
+        if utils.is_either_contained_in_other(query, title):
+            continue
+
         query_count, title_count, pair_count = (
             word_counter[query],
             word_counter[title],
             pair_counter[key],
         )
+        if pair_count < min_cooccurrence:
+            continue
+
         log_pair_count, log_query_count, log_title_count = (
             log(pair_count),
             log(query_count),
@@ -81,6 +112,8 @@ def generate_candidates(locale: Locale, pairs: list[list[str]]) -> pl.DataFrame:
 
         pmi = log_total_word_count + log_pair_count - log_query_count - log_title_count
         npmi = pmi / (log_total_word_count - log_pair_count)
+        if npmi < min_npmi:
+            continue
 
         rows.append(
             {
@@ -92,6 +125,9 @@ def generate_candidates(locale: Locale, pairs: list[list[str]]) -> pl.DataFrame:
                 "npmi": npmi,
             }
         )
+    filtered_num_candidates = len(rows)
+    diff = original_num_candidates - filtered_num_candidates
+    print(f"Filtered out {diff} candidates ({original_num_candidates} -> {filtered_num_candidates})")
 
     candidates_df = pl.from_dicts(rows)
     return candidates_df
@@ -127,13 +163,9 @@ def generate(
 
     print("Generate candidates from query-title pairs")
     pairs = pairs_df.select(["query", "product_title"]).to_numpy().tolist()
-    candidates_df = generate_candidates(locale, pairs)
+    word_counter, pair_counter = count_words(locale, pairs)
+    candidates_df = apply_fast_filters(word_counter, pair_counter, min_cooccurrence, min_npmi)
     print(f"{len(candidates_df)} candidates were generated")
-
-    print("Filter synonyms by Mutual Information")
-    candidates_df = candidates_df.filter(
-        (pl.col("cooccurrence") >= min_cooccurrence) & (pl.col("npmi").abs() >= min_npmi)
-    )
 
     print("Filter synonyms by Semantic Similarity")
     filter = SimilarityFilter(hf_model_name)
