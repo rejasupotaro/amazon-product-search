@@ -28,6 +28,21 @@ def preprocess_query_title_pairs(df: pl.DataFrame) -> pl.DataFrame:
     )
 
 
+def generate_ngrams(tokens: list[str], n: int) -> list[str]:
+    ngrams = []
+    for i in range(len(tokens) - n + 1):
+        ngram = " ".join(tokens[i:i+n])
+        ngrams.append(ngram)
+    return ngrams
+
+
+def generate_ngrams_all(tokens: list[str], n: int) -> list[str]:
+    ngrams = []
+    for i in range(1, n + 1):
+        ngrams.extend(generate_ngrams(tokens, i))
+    return ngrams
+
+
 def generate_candidates(locale: Locale, pairs: list[list[str]]) -> pl.DataFrame:
     """Generate synonyms based on cooccurrence."""
     tokenizer = locale_to_tokenizer(locale)
