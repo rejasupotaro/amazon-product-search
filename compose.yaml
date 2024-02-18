@@ -30,7 +30,7 @@ services:
   vespa-0:
     image: vespaengine/vespa:8.301.19
     container_name: amazon-product-search-vespa-0
-    hostname: vespa-0.vespanet
+    hostname: amazon-product-search-vespa-0.vespanet
     networks:
       - vespanet
     ports:
@@ -47,14 +47,14 @@ services:
     volumes:
       - vespa-data-0:/opt/vespa/var
     environment:
-      VESPA_CONFIGSERVERS: vespa-0.vespanet
+      VESPA_CONFIGSERVERS: amazon-product-search-vespa-0.vespanet
     profiles:
       - vespa
 
   vespa-1:
     image: vespaengine/vespa:8.301.19
     container_name: amazon-product-search-vespa-1
-    hostname: vespa-1.vespanet
+    hostname: amazon-product-search-vespa-1.vespanet
     networks:
       - vespanet
     command: services
@@ -68,7 +68,7 @@ services:
     volumes:
       - vespa-data-1:/opt/vespa/var
     environment:
-      VESPA_CONFIGSERVERS: vespa-0.vespanet
+      VESPA_CONFIGSERVERS: amazon-product-search-vespa-0.vespanet
     profiles:
       - vespa
 

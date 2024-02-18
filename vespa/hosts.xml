@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <hosts>
-  <host name="vespa-0.vespanet">
+  <host name="amazon-product-search-vespa-0.vespanet">
     <alias>vespa-0</alias>
   </host>
-  <host name="vespa-1.vespanet">
+  <host name="amazon-product-search-vespa-1.vespanet">
     <alias>vespa-1</alias>
   </host>
 </hosts>
