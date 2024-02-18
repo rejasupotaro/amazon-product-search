@@ -136,7 +136,7 @@ def apply_fast_filters(
 def generate(
     locale: Locale,
     output_filename: str,
-    min_cooccurrence: int = 30,
+    min_cooccurrence: int = 10,
     min_npmi: float = 0.5,
 ) -> None:
     """Generate synonyms from query title pairs.
