@@ -60,22 +60,35 @@ class SynonymDict:
             entry_dict[query].append((title, similarity))
         return entry_dict
 
-    def expand_synonyms(self, query: str) -> list[str]:
+    def expand_synonyms(self, query: str, ngrams: int = 2) -> list[tuple[str, list[str]]]:
         """Return a list of synonyms for a given query.
 
         Args:
             query (str): A query to expand.
 
         Returns:
-            list[str]: A list of synonyms.
+            list[tuple[str, list[str]]]: A list of the original query terms and their synonyms.
         """
-        all_synonyms = []
-        tokens = cast(list, self.tokenizer.tokenize(query))
-        for token in tokens:
-            if token not in self._entry_dict:
-                continue
-            candidates: list[tuple[str, float]] = self._entry_dict[token]
-            synonyms = [synonym for synonym, _ in candidates]
-            if synonyms:
-                all_synonyms.extend(synonyms)
-        return all_synonyms
+        expanded_query: list[tuple[str, list[str]]] = []
+        tokens: list[str] = cast(list, self.tokenizer.tokenize(query))
+        current_position = 0
+        while current_position < len(tokens):
+            found = None
+            for n in range(ngrams, 0, -1):
+                end_position = current_position + n
+                if end_position > len(tokens):
+                    continue
+                key = " ".join(tokens[current_position:end_position])
+                if key not in self._entry_dict:
+                    continue
+                candidates: list[tuple[str, float]] = self._entry_dict[key]
+                synonym = [candidate[0] for candidate in candidates]
+                found = (key, synonym)
+                break
+            if found:
+                expanded_query.append(found)
+                current_position = end_position
+            else:
+                expanded_query.append((tokens[current_position], []))
+                current_position += 1
+        return expanded_query

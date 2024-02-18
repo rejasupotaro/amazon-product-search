@@ -58,13 +58,17 @@ class QueryBuilder:
         tokens = cast(list, self.tokenizer.tokenize(query))
         query = " ".join(tokens)
 
-        synonyms = []
         if is_synonym_expansion_enabled and self.synonym_dict:
-            synonyms = self.synonym_dict.expand_synonyms(query)
+            query_with_synonyms = self.synonym_dict.expand_synonyms(query)
+            expanded_tokens = []
+            for token, synonyms in query_with_synonyms:
+                expanded_tokens.append(token)
+                expanded_tokens.extend(synonyms)
+            query = " ".join(expanded_tokens)
 
         query_match = json.loads(
             self.template_loader.load("query_match.j2").render(
-                queries=[query, *synonyms],
+                query=query,
                 query_type=query_type,
                 fields=fields,
                 boost=boost,

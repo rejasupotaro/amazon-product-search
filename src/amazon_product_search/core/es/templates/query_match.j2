@@ -1,7 +1,6 @@
 {
     "bool": {
         "should": [
-            {% for query in queries %}
             {% if query_type == "cross_fields" %}
             {
                 "multi_match": {
@@ -44,10 +43,6 @@
                 }
             }
             {% endif %}
-            {% if not loop.last %}
-            ,
-            {% endif %}
-            {% endfor %}
         ],
         "minimum_should_match": 1
     }

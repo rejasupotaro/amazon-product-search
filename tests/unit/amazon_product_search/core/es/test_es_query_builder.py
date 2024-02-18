@@ -44,15 +44,7 @@ def test_build_search_query_with_synonym_expansion_enabled():
             "should": [
                 {
                     "combined_fields": {
-                        "query": "query",
-                        "fields": ["product_title"],
-                        "operator": "and",
-                        "boost": 1.0,
-                    },
-                },
-                {
-                    "combined_fields": {
-                        "query": "synonym",
+                        "query": "query synonym",
                         "fields": ["product_title"],
                         "operator": "and",
                         "boost": 1.0,
@@ -121,15 +113,7 @@ def test_build_search_query_with_synonym_expansion_enabled_with_product_ids():
                         "should": [
                             {
                                 "combined_fields": {
-                                    "query": "query",
-                                    "fields": ["product_title"],
-                                    "operator": "and",
-                                    "boost": 1.0,
-                                },
-                            },
-                            {
-                                "combined_fields": {
-                                    "query": "synonym",
+                                    "query": "query synonym",
                                     "fields": ["product_title"],
                                     "operator": "and",
                                     "boost": 1.0,
