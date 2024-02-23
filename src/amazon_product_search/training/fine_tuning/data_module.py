@@ -2,7 +2,7 @@ import math
 from typing import Optional
 
 import pandas as pd
-from pytorch_lightning import LightningDataModule
+from lightning import LightningDataModule
 from torch.utils.data import DataLoader, Dataset
 from transformers import (
     AutoTokenizer,

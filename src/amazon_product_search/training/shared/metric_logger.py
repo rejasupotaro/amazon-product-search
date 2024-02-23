@@ -1,7 +1,7 @@
 from typing import Any
 
-from pytorch_lightning import LightningModule, Trainer
-from pytorch_lightning.callbacks import Callback
+from lightning import LightningModule, Trainer
+from lightning.pytorch.callbacks import Callback
 
 
 class MetricLogger(Callback):

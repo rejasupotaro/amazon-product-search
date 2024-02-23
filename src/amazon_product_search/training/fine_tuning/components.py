@@ -2,8 +2,8 @@ from typing import Any, Optional, Union
 
 import pandas as pd
 import torch
-from pytorch_lightning import LightningModule, Trainer
-from pytorch_lightning.callbacks import ModelCheckpoint
+from lightning import LightningModule, Trainer
+from lightning.pytorch.callbacks import ModelCheckpoint
 from torch import Tensor
 from torch.nn.functional import cross_entropy
 from torch.optim import Optimizer
