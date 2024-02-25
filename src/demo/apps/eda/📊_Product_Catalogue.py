@@ -44,16 +44,20 @@ def draw_examples(products_df: pl.DataFrame) -> None:
     if not selected_rows:
         return
 
-    judgement = selected_rows[0]
-    del judgement["_selectedRowNodeInfo"]
-    st.write(judgement)
+    product = selected_rows[0]
+    del product["_selectedRowNodeInfo"]
+    for key, value in product.items():
+        st.write(f"#### {key}")
+        st.text(value)
 
 
 def main() -> None:
     set_page_config()
     st.write("## Product Catalogue")
 
-    locale = st.selectbox("Locale:", ["us", "jp", "es"])
+    with st.sidebar:
+        locale = st.selectbox("Locale:", ["us", "jp", "es"])
+
     products_df = load_products(locale)
     draw_column_info(products_df)
     draw_brand_info(products_df)
