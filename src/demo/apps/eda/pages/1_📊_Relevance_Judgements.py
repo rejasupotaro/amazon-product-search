@@ -11,7 +11,7 @@ def main() -> None:
     set_page_config()
     st.write("## Relevance Judgements")
 
-    locale = st.selectbox("Locale:", ["jp", "us", "es"])
+    locale = st.selectbox("Locale:", ["us", "jp", "es"])
     df = source.load_merged(locale)
 
     st.write("### Columns")

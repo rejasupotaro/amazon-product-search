@@ -53,7 +53,7 @@ def main() -> None:
     set_page_config()
     st.write("## Product Catalogue")
 
-    locale = st.selectbox("Locale:", ["jp", "us", "es"])
+    locale = st.selectbox("Locale:", ["us", "jp", "es"])
     products_df = load_products(locale)
     draw_column_info(products_df)
     draw_brand_info(products_df)
