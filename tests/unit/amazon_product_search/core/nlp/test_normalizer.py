@@ -22,6 +22,7 @@ def test_normalize_doc(s, expected):
     "s,expected",
     [
         ("", ""),
+        ("Joe's Kitchen", "joe\\'s kitchen"),
         ("  LOUIS VUITTON", "louis vuitton"),
     ],
 )

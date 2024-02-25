@@ -94,6 +94,8 @@ def normalize_query(s: str) -> str:
     try:
         s = unicodedata.normalize("NFKC", s)
         s = s.lower()
+        s = s.replace('"', '\\"')
+        s = s.replace("'", "\\'")
         s = remove_extra_spaces(s)
     except Exception as e:
         logging.error(f"Received an unknown exception: {e} when processing {s}")
