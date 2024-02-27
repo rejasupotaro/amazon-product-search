@@ -20,7 +20,6 @@ class SynonymDict:
         synonym_filename: str | None = None,
         data_dir: str = DATA_DIR,
         threshold: float = 0.6,
-        skip_numbers: bool = True,
     ) -> None:
         self.tokenizer = locale_to_tokenizer(locale)
         self.threshold = threshold
@@ -28,14 +27,11 @@ class SynonymDict:
             self._entry_dict: dict[str, list[tuple[str, float]]] = self.load_synonym_dict(
                 data_dir,
                 synonym_filename,
-                skip_numbers,
             )
         else:
             self._entry_dict = defaultdict(list)
 
-    def load_synonym_dict(
-        self, data_dir: str, synonym_filename: str, skip_numbers: bool
-    ) -> dict[str, list[tuple[str, float]]]:
+    def load_synonym_dict(self, data_dir: str, synonym_filename: str) -> dict[str, list[tuple[str, float]]]:
         """Load the synonym file and convert it into a dict for lookup.
 
         Args:
@@ -50,10 +46,7 @@ class SynonymDict:
         for row in df.to_dicts():
             query: str = row["query"]
             title: str = row["title"]
-            if skip_numbers and (has_numbers(query) or has_numbers(title)):
-                continue
-
-            score = row["npmi"] * row["similarity"]
+            score: float = row["npmi"] * row["similarity"]
             if score > self.threshold:
                 continue
 
