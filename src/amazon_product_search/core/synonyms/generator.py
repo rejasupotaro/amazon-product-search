@@ -95,6 +95,8 @@ def apply_fast_filters(
             continue
         if utils.is_either_contained_in_other(query, title):
             continue
+        if utils.is_either_number(query, title):
+            continue
 
         query_count, title_count, pair_count = (
             word_counter[query],

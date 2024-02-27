@@ -187,3 +187,7 @@ def are_two_sets_identical(a: str, b: str) -> bool:
 
 def is_either_contained_in_other(a: str, b: str) -> bool:
     return a in b or b in a
+
+
+def is_either_number(a: str, b: str) -> bool:
+    return a.isdigit() or b.isdigit()
