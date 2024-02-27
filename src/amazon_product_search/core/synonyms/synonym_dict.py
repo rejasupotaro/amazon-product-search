@@ -19,7 +19,7 @@ class SynonymDict:
         locale: Locale,
         synonym_filename: str | None = None,
         data_dir: str = DATA_DIR,
-        threshold: float = 0.8,
+        threshold: float = 0.6,
         skip_numbers: bool = True,
     ) -> None:
         self.tokenizer = locale_to_tokenizer(locale)
@@ -53,11 +53,11 @@ class SynonymDict:
             if skip_numbers and (has_numbers(query) or has_numbers(title)):
                 continue
 
-            similarity = row["similarity"]
-            if similarity > self.threshold:
+            score = row["npmi"] * row["similarity"]
+            if score > self.threshold:
                 continue
 
-            entry_dict[query].append((title, similarity))
+            entry_dict[query].append((title, score))
         return entry_dict
 
     def expand_synonyms(self, query: str, ngrams: int = 2) -> list[tuple[str, list[str]]]:
