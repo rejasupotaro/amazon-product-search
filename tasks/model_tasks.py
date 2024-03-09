@@ -36,7 +36,9 @@ def print_input_and_output_names(onnx_model: ModelProto) -> None:
 
 
 @task
-def export(c, hf_model_name=HF.EN_ALL_MINILM, output_model_name="model"):
+def export(c, hf_model_name=HF.EN_ALL_MINILM, output_model_name="model", verbose=False):
+    """Convert Hugging Face model to ONNX model and quantize it."""
+    print(f"Convert {hf_model_name} to ONNX model.")
     torch_model = MeanPoolingEncoderONNX.from_pretrained(hf_model_name).eval()
     tokenizer = AutoTokenizer.from_pretrained(hf_model_name)
     onnx_model_filepath = f"{MODELS_DIR}/{output_model_name}.onnx"
@@ -60,20 +62,24 @@ def export(c, hf_model_name=HF.EN_ALL_MINILM, output_model_name="model"):
         do_constant_folding=True,
         operator_export_type=torch.onnx.OperatorExportTypes.ONNX,
     )
+    print(f"ONNX model is exported to {onnx_model_filepath}.")
 
     quantize_dynamic(
         model_input=onnx_model_filepath,
         model_output=quantized_onnx_model_filepath,
     )
+    print(f"Quantized ONNX model is exported to {quantized_onnx_model_filepath}.")
 
-    print(f"====== {onnx_model_filepath} ======")
-    onnx_model = onnx.load(onnx_model_filepath)
-    print_input_and_output_names(onnx_model)
+    if verbose:
+        print(f"====== {onnx_model_filepath} ======")
+        onnx_model = onnx.load(onnx_model_filepath)
+        print_input_and_output_names(onnx_model)
 
-    print(f"====== {quantized_onnx_model_filepath} ======")
-    quantized_onnx_model = onnx.load(quantized_onnx_model_filepath)
-    print_input_and_output_names(quantized_onnx_model)
+        print(f"====== {quantized_onnx_model_filepath} ======")
+        quantized_onnx_model = onnx.load(quantized_onnx_model_filepath)
+        print_input_and_output_names(quantized_onnx_model)
 
+    print("Testing the quantized ONNX model with dummy text...")
     session = InferenceSession(quantized_onnx_model_filepath)
     encoded_text = tokenizer(
         "dummy_text",
@@ -89,4 +95,4 @@ def export(c, hf_model_name=HF.EN_ALL_MINILM, output_model_name="model"):
             "attention_mask": encoded_text["attention_mask"],
         },
     )
-    print(mean_vector)
+    print(f"Quantized ONNX model is working. {mean_vector[0].shape} is returned.")
