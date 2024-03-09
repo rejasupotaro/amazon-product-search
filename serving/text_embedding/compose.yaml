@@ -1,7 +1,8 @@
-version: "3.2"
+version: "3"
 services:
   server:
-    image: nvcr.io/nvidia/tritonserver:23.12-py3
+    build: .
+    image: amazon_product_search_text_embedding_server
     entrypoint: tritonserver --model-repository=/models
     platform: linux/x86_64
     volumes:

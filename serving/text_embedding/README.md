@@ -14,4 +14,19 @@ Then, move the exported ONNX model to `serving/text_embedding/model_repository/a
 
 ## Launch Server
 
-To launch the Triton Inference Server, execute the command `docker compose up`.
+To launch the Triton Inference Server, execute the following commands:
+
+```
+docker compose build
+docker compose up
+```
+
+It launches the following services:
+
+```
+curl http://localhost:8000/v2/models/tokenizer
+{"name":"tokenizer","versions":["1"],"platform":"python","inputs":[{"name":"text","datatype":"BYTES","shape":[-1]}],"outputs":[{"name":"input_ids","datatype":"INT64","shape":[-1,512]},{"name":"attention_mask","datatype":"INT64","shape":[-1,512]}]}
+
+curl http://localhost:8000/v2/models/all_minilm
+{"name":"all_minilm","versions":["1"],"platform":"onnxruntime_onnx","inputs":[{"name":"input_ids","datatype":"INT64","shape":[-1,512]},{"name":"attention_mask","datatype":"INT64","shape":[-1,512]}],"outputs":[{"name":"output","datatype":"FP32","shape":[-1,384]}]}
+```

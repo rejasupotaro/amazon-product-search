@@ -1,0 +1,21 @@
+name: "tokenizer"
+backend: "python"
+input [
+  {
+    name: "text"
+    data_type: TYPE_STRING
+    dims: [ -1 ]
+  }
+]
+output [
+    {
+        name: "input_ids"
+        data_type: TYPE_INT64
+        dims: [-1, 512]
+    },
+    {
+        name: "attention_mask"
+        data_type: TYPE_INT64
+        dims: [-1, 512]
+    }
+]
