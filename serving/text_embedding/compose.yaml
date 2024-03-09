@@ -1,0 +1,23 @@
+version: "3.2"
+services:
+  server:
+    image: nvcr.io/nvidia/tritonserver:23.12-py3
+    entrypoint: tritonserver --model-repository=/models
+    platform: linux/x86_64
+    volumes:
+      - type: bind
+        source: ./model_repository
+        target: /models
+    ports:
+      - 8000:8000  # HTTP
+      - 8001:8001  # gRPC
+      - 8002:8002  # Prometheus
+    networks:
+      - triton
+    healthcheck:
+      test: ["CMD", "curl", "-f", "localhost:8000/v2/models/all_minilm/ready" ]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+networks:
+  triton:
