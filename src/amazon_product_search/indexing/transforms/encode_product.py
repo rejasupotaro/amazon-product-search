@@ -2,10 +2,8 @@ import logging
 from typing import Any, Dict, Iterator, List, Tuple
 
 import apache_beam as beam
-import numpy as np
 from apache_beam.utils.shared import Shared
 from torch import Tensor
-from transformers import AutoTokenizer
 from tritonclient.grpc import (
     InferenceServerClient,
     InferInput,
@@ -14,6 +12,10 @@ from tritonclient.grpc import (
 from amazon_product_search.indexing.transforms.weak_reference import WeakReference
 from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 from amazon_product_search_dense_retrieval.encoders.modules.pooler import PoolingMode
+
+
+def _product_to_text(product: Dict[str, Any]) -> str:
+    return product["product_title"] + " " + product["product_brand"]
 
 
 class EncodeProductFn(beam.DoFn):
@@ -34,48 +36,33 @@ class EncodeProductFn(beam.DoFn):
 
     def process(self, products: List[Dict[str, Any]]) -> Iterator[Tuple[str, List[float]]]:
         logging.info(f"Encode {len(products)} products in a batch")
-        texts = [product["product_title"] + " " + product["product_brand"] for product in products]
+        texts = [_product_to_text(product) for product in products]
         product_vectors = self._encode(texts)
         for product, product_vector in zip(products, product_vectors, strict=True):
             yield product["product_id"], product_vector.tolist()
 
 
 class EncodeProductTritonFn(beam.DoFn):
-    def __init__(self, hf_model_name: str, host: str = "localhost:8001", onnx_model_name: str = "all_minilm") -> None:
+    def __init__(
+        self, hf_model_name: str, host: str = "localhost:8001", onnx_model_name: str = "text_embedding"
+    ) -> None:
         self._hf_model_name = hf_model_name
         self._host = host
         self._onnx_model_name = onnx_model_name
 
     def setup(self) -> None:
-        self._tokenizer = AutoTokenizer.from_pretrained(self._hf_model_name)
         self._client = InferenceServerClient(host=self._host)
 
-    def _tokenize(self, texts: list[str]) -> Tuple[np.ndarray, np.ndarray]:
-        return self._tokenizer(
-            texts,
-            max_length=512,
-            padding="max_length",
-            truncation=True,
-            return_tensors="np",
-        )
-
     def process(self, products: List[Dict[str, Any]]) -> Iterator[Tuple[str, List[float]]]:
-        input_ids, attention_mask = self._tokenize(
-            [product["product_title"] + " " + product["product_brand"] for product in products]
-        )
+        texts = [_product_to_text(product) for product in products]
         product_vectors = self._client.infer(
             model_name=self._onnx_model_name,
             inputs=[
                 InferInput(
-                    name="input_ids",
-                    shape=[len(products), 512],
-                    datatype="INT64",
-                ).set_data_from_numpy(input_ids),
-                InferInput(
-                    name="attention_mask",
-                    shape=[len(products), 512],
-                    datatype="INT64",
-                ).set_data_from_numpy(attention_mask),
+                    name="text",
+                    shape=[len(texts)],
+                    datatype="BYTES",
+                )
             ],
         ).as_numpy("output")
         for product, product_vector in zip(products, product_vectors, strict=True):
