@@ -129,3 +129,4 @@ data/*
 !data/raw
 .envrc
 google_application_credentials.json
+*.onnx
