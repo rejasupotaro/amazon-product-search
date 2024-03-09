@@ -16,7 +16,7 @@ services:
     networks:
       - triton
     healthcheck:
-      test: ["CMD", "curl", "-f", "localhost:8000/v2/models/all_minilm/ready" ]
+      test: ["CMD", "curl", "-f", "localhost:8000/v2/models/text_embedding/ready" ]
       interval: 1s
       timeout: 3s
       retries: 30

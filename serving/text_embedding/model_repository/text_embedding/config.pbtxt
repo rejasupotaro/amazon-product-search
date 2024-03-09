@@ -1,0 +1,52 @@
+name: "text_embedding"
+platform: "ensemble"
+input [
+    {
+        name: "text"
+        data_type: TYPE_STRING
+        dims: [-1]
+    }
+]
+output [
+    {
+        name: "output"
+        data_type: TYPE_FP32
+        dims: [-1, 384]
+    }
+]
+ensemble_scheduling {
+    step [
+    {
+        model_name: "tokenizer"
+        model_version: 1
+        input_map {
+            key: "text"
+            value: "text"
+        }
+        output_map {
+            key: "input_ids"
+            value: "input_ids"
+        }
+        output_map {
+            key: "attention_mask"
+            value: "attention_mask"
+        }
+    },
+    {
+        model_name: "all_minilm"
+        model_version: 1
+        input_map {
+            key: "input_ids"
+            value: "input_ids"
+        }
+        input_map {
+            key: "attention_mask"
+            value: "attention_mask"
+        }
+        output_map {
+            key: "output"
+            value: "output"
+        }
+    }
+  ]
+}
