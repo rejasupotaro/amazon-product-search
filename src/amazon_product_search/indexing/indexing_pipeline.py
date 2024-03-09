@@ -8,7 +8,7 @@ from apache_beam.transforms.util import BatchElements
 from apache_beam.utils.shared import Shared
 
 from amazon_product_search.constants import DATASET_ID, HF, PROJECT_ID
-from amazon_product_search.indexing.doc_transformation_pipeline import get_input_source, join_branches
+from amazon_product_search.indexing.doc_pipeline import get_input_source, join_branches
 from amazon_product_search.indexing.io.elasticsearch_io import WriteToElasticsearch
 from amazon_product_search.indexing.io.vespa_io import WriteToVespa
 from amazon_product_search.indexing.options import IndexerOptions

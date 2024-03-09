@@ -116,7 +116,7 @@ def transform(
     ```
     """
     command = [
-        "poetry run python src/amazon_product_search/indexing/doc_transformation_pipeline.py",
+        "poetry run python src/amazon_product_search/indexing/doc_pipeline.py",
         f"--runner={runner}",
         f"--locale={locale}",
         f"--dest={dest}",
@@ -260,7 +260,7 @@ def encode(
     ```
     """
     command = [
-        "poetry run python src/amazon_product_search/indexing/query_encoding_pipeline.py",
+        "poetry run python src/amazon_product_search/indexing/query_pipeline.py",
         f"--runner={runner}",
         f"--locale={locale}",
         f"--dest={dest}",
