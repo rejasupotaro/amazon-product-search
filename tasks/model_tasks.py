@@ -45,7 +45,13 @@ def export(c, hf_model_name=HF.EN_ALL_MINILM, output_model_name="model", verbose
     quantized_onnx_model_filepath = f"{MODELS_DIR}/{output_model_name}_quantized.onnx"
 
     with torch.no_grad():
-        encoded_text = tokenizer("dummy_text", return_tensors="pt")
+        encoded_text = tokenizer(
+            "dummy_text",
+            max_length=512,
+            padding="max_length",
+            truncation=True,
+            return_tensors="pt",
+        )
 
     torch.onnx.export(
         torch_model,
@@ -83,9 +89,9 @@ def export(c, hf_model_name=HF.EN_ALL_MINILM, output_model_name="model", verbose
     session = InferenceSession(quantized_onnx_model_filepath)
     encoded_text = tokenizer(
         "dummy_text",
-        padding=True,
-        truncation=True,
         max_length=512,
+        padding="max_length",
+        truncation=True,
         return_tensors="np",
     )
     mean_vector = session.run(
