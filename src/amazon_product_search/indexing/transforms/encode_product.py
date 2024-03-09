@@ -52,7 +52,7 @@ class EncodeProductTritonFn(beam.DoFn):
 
     def _tokenize(self, texts: list[str]) -> Tuple[np.ndarray, np.ndarray]:
         return self._tokenizer(
-            texts=texts,
+            texts,
             max_length=512,
             padding="max_length",
             truncation=True,
