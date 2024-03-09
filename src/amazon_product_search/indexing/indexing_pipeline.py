@@ -13,7 +13,7 @@ from amazon_product_search.indexing.io.elasticsearch_io import WriteToElasticsea
 from amazon_product_search.indexing.io.vespa_io import WriteToVespa
 from amazon_product_search.indexing.options import IndexerOptions
 from amazon_product_search.indexing.transforms.analyze_doc_fn import AnalyzeDocFn
-from amazon_product_search.indexing.transforms.encode_fn import EncodeInBatchFn
+from amazon_product_search.indexing.transforms.encode_product import EncodeProduct
 from amazon_product_search.indexing.transforms.extract_keywords_fn import (
     ExtractKeywordsFn,
 )
@@ -48,16 +48,8 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
             if options.extract_keywords:
                 branches["extracted_keywords"] = products | "Extract keywords" >> beam.ParDo(ExtractKeywordsFn())
             if options.encode_text:
-                branches["product_vector"] = (
-                    products
-                    | "Batch products for encoding" >> BatchElements(min_batch_size=8)
-                    | "Encode products"
-                    >> beam.ParDo(
-                        EncodeInBatchFn(
-                            shared_handle=Shared(),
-                            hf_model_name=hf_model_name,
-                        )
-                    )
+                branches["product_vector"] = products | "Encode products" >> EncodeProduct(
+                    Shared(), hf_model_name, batch_size=8
                 )
             if branches:
                 branches["product"] = products | beam.WithKeys(lambda product: product["product_id"])

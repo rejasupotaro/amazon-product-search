@@ -10,7 +10,7 @@ from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 from amazon_product_search_dense_retrieval.encoders.modules.pooler import PoolingMode
 
 
-class EncodeInBatchFn(beam.DoFn):
+class EncodeProductFn(beam.DoFn):
     def __init__(self, shared_handle: Shared, hf_model_name: str, pooling_mode: PoolingMode = "mean") -> None:
         self._shared_handle = shared_handle
         self._hf_model_name = hf_model_name
@@ -32,3 +32,28 @@ class EncodeInBatchFn(beam.DoFn):
         product_vectors = self._encode(texts)
         for product, product_vector in zip(products, product_vectors, strict=True):
             yield product["product_id"], product_vector.tolist()
+
+
+class EncodeProduct(beam.PTransform):
+    def __init__(
+        self,
+        shared_handle: Shared,
+        hf_model_name: str,
+        batch_size: int,
+    ) -> None:
+        super().__init__()
+        self._shared_handle = shared_handle
+        self._hf_model_name = hf_model_name
+        self._batch_size = batch_size
+
+    def expand(self, pcoll: beam.PCollection[Dict[str, Any]]) -> beam.PCollection[Dict[str, Any]]:
+        return (
+            pcoll
+            | "Batch items for EncodeProductFn" >> beam.BatchElements(min_batch_size=self._batch_size)
+            | beam.ParDo(
+                EncodeProductFn(
+                    shared_handle=self._shared_handle,
+                    hf_model_name=self._hf_model_name,
+                )
+            )
+        )
