@@ -21,7 +21,7 @@
             }
         },
         "functions": [
-            {% if is_phrase_match_boost_enabled %}
+            {% if enable_phrase_match_boost %}
             {
                 "filter": {
                     "match_phrase": {

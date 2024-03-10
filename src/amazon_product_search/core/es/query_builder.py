@@ -52,14 +52,18 @@ class QueryBuilder:
         fields: list[str],
         boost: float = 1.0,
         enable_synonym_expansion: bool | float = False,
-        is_phrase_match_boost_enabled: bool = False,
+        enable_phrase_match_boost: bool = False,
         product_ids: list[str] | None = None,
     ) -> dict[str, Any]:
         """Build a multi-match ES query.
 
         Args:
+            query (str): A query to search.
             fields (list[str]): A list of fields to search.
+            boost (float): A boost factor for the query.
             enable_synonym_expansion: Expand the given query if True.
+            enable_phrase_match_boost: Enable phrase match boosting if True.
+            product_ids (list[str]): A list of product IDs to filter.
 
         Returns:
             dict[str, Any]: The constructed ES query.
@@ -82,7 +86,7 @@ class QueryBuilder:
                 queries=queries,
                 fields=fields,
                 boost=boost,
-                is_phrase_match_boost_enabled=is_phrase_match_boost_enabled,
+                enable_phrase_match_boost=enable_phrase_match_boost,
             )
         )
         if not product_ids:
