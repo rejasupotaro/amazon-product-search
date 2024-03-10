@@ -53,9 +53,12 @@
       },
       "product_vector": {
         "type": "dense_vector",
-        "dims": 768,
+        "dims": 384,
         "index": true,
-        "similarity": "cosine"
+        "similarity": "cosine",
+        "index_options": {
+          "type": "int8_hnsw"
+        }
       },
       "product_locale": {
         "type": "keyword"
