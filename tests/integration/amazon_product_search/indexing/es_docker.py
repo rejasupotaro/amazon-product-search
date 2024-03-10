@@ -19,7 +19,7 @@ class EsDocker:
             self.container.restart()
         except NotFound:
             self.container = docker_client.containers.run(
-                image="docker.elastic.co/elasticsearch/elasticsearch:8.10.4",
+                image="docker.elastic.co/elasticsearch/elasticsearch:8.12.1",
                 name=container_id,
                 ports={9200: 9200},
                 environment={

@@ -1130,13 +1130,13 @@ graph = ["objgraph (>=1.7.2)"]
 
 [[package]]
 name = "docker"
-version = "6.0.1"
+version = "7.0.0"
 description = "A Python library for the Docker Engine API."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "docker-6.0.1-py3-none-any.whl", hash = "sha256:dbcb3bd2fa80dca0788ed908218bf43972772009b881ed1e20dfc29a65e49782"},
-    {file = "docker-6.0.1.tar.gz", hash = "sha256:896c4282e5c7af5c45e8b683b0b0c33932974fe6e50fc6906a0a83616ab3da97"},
+    {file = "docker-7.0.0-py3-none-any.whl", hash = "sha256:12ba681f2777a0ad28ffbcc846a69c31b4dfd9752b47eb425a274ee269c5e14b"},
+    {file = "docker-7.0.0.tar.gz", hash = "sha256:323736fb92cd9418fc5e7133bc953e11a9da04f4483f828b527db553f1e7e5a3"},
 ]
 
 [package.dependencies]
@@ -1144,10 +1144,10 @@ packaging = ">=14.0"
 pywin32 = {version = ">=304", markers = "sys_platform == \"win32\""}
 requests = ">=2.26.0"
 urllib3 = ">=1.26.0"
-websocket-client = ">=0.32.0"
 
 [package.extras]
 ssh = ["paramiko (>=2.4.3)"]
+websockets = ["websocket-client (>=1.3.0)"]
 
 [[package]]
 name = "docopt"
@@ -1214,13 +1214,13 @@ develop = ["aiohttp", "furo", "mock", "pytest", "pytest-asyncio", "pytest-cov", 
 
 [[package]]
 name = "elasticsearch"
-version = "8.10.1"
+version = "8.12.1"
 description = "Python client for Elasticsearch"
 optional = false
-python-versions = ">=3.6, <4"
+python-versions = ">=3.7"
 files = [
-    {file = "elasticsearch-8.10.1-py3-none-any.whl", hash = "sha256:68141d42d10c7f67ac466ca00496830d3b81a7e9476c3baa5585060832c60c69"},
-    {file = "elasticsearch-8.10.1.tar.gz", hash = "sha256:2cb56b433daa2d3ef1aaa2e5a5eacd36ba1d66884722f3d7759a4f9d16190059"},
+    {file = "elasticsearch-8.12.1-py3-none-any.whl", hash = "sha256:cc459b7e0fb88dc85b43b9d7d254cffad552b0063a3e0a12290c8fa5f138c038"},
+    {file = "elasticsearch-8.12.1.tar.gz", hash = "sha256:00c997720fbd0f2afe5417c8193cf65d116817a0250de0521e30c3e81f00b8ac"},
 ]
 
 [package.dependencies]
@@ -7207,4 +7207,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "3.10.12"
-content-hash = "f08cbbff047a3a35f1c8fb4aa874ecd23c4f73e9e890304e99d89fb6ca1984eb"
+content-hash = "00b871192d0dcdbcf325812680b31a5084f68a079003cc6da941973029b0a5d3"
