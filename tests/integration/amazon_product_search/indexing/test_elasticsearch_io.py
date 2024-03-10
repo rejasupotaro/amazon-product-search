@@ -1,12 +1,12 @@
-from pathlib import Path
 from time import sleep
 from typing import Iterator
 
-import polars as pl
+import apache_beam as beam
 import pytest
+from apache_beam.transforms.util import BatchElements
 
 from amazon_product_search.core.es.es_client import EsClient
-from amazon_product_search.indexing.indexing_pipeline import create_pipeline
+from amazon_product_search.indexing.io.elasticsearch_io import WriteToElasticsearch
 from amazon_product_search.indexing.options import IndexerOptions
 from tests.integration.amazon_product_search.indexing.es_docker import EsDocker
 
@@ -17,15 +17,12 @@ def es_docker() -> Iterator[EsDocker]:
         yield instance
 
 
-def test_pipeline(tmp_path: Path, es_docker):
+def test_pipeline(es_docker):
     inputs = [
         {
             "product_id": "1",
-            "product_title": "Title",
-            "product_description": "Description",
-            "product_bullet_point": "Bullet Point",
-            "product_brand": "Brand",
-            "product_color": "Color",
+            "product_title": "title",
+            "product_description": "description",
         },
     ]
     expected = [
@@ -33,39 +30,38 @@ def test_pipeline(tmp_path: Path, es_docker):
             "product_id": "1",
             "product_title": "title",
             "product_description": "description",
-            "product_bullet_point": "bullet point",
-            "product_brand": "brand",
-            "product_color": "color",
-            "product_description_keybert": "description point bullet",
         },
     ]
 
-    index_name = "test"
     locale = "us"
+    index_name = "test"
     dest_host = "http://localhost:9200"
 
     client = EsClient(es_host=dest_host)
     if index_name in client.list_indices():
         client.delete_index(index_name)
-    client.create_index(index_name)
-
-    data_dir = tmp_path / "amazon_product_search_test"
-    data_dir.mkdir()
-    filepath = data_dir / f"products_{locale}.parquet"
-    pl.from_dicts(inputs).write_parquet(filepath)
+    client.create_index(locale, index_name)
 
     options = IndexerOptions.from_dictionary(
         {
             "index_name": index_name,
-            "locale": locale,
-            "data_dir": str(data_dir),
-            "dest": "es",
             "dest_host": dest_host,
-            "extract_keywords": True,
-            "encode_text": True,
         }
     )
-    pipeline = create_pipeline(options)
+    pipeline = beam.Pipeline(options=options)
+    (
+        pipeline
+        | beam.Create(inputs)
+        | "Batch products for WriteToElasticsearch" >> BatchElements()
+        | "Index products"
+        >> beam.ParDo(
+            WriteToElasticsearch(
+                es_host=options.dest_host,
+                index_name=options.index_name,
+                id_fn=lambda doc: doc["product_id"],
+            )
+        )
+    )
     pipeline.run().wait_until_finish()
 
     # Bulk insert is done in an asynchronous manner. We need to wait for docs to be indexed.
@@ -80,7 +76,4 @@ def test_pipeline(tmp_path: Path, es_docker):
 
     response = client.search(index_name, query={"match_all": {}})
     actual = [result.product for result in response.results]
-    for product in actual:
-        assert "product_vector" in product
-        del product["product_vector"]
     assert actual == expected
