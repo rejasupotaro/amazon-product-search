@@ -45,15 +45,13 @@ def search(
     index_name: str,
     query: str,
     sparse_fields: list[str],
-    query_type: str,
     is_synonym_expansion_enabled: bool,
     size: int = 100,
 ) -> tuple[Response, Response]:
     normalized_query = normalize_query(query)
-    sparse_query = get_query_builder(locale).build_sparse_search_query(
+    sparse_query = get_query_builder(locale).build_lexical_search_query(
         query=normalized_query,
         fields=sparse_fields,
-        query_type=query_type,
         is_synonym_expansion_enabled=is_synonym_expansion_enabled,
     )
 
@@ -101,18 +99,6 @@ def main() -> None:
             default=["product_title"],
         )
 
-        query_type = str(
-            st.selectbox(
-                "Query Type:",
-                options=[
-                    "combined_fields",
-                    "cross_fields",
-                    "best_fields",
-                    "simple_query_string",
-                ],
-            )
-        )
-
         is_synonym_expansion_enabled = st.checkbox("enable_synonym_expansion")
 
         if not st.form_submit_button("Search"):
@@ -130,9 +116,7 @@ def main() -> None:
     st.write("#### Output")
 
     relevant_ids = {product_id for product_id, (label, product_title) in label_dict.items() if label == "E"}
-    sparse_response, dense_response = search(
-        locale, index_name, query, sparse_fields, query_type, is_synonym_expansion_enabled
-    )
+    sparse_response, dense_response = search(locale, index_name, query, sparse_fields, is_synonym_expansion_enabled)
     sparse_retrieved_ids = [result.product["product_id"] for result in sparse_response.results]
     dense_retrieved_ids = [result.product["product_id"] for result in dense_response.results]
     sparse_relevant_ids = [retrieved_id for retrieved_id in sparse_retrieved_ids if retrieved_id in relevant_ids]

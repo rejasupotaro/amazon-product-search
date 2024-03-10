@@ -89,7 +89,6 @@ def main() -> None:
         index_name=index_name,
         query=form_input.query,
         fields=form_input.fields,
-        query_type=form_input.query_type,
         is_synonym_expansion_enabled=form_input.is_synonym_expansion_enabled,
         sparse_boost=form_input.sparse_boost,
         dense_boost=form_input.dense_boost,

@@ -44,7 +44,6 @@ class Retriever:
         query: str,
         fields: list[str],
         is_synonym_expansion_enabled: bool = False,
-        query_type: str = "combined_fields",
         product_ids: list[str] | None = None,
         sparse_boost: float = 1.0,
         dense_boost: float = 1.0,
@@ -62,10 +61,9 @@ class Retriever:
 
         sparse_query = None
         if sparse_fields:
-            sparse_query = self.query_builder.build_sparse_search_query(
+            sparse_query = self.query_builder.build_lexical_search_query(
                 query=normalized_query,
                 fields=sparse_fields,
-                query_type=query_type,
                 # Boost should be 1.0 if fuser == "own" because boost will be applied later.
                 boost=1.0 if rank_fusion.fuser == "own" else sparse_boost,
                 is_synonym_expansion_enabled=is_synonym_expansion_enabled,

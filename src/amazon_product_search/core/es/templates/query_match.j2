@@ -1,49 +1,9 @@
 {
-    "bool": {
-        "should": [
-            {% if query_type == "cross_fields" %}
-            {
-                "multi_match": {
-                    "query": "{{ query }}",
-                    "type": "cross_fields",
-                    "fields": {{ fields | tojson }},
-                    "operator": "and",
-                    "boost": {{ boost }}
-                }
-            }
-            {% endif %}
-            {% if query_type == "best_fields" %}
-            {
-                "multi_match": {
-                    "query": "{{ query }}",
-                    "type": "best_fields",
-                    "fields": {{ fields | tojson }},
-                    "operator": "and",
-                    "boost": {{ boost }}
-                }
-            }
-            {% endif %}
-            {% if query_type == "combined_fields" %}
-            {
-                "combined_fields": {
-                    "query": "{{ query }}",
-                    "fields": {{ fields | tojson }},
-                    "operator": "and",
-                    "boost": {{ boost }}
-                }
-            }
-            {% endif %}
-            {% if query_type == "simple_query_string" %}
-            {
-                "simple_query_string": {
-                    "query": "{{ query }}",
-                    "fields": {{ fields | tojson }},
-                    "default_operator": "and",
-                    "boost": {{ boost }}
-                }
-            }
-            {% endif %}
-        ],
-        "minimum_should_match": 1
+    "multi_match": {
+        "query": "{{ query }}",
+        "type": "cross_fields",
+        "fields": {{ fields | tojson }},
+        "operator": "and",
+        "boost": {{ boost }}
     }
 }

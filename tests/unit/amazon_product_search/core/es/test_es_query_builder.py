@@ -9,22 +9,14 @@ def test_match_all():
 
 def test_build_search_query():
     query_builder = QueryBuilder(locale="us")
-    es_query = query_builder.build_sparse_search_query(
-        query="query", fields=["product_title"], query_type="combined_fields"
-    )
+    es_query = query_builder.build_lexical_search_query(query="query", fields=["product_title"])
     assert es_query == {
-        "bool": {
-            "should": [
-                {
-                    "combined_fields": {
-                        "query": "query",
-                        "fields": ["product_title"],
-                        "operator": "and",
-                        "boost": 1.0,
-                    }
-                }
-            ],
-            "minimum_should_match": 1,
+        "multi_match": {
+            "query": "query",
+            "type": "cross_fields",
+            "fields": ["product_title"],
+            "operator": "and",
+            "boost": 1.0,
         }
     }
 
@@ -33,53 +25,39 @@ def test_build_search_query_with_synonym_expansion_enabled():
     synonym_dict = SynonymDict(locale="us")
     synonym_dict._entry_dict = {"query": [("synonym", 1.0)]}
     query_builder = QueryBuilder(locale="us", synonym_dict=synonym_dict)
-    es_query = query_builder.build_sparse_search_query(
+    es_query = query_builder.build_lexical_search_query(
         query="query",
         fields=["product_title"],
-        query_type="combined_fields",
         is_synonym_expansion_enabled=True,
     )
     assert es_query == {
-        "bool": {
-            "should": [
-                {
-                    "combined_fields": {
-                        "query": "query synonym",
-                        "fields": ["product_title"],
-                        "operator": "and",
-                        "boost": 1.0,
-                    },
-                },
-            ],
-            "minimum_should_match": 1,
+        "multi_match": {
+            "query": "query synonym",
+            "type": "cross_fields",
+            "fields": ["product_title"],
+            "operator": "and",
+            "boost": 1.0,
         },
     }
 
 
 def test_build_search_query_with_product_ids():
     query_builder = QueryBuilder(locale="us")
-    es_query = query_builder.build_sparse_search_query(
+    es_query = query_builder.build_lexical_search_query(
         query="query",
         fields=["product_title"],
-        query_type="combined_fields",
         product_ids=["1", "2", "3"],
     )
     assert es_query == {
         "bool": {
             "should": [
                 {
-                    "bool": {
-                        "should": [
-                            {
-                                "combined_fields": {
-                                    "query": "query",
-                                    "fields": ["product_title"],
-                                    "operator": "and",
-                                    "boost": 1.0,
-                                },
-                            }
-                        ],
-                        "minimum_should_match": 1,
+                    "multi_match": {
+                        "query": "query",
+                        "type": "cross_fields",
+                        "fields": ["product_title"],
+                        "operator": "and",
+                        "boost": 1.0,
                     },
                 },
             ],
@@ -98,10 +76,9 @@ def test_build_search_query_with_synonym_expansion_enabled_with_product_ids():
     synonym_dict = SynonymDict(locale="us")
     synonym_dict._entry_dict = {"query": [("synonym", 1.0)]}
     query_builder = QueryBuilder(locale="us", synonym_dict=synonym_dict)
-    es_query = query_builder.build_sparse_search_query(
+    es_query = query_builder.build_lexical_search_query(
         query="query",
         fields=["product_title"],
-        query_type="combined_fields",
         is_synonym_expansion_enabled=True,
         product_ids=["1", "2", "3"],
     )
@@ -109,18 +86,12 @@ def test_build_search_query_with_synonym_expansion_enabled_with_product_ids():
         "bool": {
             "should": [
                 {
-                    "bool": {
-                        "should": [
-                            {
-                                "combined_fields": {
-                                    "query": "query synonym",
-                                    "fields": ["product_title"],
-                                    "operator": "and",
-                                    "boost": 1.0,
-                                },
-                            },
-                        ],
-                        "minimum_should_match": 1,
+                    "multi_match": {
+                        "query": "query synonym",
+                        "type": "cross_fields",
+                        "fields": ["product_title"],
+                        "operator": "and",
+                        "boost": 1.0,
                     },
                 },
             ],

@@ -34,11 +34,10 @@ class QueryBuilder:
         es_query_str = self.template_loader.load("match_all.j2").render()
         return json.loads(es_query_str)
 
-    def build_sparse_search_query(
+    def build_lexical_search_query(
         self,
         query: str,
         fields: list[str],
-        query_type: str = "combined_fields",
         boost: float = 1.0,
         is_synonym_expansion_enabled: bool | float = False,
         product_ids: list[str] | None = None,
@@ -69,7 +68,6 @@ class QueryBuilder:
         query_match = json.loads(
             self.template_loader.load("query_match.j2").render(
                 query=query,
-                query_type=query_type,
                 fields=fields,
                 boost=boost,
             )
