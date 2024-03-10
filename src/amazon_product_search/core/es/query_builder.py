@@ -50,6 +50,7 @@ class QueryBuilder:
         self,
         query: str,
         fields: list[str],
+        weight_dict: dict[str, float] | None = None,
         enable_synonym_expansion: bool | float = False,
         enable_phrase_match_boost: bool = False,
         product_ids: list[str] | None = None,
@@ -59,6 +60,7 @@ class QueryBuilder:
         Args:
             query (str): A query to search.
             fields (list[str]): A list of fields to search.
+            weight_dict (dict[str, float]): A dictionary specifying the weight of each field.
             enable_synonym_expansion: Expand the given query if True.
             enable_phrase_match_boost: Enable phrase match boosting if True.
             product_ids (list[str], Optional): A list of product IDs to filter.
@@ -78,6 +80,9 @@ class QueryBuilder:
             queries = [" ".join(tokens) for tokens in query_tokens]
         else:
             queries = [" ".join(tokens)]
+
+        if weight_dict:
+            fields = [f"{field}^{weight_dict.get(field, 1)}" for field in fields]
 
         query_match = json.loads(
             self.template_loader.load("query_match.j2").render(
