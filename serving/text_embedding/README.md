@@ -29,4 +29,7 @@ curl http://localhost:8000/v2/models/tokenizer
 
 curl http://localhost:8000/v2/models/all_minilm
 {"name":"all_minilm","versions":["1"],"platform":"onnxruntime_onnx","inputs":[{"name":"input_ids","datatype":"INT64","shape":[-1,512]},{"name":"attention_mask","datatype":"INT64","shape":[-1,512]}],"outputs":[{"name":"output","datatype":"FP32","shape":[-1,384]}]}
+
+http://localhost:8000/v2/models/text_embedding
+{"name":"text_embedding","versions":["1"],"platform":"ensemble","inputs":[{"name":"text","datatype":"BYTES","shape":[-1]}],"outputs":[{"name":"output","datatype":"FP32","shape":[-1,384]}]}
 ```
