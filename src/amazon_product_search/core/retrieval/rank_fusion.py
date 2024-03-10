@@ -15,8 +15,6 @@ CombinationMethod = Literal["sum", "max", "append"]
 
 @dataclass
 class RankFusion:
-    fuser: Literal["own", "search_engine"] = "own"
-    # When `fuser == "own"`, the following options are available.
     combination_method: CombinationMethod = "sum"
     # When `combination_method != "append"`, the following options are available.
     score_transformation_method: ScoreTransformationMethod = "min_max"

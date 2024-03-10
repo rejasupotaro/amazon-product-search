@@ -76,23 +76,6 @@ class Retriever:
                 product_ids=product_ids,
             )
 
-        if rank_fusion.fuser == "search_engine":
-            rank = None
-            if rank_fusion.score_transformation_method == "rrf":
-                rank = {
-                    "rrf": {
-                        "window_size": window_size,
-                    }
-                }
-            return self.es_client.search(
-                index_name=index_name,
-                query=sparse_query,
-                knn_query=dense_query,
-                rank=rank,
-                size=size,
-                explain=True,
-            )
-
         if sparse_query:
             sparse_response = self.es_client.search(
                 index_name=index_name,

@@ -19,7 +19,6 @@ class FormInput:
     enable_synonym_expansion: bool
     size: int
     window_size: int
-    fuser: str
     combination_method: Literal["sum", "max", "append"]
     score_transformation_method: Literal["min_max", "rrf"] | None
     reranker_str: str | None
@@ -53,8 +52,6 @@ def draw_input_form(queries: list[str] | None = None) -> FormInput:
 
     window_size = st.number_input("window_size", value=100)
 
-    fuser = st.selectbox("fuser:", ["own", "search_engine"])
-
     combination_method = st.selectbox("combination_method:", ["sum", "max", "append"])
 
     score_transformation_method = st.selectbox("score_transformation_method:", ["min_max", "rrf", "borda"])
@@ -69,7 +66,6 @@ def draw_input_form(queries: list[str] | None = None) -> FormInput:
         enable_synonym_expansion,
         size=size,
         window_size=window_size,
-        fuser=fuser,
         combination_method=combination_method,
         score_transformation_method=score_transformation_method,
         reranker_str=reranker_str,

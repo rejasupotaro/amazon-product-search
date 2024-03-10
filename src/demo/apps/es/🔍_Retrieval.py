@@ -95,7 +95,6 @@ def main() -> None:
         size=form_input.size,
         window_size=form_input.window_size,
         rank_fusion=RankFusion(
-            fuser=form_input.fuser,
             combination_method=form_input.combination_method,
             score_transformation_method=form_input.score_transformation_method,
         ),
