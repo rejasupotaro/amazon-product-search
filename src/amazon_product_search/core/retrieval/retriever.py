@@ -73,8 +73,6 @@ class Retriever:
                 normalized_query,
                 field=dense_fields[0],
                 top_k=window_size,
-                # Boost should be 1.0 if fuser == "own" because boost will be applied later.
-                boost=1.0 if rank_fusion.fuser == "own" else dense_boost,
                 product_ids=product_ids,
             )
 

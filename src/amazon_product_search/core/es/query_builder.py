@@ -61,7 +61,7 @@ class QueryBuilder:
             fields (list[str]): A list of fields to search.
             enable_synonym_expansion: Expand the given query if True.
             enable_phrase_match_boost: Enable phrase match boosting if True.
-            product_ids (list[str]): A list of product IDs to filter.
+            product_ids (list[str], Optional): A list of product IDs to filter.
 
         Returns:
             dict[str, Any]: The constructed ES query.
@@ -115,7 +115,6 @@ class QueryBuilder:
         query: str,
         field: str,
         top_k: int,
-        boost: float = 1.0,
         product_ids: list[str] | None = None,
     ) -> dict[str, Any]:
         """Build a KNN ES query from given conditions.
@@ -124,6 +123,7 @@ class QueryBuilder:
             query (str): A query to encode.
             field (str): A field to examine.
             top_k (int): A number specifying how many results to return.
+            product_ids (list[str], Optional): A list of product IDs to filter.
 
         Returns:
             dict[str, Any]: The constructed ES query.
@@ -134,7 +134,6 @@ class QueryBuilder:
             field=field,
             k=top_k,
             num_candidates=top_k,
-            boost=boost,
             product_ids=product_ids,
         )
         return json.loads(es_query_str)
