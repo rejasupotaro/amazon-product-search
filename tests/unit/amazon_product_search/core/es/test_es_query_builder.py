@@ -26,20 +26,23 @@ def test_build_search_query():
     query_builder = QueryBuilder(locale="us")
     es_query = query_builder.build_lexical_search_query(query="query", fields=["product_title"])
     assert es_query == {
-        "bool": {
-            "should": [
-                {
-                    "multi_match": {
-                        "query": "query",
-                        "type": "cross_fields",
-                        "fields": ["product_title"],
-                        "operator": "and",
-                        "boost": 1.0,
-                    },
+        "function_score": {
+            "query": {
+                "dis_max": {
+                    "queries": [
+                        {
+                            "multi_match": {
+                                "query": "query",
+                                "type": "cross_fields",
+                                "fields": ["product_title"],
+                                "operator": "and",
+                                "boost": 1.0,
+                            },
+                        },
+                    ],
                 },
-            ],
-            "minimum_should_match": 1,
-        }
+            },
+        },
     }
 
 
@@ -53,29 +56,32 @@ def test_build_search_query_with_synonym_expansion_enabled():
         is_synonym_expansion_enabled=True,
     )
     assert es_query == {
-        "bool": {
-            "should": [
-                {
-                    "multi_match": {
-                        "query": "query",
-                        "type": "cross_fields",
-                        "fields": ["product_title"],
-                        "operator": "and",
-                        "boost": 1.0,
-                    },
+        "function_score": {
+            "query": {
+                "dis_max": {
+                    "queries": [
+                        {
+                            "multi_match": {
+                                "query": "query",
+                                "type": "cross_fields",
+                                "fields": ["product_title"],
+                                "operator": "and",
+                                "boost": 1.0,
+                            },
+                        },
+                        {
+                            "multi_match": {
+                                "query": "synonym",
+                                "type": "cross_fields",
+                                "fields": ["product_title"],
+                                "operator": "and",
+                                "boost": 1.0,
+                            },
+                        },
+                    ],
                 },
-                {
-                    "multi_match": {
-                        "query": "synonym",
-                        "type": "cross_fields",
-                        "fields": ["product_title"],
-                        "operator": "and",
-                        "boost": 1.0,
-                    },
-                },
-            ],
-            "minimum_should_match": 1,
-        }
+            },
+        },
     }
 
 
@@ -90,21 +96,24 @@ def test_build_search_query_with_product_ids():
         "bool": {
             "must": [
                 {
-                    "bool": {
-                        "should": [
-                            {
-                                "multi_match": {
-                                    "query": "query",
-                                    "type": "cross_fields",
-                                    "fields": ["product_title"],
-                                    "operator": "and",
-                                    "boost": 1.0,
-                                },
+                    "function_score": {
+                        "query": {
+                            "dis_max": {
+                                "queries": [
+                                    {
+                                        "multi_match": {
+                                            "query": "query",
+                                            "type": "cross_fields",
+                                            "fields": ["product_title"],
+                                            "operator": "and",
+                                            "boost": 1.0,
+                                        },
+                                    },
+                                ],
                             },
-                        ],
-                        "minimum_should_match": 1,
-                    },
-                },
+                        }
+                    }
+                }
             ],
             "filter": [
                 {
@@ -131,29 +140,32 @@ def test_build_search_query_with_synonym_expansion_enabled_with_product_ids():
         "bool": {
             "must": [
                 {
-                    "bool": {
-                        "should": [
-                            {
-                                "multi_match": {
-                                    "query": "query",
-                                    "type": "cross_fields",
-                                    "fields": ["product_title"],
-                                    "operator": "and",
-                                    "boost": 1.0,
-                                },
+                    "function_score": {
+                        "query": {
+                            "dis_max": {
+                                "queries": [
+                                    {
+                                        "multi_match": {
+                                            "query": "query",
+                                            "type": "cross_fields",
+                                            "fields": ["product_title"],
+                                            "operator": "and",
+                                            "boost": 1.0,
+                                        },
+                                    },
+                                    {
+                                        "multi_match": {
+                                            "query": "synonym",
+                                            "type": "cross_fields",
+                                            "fields": ["product_title"],
+                                            "operator": "and",
+                                            "boost": 1.0,
+                                        },
+                                    },
+                                ],
                             },
-                            {
-                                "multi_match": {
-                                    "query": "synonym",
-                                    "type": "cross_fields",
-                                    "fields": ["product_title"],
-                                    "operator": "and",
-                                    "boost": 1.0,
-                                },
-                            },
-                        ],
-                        "minimum_should_match": 1,
-                    },
+                        }
+                    }
                 },
             ],
             "filter": [
