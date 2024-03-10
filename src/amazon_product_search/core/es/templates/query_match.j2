@@ -10,7 +10,7 @@
                             "type": "cross_fields",
                             "fields": {{ fields | tojson }},
                             "operator": "and",
-                            "boost": {{ boost }}
+                            "boost": 1.0
                         }
                     }
                     {% if not loop.last %}

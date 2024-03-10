@@ -50,7 +50,6 @@ class QueryBuilder:
         self,
         query: str,
         fields: list[str],
-        boost: float = 1.0,
         enable_synonym_expansion: bool | float = False,
         enable_phrase_match_boost: bool = False,
         product_ids: list[str] | None = None,
@@ -60,7 +59,6 @@ class QueryBuilder:
         Args:
             query (str): A query to search.
             fields (list[str]): A list of fields to search.
-            boost (float): A boost factor for the query.
             enable_synonym_expansion: Expand the given query if True.
             enable_phrase_match_boost: Enable phrase match boosting if True.
             product_ids (list[str]): A list of product IDs to filter.
@@ -85,7 +83,6 @@ class QueryBuilder:
             self.template_loader.load("query_match.j2").render(
                 queries=queries,
                 fields=fields,
-                boost=boost,
                 enable_phrase_match_boost=enable_phrase_match_boost,
             )
         )

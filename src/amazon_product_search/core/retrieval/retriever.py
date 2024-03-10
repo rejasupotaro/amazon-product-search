@@ -64,8 +64,6 @@ class Retriever:
             sparse_query = self.query_builder.build_lexical_search_query(
                 query=normalized_query,
                 fields=sparse_fields,
-                # Boost should be 1.0 if fuser == "own" because boost will be applied later.
-                boost=1.0 if rank_fusion.fuser == "own" else sparse_boost,
                 enable_synonym_expansion=enable_synonym_expansion,
                 product_ids=product_ids,
             )
