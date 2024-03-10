@@ -16,7 +16,7 @@ class FormInput:
     fields: list[str]
     sparse_boost: float
     dense_boost: float
-    is_synonym_expansion_enabled: bool
+    enable_synonym_expansion: bool
     size: int
     window_size: int
     fuser: str
@@ -47,7 +47,7 @@ def draw_input_form(queries: list[str] | None = None) -> FormInput:
     with columns[1]:
         dense_boost = st.number_input("Dense Boost", value=1.0)
 
-    is_synonym_expansion_enabled = st.checkbox("enable_synonym_expansion")
+    enable_synonym_expansion = st.checkbox("enable_synonym_expansion")
 
     size = st.number_input("size", value=100)
 
@@ -66,7 +66,7 @@ def draw_input_form(queries: list[str] | None = None) -> FormInput:
         fields,
         sparse_boost,
         dense_boost,
-        is_synonym_expansion_enabled,
+        enable_synonym_expansion,
         size=size,
         window_size=window_size,
         fuser=fuser,

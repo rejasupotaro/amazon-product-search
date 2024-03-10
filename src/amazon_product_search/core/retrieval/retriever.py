@@ -43,7 +43,7 @@ class Retriever:
         index_name: str,
         query: str,
         fields: list[str],
-        is_synonym_expansion_enabled: bool = False,
+        enable_synonym_expansion: bool = False,
         product_ids: list[str] | None = None,
         sparse_boost: float = 1.0,
         dense_boost: float = 1.0,
@@ -66,7 +66,7 @@ class Retriever:
                 fields=sparse_fields,
                 # Boost should be 1.0 if fuser == "own" because boost will be applied later.
                 boost=1.0 if rank_fusion.fuser == "own" else sparse_boost,
-                is_synonym_expansion_enabled=is_synonym_expansion_enabled,
+                enable_synonym_expansion=enable_synonym_expansion,
                 product_ids=product_ids,
             )
         dense_query = None

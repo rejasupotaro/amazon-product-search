@@ -54,7 +54,7 @@ def test_build_search_query_with_synonym_expansion_enabled():
     es_query = query_builder.build_lexical_search_query(
         query="query",
         fields=["product_title"],
-        is_synonym_expansion_enabled=True,
+        enable_synonym_expansion=True,
     )
     assert es_query == {
         "function_score": {
@@ -136,7 +136,7 @@ def test_build_search_query_with_synonym_expansion_enabled_with_product_ids():
     es_query = query_builder.build_lexical_search_query(
         query="query",
         fields=["product_title"],
-        is_synonym_expansion_enabled=True,
+        enable_synonym_expansion=True,
         product_ids=["1", "2", "3"],
     )
     assert es_query == {

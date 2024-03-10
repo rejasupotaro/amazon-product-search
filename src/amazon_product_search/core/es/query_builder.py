@@ -51,7 +51,7 @@ class QueryBuilder:
         query: str,
         fields: list[str],
         boost: float = 1.0,
-        is_synonym_expansion_enabled: bool | float = False,
+        enable_synonym_expansion: bool | float = False,
         is_phrase_match_boost_enabled: bool = False,
         product_ids: list[str] | None = None,
     ) -> dict[str, Any]:
@@ -59,7 +59,7 @@ class QueryBuilder:
 
         Args:
             fields (list[str]): A list of fields to search.
-            is_synonym_expansion_enabled: Expand the given query if True.
+            enable_synonym_expansion: Expand the given query if True.
 
         Returns:
             dict[str, Any]: The constructed ES query.
@@ -69,7 +69,7 @@ class QueryBuilder:
 
         tokens = cast(list, self.tokenizer.tokenize(query))
 
-        if is_synonym_expansion_enabled and self.synonym_dict:
+        if enable_synonym_expansion and self.synonym_dict:
             query_with_synonyms = self.synonym_dict.expand_synonyms(tokens)
             query_tokens: list[list[str]] = []
             expand_synonyms(query_with_synonyms, [], query_tokens)
