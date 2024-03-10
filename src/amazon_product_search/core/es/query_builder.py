@@ -52,6 +52,7 @@ class QueryBuilder:
         fields: list[str],
         boost: float = 1.0,
         is_synonym_expansion_enabled: bool | float = False,
+        is_phrase_match_boost_enabled: bool = False,
         product_ids: list[str] | None = None,
     ) -> dict[str, Any]:
         """Build a multi-match ES query.
@@ -81,6 +82,7 @@ class QueryBuilder:
                 queries=queries,
                 fields=fields,
                 boost=boost,
+                is_phrase_match_boost_enabled=is_phrase_match_boost_enabled,
             )
         )
         if not product_ids:

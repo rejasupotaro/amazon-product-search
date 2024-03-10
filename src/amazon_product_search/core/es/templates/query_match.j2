@@ -19,6 +19,20 @@
                     {% endfor %}
                 ]
             }
-        }
+        },
+        "functions": [
+            {% if is_phrase_match_boost_enabled %}
+            {
+                "filter": {
+                    "match_phrase": {
+                        "product_title": {
+                            "query": "{{ queries[0] }}",
+                            "boost": 2
+                        }
+                    }
+                }
+            }
+            {% endif %}
+        ]
     }
 }

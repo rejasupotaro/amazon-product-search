@@ -42,6 +42,7 @@ def test_build_search_query():
                     ],
                 },
             },
+            "functions": [],
         },
     }
 
@@ -81,6 +82,7 @@ def test_build_search_query_with_synonym_expansion_enabled():
                     ],
                 },
             },
+            "functions": [],
         },
     }
 
@@ -111,8 +113,9 @@ def test_build_search_query_with_product_ids():
                                     },
                                 ],
                             },
-                        }
-                    }
+                        },
+                        "functions": [],
+                    },
                 }
             ],
             "filter": [
@@ -164,8 +167,9 @@ def test_build_search_query_with_synonym_expansion_enabled_with_product_ids():
                                     },
                                 ],
                             },
-                        }
-                    }
+                        },
+                        "functions": [],
+                    },
                 },
             ],
             "filter": [
