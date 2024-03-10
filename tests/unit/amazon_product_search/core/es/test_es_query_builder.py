@@ -1,5 +1,20 @@
-from amazon_product_search.core.es.query_builder import QueryBuilder
+from amazon_product_search.core.es.query_builder import QueryBuilder, expand_synonyms
 from amazon_product_search.core.synonyms.synonym_dict import SynonymDict
+
+
+def test_expand_synonyms():
+    token_chain = [("1", []), ("2", ["3", "4"]), ("5", ["6"])]
+    expanded_queries = []
+    expand_synonyms(token_chain, [], expanded_queries)
+    assert len(expanded_queries) == 6
+    assert expanded_queries == [
+        ["1", "2", "5"],
+        ["1", "2", "6"],
+        ["1", "3", "5"],
+        ["1", "3", "6"],
+        ["1", "4", "5"],
+        ["1", "4", "6"],
+    ]
 
 
 def test_match_all():
@@ -11,12 +26,19 @@ def test_build_search_query():
     query_builder = QueryBuilder(locale="us")
     es_query = query_builder.build_lexical_search_query(query="query", fields=["product_title"])
     assert es_query == {
-        "multi_match": {
-            "query": "query",
-            "type": "cross_fields",
-            "fields": ["product_title"],
-            "operator": "and",
-            "boost": 1.0,
+        "bool": {
+            "should": [
+                {
+                    "multi_match": {
+                        "query": "query",
+                        "type": "cross_fields",
+                        "fields": ["product_title"],
+                        "operator": "and",
+                        "boost": 1.0,
+                    },
+                },
+            ],
+            "minimum_should_match": 1,
         }
     }
 
@@ -31,13 +53,29 @@ def test_build_search_query_with_synonym_expansion_enabled():
         is_synonym_expansion_enabled=True,
     )
     assert es_query == {
-        "multi_match": {
-            "query": "query synonym",
-            "type": "cross_fields",
-            "fields": ["product_title"],
-            "operator": "and",
-            "boost": 1.0,
-        },
+        "bool": {
+            "should": [
+                {
+                    "multi_match": {
+                        "query": "query",
+                        "type": "cross_fields",
+                        "fields": ["product_title"],
+                        "operator": "and",
+                        "boost": 1.0,
+                    },
+                },
+                {
+                    "multi_match": {
+                        "query": "synonym",
+                        "type": "cross_fields",
+                        "fields": ["product_title"],
+                        "operator": "and",
+                        "boost": 1.0,
+                    },
+                },
+            ],
+            "minimum_should_match": 1,
+        }
     }
 
 
@@ -50,18 +88,25 @@ def test_build_search_query_with_product_ids():
     )
     assert es_query == {
         "bool": {
-            "should": [
+            "must": [
                 {
-                    "multi_match": {
-                        "query": "query",
-                        "type": "cross_fields",
-                        "fields": ["product_title"],
-                        "operator": "and",
-                        "boost": 1.0,
+                    "bool": {
+                        "should": [
+                            {
+                                "multi_match": {
+                                    "query": "query",
+                                    "type": "cross_fields",
+                                    "fields": ["product_title"],
+                                    "operator": "and",
+                                    "boost": 1.0,
+                                },
+                            },
+                        ],
+                        "minimum_should_match": 1,
                     },
                 },
             ],
-            "must": [
+            "filter": [
                 {
                     "terms": {
                         "product_id": ["1", "2", "3"],
@@ -84,18 +129,34 @@ def test_build_search_query_with_synonym_expansion_enabled_with_product_ids():
     )
     assert es_query == {
         "bool": {
-            "should": [
+            "must": [
                 {
-                    "multi_match": {
-                        "query": "query synonym",
-                        "type": "cross_fields",
-                        "fields": ["product_title"],
-                        "operator": "and",
-                        "boost": 1.0,
+                    "bool": {
+                        "should": [
+                            {
+                                "multi_match": {
+                                    "query": "query",
+                                    "type": "cross_fields",
+                                    "fields": ["product_title"],
+                                    "operator": "and",
+                                    "boost": 1.0,
+                                },
+                            },
+                            {
+                                "multi_match": {
+                                    "query": "synonym",
+                                    "type": "cross_fields",
+                                    "fields": ["product_title"],
+                                    "operator": "and",
+                                    "boost": 1.0,
+                                },
+                            },
+                        ],
+                        "minimum_should_match": 1,
                     },
                 },
             ],
-            "must": [
+            "filter": [
                 {
                     "terms": {
                         "product_id": ["1", "2", "3"],

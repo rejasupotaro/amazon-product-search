@@ -1,6 +1,5 @@
 import re
 from collections import defaultdict
-from typing import cast
 
 import polars as pl
 
@@ -53,7 +52,7 @@ class SynonymDict:
             entry_dict[query].append((title, score))
         return entry_dict
 
-    def expand_synonyms(self, query: str, ngrams: int = 2) -> list[tuple[str, list[str]]]:
+    def expand_synonyms(self, tokens: list[str], ngrams: int = 2) -> list[tuple[str, list[str]]]:
         """Return a list of synonyms for a given query.
 
         Args:
@@ -63,7 +62,6 @@ class SynonymDict:
             list[tuple[str, list[str]]]: A list of the original query terms and their synonyms.
         """
         expanded_query: list[tuple[str, list[str]]] = []
-        tokens: list[str] = cast(list, self.tokenizer.tokenize(query))
         current_position = 0
         while current_position < len(tokens):
             found = None

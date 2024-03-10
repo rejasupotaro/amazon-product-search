@@ -1,9 +1,21 @@
 {
-    "multi_match": {
-        "query": "{{ query }}",
-        "type": "cross_fields",
-        "fields": {{ fields | tojson }},
-        "operator": "and",
-        "boost": {{ boost }}
+    "bool": {
+        "should": [
+            {% for query in queries %}
+            {
+                "multi_match": {
+                    "query": "{{ query }}",
+                    "type": "cross_fields",
+                    "fields": {{ fields | tojson }},
+                    "operator": "and",
+                    "boost": {{ boost }}
+                }
+            }
+            {% if not loop.last %}
+            ,
+            {% endif %}
+            {% endfor %}
+        ],
+        "minimum_should_match": 1
     }
 }

@@ -11,6 +11,18 @@ from amazon_product_search.core.synonyms.synonym_dict import SynonymDict
 from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 
 
+def expand_synonyms(token_chain: list[tuple[str, list[str]]], current: list[str], result: list[list[str]]):
+    if not token_chain:
+        result.append(current)
+        return
+
+    token, synonyms = token_chain[0]
+    expand_synonyms(token_chain[1:], [*current, token], result)
+    if synonyms:
+        for synonym in synonyms:
+            expand_synonyms(token_chain[1:], [*current, synonym], result)
+
+
 class QueryBuilder:
     def __init__(
         self,
@@ -55,19 +67,18 @@ class QueryBuilder:
             return self.match_all()
 
         tokens = cast(list, self.tokenizer.tokenize(query))
-        query = " ".join(tokens)
 
         if is_synonym_expansion_enabled and self.synonym_dict:
-            query_with_synonyms = self.synonym_dict.expand_synonyms(query)
-            expanded_tokens = []
-            for token, synonyms in query_with_synonyms:
-                expanded_tokens.append(token)
-                expanded_tokens.extend(synonyms)
-            query = " ".join(expanded_tokens)
+            query_with_synonyms = self.synonym_dict.expand_synonyms(tokens)
+            query_tokens: list[list[str]] = []
+            expand_synonyms(query_with_synonyms, [], query_tokens)
+            queries = [" ".join(tokens) for tokens in query_tokens]
+        else:
+            queries = [" ".join(tokens)]
 
         query_match = json.loads(
             self.template_loader.load("query_match.j2").render(
-                query=query,
+                queries=queries,
                 fields=fields,
                 boost=boost,
             )
@@ -76,10 +87,10 @@ class QueryBuilder:
             return query_match
         return {
             "bool": {
-                "should": [
+                "must": [
                     query_match,
                 ],
-                "must": [
+                "filter": [
                     {
                         "terms": {
                             "product_id": product_ids,

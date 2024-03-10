@@ -38,7 +38,7 @@ class QueryBuilder:
     def _build_text_matching_query(self, tokens: list[str], fields: list[str], operator: Operator) -> str:
         if operator == "weakAnd":
             conditions = []
-            for token, synonyms in self.synonym_dict.expand_synonyms(" ".join(tokens)):
+            for token, synonyms in self.synonym_dict.expand_synonyms(tokens):
                 for field in fields:
                     conditions.append(f"{field} contains '{token}'")
                     for synonym in synonyms:
@@ -46,7 +46,7 @@ class QueryBuilder:
             return f"weakAnd({', '.join(conditions)})"
 
         and_conditions = []
-        for token, synonyms in self.synonym_dict.expand_synonyms(" ".join(tokens)):
+        for token, synonyms in self.synonym_dict.expand_synonyms(tokens):
             or_conditions = []
             for field in fields:
                 if synonyms:
