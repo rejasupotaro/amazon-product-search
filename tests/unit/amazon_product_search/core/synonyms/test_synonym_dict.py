@@ -23,5 +23,5 @@ def test_expand_synonyms(query, expected):
         "a b": [("a b'", 1.0)],
     }
 
-    actual = synonym_dict.expand_synonyms(query.split())
+    actual = synonym_dict.look_up(query.split())
     assert actual == expected

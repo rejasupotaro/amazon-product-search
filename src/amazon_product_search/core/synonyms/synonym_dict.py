@@ -52,11 +52,11 @@ class SynonymDict:
             entry_dict[query].append((title, score))
         return entry_dict
 
-    def expand_synonyms(self, tokens: list[str], ngrams: int = 2) -> list[tuple[str, list[str]]]:
+    def look_up(self, tokens: list[str], ngrams: int = 2) -> list[tuple[str, list[str]]]:
         """Return a list of synonyms for a given query.
 
         Args:
-            query (str): A query to expand.
+            tokens (list[str]): A list of tokens to look up.
 
         Returns:
             list[tuple[str, list[str]]]: A list of the original query terms and their synonyms.

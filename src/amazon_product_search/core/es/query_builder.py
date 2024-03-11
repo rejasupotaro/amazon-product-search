@@ -74,7 +74,7 @@ class QueryBuilder:
         tokens = cast(list, self.tokenizer.tokenize(query))
 
         if enable_synonym_expansion and self.synonym_dict:
-            query_with_synonyms = self.synonym_dict.expand_synonyms(tokens)
+            query_with_synonyms = self.synonym_dict.look_up(tokens)
             query_tokens: list[list[str]] = []
             expand_synonyms(query_with_synonyms, [], query_tokens)
             queries = [" ".join(tokens) for tokens in query_tokens]
