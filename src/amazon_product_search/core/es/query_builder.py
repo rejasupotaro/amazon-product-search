@@ -115,7 +115,7 @@ class QueryBuilder:
             return query_vector
         return self.encoder.encode(query).tolist()
 
-    def build_dense_search_query(
+    def build_semantic_search_query(
         self,
         query: str,
         field: str,

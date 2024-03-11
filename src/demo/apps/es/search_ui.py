@@ -14,8 +14,8 @@ from amazon_product_search.core.retrieval.response import Response, Result
 class FormInput:
     query: str | None
     fields: list[str]
-    sparse_boost: float
-    dense_boost: float
+    lexical_boost: float
+    semantic_boost: float
     enable_synonym_expansion: bool
     size: int
     window_size: int
@@ -42,9 +42,9 @@ def draw_input_form(queries: list[str] | None = None) -> FormInput:
 
     columns = st.columns(2)
     with columns[0]:
-        sparse_boost = st.number_input("Sparse Boost", value=1.0)
+        lexical_boost = st.number_input("Lexical Boost", value=1.0)
     with columns[1]:
-        dense_boost = st.number_input("Dense Boost", value=1.0)
+        semantic_boost = st.number_input("Semantic Boost", value=1.0)
 
     enable_synonym_expansion = st.checkbox("enable_synonym_expansion")
 
@@ -61,8 +61,8 @@ def draw_input_form(queries: list[str] | None = None) -> FormInput:
     return FormInput(
         query,
         fields,
-        sparse_boost,
-        dense_boost,
+        lexical_boost,
+        semantic_boost,
         enable_synonym_expansion,
         size=size,
         window_size=window_size,
@@ -75,12 +75,12 @@ def draw_input_form(queries: list[str] | None = None) -> FormInput:
 def draw_response_stats(response: Response, query_vector: np.ndarray, label_dict: dict[str, tuple[str, str]]) -> None:
     rows = []
     for result in response.results:
-        sparse_score, dense_score = result.get_scores_in_explanation()
+        lexical_score, semantic_score = result.get_scores_in_explanation()
         row = {
             "product_title": result.product["product_title"],
             "total_score": result.score,
-            "sparse_score": sparse_score,
-            "dense_score": dense_score,
+            "lexical_score": lexical_score,
+            "semantic_score": semantic_score,
             "label": label_dict.get(result.product["product_id"], ("-", ""))[0],
         }
         rows.append(row)
@@ -93,16 +93,16 @@ def draw_response_stats(response: Response, query_vector: np.ndarray, label_dict
         for i, row in enumerate(df.to_dict(orient="records")):
             rows.append(
                 {
-                    "retrieval": "sparse",
+                    "retrieval": "lexical",
                     "rank": i,
-                    "score": row["sparse_score"],
+                    "score": row["lexical_score"],
                 }
             )
             rows.append(
                 {
-                    "retrieval": "dense",
+                    "retrieval": "semantic",
                     "rank": i,
-                    "score": row["dense_score"],
+                    "score": row["semantic_score"],
                 }
             )
         scores_df = pd.DataFrame(rows)
@@ -117,7 +117,7 @@ def draw_response_stats(response: Response, query_vector: np.ndarray, label_dict
             st.plotly_chart(fig, use_container_width=True)
         with cols[1]:
             df["label"] = df["label"].astype("category")
-            fig = px.scatter(df, x="sparse_score", y="dense_score", color="label")
+            fig = px.scatter(df, x="lexical_score", y="semantic_score", color="label")
             fig.update_layout(title="Scores and Labels")
             st.plotly_chart(fig, use_container_width=True)
 

@@ -114,15 +114,15 @@ def test_borda_counts(scores, expected):
     ],
 )
 def test_append_results(original_results, alternative_results, expected_total_hits, expected_product_ids):
-    sparse_response = Response(results=original_results, total_hits=len(original_results))
-    dense_response = Response(results=alternative_results, total_hits=len(alternative_results))
-    response = _append_results(sparse_response, dense_response, size=2)
+    lexical_response = Response(results=original_results, total_hits=len(original_results))
+    semantic_response = Response(results=alternative_results, total_hits=len(alternative_results))
+    response = _append_results(lexical_response, semantic_response, size=2)
     assert response.total_hits == expected_total_hits
     assert [result.product["product_id"] for result in response.results] == expected_product_ids
 
 
 @pytest.mark.parametrize(
-    ("sparse_results", "dense_results", "expected_total_hits", "expected_product_ids"),
+    ("lexical_results", "semantic_results", "expected_total_hits", "expected_product_ids"),
     [
         ([], [], 0, []),
         (
@@ -163,20 +163,20 @@ def test_append_results(original_results, alternative_results, expected_total_hi
         ),
     ],
 )
-def test_combine_responses(sparse_results, dense_results, expected_total_hits, expected_product_ids):
-    sparse_response = Response(results=sparse_results, total_hits=len(sparse_results))
-    dense_response = Response(results=dense_results, total_hits=len(dense_results))
-    response = _combine_responses(sparse_response, dense_response, combination_method="sum", size=100)
+def test_combine_responses(lexical_results, semantic_results, expected_total_hits, expected_product_ids):
+    lexical_response = Response(results=lexical_results, total_hits=len(lexical_results))
+    semantic_response = Response(results=semantic_results, total_hits=len(semantic_results))
+    response = _combine_responses(lexical_response, semantic_response, combination_method="sum", size=100)
     assert response.total_hits == expected_total_hits
     assert [result.product["product_id"] for result in response.results] == expected_product_ids
     _is_sorted([result.score for result in response.results])
 
 
 def test_combine_responses_with_size():
-    sparse_results = [Result(product={"product_id": str(i)}, score=0) for i in range(0, 3)]
-    sparse_response = Response(results=sparse_results, total_hits=len(sparse_results))
-    dense_results = [Result(product={"product_id": str(i)}, score=0) for i in range(3, 6)]
-    dense_response = Response(results=dense_results, total_hits=len(dense_results))
-    response = _combine_responses(sparse_response, dense_response, combination_method="sum", size=4)
+    lexical_results = [Result(product={"product_id": str(i)}, score=0) for i in range(0, 3)]
+    lexical_response = Response(results=lexical_results, total_hits=len(lexical_results))
+    semantic_results = [Result(product={"product_id": str(i)}, score=0) for i in range(3, 6)]
+    semantic_response = Response(results=semantic_results, total_hits=len(semantic_results))
+    response = _combine_responses(lexical_response, semantic_response, combination_method="sum", size=4)
     assert response.total_hits == 6
     assert len(response.results) == 4

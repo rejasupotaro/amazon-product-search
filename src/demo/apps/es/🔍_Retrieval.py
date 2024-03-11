@@ -90,8 +90,8 @@ def main() -> None:
         query=form_input.query,
         fields=form_input.fields,
         enable_synonym_expansion=form_input.enable_synonym_expansion,
-        sparse_boost=form_input.sparse_boost,
-        dense_boost=form_input.dense_boost,
+        lexical_boost=form_input.lexical_boost,
+        semantic_boost=form_input.semantic_boost,
         size=form_input.size,
         window_size=form_input.window_size,
         rank_fusion=RankFusion(

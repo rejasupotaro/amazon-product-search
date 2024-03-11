@@ -44,29 +44,29 @@ def search(
     locale: Locale,
     index_name: str,
     query: str,
-    sparse_fields: list[str],
+    lexical_fields: list[str],
     enable_synonym_expansion: bool,
     size: int = 100,
 ) -> tuple[Response, Response]:
     normalized_query = normalize_query(query)
-    sparse_query = get_query_builder(locale).build_lexical_search_query(
+    lexical_query = get_query_builder(locale).build_lexical_search_query(
         query=normalized_query,
-        fields=sparse_fields,
+        fields=lexical_fields,
         enable_synonym_expansion=enable_synonym_expansion,
     )
 
     query_vector = get_query_builder(locale).encode(normalized_query)
-    dense_query = {
+    semantic_query = {
         "query_vector": query_vector,
         "field": "product_vector",
         "k": size,
         "num_candidates": size,
     }
 
-    sparse_response = es_client.search(index_name=index_name, query=sparse_query, size=size)
-    dense_response = es_client.search(index_name=index_name, knn_query=dense_query)
+    lexical_response = es_client.search(index_name=index_name, query=lexical_query, size=size)
+    semantic_response = es_client.search(index_name=index_name, knn_query=semantic_query)
 
-    return sparse_response, dense_response
+    return lexical_response, semantic_response
 
 
 def main() -> None:
@@ -87,7 +87,7 @@ def main() -> None:
         query = st.selectbox("Query:", queries) if queries else st.text_input("Query:")
         assert query is not None
 
-        sparse_fields = st.multiselect(
+        lexical_fields = st.multiselect(
             "Fields:",
             options=[
                 "product_title",
@@ -116,38 +116,40 @@ def main() -> None:
     st.write("#### Output")
 
     relevant_ids = {product_id for product_id, (label, product_title) in label_dict.items() if label == "E"}
-    sparse_response, dense_response = search(locale, index_name, query, sparse_fields, enable_synonym_expansion)
-    sparse_retrieved_ids = [result.product["product_id"] for result in sparse_response.results]
-    dense_retrieved_ids = [result.product["product_id"] for result in dense_response.results]
-    sparse_relevant_ids = [retrieved_id for retrieved_id in sparse_retrieved_ids if retrieved_id in relevant_ids]
-    dense_relevant_ids = [retrieved_id for retrieved_id in dense_retrieved_ids if retrieved_id in relevant_ids]
+    lexical_response, semantic_response = search(locale, index_name, query, lexical_fields, enable_synonym_expansion)
+    lexical_retrieved_ids = [result.product["product_id"] for result in lexical_response.results]
+    semantic_retrieved_ids = [result.product["product_id"] for result in semantic_response.results]
+    lexical_relevant_ids = [retrieved_id for retrieved_id in lexical_retrieved_ids if retrieved_id in relevant_ids]
+    semantic_relevant_ids = [retrieved_id for retrieved_id in semantic_retrieved_ids if retrieved_id in relevant_ids]
 
-    all_iou, all_intersection, all_union = compute_iou(set(sparse_retrieved_ids), set(dense_retrieved_ids))
+    all_iou, all_intersection, all_union = compute_iou(set(lexical_retrieved_ids), set(semantic_retrieved_ids))
     all_iou_text = f"All IoU: {all_iou} ({len(all_intersection)} / {len(all_union)})"
-    relevant_iou, relevant_intersection, relevant_union = compute_iou(set(sparse_relevant_ids), set(dense_relevant_ids))
+    relevant_iou, relevant_intersection, relevant_union = compute_iou(
+        set(lexical_relevant_ids), set(semantic_relevant_ids)
+    )
     relevant_iou_text = f"Relevant IoU: {relevant_iou} ({len(relevant_intersection)} / {len(relevant_union)})"
     st.write(f"{all_iou_text}, {relevant_iou_text}")
 
     columns = st.columns(2)
     id_to_label = {product_id: label for product_id, (label, product_title) in label_dict.items()}
     with columns[0]:
-        header = f"{sparse_response.total_hits} products found"
+        header = f"{lexical_response.total_hits} products found"
         if label_dict:
-            precision = compute_precision(sparse_retrieved_ids, relevant_ids)
-            recall = compute_recall(sparse_retrieved_ids, relevant_ids)
-            ndcg = compute_ndcg(sparse_retrieved_ids, id_to_label)
+            precision = compute_precision(lexical_retrieved_ids, relevant_ids)
+            recall = compute_recall(lexical_retrieved_ids, relevant_ids)
+            ndcg = compute_ndcg(lexical_retrieved_ids, id_to_label)
             header = f"{header} (Precision: {precision}, Recall: {recall}, NDCG: {ndcg})"
         st.write(header)
-        draw_products(sparse_response.results, label_dict)
+        draw_products(lexical_response.results, label_dict)
     with columns[1]:
-        header = f"{dense_response.total_hits} products found"
+        header = f"{semantic_response.total_hits} products found"
         if label_dict:
-            precision = compute_precision(dense_retrieved_ids, relevant_ids)
-            recall = compute_recall(dense_retrieved_ids, relevant_ids)
-            ndcg = compute_ndcg(dense_retrieved_ids, id_to_label)
+            precision = compute_precision(semantic_retrieved_ids, relevant_ids)
+            recall = compute_recall(semantic_retrieved_ids, relevant_ids)
+            ndcg = compute_ndcg(semantic_retrieved_ids, id_to_label)
             header = f"{header} (Preicison: {precision}, Recall: {recall}, NDCG: {ndcg})"
         st.write(header)
-        draw_products(dense_response.results, label_dict)
+        draw_products(semantic_response.results, label_dict)
 
 
 if __name__ == "__main__":

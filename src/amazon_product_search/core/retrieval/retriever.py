@@ -7,21 +7,21 @@ from amazon_product_search.core.source import Locale
 
 
 def split_fields(fields: list[str]) -> tuple[list[str], list[str]]:
-    """Convert a given list of fields into a tuple of (sparse_fields, dense_fields)
+    """Convert a given list of fields into a tuple of (lexical_fields, semantic_fields)
 
-    Field names containing "vector" will be considered dense_fields.
+    Field names containing "vector" will be considered semantic_fields.
 
     Args:
         fields (list[str]): A list of fields.
 
     Returns:
-        tuple[list[str], list[str]]: A tuple of (sparse_fields, dense_fields)
+        tuple[list[str], list[str]]: A tuple of (lexical_fields, semantic_fields)
     """
-    sparse_fields: list[str] = []
-    dense_fields: list[str] = []
+    lexical_fields: list[str] = []
+    semantic_fields: list[str] = []
     for field in fields:
-        (dense_fields if "vector" in field else sparse_fields).append(field)
-    return sparse_fields, dense_fields
+        (semantic_fields if "vector" in field else lexical_fields).append(field)
+    return lexical_fields, semantic_fields
 
 
 class Retriever:
@@ -45,56 +45,56 @@ class Retriever:
         fields: list[str],
         enable_synonym_expansion: bool = False,
         product_ids: list[str] | None = None,
-        sparse_boost: float = 1.0,
-        dense_boost: float = 1.0,
+        lexical_boost: float = 1.0,
+        semantic_boost: float = 1.0,
         size: int = 20,
         window_size: int | None = None,
         rank_fusion: RankFusion | None = None,
     ) -> Response:
         normalized_query = normalize_query(query)
-        sparse_fields, dense_fields = split_fields(fields)
+        lexical_fields, semantic_fields = split_fields(fields)
         if window_size is None:
             window_size = size
 
         if not rank_fusion:
             rank_fusion = RankFusion()
 
-        sparse_query = None
-        if sparse_fields:
-            sparse_query = self.query_builder.build_lexical_search_query(
+        lexical_query = None
+        if lexical_fields:
+            lexical_query = self.query_builder.build_lexical_search_query(
                 query=normalized_query,
-                fields=sparse_fields,
+                fields=lexical_fields,
                 enable_synonym_expansion=enable_synonym_expansion,
                 product_ids=product_ids,
             )
-        dense_query = None
-        if normalized_query and dense_fields:
-            dense_query = self.query_builder.build_dense_search_query(
+        semantic_query = None
+        if normalized_query and semantic_fields:
+            semantic_query = self.query_builder.build_semantic_search_query(
                 normalized_query,
-                field=dense_fields[0],
+                field=semantic_fields[0],
                 top_k=window_size,
                 product_ids=product_ids,
             )
 
-        if sparse_query:
-            sparse_response = self.es_client.search(
+        if lexical_query:
+            lexical_response = self.es_client.search(
                 index_name=index_name,
-                query=sparse_query,
+                query=lexical_query,
                 knn_query=None,
                 size=window_size,
                 explain=True,
             )
         else:
-            sparse_response = Response(results=[], total_hits=0)
-        if dense_query:
-            dense_response = self.es_client.search(
+            lexical_response = Response(results=[], total_hits=0)
+        if semantic_query:
+            semantic_response = self.es_client.search(
                 index_name=index_name,
                 query=None,
-                knn_query=dense_query,
+                knn_query=semantic_query,
                 size=window_size,
                 explain=True,
             )
         else:
-            dense_response = Response(results=[], total_hits=0)
+            semantic_response = Response(results=[], total_hits=0)
 
-        return fuse(query, sparse_response, dense_response, sparse_boost, dense_boost, rank_fusion, size)
+        return fuse(query, lexical_response, semantic_response, lexical_boost, semantic_boost, rank_fusion, size)

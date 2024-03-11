@@ -72,11 +72,11 @@ def _borda_counts(response: Response, n: int) -> Response:
 
 
 def _transform_scores(
-    sparse_response: Response, dense_response: Response, rank_fusion: RankFusion, size: int
+    lexical_response: Response, semantic_response: Response, rank_fusion: RankFusion, size: int
 ) -> tuple[Response, Response]:
     score_transformation_method = rank_fusion.score_transformation_method
     if score_transformation_method is None:
-        return sparse_response, dense_response
+        return lexical_response, semantic_response
 
     score_transformation_method_dict: dict[str | None, Callable[[Response], Response]] = {
         "min_max": _min_max_scores,
@@ -86,15 +86,15 @@ def _transform_scores(
     }
 
     if isinstance(score_transformation_method, str):
-        sparse_response = score_transformation_method_dict[score_transformation_method](sparse_response)
-        dense_response = score_transformation_method_dict[score_transformation_method](dense_response)
-        return sparse_response, dense_response
+        lexical_response = score_transformation_method_dict[score_transformation_method](lexical_response)
+        semantic_response = score_transformation_method_dict[score_transformation_method](semantic_response)
+        return lexical_response, semantic_response
 
     if isinstance(score_transformation_method, list):
-        for_sparse, for_dense = tuple(score_transformation_method)
-        sparse_response = score_transformation_method_dict[for_sparse](sparse_response)
-        dense_response = score_transformation_method_dict[for_dense](dense_response)
-        return sparse_response, dense_response
+        for_lexical, for_semantic = tuple(score_transformation_method)
+        lexical_response = score_transformation_method_dict[for_lexical](lexical_response)
+        semantic_response = score_transformation_method_dict[for_semantic](semantic_response)
+        return lexical_response, semantic_response
 
     raise ValueError(f"Invalid score_transformation_method: {score_transformation_method}")
 
@@ -119,13 +119,13 @@ def _append_results(original_response: Response, alternative_response: Response,
 
 
 def _combine_responses(
-    sparse_response: Response, dense_response: Response, combination_method: CombinationMethod, size: int
+    lexical_response: Response, semantic_response: Response, combination_method: CombinationMethod, size: int
 ) -> Response:
     """Merge two responses by score.
 
     Args:
-        sparse_response (Response): A response from sparse retrieval.
-        dense_response (Response): A response from dense retrieval.
+        lexical_response (Response): A response from lexical search.
+        semantic_response (Response): A response from semantic search.
         combination_method (CombinationMethod): The method to combine results.
         size (int): The number of results to return.
 
@@ -133,29 +133,29 @@ def _combine_responses(
         Response: A merged response.
     """
     id_to_product: dict[str, dict[str, Any]] = {}
-    sparse_results: dict[str, float] = {}
-    dense_results: dict[str, float] = {}
+    lexical_results: dict[str, float] = {}
+    semantic_results: dict[str, float] = {}
 
-    for result in sparse_response.results:
+    for result in lexical_response.results:
         product_id = result.product["product_id"]
         id_to_product[product_id] = result.product
-        sparse_results[product_id] = result.score
-    for result in dense_response.results:
+        lexical_results[product_id] = result.score
+    for result in semantic_response.results:
         product_id = result.product["product_id"]
         id_to_product[product_id] = result.product
-        dense_results[product_id] = result.score
+        semantic_results[product_id] = result.score
 
     results: list[Result] = []
-    for product_id in sparse_results.keys() | dense_results.keys():
-        sparse_score, dense_score = sparse_results.get(product_id, 0), dense_results.get(product_id, 0)
-        score = max(sparse_score, dense_score) if combination_method == "max" else sparse_score + dense_score
+    for product_id in lexical_results.keys() | semantic_results.keys():
+        lexical_score, semantic_score = lexical_results.get(product_id, 0), semantic_results.get(product_id, 0)
+        score = max(lexical_score, semantic_score) if combination_method == "max" else lexical_score + semantic_score
         explanation = {
-            "lexical_score": sparse_score,
-            "semantic_score": dense_score,
+            "lexical_score": lexical_score,
+            "semantic_score": semantic_score,
         }
         result = Result(product=id_to_product[product_id], score=score, explanation=explanation)
         results.append(result)
-    total_hits = max(sparse_response.total_hits, dense_response.total_hits, len(results))
+    total_hits = max(lexical_response.total_hits, semantic_response.total_hits, len(results))
 
     results = sorted(results, key=lambda result: (result.score, result.product["product_id"]), reverse=True)[:size]
     return Response(results=results, total_hits=total_hits)
@@ -163,23 +163,23 @@ def _combine_responses(
 
 def fuse(
     query: str,
-    sparse_response: Response,
-    dense_response: Response,
-    sparse_boost: float,
-    dense_boost: float,
+    lexical_response: Response,
+    semantic_response: Response,
+    lexical_boost: float,
+    semantic_boost: float,
     rank_fusion: RankFusion,
     size: int,
 ) -> Response:
     if rank_fusion.combination_method == "append":
-        return _append_results(sparse_response, dense_response, size)
+        return _append_results(lexical_response, semantic_response, size)
 
-    sparse_response, dense_response = _transform_scores(sparse_response, dense_response, rank_fusion, size)
+    lexical_response, semantic_response = _transform_scores(lexical_response, semantic_response, rank_fusion, size)
 
     if rank_fusion.weighting_strategy:
-        weighting_strategy = FixedWeighting({"sparse": sparse_boost, "dense": dense_boost})
-        for result in sparse_response.results:
-            result.score *= weighting_strategy.apply("sparse", query)
-        for result in dense_response.results:
-            result.score *= weighting_strategy.apply("dense", query)
+        weighting_strategy = FixedWeighting({"lexical": lexical_boost, "semantic": semantic_boost})
+        for result in lexical_response.results:
+            result.score *= weighting_strategy.apply("lexical", query)
+        for result in semantic_response.results:
+            result.score *= weighting_strategy.apply("semantic", query)
 
-    return _combine_responses(sparse_response, dense_response, rank_fusion.combination_method, size)
+    return _combine_responses(lexical_response, semantic_response, rank_fusion.combination_method, size)

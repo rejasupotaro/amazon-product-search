@@ -42,7 +42,7 @@ class Result:
         If the result has no explanation, (0, 0) is returned.
 
         Returns:
-            tuple[float, float]: A tuple of (sparse_score, dense_score).
+            tuple[float, float]: A tuple of (lexical_score, semantic_score).
         """
         if not self.explanation:
             return 0, 0
@@ -50,14 +50,14 @@ class Result:
         if self.lexical_score > 0 or self.semantic_score > 0:
             return self.lexical_score, self.semantic_score
 
-        dense_score = self._get_semantic_score(self.explanation)
-        if dense_score:
-            return 0, dense_score
+        semantic_score = self._get_semantic_score(self.explanation)
+        if semantic_score:
+            return 0, semantic_score
 
-        sparse_score, dense_score = self.score, 0
+        lexical_score, semantic_score = self.score, 0
         for child_explanation in self.explanation.get("details", []):
-            dense_score += self._get_semantic_score(child_explanation)
-        return sparse_score - dense_score, dense_score
+            semantic_score += self._get_semantic_score(child_explanation)
+        return lexical_score - semantic_score, semantic_score
 
 
 @dataclass
