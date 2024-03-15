@@ -12,6 +12,18 @@ def has_numbers(s: str) -> bool:
     return bool(re.search(r"\d", s))
 
 
+def expand_synonyms(token_chain: list[tuple[str, list[str]]], current: list[str], result: list[list[str]]):
+    if not token_chain:
+        result.append(current)
+        return
+
+    token, synonyms = token_chain[0]
+    expand_synonyms(token_chain[1:], [*current, token], result)
+    if synonyms:
+        for synonym in synonyms:
+            expand_synonyms(token_chain[1:], [*current, synonym], result)
+
+
 class SynonymDict:
     def __init__(
         self,

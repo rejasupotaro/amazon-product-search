@@ -7,20 +7,8 @@ from amazon_product_search.core.es.templates.template_loader import TemplateLoad
 from amazon_product_search.core.nlp.tokenizers import Tokenizer, locale_to_tokenizer
 from amazon_product_search.core.retrieval.query_vector_cache import QueryVectorCache
 from amazon_product_search.core.source import Locale
-from amazon_product_search.core.synonyms.synonym_dict import SynonymDict
+from amazon_product_search.core.synonyms.synonym_dict import SynonymDict, expand_synonyms
 from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
-
-
-def expand_synonyms(token_chain: list[tuple[str, list[str]]], current: list[str], result: list[list[str]]):
-    if not token_chain:
-        result.append(current)
-        return
-
-    token, synonyms = token_chain[0]
-    expand_synonyms(token_chain[1:], [*current, token], result)
-    if synonyms:
-        for synonym in synonyms:
-            expand_synonyms(token_chain[1:], [*current, synonym], result)
 
 
 class QueryBuilder:

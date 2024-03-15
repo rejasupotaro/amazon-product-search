@@ -1,20 +1,5 @@
-from amazon_product_search.core.es.query_builder import QueryBuilder, expand_synonyms
+from amazon_product_search.core.es.query_builder import QueryBuilder
 from amazon_product_search.core.synonyms.synonym_dict import SynonymDict
-
-
-def test_expand_synonyms():
-    token_chain = [("1", []), ("2", ["3", "4"]), ("5", ["6"])]
-    expanded_queries = []
-    expand_synonyms(token_chain, [], expanded_queries)
-    assert len(expanded_queries) == 6
-    assert expanded_queries == [
-        ["1", "2", "5"],
-        ["1", "2", "6"],
-        ["1", "3", "5"],
-        ["1", "3", "6"],
-        ["1", "4", "5"],
-        ["1", "4", "6"],
-    ]
 
 
 def test_match_all():
