@@ -12,16 +12,35 @@ def has_numbers(s: str) -> bool:
     return bool(re.search(r"\d", s))
 
 
-def expand_synonyms(token_chain: list[tuple[str, list[str]]], current: list[str], result: list[list[str]]):
+def expand_synonyms(
+    token_chain: list[tuple[tuple[str, float | None], list[tuple[str, float]]]],
+    current: list[tuple[str, float | None]],
+    result: list[list[tuple[str, float | None]]],
+):
+    """Expand synonyms recursively.
+
+    This function expands synonyms recursively and appends the result to the result list.
+    For example, if the input token_chain is [("a", None), [("b", None), [("b'", 1.0)]]],
+    the output result will be:
+    [
+        [("a", None), ("b", None)],
+        [("a", None), ("b'", 1.0)],
+    ]
+
+    Args:
+        token_chain (list[tuple[str, list[tuple[str, float]]]]): A list of tokens and their synonyms.
+        current (list[tuple[str, float]]): The current list of tokens and their synonyms.
+        result (list[list[tuple[str, float]]]): The result list of expanded synonyms with scores.
+    """
     if not token_chain:
         result.append(current)
         return
 
-    token, synonyms = token_chain[0]
+    token, synonym_score_tuples = token_chain[0]
     expand_synonyms(token_chain[1:], [*current, token], result)
-    if synonyms:
-        for synonym in synonyms:
-            expand_synonyms(token_chain[1:], [*current, synonym], result)
+    if synonym_score_tuples:
+        for synonym, score in synonym_score_tuples:
+            expand_synonyms(token_chain[1:], [*current, (synonym, score)], result)
 
 
 class SynonymDict:
@@ -64,7 +83,7 @@ class SynonymDict:
             entry_dict[query].append((title, score))
         return entry_dict
 
-    def look_up(self, tokens: list[str], ngrams: int = 2) -> list[tuple[str, list[str]]]:
+    def look_up(self, tokens: list[str], ngrams: int = 2) -> list[tuple[str, list[tuple[str, float]]]]:
         """Return a list of synonyms for a given query.
 
         Args:
@@ -73,7 +92,7 @@ class SynonymDict:
         Returns:
             list[tuple[str, list[str]]]: A list of the original query terms and their synonyms.
         """
-        expanded_query: list[tuple[str, list[str]]] = []
+        expanded_query: list[tuple[str, list[tuple[str, float]]]] = []
         current_position = 0
         while current_position < len(tokens):
             found = None
@@ -84,9 +103,8 @@ class SynonymDict:
                 key = " ".join(tokens[current_position:end_position])
                 if key not in self._entry_dict:
                     continue
-                candidates: list[tuple[str, float]] = self._entry_dict[key]
-                synonym = [candidate[0] for candidate in candidates]
-                found = (key, synonym)
+                synonyms = self._entry_dict[key]
+                found = (key, synonyms)
                 break
             if found:
                 expanded_query.append(found)

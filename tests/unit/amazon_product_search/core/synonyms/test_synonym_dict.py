@@ -4,17 +4,17 @@ from amazon_product_search.core.synonyms.synonym_dict import SynonymDict, expand
 
 
 def test_expand_synonyms():
-    token_chain = [("1", []), ("2", ["3", "4"]), ("5", ["6"])]
-    expanded_queries = []
-    expand_synonyms(token_chain, [], expanded_queries)
-    assert len(expanded_queries) == 6
-    assert expanded_queries == [
-        ["1", "2", "5"],
-        ["1", "2", "6"],
-        ["1", "3", "5"],
-        ["1", "3", "6"],
-        ["1", "4", "5"],
-        ["1", "4", "6"],
+    token_chain = [(("a", None), []), (("b", None), [("b'", 1.0), ("b''", 0.5)]), (("c", None), [("c'", 1.0)])]
+    expanded_tokens = []
+    expand_synonyms(token_chain, [], expanded_tokens)
+    assert len(expanded_tokens) == 6
+    assert [" ".join([token for token, _ in token_scores]) for token_scores in expanded_tokens] == [
+        "a b c",
+        "a b c'",
+        "a b' c",
+        "a b' c'",
+        "a b'' c",
+        "a b'' c'",
     ]
 
 
@@ -22,10 +22,10 @@ def test_expand_synonyms():
     ("query", "expected"),
     [
         ("", []),
-        ("a", [("a", ["a'", "a''"])]),
-        ("a b", [("a b", ["a b'"])]),
-        ("b", [("b", ["b'"])]),
-        ("b c", [("b", ["b'"]), ("c", [])]),
+        ("a", [("a", [("a'", 1.0), ("a''", 0.5)])]),
+        ("a b", [("a b", [("a b'", 1.0)])]),
+        ("b", [("b", [("b'", 1.0)])]),
+        ("b c", [("b", [("b'", 1.0)]), ("c", [])]),
         ("c", [("c", [])]),
         ("c d", [("c", []), ("d", [])]),
     ],

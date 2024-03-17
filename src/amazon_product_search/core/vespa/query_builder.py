@@ -41,7 +41,7 @@ class QueryBuilder:
             for token, synonyms in self.synonym_dict.look_up(tokens):
                 for field in fields:
                     conditions.append(f"{field} contains '{token}'")
-                    for synonym in synonyms:
+                    for synonym, _ in synonyms:
                         conditions.append(f"{field} contains '{synonym}'")
             return f"weakAnd({', '.join(conditions)})"
 
@@ -50,7 +50,7 @@ class QueryBuilder:
             or_conditions = []
             for field in fields:
                 if synonyms:
-                    equiv_query = ", ".join([f"'{token}'" for token in [token, *synonyms]])
+                    equiv_query = ", ".join([f"'{token}'" for token in [token, *[synonym for synonym, _ in synonyms]]])
                     or_conditions.append(f"{field} contains equiv({equiv_query})")
                 else:
                     or_conditions.append(f"{field} contains '{token}'")
