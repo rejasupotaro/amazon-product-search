@@ -10,7 +10,7 @@
                             "type": "cross_fields",
                             "fields": {{ fields | tojson }},
                             "operator": "and",
-                            "boost": 1.0
+                            "boost": {% if loop.first %} 1.0 {% else %} 0.5 {% endif %}
                         }
                     }
                     {% if not loop.last %}
@@ -26,11 +26,11 @@
                 "filter": {
                     "match_phrase": {
                         "product_title": {
-                            "query": "{{ queries[0] }}",
-                            "boost": 2
+                            "query": "{{ queries[0] }}"
                         }
                     }
-                }
+                },
+                "weight": 2
             }
             {% endif %}
         ]
