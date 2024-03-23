@@ -1,10 +1,24 @@
 import pytest
 
-from amazon_product_search.core.nlp.normalizer import normalize_doc, normalize_query
+from amazon_product_search.core.nlp.normalizer import normalize_doc, normalize_query, escape_json
 
 
 @pytest.mark.parametrize(
-    "s,expected",
+    ("s", "expected"),
+    [
+        ("", ""),
+        ("\n", ""),
+        ('"Hello"', "Hello"),
+        ("Joe's Kitchen", "Joe s Kitchen"),
+    ],
+)
+def test_escape_json(s, expected):
+    actual = escape_json(s)
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    ("s", "expected"),
     [
         ("", ""),
         (
@@ -19,10 +33,10 @@ def test_normalize_doc(s, expected):
 
 
 @pytest.mark.parametrize(
-    "s,expected",
+    ("s", "expected"),
     [
         ("", ""),
-        ("Joe's Kitchen", "joe\\'s kitchen"),
+        ("Joe's Kitchen", "joe s kitchen"),
         ("  LOUIS VUITTON", "louis vuitton"),
     ],
 )

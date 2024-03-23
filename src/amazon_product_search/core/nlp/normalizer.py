@@ -4,6 +4,7 @@ import unicodedata
 
 TAG_PATTERN = re.compile(r"<[/a-z0-1 ]*?>")
 WHITESPACE_PATTERN = re.compile(r"\s+")
+ESCAPE_JSON_PATTERN = re.compile(r"['\\\"/\b\f\n\r\t]")
 
 
 def remove_html_tags(s: str) -> str:
@@ -43,6 +44,10 @@ def remove_surrogates(s: str) -> str:
 
 def remove_extra_spaces(s: str) -> str:
     return WHITESPACE_PATTERN.sub(" ", s).strip()
+
+
+def escape_json(s: str) -> str:
+    return ESCAPE_JSON_PATTERN.sub(" ", s).strip()
 
 
 def normalize_doc(s: str) -> str:
@@ -94,8 +99,7 @@ def normalize_query(s: str) -> str:
     try:
         s = unicodedata.normalize("NFKC", s)
         s = s.lower()
-        s = s.replace('"', '\\"')
-        s = s.replace("'", "\\'")
+        s = escape_json(s)
         s = remove_extra_spaces(s)
     except Exception as e:
         logging.error(f"Received an unknown exception: {e} when processing {s}")
