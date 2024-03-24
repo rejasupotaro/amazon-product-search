@@ -29,7 +29,7 @@ def fine_tune(
 ) -> None:
     from collections import defaultdict
 
-    from amazon_product_search.training.fine_tuning.components import run
+    from amazon_product_search.training.fine_tuning_mlm.components import run
 
     metrics: list[dict[str, Any]] = run(
         project_dir,
@@ -62,7 +62,7 @@ def fine_tune(
 
 
 @dsl.pipeline(
-    name="fine_tuning",
+    name="fine_tuning_mlm",
 )
 def pipeline_func(project_dir: str, max_epochs: int, batch_size: int, num_sentences: Optional[int]) -> None:
     fine_tune(project_dir=project_dir, max_epochs=max_epochs, batch_size=batch_size, num_sentences=num_sentences)
@@ -76,9 +76,9 @@ def main() -> None:
         "batch_size": 2,
         "num_sentences": 20,
     }
-    experiment = "fine-tuning-1"
-    display_name = f"fine-tuning-{get_unix_timestamp()}"
-    package_path = f"{VERTEX_DIR}/fine_tuning.yaml"
+    experiment = "fine-tuning-mlm-1"
+    display_name = f"fine-tuning-mlm-{get_unix_timestamp()}"
+    package_path = f"{VERTEX_DIR}/fine_tuning_mlm.yaml"
 
     aiplatform.init(
         project=PROJECT_ID,

@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from amazon_product_search.training.fine_tuning.components import ProductMLMDataModule
+from amazon_product_search.training.fine_tuning_mlm.components import ProductMLMDataModule
 
 
 @pytest.mark.parametrize(

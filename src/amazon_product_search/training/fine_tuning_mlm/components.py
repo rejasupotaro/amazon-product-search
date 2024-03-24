@@ -11,7 +11,7 @@ from transformers import (
     AutoModelForMaskedLM,
 )
 
-from amazon_product_search.training.fine_tuning.data_module import ProductMLMDataModule
+from amazon_product_search.training.fine_tuning_mlm.data_module import ProductMLMDataModule
 from amazon_product_search.training.shared.metric_logger import MetricLogger
 
 
