@@ -1361,20 +1361,6 @@ testing = ["covdefaults (>=2.3)", "coverage (>=7.3.2)", "diff-cover (>=8)", "pyt
 typing = ["typing-extensions (>=4.8)"]
 
 [[package]]
-name = "fire"
-version = "0.6.0"
-description = "A library for automatically generating command line interfaces."
-optional = false
-python-versions = "*"
-files = [
-    {file = "fire-0.6.0.tar.gz", hash = "sha256:54ec5b996ecdd3c0309c800324a0703d6da512241bc73b553db959d98de0aa66"},
-]
-
-[package.dependencies]
-six = "*"
-termcolor = "*"
-
-[[package]]
 name = "flatbuffers"
 version = "24.3.7"
 description = "The FlatBuffers serialization format for Python"
@@ -2983,49 +2969,54 @@ use = ["tensorflow", "tensorflow_hub", "tensorflow_text"]
 
 [[package]]
 name = "kfp"
-version = "1.4.0"
-description = "KubeFlow Pipelines SDK"
+version = "2.7.0"
+description = "Kubeflow Pipelines SDK"
 optional = false
-python-versions = ">=3.5.3"
+python-versions = ">=3.7.0,<3.13.0"
 files = [
-    {file = "kfp-1.4.0.tar.gz", hash = "sha256:56e28e0e760216d0ff71fe4c6596c2eda9342ecdfda27ee69f3b4b94784e3b2d"},
+    {file = "kfp-2.7.0.tar.gz", hash = "sha256:8a2065527ec3d50617bd374c2b25cffeab16d93b34e4be08c1ca3e4bd8d2cc0c"},
 ]
 
 [package.dependencies]
-click = "*"
-cloudpickle = "*"
-Deprecated = "*"
-docstring-parser = ">=0.7.3"
-fire = ">=0.3.1"
-google-auth = ">=1.6.1"
-google-cloud-storage = ">=1.13.0"
-jsonschema = ">=3.0.1"
-kfp-pipeline-spec = ">=0.1.0,<0.2.0"
-kfp-server-api = ">=1.1.2,<2.0.0"
-kubernetes = ">=8.0.0,<12.0.0"
-PyYAML = ">=5.3"
-requests_toolbelt = ">=0.8.0"
-strip-hints = "*"
-tabulate = "*"
+click = ">=8.0.0,<9"
+docstring-parser = ">=0.7.3,<1"
+google-api-core = ">=1.31.5,<2.0.dev0 || >2.3.0,<3.0.0dev"
+google-auth = ">=1.6.1,<3"
+google-cloud-storage = ">=2.2.1,<3"
+kfp-pipeline-spec = "0.3.0"
+kfp-server-api = ">=2.0.0,<2.1.0"
+kubernetes = ">=8.0.0,<27"
+protobuf = ">=4.21.1,<5"
+PyYAML = ">=5.3,<7"
+requests-toolbelt = ">=0.8.0,<1"
+tabulate = ">=0.8.6,<1"
+urllib3 = "<2.0.0"
+
+[package.extras]
+all = ["docker", "kfp-kubernetes (<2)"]
+kubernetes = ["kfp-kubernetes (<2)"]
 
 [[package]]
 name = "kfp-pipeline-spec"
-version = "0.1.5"
+version = "0.3.0"
 description = "Kubeflow Pipelines pipeline spec"
 optional = false
-python-versions = ">=3.5.3"
+python-versions = ">=3.7.0,<3.13.0"
 files = [
-    {file = "kfp_pipeline_spec-0.1.5-py3-none-any.whl", hash = "sha256:4f027020cbe8bd16c9bd451fef3c06ad1a0c25cb4a0161313337af78cfd1634f"},
+    {file = "kfp_pipeline_spec-0.3.0-py3-none-any.whl", hash = "sha256:1db84524a0a2d6c9d36e7e87e6fa0e181bf1ba1513d29dcd54f7b8822e7a52a2"},
 ]
+
+[package.dependencies]
+protobuf = ">=4.21.1,<5"
 
 [[package]]
 name = "kfp-server-api"
-version = "1.8.5"
+version = "2.0.5"
 description = "Kubeflow Pipelines API"
 optional = false
 python-versions = "*"
 files = [
-    {file = "kfp-server-api-1.8.5.tar.gz", hash = "sha256:482d71765ba57c003164dbb980a8cb1a18d234b578d064dc88dbeb3e4c7ab6de"},
+    {file = "kfp-server-api-2.0.5.tar.gz", hash = "sha256:c9cfbf0e87271d3bfe96e5ecc9ffbdd6ab566bc1c9a9ddc2a39d7698a16e26ff"},
 ]
 
 [package.dependencies]
@@ -3149,20 +3140,20 @@ files = [
 
 [[package]]
 name = "kubernetes"
-version = "11.0.0"
+version = "26.1.0"
 description = "Kubernetes python client"
 optional = false
-python-versions = "*"
+python-versions = ">=3.6"
 files = [
-    {file = "kubernetes-11.0.0-py3-none-any.whl", hash = "sha256:4af81201520977139a143f96123fb789fa351879df37f122916b9b6ed050bbaf"},
-    {file = "kubernetes-11.0.0.tar.gz", hash = "sha256:1a2472f8b01bc6aa87e3a34781f859bded5a5c8ff791a53d889a8bd6cc550430"},
+    {file = "kubernetes-26.1.0-py2.py3-none-any.whl", hash = "sha256:e3db6800abf7e36c38d2629b5cb6b74d10988ee0cba6fba45595a7cbe60c0042"},
+    {file = "kubernetes-26.1.0.tar.gz", hash = "sha256:5854b0c508e8d217ca205591384ab58389abdae608576f9c9afc35a3c76a366c"},
 ]
 
 [package.dependencies]
 certifi = ">=14.05.14"
 google-auth = ">=1.0.1"
 python-dateutil = ">=2.5.3"
-pyyaml = ">=3.12"
+pyyaml = ">=5.4.1"
 requests = "*"
 requests-oauthlib = "*"
 setuptools = ">=21.0.0"
@@ -5503,13 +5494,13 @@ rsa = ["oauthlib[signedtoken] (>=3.0.0)"]
 
 [[package]]
 name = "requests-toolbelt"
-version = "1.0.0"
+version = "0.10.1"
 description = "A utility belt for advanced users of python-requests"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 files = [
-    {file = "requests-toolbelt-1.0.0.tar.gz", hash = "sha256:7681a0a3d047012b5bdc0ee37d7f8f07ebe76ab08caeccfc3921ce23c88d5bc6"},
-    {file = "requests_toolbelt-1.0.0-py2.py3-none-any.whl", hash = "sha256:cccfdd665f0a24fcf4726e690f65639d272bb0637b9b92dfd91a5568ccf6bd06"},
+    {file = "requests-toolbelt-0.10.1.tar.gz", hash = "sha256:62e09f7ff5ccbda92772a29f394a49c3ad6cb181d568b1337626b2abb628a63d"},
+    {file = "requests_toolbelt-0.10.1-py2.py3-none-any.whl", hash = "sha256:18565aa58116d9951ac39baa288d3adb5b3ff975c4f25eee78555d89e8f247f7"},
 ]
 
 [package.dependencies]
@@ -6325,19 +6316,6 @@ python-decouple = ">=3.6,<4.0"
 streamlit = ">=0.87.0"
 
 [[package]]
-name = "strip-hints"
-version = "0.1.10"
-description = "Function and command-line program to strip Python type hints."
-optional = false
-python-versions = "*"
-files = [
-    {file = "strip-hints-0.1.10.tar.gz", hash = "sha256:307c2bd147cd35997c8ed2e9a3bdca48ad9c9617e04ea46599095201b4ce998f"},
-]
-
-[package.dependencies]
-wheel = "*"
-
-[[package]]
 name = "sympy"
 version = "1.12"
 description = "Computer algebra system (CAS) in Python"
@@ -6411,20 +6389,6 @@ files = [
     {file = "tensorboard_data_server-0.7.2-py3-none-macosx_10_9_x86_64.whl", hash = "sha256:9fe5d24221b29625dbc7328b0436ca7fc1c23de4acf4d272f1180856e32f9f60"},
     {file = "tensorboard_data_server-0.7.2-py3-none-manylinux_2_31_x86_64.whl", hash = "sha256:ef687163c24185ae9754ed5650eb5bc4d84ff257aabdc33f0cc6f74d8ba54530"},
 ]
-
-[[package]]
-name = "termcolor"
-version = "2.4.0"
-description = "ANSI color formatting for output in terminal"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "termcolor-2.4.0-py3-none-any.whl", hash = "sha256:9297c0df9c99445c2412e832e882a7884038a25617c60cea2ad69488d4040d63"},
-    {file = "termcolor-2.4.0.tar.gz", hash = "sha256:aab9e56047c8ac41ed798fa36d892a37aca6b3e9159f3e0c24bc64a9b3ac7b7a"},
-]
-
-[package.extras]
-tests = ["pytest", "pytest-cov"]
 
 [[package]]
 name = "terminado"
@@ -6881,20 +6845,19 @@ tutorials = ["matplotlib", "pandas", "tabulate"]
 
 [[package]]
 name = "tritonclient"
-version = "2.43.0"
+version = "2.41.1"
 description = "Python client library and utilities for communicating with Triton Inference Server"
 optional = false
 python-versions = "*"
 files = [
-    {file = "tritonclient-2.43.0-py3-none-any.whl", hash = "sha256:26cf1e2813e3bdbead66018a2d3891fd4252670a07af67821d39394b5abe0192"},
-    {file = "tritonclient-2.43.0-py3-none-manylinux1_x86_64.whl", hash = "sha256:a6ce7c1b170db4cc05f81c3bde1726ec65da8646f65dab9e0674eb9d564bec36"},
-    {file = "tritonclient-2.43.0-py3-none-manylinux2014_aarch64.whl", hash = "sha256:b6e1251bbc4db6122cc9d6f2ec3332978a3a00e6e66f7d9829e53f3aa053b29b"},
+    {file = "tritonclient-2.41.1-py3-none-any.whl", hash = "sha256:91cb234331a7145c407cea605caf9eecbd4276ddc5f085ddd5a6dcab64e5e70b"},
+    {file = "tritonclient-2.41.1-py3-none-manylinux1_x86_64.whl", hash = "sha256:22ad56ae5ab25518862dec85af0a8246a32a1e14e2ee1d86f1444ce432c254e1"},
+    {file = "tritonclient-2.41.1-py3-none-manylinux2014_aarch64.whl", hash = "sha256:6545055add115e9bd07ca540af95db5ceda0c783009ad41df6a7f35a79d57474"},
 ]
 
 [package.dependencies]
 numpy = ">=1.19.1"
 python-rapidjson = ">=0.9.1"
-urllib3 = ">=2.0.7"
 
 [package.extras]
 all = ["aiohttp (>=3.8.1,<4.0.0)", "cuda-python", "geventhttpclient (>=1.4.4,<=2.0.2)", "grpcio (>=1.41.0)", "numpy (>=1.19.1)", "packaging (>=14.1)", "protobuf (>=3.5.0,<5)", "python-rapidjson (>=0.9.1)"]
@@ -6915,17 +6878,28 @@ files = [
 
 [[package]]
 name = "types-requests"
-version = "2.31.0.20240311"
+version = "2.31.0.6"
 description = "Typing stubs for requests"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.7"
 files = [
-    {file = "types-requests-2.31.0.20240311.tar.gz", hash = "sha256:b1c1b66abfb7fa79aae09097a811c4aa97130eb8831c60e47aee4ca344731ca5"},
-    {file = "types_requests-2.31.0.20240311-py3-none-any.whl", hash = "sha256:47872893d65a38e282ee9f277a4ee50d1b28bd592040df7d1fdaffdf3779937d"},
+    {file = "types-requests-2.31.0.6.tar.gz", hash = "sha256:cd74ce3b53c461f1228a9b783929ac73a666658f223e28ed29753771477b3bd0"},
+    {file = "types_requests-2.31.0.6-py3-none-any.whl", hash = "sha256:a2db9cb228a81da8348b49ad6db3f5519452dd20a9c1e1a868c83c5fe88fd1a9"},
 ]
 
 [package.dependencies]
-urllib3 = ">=2"
+types-urllib3 = "*"
+
+[[package]]
+name = "types-urllib3"
+version = "1.26.25.14"
+description = "Typing stubs for urllib3"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-urllib3-1.26.25.14.tar.gz", hash = "sha256:229b7f577c951b8c1b92c1bc2b2fdb0b49847bd2af6d1cc2a2e3dd340f3bda8f"},
+    {file = "types_urllib3-1.26.25.14-py3-none-any.whl", hash = "sha256:9683bbb7fb72e32bfe9d2be6e04875fbe1b3eeec3cbb4ea231435aa7fd6b4f0e"},
+]
 
 [[package]]
 name = "typing-extensions"
@@ -6980,20 +6954,19 @@ dev = ["flake8", "flake8-annotations", "flake8-bandit", "flake8-bugbear", "flake
 
 [[package]]
 name = "urllib3"
-version = "2.2.1"
+version = "1.26.18"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*"
 files = [
-    {file = "urllib3-2.2.1-py3-none-any.whl", hash = "sha256:450b20ec296a467077128bff42b73080516e71b56ff59a60a02bef2232c4fa9d"},
-    {file = "urllib3-2.2.1.tar.gz", hash = "sha256:d0570876c61ab9e520d776c38acbbb5b05a776d3f9ff98a5c8fd5162a444cf19"},
+    {file = "urllib3-1.26.18-py2.py3-none-any.whl", hash = "sha256:34b97092d7e0a3a8cf7cd10e386f401b3737364026c45e622aa02903dffe0f07"},
+    {file = "urllib3-1.26.18.tar.gz", hash = "sha256:f8ecc1bba5667413457c529ab955bf8c67b45db799d159066261719e328580a0"},
 ]
 
 [package.extras]
-brotli = ["brotli (>=1.0.9)", "brotlicffi (>=0.8.0)"]
-h2 = ["h2 (>=4,<5)"]
-socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
-zstd = ["zstandard (>=0.18.0)"]
+brotli = ["brotli (==1.0.9)", "brotli (>=1.0.9)", "brotlicffi (>=0.8.0)", "brotlipy (>=0.6.0)"]
+secure = ["certifi", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "ipaddress", "pyOpenSSL (>=0.14)", "urllib3-secure-extra"]
+socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [[package]]
 name = "wasabi"
@@ -7376,4 +7349,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.8"
-content-hash = "86262ec09cb44b1b2a5b0d553094a50ff69422fdab08dbe7a4722fed4b8e7cdc"
+content-hash = "ac8f82e629b1b925017110804e1a66ca73fc1f403df0b6ea6f65c70939fd8320"
