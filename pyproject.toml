@@ -5,11 +5,10 @@ description = ""
 authors = ["rejasupotaro"]
 
 [tool.poetry.dependencies]
-python = "3.10.12"
-invoke = "^1.7.3"
-streamlit = "1.21.0"
+python = "3.11.8"
+streamlit = "^1.21.0"
 pandas = "^1.5.0"
-apache-beam = {version = "2.50.0", extras = ["gcp"]}
+apache-beam = {version = "^2.50.0", extras = ["gcp"]}
 fugashi = {extras = ["unidic"], version = "^1.2.0"}
 ipadic = "^1.0.0"
 elasticsearch = "8.12.1"
@@ -29,7 +28,6 @@ unidic-lite = "^1.0.8"
 polars = {version = "^0.16.0", extras = ["numpy", "pandas", "pyarrow"]}
 types-requests = "^2.28.11.17"
 docker = "^7.0.0"
-eland = "8.7.0"
 amazon-product-search-dense-retrieval = {git = "https://github.com/rejasupotaro/amazon-product-search-dense-retrieval.git"}
 google-cloud-aiplatform = "^1.25.0"
 kfp = {version = "*", allow-prereleases = true}
@@ -42,13 +40,14 @@ tritonclient = "^2.43.0"
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2"
 pytest-cov = "^4.0.0"
-mypy = "^0.982"
+mypy = "^1.9.0"
 jupyterlab = "3.5.0"
 seaborn = "^0.12.1"
 ruff = "^0.0.265"
 black = "^23.3.0"
 matplotlib-venn = "^0.11.10"
 optuna = "^3.5.0"
+invoke = "^2.2.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -87,6 +86,6 @@ known-first-party = [
 ]
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 mypy_path = ["src"]
 ignore_missing_imports = true

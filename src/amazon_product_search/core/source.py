@@ -62,11 +62,11 @@ def merge_and_split(data_dir: str = DATA_DIR) -> None:
     - data/merged_us.parquet
     """
     print("Load product catalogue")
-    products_df = pl.from_pandas(load_products())
+    products_df = load_products()
     print("Load relevance judgements")
-    labels_df = pl.from_pandas(load_labels())
+    labels_df = load_labels()
     print("Load sources")
-    sources_df = pl.from_pandas(load_sources())
+    sources_df = load_sources()
     print("Merge datasets")
     merged_df = labels_df.join(products_df, how="left", on=["product_id", "product_locale"]).join(
         sources_df, how="left", on=["query_id"]

@@ -46,6 +46,6 @@ class SimilarityFilter:
         synonyms_df = (
             synonyms_df.with_columns(pl.Series(name="similarity", values=scores))
             .filter(pl.col("similarity") > threshold)
-            .sort("similarity", reverse=True)
+            .sort("similarity", descending=True)
         )
         return synonyms_df

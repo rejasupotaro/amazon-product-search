@@ -9,8 +9,8 @@ This repo showcases and compares various search algorithms and models using [Sho
 Copy `.envrc.example` and fill in the necessary environment variables. Afterwards, proceed with installing the dependencies.
 
 ```shell
-$ pyenv install 3.10.12
-$ pyenv local 3.10.12
+$ pyenv install 3.11.8
+$ pyenv local 3.11.8
 $ pip install poetry
 $ poetry env use python
 $ poetry install

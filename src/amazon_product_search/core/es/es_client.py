@@ -1,11 +1,6 @@
 import json
-from pathlib import Path
 from typing import Any, Callable, Iterator, Optional
 
-from eland.ml.pytorch import PyTorchModel
-from eland.ml.pytorch.transformers import TransformerModel
-
-from amazon_product_search.constants import MODELS_DIR
 from amazon_product_search.core.retrieval.response import Response, Result
 from amazon_product_search.core.source import Locale
 from elasticsearch import Elasticsearch, helpers
@@ -33,55 +28,6 @@ class EsClient:
             schema = json.load(file)
             print(schema)
         self.es.indices.create(index=index_name, settings=schema.get("settings"), mappings=schema.get("mappings"))
-
-    def import_model(self, model_id: str, tmp_path: str = MODELS_DIR) -> None:
-        """Import a TransformerModel into Elasticsearch.
-
-        Call `POST _ml/trained_models/_model_id_/deployment/_start` after the model is imported.
-        The imported model can be used as follows:
-        ```
-        GET products_jp/_search
-        {
-          "query": {
-            "match": {
-              "product_title": {
-                "query": "東京"
-              }
-            }
-          },
-          "knn": [
-            {
-              "field": "product_vector",
-              "k": 10,
-              "num_candidates": "100",
-              "query_vector_builder": {
-                "text_embedding": {
-                  "model_id": "sonoisa__sentence-bert-base-ja-mean-tokens-v2",
-                  "model_text": "東京"
-                }
-              }
-            }
-          ]
-        }
-        ```
-
-        Args:
-            model_id (str): The name of the transformer model to import.
-            tmp_path (str, optional): The directory to save the model. Defaults to MODELS_DIR.
-        """
-        tm = TransformerModel(model_id, task_type="text_embedding")
-
-        Path(tmp_path).mkdir(parents=True, exist_ok=True)
-        model_path, config, vocab_path = tm.save(tmp_path)
-
-        ptm = PyTorchModel(self.es, tm.elasticsearch_model_id())
-        ptm.import_model(
-            model_path=model_path,
-            config_path=None,
-            vocab_path=vocab_path,
-            config=config,
-        )
-        ptm.start()
 
     def count_docs(self, index_name: str) -> int:
         return self.es.count(index=index_name)["count"]
