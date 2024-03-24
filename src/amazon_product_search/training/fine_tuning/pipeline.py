@@ -77,7 +77,7 @@ def main() -> None:
         "num_sentences": 20,
     }
     experiment = "fine-tuning-1"
-    display_name = f"dummy-{get_unix_timestamp()}"
+    display_name = f"fine-tuning-{get_unix_timestamp()}"
     package_path = f"{VERTEX_DIR}/fine_tuning.yaml"
 
     aiplatform.init(
