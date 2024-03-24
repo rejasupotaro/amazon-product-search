@@ -1,6 +1,21 @@
 from invoke import task
 
-from amazon_product_search.constants import PROJECT_ID, PROJECT_NAME, REGION
+from amazon_product_search.constants import (
+    INDEXING_IMAGE_URI,
+    PROJECT_ID,
+    PROJECT_NAME,
+    REGION,
+)
+
+
+@task
+def build_indexing(c):
+    command = f"""
+    gcloud builds submit . \
+        --config=cloudbuild.yaml \
+        --substitutions=_DOCKERFILE=Dockerfile.indexing,_IMAGE={INDEXING_IMAGE_URI} \
+    """
+    c.run(command)
 
 
 @task
