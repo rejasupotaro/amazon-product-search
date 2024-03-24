@@ -1,9 +1,1 @@
-.git
-.github
-.ipynb_checkpoints
-.ruff_cache
-.streamlit
-.venv
-data
-models
-notebooks
+#!include:.dockerignore
