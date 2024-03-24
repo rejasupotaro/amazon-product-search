@@ -12,7 +12,7 @@ from transformers import (
 )
 
 from amazon_product_search.training.fine_tuning_mlm.data_module import ProductMLMDataModule
-from amazon_product_search.training.shared.metric_logger import MetricLogger
+from amazon_product_search.training.shared.metric_logger import MetricLoggerPL
 
 
 class MLMFineTuner(LightningModule):
@@ -61,7 +61,7 @@ def run(
 
     fine_tuner = MLMFineTuner(bert_model_name, learning_rate)
     data_module = ProductMLMDataModule(bert_model_name, df, mlm_probability, batch_size, num_sentences)
-    metric_logger = MetricLogger()
+    metric_logger = MetricLoggerPL()
     model_checkpoint = ModelCheckpoint(
         monitor="val_loss",
         mode="min",
