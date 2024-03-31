@@ -79,7 +79,7 @@ class QueryBuilder:
 
         query_match = json.loads(
             self.template_loader.load("query_match.j2").render(
-                queries=queries,
+                queries=queries[:10],
                 fields=fields,
                 operator=operator,
                 enable_phrase_match_boost=enable_phrase_match_boost,
