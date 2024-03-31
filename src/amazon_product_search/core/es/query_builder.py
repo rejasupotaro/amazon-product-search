@@ -40,6 +40,7 @@ class QueryBuilder:
         fields: list[str],
         weight_dict: dict[str, float] | None = None,
         enable_synonym_expansion: bool | float = False,
+        operator: str = "and",
         enable_phrase_match_boost: bool = False,
         product_ids: list[str] | None = None,
     ) -> dict[str, Any]:
@@ -80,6 +81,7 @@ class QueryBuilder:
             self.template_loader.load("query_match.j2").render(
                 queries=queries,
                 fields=fields,
+                operator=operator,
                 enable_phrase_match_boost=enable_phrase_match_boost,
             )
         )

@@ -9,7 +9,7 @@
                             "query": "{{ query }}",
                             "type": "cross_fields",
                             "fields": {{ fields | tojson }},
-                            "operator": "and",
+                            "operator": "{{ operator }}",
                             "boost": {% if loop.first %} 1.0 {% else %} 0.5 {% endif %}
                         }
                     }
