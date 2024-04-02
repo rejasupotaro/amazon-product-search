@@ -68,7 +68,9 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
         branches["extracted_keywords"] = products | "Extract keywords" >> beam.ParDo(ExtractKeywordsFn())
     if options.encode_text:
         branches["product_vector"] = products | "Encode products" >> EncodeProduct(
-            Shared(), hf_model_name, batch_size=8
+            Shared(),
+            hf_model_name,
+            batch_size=8,
         )
     if branches:
         branches["product"] = products | beam.WithKeys(lambda product: product["product_id"])

@@ -2,6 +2,7 @@ import logging
 from typing import Any, Dict, Iterator, List, Tuple
 
 import apache_beam as beam
+import numpy as np
 from apache_beam.utils.shared import Shared
 from torch import Tensor
 from tritonclient.grpc import (
@@ -63,7 +64,11 @@ class EncodeProductTritonFn(beam.DoFn):
         self._onnx_model_name = onnx_model_name
 
     def setup(self) -> None:
-        self._client = InferenceServerClient(host=self._host)
+        self._client = InferenceServerClient(
+            url=self._host,
+            ssl=False,
+            verbose=False,
+        )
 
     def process(self, products: List[Dict[str, Any]]) -> Iterator[Tuple[str, List[float]]]:
         texts = [_product_to_text(product, self._product_fields) for product in products]
@@ -74,7 +79,7 @@ class EncodeProductTritonFn(beam.DoFn):
                     name="text",
                     shape=[len(texts)],
                     datatype="BYTES",
-                )
+                ).set_data_from_numpy(np.asarray(texts, dtype=object))
             ],
         ).as_numpy("output")
         for product, product_vector in zip(products, product_vectors, strict=True):
@@ -99,25 +104,20 @@ class EncodeProduct(beam.PTransform):
         self._product_fields = product_fields
         self._use_triton = use_triton
 
-    def expand(self, pcoll: beam.PCollection[Dict[str, Any]]) -> beam.PCollection[Dict[str, Any]]:
-        return (
-            (pcoll | "Batch items for EncodeProductFn" >> beam.BatchElements(min_batch_size=self._batch_size))
-            | (
-                beam.ParDo(
-                    EncodeProductFn(
-                        shared_handle=self._shared_handle,
-                        hf_model_name=self._hf_model_name,
-                        product_fields=self._product_fields,
-                    )
+    def expand(self, pcoll: beam.PCollection[Dict[str, Any]]) -> beam.PCollection[Tuple[str, List[float]]]:
+        pcoll |= "Batch items for EncodeProductFn" >> beam.BatchElements(min_batch_size=self._batch_size)
+        if self._use_triton:
+            return pcoll | beam.ParDo(
+                EncodeProductTritonFn(
+                    hf_model_name=self._hf_model_name,
+                    product_fields=self._product_fields,
                 )
             )
-            if not self._use_triton
-            else (
-                beam.ParDo(
-                    EncodeProductTritonFn(
-                        hf_model_name=self._hf_model_name,
-                        product_fields=self._product_fields,
-                    )
+        else:
+            return pcoll | beam.ParDo(
+                EncodeProductFn(
+                    shared_handle=self._shared_handle,
+                    hf_model_name=self._hf_model_name,
+                    product_fields=self._product_fields,
                 )
             )
-        )
