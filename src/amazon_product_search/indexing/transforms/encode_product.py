@@ -4,6 +4,7 @@ from typing import Any, Dict, Iterator, List, Tuple
 import apache_beam as beam
 import numpy as np
 from apache_beam.utils.shared import Shared
+from tenacity import retry, stop_after_attempt, wait_fixed
 from torch import Tensor
 from tritonclient.grpc import (
     InferenceServerClient,
@@ -70,8 +71,8 @@ class EncodeProductTritonFn(beam.DoFn):
             verbose=False,
         )
 
-    def process(self, products: List[Dict[str, Any]]) -> Iterator[Tuple[str, List[float]]]:
-        texts = [_product_to_text(product, self._product_fields) for product in products]
+    @retry(stop=stop_after_attempt(5), wait=wait_fixed(5))
+    def encode(self, texts: List[str]) -> np.ndarray:
         product_vectors = self._client.infer(
             model_name=self._onnx_model_name,
             inputs=[
@@ -81,7 +82,13 @@ class EncodeProductTritonFn(beam.DoFn):
                     datatype="BYTES",
                 ).set_data_from_numpy(np.asarray(texts, dtype=object))
             ],
+            client_timeout=30,
         ).as_numpy("output")
+        return product_vectors
+
+    def process(self, products: List[Dict[str, Any]]) -> Iterator[Tuple[str, List[float]]]:
+        texts = [_product_to_text(product, self._product_fields) for product in products]
+        product_vectors = self.encode(texts)
         for product, product_vector in zip(products, product_vectors, strict=True):
             yield product["product_id"], product_vector.tolist()
 
