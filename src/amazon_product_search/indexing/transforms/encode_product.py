@@ -1,23 +1,26 @@
 import logging
+from functools import partial
 from typing import Any, Dict, Iterator, List, Tuple
 
 import apache_beam as beam
 import numpy as np
 from apache_beam.utils.shared import Shared
 from tenacity import retry, stop_after_attempt, wait_fixed
-from torch import Tensor
 from tritonclient.grpc import (
     InferenceServerClient,
     InferInput,
 )
 
-from amazon_product_search.indexing.transforms.weak_reference import WeakReference
 from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 from amazon_product_search_dense_retrieval.encoders.modules.pooler import PoolingMode
 
 
 def _product_to_text(product: Dict[str, Any], fields: list[str]) -> str:
     return " ".join(product[field] for field in fields)
+
+
+def initialize_encoder(hf_model_name: str, pooling_mode: PoolingMode) -> SBERTEncoder:
+    return SBERTEncoder(hf_model_name, pooling_mode)
 
 
 class EncodeProductFn(beam.DoFn):
@@ -29,24 +32,16 @@ class EncodeProductFn(beam.DoFn):
         pooling_mode: PoolingMode = "mean",
     ) -> None:
         self._shared_handle = shared_handle
-        self._hf_model_name = hf_model_name
-        self._pooling_mode = pooling_mode
+        self._initialize_fn = partial(initialize_encoder, hf_model_name, pooling_mode)
         self._product_fields = product_fields
 
     def setup(self) -> None:
-        def initialize_encoder() -> WeakReference[SBERTEncoder]:
-            # Load a potentially large model in memory. Executed once per process.
-            return WeakReference[SBERTEncoder](SBERTEncoder(self._hf_model_name, self._pooling_mode))
-
-        self._weak_reference: WeakReference[SBERTEncoder] = self._shared_handle.acquire(initialize_encoder)
-
-    def _encode(self, texts: list[str]) -> Tensor:
-        return self._weak_reference.ref.encode(texts)
+        self._encoder: SBERTEncoder = self._shared_handle.acquire(self._initialize_fn)
 
     def process(self, products: List[Dict[str, Any]]) -> Iterator[Tuple[str, List[float]]]:
         logging.info(f"Encode {len(products)} products in a batch")
         texts = [_product_to_text(product, self._product_fields) for product in products]
-        product_vectors = self._encode(texts)
+        product_vectors = self._encoder.encode(texts)
         for product, product_vector in zip(products, product_vectors, strict=True):
             yield product["product_id"], product_vector.tolist()
 

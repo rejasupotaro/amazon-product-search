@@ -1,5 +1,6 @@
 import logging
 import os
+from functools import partial
 from typing import Any, Dict, Iterator, List
 
 import apache_beam as beam
@@ -15,7 +16,6 @@ from amazon_product_search.core import source
 from amazon_product_search.core.nlp.normalizer import normalize_query
 from amazon_product_search.core.source import Locale
 from amazon_product_search.indexing.options import IndexerOptions
-from amazon_product_search.indexing.transforms.weak_reference import WeakReference
 from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
 from amazon_product_search_dense_retrieval.encoders.modules.pooler import PoolingMode
 
@@ -29,6 +29,10 @@ def get_input_source(data_dir: str, locale: Locale, nrows: int = -1) -> PTransfo
     return beam.Create(query_dicts)
 
 
+def initialize_encoder(hf_model_name: str, pooling_mode: PoolingMode) -> SBERTEncoder:
+    return SBERTEncoder(hf_model_name, pooling_mode)
+
+
 class NormalizeQueryFn(beam.DoFn):
     def process(self, query_dict: Dict[str, Any]) -> Iterator[Dict[str, Any]]:
         query_dict["query"] = normalize_query(query_dict["query"])
@@ -38,18 +42,13 @@ class NormalizeQueryFn(beam.DoFn):
 class EncodeQueriesInBatchFn(beam.DoFn):
     def __init__(self, shared_handle: Shared, hf_model_name: str, pooling_mode: PoolingMode = "mean") -> None:
         self._shared_handle = shared_handle
-        self._hf_model_name = hf_model_name
-        self._pooling_mode = pooling_mode
+        self._initialize_fn = partial(initialize_encoder, hf_model_name, pooling_mode)
 
     def setup(self) -> None:
-        def initialize_encoder() -> WeakReference[SBERTEncoder]:
-            # Load a potentially large model in memory. Executed once per process.
-            return WeakReference[SBERTEncoder](SBERTEncoder(self._hf_model_name, self._pooling_mode))
-
-        self._weak_reference: WeakReference[SBERTEncoder] = self._shared_handle.acquire(initialize_encoder)
+        self._encoder: SBERTEncoder = self._shared_handle.acquire(self._initialize_fn)
 
     def _encode(self, texts: list[str]) -> Tensor:
-        return self._weak_reference.ref.encode(texts)
+        return self._encoder.encode(texts)
 
     def process(self, query_dicts: List[Dict[str, Any]]) -> Iterator[Dict[str, Any]]:
         logging.info(f"Encode {len(query_dicts)} queries in a batch")
