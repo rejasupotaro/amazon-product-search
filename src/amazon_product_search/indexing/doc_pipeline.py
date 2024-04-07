@@ -10,12 +10,13 @@ from apache_beam.transforms.ptransform import PTransform
 from apache_beam.transforms.util import BatchElements
 from apache_beam.utils.shared import Shared
 
-from amazon_product_search.constants import DATASET_ID, HF, PROJECT_ID
+from amazon_product_search.constants import DATA_DIR, DATASET_ID, HF, PROJECT_ID
 from amazon_product_search.core import source
 from amazon_product_search.core.source import Locale
 from amazon_product_search.indexing.io.elasticsearch_io import WriteToElasticsearch
 from amazon_product_search.indexing.io.vespa_io import WriteToVespa
 from amazon_product_search.indexing.options import IndexerOptions
+from amazon_product_search.indexing.transforms.add_image_url import AddImageUrlFn
 from amazon_product_search.indexing.transforms.analyze_doc import AnalyzeDocFn
 from amazon_product_search.indexing.transforms.encode_product import EncodeProduct
 from amazon_product_search.indexing.transforms.extract_keywords import (
@@ -55,6 +56,7 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
         "product_description",
     ]
     hf_model_name = HF.LOCALE_TO_MODEL_NAME[locale]
+    product_images_filepath = f"{DATA_DIR}/product_images.parquet"
 
     pipeline = beam.Pipeline(options=options)
     products = (
@@ -62,6 +64,7 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
         | get_input_source(options.data_dir, locale, options.nrows)
         | "Filter products" >> beam.Filter(is_indexable)
         | "Analyze products" >> beam.ParDo(AnalyzeDocFn(text_fields, locale))
+        | "Add image URL" >> beam.ParDo(AddImageUrlFn(product_images_filepath, locale))
     )
     branches = {}
     if options.extract_keywords:

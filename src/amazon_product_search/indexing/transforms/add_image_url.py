@@ -43,6 +43,10 @@ class AddImageUrlFn(beam.DoFn):
         Yields:
             Iterator[Dict[str, Any]]: _description_
         """
+        if "image_url" in product:
+            yield product
+            return
+
         if product["product_id"] in self.asin_to_image_url:
             product["image_url"] = self.asin_to_image_url[product["product_id"]]
         yield product
