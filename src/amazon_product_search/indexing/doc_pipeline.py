@@ -16,9 +16,9 @@ from amazon_product_search.core.source import Locale
 from amazon_product_search.indexing.io.elasticsearch_io import WriteToElasticsearch
 from amazon_product_search.indexing.io.vespa_io import WriteToVespa
 from amazon_product_search.indexing.options import IndexerOptions
-from amazon_product_search.indexing.transforms.analyze_doc_fn import AnalyzeDocFn
+from amazon_product_search.indexing.transforms.analyze_doc import AnalyzeDocFn
 from amazon_product_search.indexing.transforms.encode_product import EncodeProduct
-from amazon_product_search.indexing.transforms.extract_keywords_fn import (
+from amazon_product_search.indexing.transforms.extract_keywords import (
     ExtractKeywordsFn,
 )
 from amazon_product_search.indexing.transforms.filters import is_indexable

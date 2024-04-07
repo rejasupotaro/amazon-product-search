@@ -31,6 +31,7 @@ class EncodeProductFn(beam.DoFn):
         product_fields: list[str],
         pooling_mode: PoolingMode = "mean",
     ) -> None:
+        super().__init__()
         self._shared_handle = shared_handle
         self._initialize_fn = partial(initialize_encoder, hf_model_name, pooling_mode)
         self._product_fields = product_fields

@@ -9,6 +9,7 @@ from amazon_product_search.core.source import Locale
 
 class AnalyzeDocFn(beam.DoFn):
     def __init__(self, text_fields: list[str], locale: Locale) -> None:
+        super().__init__()
         self.text_fields = text_fields
         self.locale = locale
 
