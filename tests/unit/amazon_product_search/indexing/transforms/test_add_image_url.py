@@ -13,7 +13,7 @@ def test_add_image_url(tmp_path):
             {
                 "asin": "2",
                 "locale": "us",
-                "image_url": "https://amazon.product.search/2.jpg",
+                "image": "https://amazon.product.search/2.jpg",
             }
         ]
     ).to_parquet(filepath, index=False)

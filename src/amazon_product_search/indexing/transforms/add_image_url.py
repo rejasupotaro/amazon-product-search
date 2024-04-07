@@ -13,7 +13,7 @@ class AddImageUrlFn(beam.DoFn):
     The data source is extracted from https://github.com/shuttie/esci-s?tab=readme-ov-file
 
     Args:
-        filepath (str): Path to the parquet file that contains `asin`, `locale`, and `image_url`.
+        filepath (str): Path to the parquet file that contains `asin`, `locale`, and `image`.
         locale (Locale): Locale of the products.
 
     Attributes:
@@ -32,17 +32,9 @@ class AddImageUrlFn(beam.DoFn):
 
         df = pd.read_parquet(filepath)
         df = df[df["locale"] == locale]
-        return dict(zip(df["asin"], df["image_url"], strict=True))
+        return dict(zip(df["asin"], df["image"], strict=True))
 
     def process(self, product: Dict[str, Any]) -> Iterator[Dict[str, Any]]:
-        """Add image URL to product.
-
-        Args:
-            product (Dict[str, Any]): _description_
-
-        Yields:
-            Iterator[Dict[str, Any]]: _description_
-        """
         if "image_url" in product:
             yield product
             return
