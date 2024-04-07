@@ -36,6 +36,7 @@ class ProductMLMDataModule(LightningDataModule):
         mlm_probability: float,
         batch_size: int,
         num_sentences: Optional[int] = None,
+        columns: list[tuple[str, str]] | None = None,
         prepend_tag: bool = False,
     ) -> None:
         super().__init__()
@@ -52,17 +53,19 @@ class ProductMLMDataModule(LightningDataModule):
             tokenizer=self.tokenizer, mlm=True, mlm_probability=mlm_probability
         )
         self.batch_size = batch_size
+        if not columns:
+            columns = [
+                ("product_title", "title"),
+                ("product_brand", "brand"),
+                ("product_color", "color"),
+                ("product_bullet_point", "bullet"),
+                ("product_description", "desc"),
+            ]
+        self.columns = columns
         self.prepend_tag = prepend_tag
 
     @staticmethod
-    def make_sentences(df: pd.DataFrame, prepend_tag: bool) -> list[str]:
-        columns = [
-            ("product_title", "title"),
-            ("product_brand", "brand"),
-            ("product_color", "color"),
-            ("product_bullet_point", "bullet"),
-            ("product_description", "desc"),
-        ]
+    def make_sentences(df: pd.DataFrame, columns: list[tuple[str, str]], prepend_tag: bool) -> list[str]:
         df = df[[column[0] for column in columns]]
         df = df.drop_duplicates()
 
@@ -76,11 +79,11 @@ class ProductMLMDataModule(LightningDataModule):
         return sentences
 
     def train_dataloader(self) -> DataLoader:
-        sentences = self.make_sentences(self.train_df, self.prepend_tag)
+        sentences = self.make_sentences(self.train_df, self.columns, self.prepend_tag)
         dataset = TokenizedSentencesDataset(sentences, self.tokenizer)
         return DataLoader(dataset, batch_size=self.batch_size, shuffle=True, collate_fn=self.collator)
 
     def val_dataloader(self) -> DataLoader:
-        sentences = self.make_sentences(self.val_df, self.prepend_tag)
+        sentences = self.make_sentences(self.val_df, self.columns, self.prepend_tag)
         dataset = TokenizedSentencesDataset(sentences, self.tokenizer)
         return DataLoader(dataset, batch_size=self.batch_size, shuffle=False, collate_fn=self.collator)

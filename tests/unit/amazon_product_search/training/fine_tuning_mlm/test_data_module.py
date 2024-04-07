@@ -23,5 +23,15 @@ def test_make_sentences(prepend_tag, expected):
             },
         ]
     )
-    actual = ProductMLMDataModule.make_sentences(df, prepend_tag)
+    actual = ProductMLMDataModule.make_sentences(
+        df,
+        columns=[
+            ("product_title", "title"),
+            ("product_brand", "brand"),
+            ("product_color", "color"),
+            ("product_bullet_point", "bullet"),
+            ("product_description", "desc"),
+        ],
+        prepend_tag=prepend_tag,
+    )
     assert actual == expected
