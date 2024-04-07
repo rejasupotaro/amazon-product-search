@@ -133,20 +133,33 @@ def draw_response_stats(response: Response, query_vector: np.ndarray, label_dict
         st.plotly_chart(fig, use_container_width=True)
 
 
+def draw_product(result: Result, label_dict: dict[str, tuple[str, str]]) -> None:
+    product = result.product
+
+    image_url = product.get("image_url")
+    if image_url:
+        st.image(image_url, width=200)
+
+    header = f"{product['product_title']} ({round(result.score, 4)})"
+    if label_dict:
+        label = {
+            "E": "[Exact] ",
+            "S": "[Substitute] ",
+            "C": "[Complement] ",
+            "I": "[Irrelevant] ",
+            "-": "",
+        }[label_dict.get(product["product_id"], ("-", ""))[0]]
+        header = f"{label}{header}"
+
+    with st.expander(header):
+        st.write(result.product)
+
+    if result.explanation:
+        with st.expander("Explanation"):
+            st.write(result.explanation)
+
+
 def draw_products(results: list[Result], label_dict: dict[str, tuple[str, str]]) -> None:
     for result in results:
-        product = result.product
-        header = f"{result.product['product_title']} ({round(result.score, 4)})"
-        if label_dict:
-            label = {
-                "E": "[Exact] ",
-                "S": "[Substitute] ",
-                "C": "[Complement] ",
-                "I": "[Irrelevant] ",
-                "-": "",
-            }[label_dict.get(product["product_id"], ("-", ""))[0]]
-            header = f"{label}{header}"
-        with st.expander(header):
-            st.write(result.product)
-            if result.explanation:
-                st.write(result.explanation)
+        st.write("---")
+        draw_product(result, label_dict)
