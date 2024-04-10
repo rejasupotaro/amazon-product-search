@@ -33,3 +33,7 @@ curl http://localhost:8000/v2/models/all_minilm
 http://localhost:8000/v2/models/text_embedding
 {"name":"text_embedding","versions":["1"],"platform":"ensemble","inputs":[{"name":"text","datatype":"BYTES","shape":[-1]}],"outputs":[{"name":"output","datatype":"FP32","shape":[-1,384]}]}
 ```
+
+## Host on Vertex AI
+
+[Serving Predictions with NVIDIA Triton  |  Vertex AI  |  Google Cloud](https://cloud.google.com/vertex-ai/docs/predictions/using-nvidia-triton)
