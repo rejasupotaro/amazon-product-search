@@ -26,10 +26,13 @@ schema product {
         field product_locale type string {
             indexing: attribute | index | summary
         }
+        field image_url type string {
+            indexing: attribute
+        }
         field product_vector type tensor<float>(x[384]) {
             indexing: attribute | index
             attribute {
-                distance-metric: angular
+                distance-metric: dotproduct
             }
             index {
                 hnsw {
@@ -63,10 +66,10 @@ schema product {
         inputs {
             query(query_vector) tensor<float>(x[384])
             query(title_weight) double: 1.0
-            query(bullet_point_weight) double: 1.0
-            query(brand_weight) double: 1.0
-            query(color_weight) double: 1.0
-            query(description_weight) double: 1.0
+            query(bullet_point_weight) double: 0.65
+            query(brand_weight) double: 0.15
+            query(color_weight) double: 0.55
+            query(description_weight) double: 0.6
         }
 
         function lexical_score() {
@@ -107,6 +110,17 @@ schema product {
     rank-profile hybrid inherits ranking_base {
         global-phase {
             expression: query(alpha) * reciprocal_rank(lexical_score) + (1 - query(alpha)) * reciprocal_rank(semantic_score)
+        }
+
+        summary-features {
+            lexical_score
+            semantic_score
+        }
+    }
+
+    rank-profile lex_sem inherits ranking_base {
+        first-phase {
+            expression: max(lexical_score, 0.01) * semantic_score
         }
 
         summary-features {
