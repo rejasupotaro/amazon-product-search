@@ -48,18 +48,26 @@ def test_compute_recall(retrieved_ids, relevant_ids, expected):
 
 
 @pytest.mark.parametrize(
-    ("retrieved_ids", "relevant_ids", "expected"),
+    ("retrieved_ids", "relevant_ids", "zero_hits_to_none", "expected"),
     [
-        ([], set(), None),
-        (["1"], set(), 0),
-        ([], {"1"}, None),
-        (["1"], {"1"}, 1),
-        (["1", "2"], {"1"}, 0.5),
-        (["1"], {"1", "2"}, 1),
+        # Test cases for zero_hits_to_none=True
+        ([], set(), True, None),
+        (["1"], set(), True, 0),
+        ([], {"1"}, True, None),
+        (["1"], {"1"}, True, 1),
+        (["1", "2"], {"1"}, True, 0.5),
+        (["1"], {"1", "2"}, True, 1),
+        # Test cases for zero_hits_to_none=False
+        ([], set(), False, 0),
+        (["1"], set(), False, 0),
+        ([], {"1"}, False, 0),
+        (["1"], {"1"}, False, 1),
+        (["1", "2"], {"1"}, False, 0.5),
+        (["1"], {"1", "2"}, False, 1),
     ],
 )
-def test_compute_precision(retrieved_ids, relevant_ids, expected):
-    actual = compute_precision(retrieved_ids, relevant_ids)
+def test_compute_precision(retrieved_ids, relevant_ids, zero_hits_to_none, expected):
+    actual = compute_precision(retrieved_ids, relevant_ids, zero_hits_to_none=zero_hits_to_none)
     assert actual == expected
 
 

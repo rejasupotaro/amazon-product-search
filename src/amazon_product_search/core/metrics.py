@@ -24,9 +24,11 @@ def compute_recall(retrieved_ids: list[str], relevant_ids: set[str], k: Optional
     return round(len(set(retrieved_ids) & relevant_ids) / len(relevant_ids), 4)
 
 
-def compute_precision(retrieved_ids: list[str], relevant_ids: set[str], k: Optional[int] = None) -> Optional[float]:
+def compute_precision(
+    retrieved_ids: list[str], relevant_ids: set[str], k: Optional[int] = None, zero_hits_to_none: bool = True
+) -> Optional[float]:
     if not retrieved_ids:
-        return None
+        return None if zero_hits_to_none else 0.0
     if k:
         retrieved_ids = retrieved_ids[:k]
     return round(len((set(retrieved_ids) & relevant_ids)) / len(retrieved_ids), 4)
