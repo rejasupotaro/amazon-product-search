@@ -2,8 +2,8 @@ FROM gcr.io/deeplearning-platform-release/pytorch-gpu
 
 # RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub
 
-RUN apt-get update
-RUN apt-get install -y \
+RUN apt-get update && \
+    apt-get install -y \
     libffi-dev libssl-dev zlib1g-dev liblzma-dev tk-dev \
     libbz2-dev libreadline-dev libsqlite3-dev libopencv-dev \
     build-essential git
