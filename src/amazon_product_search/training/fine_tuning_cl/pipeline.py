@@ -57,8 +57,10 @@ def fine_tune(
 @dsl.pipeline(
     name="fine_tuning_cl",
 )
-def pipeline_func(project_dir: str, max_epochs: int) -> None:
-    fine_tune(project_dir=project_dir, max_epochs=max_epochs)
+def pipeline_func(project_dir: str, max_epochs: int, num_gpus: int) -> None:
+    component = fine_tune(project_dir=project_dir, max_epochs=max_epochs)
+    if num_gpus > 0:
+        component.add_node_selector_constraint("NVIDIA_TESLA_T4").set_accelerator_limit(num_gpus)
 
 
 def main() -> None:
@@ -66,6 +68,7 @@ def main() -> None:
     pipeline_parameters = {
         "project_dir": project_dir,
         "max_epochs": 1,
+        "num_gpus": 0,
     }
     experiment = "fine-tuning-cl-1"
     display_name = f"fine-tuning-cl-{get_unix_timestamp()}"
