@@ -22,6 +22,8 @@ from amazon_product_search.core.timestamp import get_unix_timestamp
 )
 def fine_tune(
     project_dir: str,
+    input_filename: str,
+    bert_model_name: str,
     max_epochs: int,
     metrics_output: Output[Metrics],
 ) -> None:
@@ -31,8 +33,8 @@ def fine_tune(
 
     metrics: list[dict[str, Any]] = run(
         project_dir,
-        input_filename="merged_jp.parquet",
-        bert_model_name="cl-tohoku/bert-base-japanese-char-v2",
+        input_filename,
+        bert_model_name,
         max_epochs=max_epochs,
     )
     # metrics are given as follows:
@@ -57,8 +59,14 @@ def fine_tune(
 @dsl.pipeline(
     name="fine_tuning_cl",
 )
-def pipeline_func(project_dir: str, max_epochs: int, num_gpus: int) -> None:
-    component = fine_tune(project_dir=project_dir, max_epochs=max_epochs)
+def pipeline_func(
+    project_dir: str,
+    input_filename: str,
+    bert_model_name: str,
+    max_epochs: int,
+    num_gpus: int,
+) -> None:
+    component = fine_tune(project_dir, input_filename, bert_model_name, max_epochs)
     if num_gpus > 0:
         component.add_node_selector_constraint("NVIDIA_TESLA_T4").set_accelerator_limit(num_gpus)
 
@@ -67,6 +75,8 @@ def main() -> None:
     project_dir = f"gs://{PROJECT_NAME}"
     pipeline_parameters = {
         "project_dir": project_dir,
+        "input_filename": "merged_us.parquet",
+        "bert_model_name": "cl-tohoku/bert-base-japanese-char-v2",
         "max_epochs": 1,
         "num_gpus": 0,
     }
