@@ -72,6 +72,7 @@ def run(
     input_filename: str,
     bert_model_name: str,
     max_epochs: int = 1,
+    debug: bool = True,
     with_tag: bool = False,
 ) -> list[dict[str, Any]]:
     data_dir = f"{project_dir}/data"
@@ -80,10 +81,12 @@ def run(
 
     df = pd.read_parquet(f"{data_dir}/{input_filename}")
     df = df[df["split"] == "train"]
-    df = df.head(1000)
+    if debug:
+        df = df.head(1000)
     train_df, val_df = train_test_split(df, test_size=0.2, random_state=42)
-    train_df = train_df.head(100)
-    val_df = val_df.head(100)
+    if debug:
+        train_df = train_df.head(100)
+        val_df = val_df.head(100)
 
     fields = ["product_title"]
     dataloader = new_train_dataloader(train_df, fields, with_tag)

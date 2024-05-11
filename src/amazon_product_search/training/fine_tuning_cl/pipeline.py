@@ -3,7 +3,7 @@ from typing import Any
 from google.cloud import aiplatform
 from kfp import dsl
 from kfp.compiler import Compiler
-from kfp.dsl import Metrics, Output
+from kfp.dsl import Metrics, Output, PipelineTask
 
 from amazon_product_search.constants import (
     PROJECT_ID,
@@ -25,6 +25,7 @@ def fine_tune(
     input_filename: str,
     bert_model_name: str,
     max_epochs: int,
+    debug: bool,
     metrics_output: Output[Metrics],
 ) -> None:
     from collections import defaultdict
@@ -36,6 +37,7 @@ def fine_tune(
         input_filename,
         bert_model_name,
         max_epochs=max_epochs,
+        debug=debug,
     )
     # metrics are given as follows:
     # [
@@ -63,12 +65,21 @@ def pipeline_func(
     project_dir: str,
     input_filename: str,
     bert_model_name: str,
-    max_epochs: int,
-    num_gpus: int,
 ) -> None:
-    component = fine_tune(project_dir, input_filename, bert_model_name, max_epochs)
+    max_epochs = 1
+    num_gpus = 1
+    debug = True
+
+    fine_tune_task: PipelineTask = fine_tune(
+        project_dir=project_dir,
+        input_filename=input_filename,
+        bert_model_name=bert_model_name,
+        max_epochs=max_epochs,
+        debug=debug,
+    )
     if num_gpus > 0:
-        component.add_node_selector_constraint("NVIDIA_TESLA_T4").set_accelerator_limit(num_gpus)
+        fine_tune_task.set_accelerator_type("NVIDIA_TESLA_T4")
+        fine_tune_task.set_accelerator_limit(num_gpus)
 
 
 def main() -> None:
@@ -77,8 +88,6 @@ def main() -> None:
         "project_dir": project_dir,
         "input_filename": "merged_us.parquet",
         "bert_model_name": "cl-tohoku/bert-base-japanese-char-v2",
-        "max_epochs": 1,
-        "num_gpus": 0,
     }
     experiment = "fine-tuning-cl-1"
     display_name = f"fine-tuning-cl-{get_unix_timestamp()}"
@@ -102,11 +111,10 @@ def main() -> None:
         display_name=display_name,
         template_path=package_path,
     )
-    job.submit(
+    job.run(
         service_account=SERVICE_ACCOUNT,
-        experiment=experiment,
+        sync=False,
     )
-    job._block_until_complete()
 
 
 if __name__ == "__main__":
