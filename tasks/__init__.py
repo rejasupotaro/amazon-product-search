@@ -14,8 +14,6 @@ from tasks import (
 
 @task
 def verify(c):
-    print("Running black...")
-    c.run("poetry run black .")
     print("Running ruff...")
     c.run("poetry run ruff . --fix")
     print("Running mypy...")
