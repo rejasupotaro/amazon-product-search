@@ -38,6 +38,7 @@ pyvespa = "^0.39.0"
 tritonclient = "^2.41.1"
 openai = "^1.14.2"
 tenacity = "^8.2.3"
+ruff = "^0.4.4"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2"
@@ -45,7 +46,6 @@ pytest-cov = "^4.0.0"
 mypy = "^1.9.0"
 jupyterlab = "3.5.0"
 seaborn = "^0.12.1"
-ruff = "^0.0.265"
 black = "^23.3.0"
 matplotlib-venn = "^0.11.10"
 optuna = "^3.5.0"
@@ -55,10 +55,7 @@ invoke = "^2.2.0"
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.black]
-line-length = 120
-
-[tool.ruff]
+[tool.ruff.lint]
 # For available rules, see https://beta.ruff.rs/docs/rules/
 select = [
     "F",  # Pyflakes
@@ -78,9 +75,8 @@ select = [
     "TCH",  # flake8-type-checking
     "RUF",  # Ruff-specific rules
 ]
-line-length = 120
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = [
     "amazon_product_search",
     "amazon_product_search_dense_retrieval",
