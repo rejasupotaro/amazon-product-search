@@ -1,4 +1,5 @@
 import os
+from typing import ClassVar
 
 PROJECT_DIR = os.getenv("PROJECT_DIR", ".")
 DATA_DIR = os.getenv("DATA_DIR", "data")
@@ -46,7 +47,7 @@ class HF:
     ML_MPNET = "paraphrase-multilingual-mpnet-base-v2"
     ML_XLM = "stsb-xlm-r-multilingual"
 
-    LOCALE_TO_MODEL_NAME = {
+    LOCALE_TO_MODEL_NAME: ClassVar[dict[str, str]] = {
         "us": EN_ALL_MINILM,
         "jp": JP_SLUKE_MEAN,
     }

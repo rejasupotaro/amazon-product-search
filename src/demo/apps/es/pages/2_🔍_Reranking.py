@@ -113,14 +113,12 @@ def run_comparison(
     reranker_names: list[str],
 ) -> None:
     queries = df.get_column("query").unique().to_list()
-    n = 0
     progress_text = st.empty()
     progress_bar = st.progress(0)
     rows = []
-    for query in random.sample(queries, num_queries):
-        n += 1
-        progress_text.text(f"Query ({n} / {num_queries}): {query}")
-        progress_bar.progress(n / num_queries)
+    for i, query in enumerate(random.sample(queries, num_queries), start=1):
+        progress_text.text(f"Query ({i} / {num_queries}): {query}")
+        progress_bar.progress(i / num_queries)
 
         products = df.filter(pl.col("query") == query).to_dicts()
         results = [Result(product=product, score=1) for product in products]
