@@ -13,16 +13,23 @@ from tasks import (
 
 
 @task
-def verify(c):
-    print("Running ruff...")
-    c.run("poetry run ruff . --fix")
+def lint(c):
+    print("Running ruff check...")
+    c.run("poetry run ruff check --fix")
+    print("Running ruff format...")
+    c.run("poetry run ruff format")
     print("Running mypy...")
     c.run("poetry run mypy src/amazon_product_search --explicit-package-bases  --namespace-packages")
+
+
+@task(pre=[lint])
+def verify(c):
     print("Running pytest...")
     c.run("poetry run pytest tests/unit")
 
 
 ns = Collection()
+ns.add_task(lint)
 ns.add_task(verify)
 ns.add_collection(Collection.from_module(data_tasks, name="data"))
 ns.add_collection(Collection.from_module(demo_tasks, name="demo"))

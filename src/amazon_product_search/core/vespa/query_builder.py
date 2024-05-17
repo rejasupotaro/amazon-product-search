@@ -92,9 +92,7 @@ class QueryBuilder:
             "hits": size,
         }
         if is_semantic_search_enabled:
-            query[
-                "yql"
-            ] = f"""
+            query["yql"] = f"""
             select
                 *
             from
@@ -105,9 +103,7 @@ class QueryBuilder:
             """
             query["input.query(query_vector)"] = self.encode(query_str)
         else:
-            query[
-                "yql"
-            ] = f"""
+            query["yql"] = f"""
             select
                 *
             from

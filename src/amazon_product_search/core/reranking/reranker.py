@@ -13,8 +13,7 @@ from amazon_product_search.core.retrieval.response import Result
 
 
 class Reranker(Protocol):
-    def rerank(self, query: str, results: list[Result]) -> list[Result]:
-        ...
+    def rerank(self, query: str, results: list[Result]) -> list[Result]: ...
 
 
 class NoOpReranker:
