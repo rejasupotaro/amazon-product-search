@@ -26,7 +26,6 @@ jobs:
         pip install poetry
         poetry install
         poetry run python -m unidic download
-    - run: poetry run ruff .
-    - run: poetry run mypy src/amazon_product_search --explicit-package-bases  --namespace-packages
+    - run: poetry run inv lint
     - run: poetry run pytest tests/unit -vv --cov
     # - run: poetry run pytest tests/integration -vv
