@@ -1,0 +1,17 @@
+{
+    "window_size": {{ window_size }},
+    "query": {
+        "rescore_query": {
+            "function_score": {
+                "script_score": {
+                    "script": {
+                        "params": {
+                           "query_vector": {{ query_vector | tojson }}
+                        },
+                        "source": "_score + Math.max(cosineSimilarity(params.query_vector, 'product_vector'), 0)"
+                    }
+                }
+            }
+        }
+    }
+}

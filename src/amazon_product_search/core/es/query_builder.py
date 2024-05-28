@@ -136,3 +136,16 @@ class QueryBuilder:
             product_ids=product_ids,
         )
         return json.loads(es_query_str)
+
+    def build_rescore_query(
+        self,
+        query: str,
+        window_size: int = 1000,
+    ) -> dict[str, Any]:
+        query_vector = self.encode(query)
+        return json.loads(
+            self.template_loader.load("rescore.j2").render(
+                query_vector=query_vector,
+                window_size=window_size,
+            )
+        )
