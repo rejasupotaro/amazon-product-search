@@ -1,3 +1,38 @@
 {
-    "match_all": {}
+    "function_score": {
+        "query": {
+            "dis_max": {
+                "queries": [
+                    {% for query in queries %}
+                    {
+                        "multi_match": {
+                            "query": "{{ query }}",
+                            "type": "cross_fields",
+                            "fields": {{ fields | tojson }},
+                            "operator": "{{ operator }}",
+                            "boost": {% if loop.first %} 1.0 {% else %} 0.5 {% endif %}
+                        }
+                    }
+                    {% if not loop.last %}
+                    ,
+                    {% endif %}
+                    {% endfor %}
+                ]
+            }
+        },
+        "functions": [
+            {% if enable_phrase_match_boost %}
+            {
+                "filter": {
+                    "match_phrase": {
+                        "product_title": {
+                            "query": "{{ queries[0] }}"
+                        }
+                    }
+                },
+                "weight": 2
+            }
+            {% endif %}
+        ]
+    }
 }
