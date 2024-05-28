@@ -78,7 +78,7 @@ class QueryBuilder:
             fields = [f"{field}^{weight_dict.get(field, 1)}" for field in fields]
 
         query_match = json.loads(
-            self.template_loader.load("query_match.j2").render(
+            self.template_loader.load("lexical.j2").render(
                 queries=queries[:10],
                 fields=fields,
                 operator=operator,
@@ -128,7 +128,7 @@ class QueryBuilder:
             dict[str, Any]: The constructed ES query.
         """
         query_vector = self.encode(query)
-        es_query_str = self.template_loader.load("dense.j2").render(
+        es_query_str = self.template_loader.load("semantic.j2").render(
             query_vector=query_vector,
             field=field,
             k=top_k,
