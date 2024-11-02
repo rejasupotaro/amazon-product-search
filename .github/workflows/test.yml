@@ -1,4 +1,5 @@
-name: lint_and_test
+name: test
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -26,6 +27,5 @@ jobs:
         pip install poetry
         poetry install
         poetry run python -m unidic download
-    - run: poetry run inv lint
     - run: poetry run pytest tests/unit -vv --cov
     # - run: poetry run pytest tests/integration -vv

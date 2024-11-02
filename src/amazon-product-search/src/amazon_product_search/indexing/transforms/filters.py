@@ -14,6 +14,4 @@ def is_indexable(product: Dict[str, Any]) -> bool:
         return False
     if "product_title" not in product:
         return False
-    if not product["product_title"]:
-        return False
-    return True
+    return product["product_title"]

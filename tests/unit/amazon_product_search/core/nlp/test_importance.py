@@ -5,7 +5,7 @@ from amazon_product_search.core.retrieval.importance_estimator import (
 )
 
 
-@pytest.mark.skip()
+@pytest.mark.skip
 @pytest.mark.parametrize(
     ("text", "expected"),
     [
