@@ -1,3 +1,12 @@
+[tool.poetry]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "3.11.8"
+
+[tool.poetry.group.dev.dependencies]
+amazon_product_search = { path = "src/amazon-product-search" }
+
 [tool.ruff]
 line-length = 120
 target-version = "py311"
