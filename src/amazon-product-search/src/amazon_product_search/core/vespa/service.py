@@ -2,7 +2,6 @@ from pathlib import Path
 from typing import Optional
 
 from docker.models.containers import Container
-
 from vespa.application import ApplicationPackage
 from vespa.deployment import Vespa, VespaDocker
 

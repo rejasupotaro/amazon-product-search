@@ -4,15 +4,21 @@ from kfp.compiler import Compiler
 from kfp.dsl import Metrics, Output
 
 from amazon_product_search.constants import (
-    PROJECT_ID,
-    REGION,
-    SERVICE_ACCOUNT,
-    STAGING_BUCKET,
     TRAINING_IMAGE_URI,
-    VERTEX_DIR,
 )
 from amazon_product_search.core.timestamp import get_unix_timestamp
 
+
+def build_preprocess_func(image: str):
+    @dsl.component(
+        base_image=image,
+        install_kfp_package=False,
+    )
+    def preprocess(message: str) -> None:
+        import logging
+
+        logging.info(message)
+    return preprocess
 
 @dsl.component(
     base_image=TRAINING_IMAGE_URI,
@@ -61,7 +67,9 @@ def pipeline_func(message: str) -> None:
     predict_task.after(evaluate_task)
 
 
-def main() -> None:
+def run(
+    project_id: str, region: str, service_account: str, templates_dir: str, staging_bucket: str
+) -> None:
     """Invoke a Vertex AI custom training job.
 
     Run `poetry run inv gcloud.build-training` to build the image used for training in advance.
@@ -75,12 +83,12 @@ def main() -> None:
     """
     experiment = "dummy-1"
     display_name = f"dummy-{get_unix_timestamp()}"
-    package_path = f"{VERTEX_DIR}/dummy.yaml"
+    package_path = f"{templates_dir}/dummy.yaml"
 
     aiplatform.init(
-        project=PROJECT_ID,
-        location=REGION,
-        staging_bucket=STAGING_BUCKET,
+        project=project_id,
+        location=region,
+        staging_bucket=staging_bucket,
         experiment=experiment,
     )
 
@@ -98,11 +106,7 @@ def main() -> None:
         template_path=package_path,
     )
     job.submit(
-        service_account=SERVICE_ACCOUNT,
+        service_account=service_account,
         experiment=experiment,
     )
     job._block_until_complete()
-
-
-if __name__ == "__main__":
-    main()
