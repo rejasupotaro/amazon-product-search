@@ -1,0 +1,18 @@
+name: ruff
+
+on: push
+
+jobs:
+  ruff:
+    strategy:
+      matrix:
+        python-version: ["3.11.8"]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install ruff mypy
+      - run: make lint

@@ -1,10 +1,10 @@
 import contextlib
 
+from elasticsearch import NotFoundError
 from invoke import task
 
 from amazon_product_search.constants import HF
 from amazon_product_search.core.es.es_client import EsClient
-from elasticsearch import NotFoundError
 
 
 @task
