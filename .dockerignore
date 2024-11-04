@@ -1,4 +1,12 @@
-.*
-data
-models
-notebooks
+**/.venv
+**/.mypy_cache
+**/.pytest_cache
+**/__pycache__
+**/.ruff_cache
+**/dist
+**/data
+**/models
+**/notebooks
+**/tests
+**/elasticsearch
+**/vespa

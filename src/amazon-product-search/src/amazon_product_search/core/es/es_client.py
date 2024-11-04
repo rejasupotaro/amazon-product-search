@@ -1,9 +1,10 @@
 import json
 from typing import Any, Callable, Iterator, Optional
 
+from elasticsearch import Elasticsearch, helpers
+
 from amazon_product_search.core.retrieval.response import Response, Result
 from amazon_product_search.core.source import Locale
-from elasticsearch import Elasticsearch, helpers
 
 
 class EsClient:

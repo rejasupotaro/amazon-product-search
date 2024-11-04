@@ -6,7 +6,6 @@ from tasks import (
     indexing_tasks,
     model_tasks,
     synonyms_tasks,
-    training_tasks,
     vespa_tasks,
 )
 
@@ -24,5 +23,4 @@ ns.add_collection(Collection.from_module(es_tasks, name="es"))
 ns.add_collection(Collection.from_module(indexing_tasks, name="indexing"))
 ns.add_collection(Collection.from_module(model_tasks, name="model"))
 ns.add_collection(Collection.from_module(synonyms_tasks, name="synonyms"))
-ns.add_collection(Collection.from_module(training_tasks, name="training"))
 ns.add_collection(Collection.from_module(vespa_tasks, name="vespa"))

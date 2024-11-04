@@ -1,7 +1,5 @@
 FROM gcr.io/deeplearning-platform-release/pytorch-gpu
 
-# RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub
-
 RUN apt-get update && \
     apt-get install -y \
     libffi-dev libssl-dev zlib1g-dev liblzma-dev tk-dev \
@@ -18,19 +16,24 @@ RUN git clone https://github.com/pyenv/pyenv.git $PYENV_ROOT && \
     pyenv global $PYTHON_VERSION && \
     pyenv rehash
 
-ENV WORKDIR /app/
+WORKDIR /app/src/amazon-product-search
 
-WORKDIR $WORKDIR
+COPY src/amazon-product-search/pyproject.toml pyproject.toml
+COPY src/amazon-product-search/poetry.lock poetry.lock
+COPY src/amazon-product-search/src src
 
-COPY pyproject.toml poetry.lock $WORKDIR
-COPY src src
-COPY tasks tasks
+WORKDIR /app/src/training
+
+COPY src/training/pyproject.toml pyproject.toml
+COPY src/training/poetry.lock poetry.lock
+COPY src/training/src src
+COPY src/training/Makefile Makefile
 
 RUN pip install poetry --no-cache-dir && \
     poetry config virtualenvs.create false && \
     poetry install --only main
 
-COPY gcloud/training.json .
+COPY gcloud/training.json training.json
 ENV GOOGLE_APPLICATION_CREDENTIALS training.json
 
-ENTRYPOINT ["poetry", "run"]
+ENTRYPOINT ["make", "run"]
