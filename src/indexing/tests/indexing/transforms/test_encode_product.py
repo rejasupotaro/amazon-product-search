@@ -1,6 +1,6 @@
 import pytest
 
-from amazon_product_search.indexing.transforms.encode_product import _product_to_text
+from indexing.transforms.encode_product import _product_to_text
 
 
 @pytest.mark.parametrize(

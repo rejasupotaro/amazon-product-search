@@ -15,9 +15,9 @@ from amazon_product_search.constants import DATASET_ID, HF, PROJECT_ID
 from amazon_product_search.core import source
 from amazon_product_search.core.nlp.normalizer import normalize_query
 from amazon_product_search.core.source import Locale
-from amazon_product_search.indexing.options import IndexerOptions
 from dense_retrieval.encoders import SBERTEncoder
 from dense_retrieval.encoders.modules.pooler import PoolingMode
+from indexing.options import IndexerOptions
 
 
 def get_input_source(data_dir: str, locale: Locale, nrows: int = -1) -> PTransform:

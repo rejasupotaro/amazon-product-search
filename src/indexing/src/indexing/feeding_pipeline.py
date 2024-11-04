@@ -6,10 +6,10 @@ from apache_beam.options.pipeline_options import GoogleCloudOptions
 from apache_beam.transforms.util import BatchElements
 
 from amazon_product_search.constants import DATA_DIR, DATASET_ID, PROJECT_ID
-from amazon_product_search.indexing.io.elasticsearch_io import WriteToElasticsearch
-from amazon_product_search.indexing.io.vespa_io import WriteToVespa
-from amazon_product_search.indexing.options import IndexerOptions
-from amazon_product_search.indexing.transforms.add_image_url import AddImageUrlFn
+from indexing.io.elasticsearch_io import WriteToElasticsearch
+from indexing.io.vespa_io import WriteToVespa
+from indexing.options import IndexerOptions
+from indexing.transforms.add_image_url import AddImageUrlFn
 
 
 def create_pipeline(options: IndexerOptions) -> beam.Pipeline:

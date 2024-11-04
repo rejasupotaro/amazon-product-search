@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "indexing"
+version = "0.1.0"
+description = ""
+authors = ["rejasupotaro"]
+
+[tool.poetry.dependencies]
+python = "~3.11"
+amazon_product_search = { path = "../amazon-product-search", develop = true }
+apache-beam = {version = "2.50.0", extras = ["gcp"]}
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.2"
+pytest-cov = "^4.0.0"
+invoke = "^2.2.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

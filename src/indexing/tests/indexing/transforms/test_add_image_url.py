@@ -3,7 +3,7 @@ import pandas as pd
 from apache_beam.testing.test_pipeline import TestPipeline
 from apache_beam.testing.util import assert_that, equal_to
 
-from amazon_product_search.indexing.transforms.add_image_url import AddImageUrlFn
+from indexing.transforms.add_image_url import AddImageUrlFn
 
 
 def test_add_image_url(tmp_path):

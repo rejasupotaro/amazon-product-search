@@ -1,6 +1,6 @@
 import pytest
 
-from amazon_product_search.indexing.transforms.filters import is_indexable
+from indexing.transforms.filters import is_indexable
 
 
 @pytest.mark.parametrize(

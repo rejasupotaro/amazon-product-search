@@ -13,16 +13,16 @@ from apache_beam.utils.shared import Shared
 from amazon_product_search.constants import DATA_DIR, DATASET_ID, HF, PROJECT_ID
 from amazon_product_search.core import source
 from amazon_product_search.core.source import Locale
-from amazon_product_search.indexing.io.elasticsearch_io import WriteToElasticsearch
-from amazon_product_search.indexing.io.vespa_io import WriteToVespa
-from amazon_product_search.indexing.options import IndexerOptions
-from amazon_product_search.indexing.transforms.add_image_url import AddImageUrlFn
-from amazon_product_search.indexing.transforms.analyze_doc import AnalyzeDocFn
-from amazon_product_search.indexing.transforms.encode_product import EncodeProduct
-from amazon_product_search.indexing.transforms.extract_keywords import (
+from indexing.io.elasticsearch_io import WriteToElasticsearch
+from indexing.io.vespa_io import WriteToVespa
+from indexing.options import IndexerOptions
+from indexing.transforms.add_image_url import AddImageUrlFn
+from indexing.transforms.analyze_doc import AnalyzeDocFn
+from indexing.transforms.encode_product import EncodeProduct
+from indexing.transforms.extract_keywords import (
     ExtractKeywordsFn,
 )
-from amazon_product_search.indexing.transforms.filters import is_indexable
+from indexing.transforms.filters import is_indexable
 
 
 def get_input_source(data_dir: str, locale: Locale, nrows: int = -1) -> PTransform:
