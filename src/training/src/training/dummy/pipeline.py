@@ -9,17 +9,6 @@ from amazon_product_search.constants import (
 from amazon_product_search.core.timestamp import get_unix_timestamp
 
 
-def build_preprocess_func(image: str):
-    @dsl.component(
-        base_image=image,
-        install_kfp_package=False,
-    )
-    def preprocess(message: str) -> None:
-        import logging
-
-        logging.info(message)
-    return preprocess
-
 @dsl.component(
     base_image=TRAINING_IMAGE_URI,
     install_kfp_package=False,
@@ -54,7 +43,7 @@ def predict() -> None:
 @dsl.pipeline(
     name="dummy",
 )
-def pipeline_func(message: str) -> None:
+def pipeline_func(training_image: str, message: str) -> None:
     preprocess(message=message)
 
     train_task = train()
@@ -68,7 +57,12 @@ def pipeline_func(message: str) -> None:
 
 
 def run(
-    project_id: str, region: str, service_account: str, templates_dir: str, staging_bucket: str
+    project_id: str,
+    region: str,
+    service_account: str,
+    templates_dir: str,
+    training_image: str,
+    staging_bucket: str,
 ) -> None:
     """Invoke a Vertex AI custom training job.
 
@@ -97,6 +91,7 @@ def run(
         package_path=package_path,
         type_check=True,
         pipeline_parameters={
+            "training_image": training_image,
             "message": "Hello World",
         },
     )

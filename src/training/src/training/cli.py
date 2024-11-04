@@ -17,6 +17,7 @@ def run(
     region: Annotated[str, typer.Option()],
     service_account: Annotated[str, typer.Option()],
     templates_dir: Annotated[str, typer.Option()],
+    training_image: Annotated[str, typer.Option()],
     staging_bucket: Annotated[str, typer.Option()],
 ) -> None:
-    dummy_pipeline.run(project_id, region, service_account, templates_dir, staging_bucket)
+    dummy_pipeline.run(project_id, region, service_account, templates_dir, training_image, staging_bucket)
