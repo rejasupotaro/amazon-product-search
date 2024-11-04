@@ -6,7 +6,7 @@ from sentence_transformers.evaluation import EmbeddingSimilarityEvaluator, Simil
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, Dataset
 
-from amazon_product_search.training.shared.metric_logger import MetricLoggerST
+from training.shared.metric_logger import MetricLoggerST
 
 
 def query_to_text(query: str, with_tag: bool) -> str:

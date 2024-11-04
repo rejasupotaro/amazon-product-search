@@ -29,7 +29,7 @@ def fine_tune(
 ) -> None:
     from collections import defaultdict
 
-    from amazon_product_search.training.fine_tuning_mlm.components import run
+    from training.fine_tuning_mlm.components import run
 
     metrics: list[dict[str, Any]] = run(
         project_dir,
