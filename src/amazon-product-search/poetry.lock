@@ -140,36 +140,6 @@ typing-extensions = ">=4"
 tz = ["backports.zoneinfo"]
 
 [[package]]
-name = "amazon-product-search-dense-retrieval"
-version = "0.1.0"
-description = ""
-optional = false
-python-versions = "^3.9"
-files = []
-develop = false
-
-[package.dependencies]
-annoy = "^1.17.2"
-fugashi = {version = "^1.2.0", extras = ["unidic"]}
-lightning = "^2.2.0.post0"
-more-itertools = "^9.1.0"
-onnx = "^1.14.0"
-onnxruntime = "^1.15.1"
-pandas = "^1.5.0"
-pytest = "^7.3.1"
-sentence-transformers = "^2.2.2"
-sentencepiece = "^0.1.99"
-torch = "^2.0.0"
-transformers = "^4.28.1"
-unidic-lite = "^1.0.8"
-
-[package.source]
-type = "git"
-url = "https://github.com/rejasupotaro/amazon-product-search-dense-retrieval.git"
-reference = "HEAD"
-resolved_reference = "35a920a162d16959cacd30e4c7200bee1fd681b1"
-
-[[package]]
 name = "annotated-types"
 version = "0.6.0"
 description = "Reusable constraint types to use with typing.Annotated"
@@ -743,6 +713,34 @@ files = [
     {file = "decorator-5.1.1-py3-none-any.whl", hash = "sha256:b8c3f85900b9dc423225913c5aace94729fe1fa9763b38939a95226f02d37186"},
     {file = "decorator-5.1.1.tar.gz", hash = "sha256:637996211036b6385ef91435e4fae22989472f9d571faba8927ba8253acbc330"},
 ]
+
+[[package]]
+name = "dense-retrieval"
+version = "0.1.0"
+description = ""
+optional = false
+python-versions = "^3.11"
+files = []
+develop = true
+
+[package.dependencies]
+annoy = "^1.17.2"
+fugashi = {version = "^1.2.0", extras = ["unidic"]}
+lightning = "^2.2.0.post0"
+more-itertools = "^9.1.0"
+onnx = "^1.14.0"
+onnxruntime = "^1.15.1"
+pandas = "^1.5.0"
+pytest = "^7.3.1"
+sentence-transformers = "^2.2.2"
+sentencepiece = "^0.1.99"
+torch = "^2.0.0"
+transformers = "^4.28.1"
+unidic-lite = "^1.0.8"
+
+[package.source]
+type = "directory"
+url = "../dense-retrieval"
 
 [[package]]
 name = "deprecated"
@@ -5340,4 +5338,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.8"
-content-hash = "4a0b681f45c3647dfd7f821f69650d193d0b8f27f54be106a480873a74d59e23"
+content-hash = "155e5c2d9a9f74d58b263c3f6af76faf60e85a77394b229c917aeba5406de6ea"

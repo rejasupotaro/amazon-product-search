@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "dense-retrieval"
+version = "0.1.0"
+description = ""
+authors = ["rejasupotaro"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pandas = "^1.5.0"
+pytest = "^7.3.1"
+transformers = "^4.28.1"
+fugashi = {extras = ["unidic"], version = "^1.2.0"}
+unidic-lite = "^1.0.8"
+sentencepiece = "^0.1.99"
+torch = "^2.0.0"
+annoy = "^1.17.2"
+sentence-transformers = "^2.2.2"
+more-itertools = "^9.1.0"
+onnx = "^1.14.0"
+onnxruntime = "^1.15.1"
+lightning = "^2.2.0.post0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

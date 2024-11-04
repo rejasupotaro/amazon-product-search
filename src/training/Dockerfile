@@ -16,6 +16,12 @@ RUN git clone https://github.com/pyenv/pyenv.git $PYENV_ROOT && \
     pyenv global $PYTHON_VERSION && \
     pyenv rehash
 
+WORKDIR /app/src/dense-retrieval
+
+COPY src/dense-retrieval/pyproject.toml pyproject.toml
+COPY src/dense-retrieval/poetry.lock poetry.lock
+COPY src/dense-retrieval/src src
+
 WORKDIR /app/src/amazon-product-search
 
 COPY src/amazon-product-search/pyproject.toml pyproject.toml

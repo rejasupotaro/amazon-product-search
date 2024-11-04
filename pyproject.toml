@@ -38,7 +38,8 @@ extend-select = ["I"]
 [tool.ruff.lint.isort]
 known-first-party = [
     "amazon_product_search",
-    "amazon_product_search_dense_retrieval",
+    "dense_retrieval",
+    "training",
 ]
 
 [tool.ruff.lint.pydocstyle]

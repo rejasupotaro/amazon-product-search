@@ -11,8 +11,8 @@ from tritonclient.grpc import (
     InferInput,
 )
 
-from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
-from amazon_product_search_dense_retrieval.encoders.modules.pooler import PoolingMode
+from dense_retrieval.encoders import SBERTEncoder
+from dense_retrieval.encoders.modules.pooler import PoolingMode
 
 
 def _product_to_text(product: Dict[str, Any], fields: list[str]) -> str:

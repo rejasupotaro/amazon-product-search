@@ -5,7 +5,7 @@ from invoke import task
 import amazon_product_search.core.vespa.service as vespa_service
 from amazon_product_search.constants import HF, VESPA_DIR
 from amazon_product_search.core.vespa.vespa_client import VespaClient
-from amazon_product_search_dense_retrieval.encoders import SBERTEncoder
+from dense_retrieval.encoders import SBERTEncoder
 
 """
 To run Vespa locally, execute the following commands:
