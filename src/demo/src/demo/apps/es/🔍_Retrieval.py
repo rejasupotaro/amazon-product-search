@@ -2,19 +2,19 @@ from typing import Any, Optional
 
 import streamlit as st
 
+from amazon_product_search import source
 from amazon_product_search.constants import HF
-from amazon_product_search.core import source
-from amazon_product_search.core.es.es_client import EsClient
-from amazon_product_search.core.es.query_builder import QueryBuilder
-from amazon_product_search.core.metrics import (
+from amazon_product_search.es.es_client import EsClient
+from amazon_product_search.es.query_builder import QueryBuilder
+from amazon_product_search.metrics import (
     compute_ndcg,
     compute_precision,
     compute_recall,
 )
-from amazon_product_search.core.reranking.reranker import from_string
-from amazon_product_search.core.retrieval.rank_fusion import RankFusion
-from amazon_product_search.core.retrieval.retriever import Retriever
-from amazon_product_search.core.source import Locale
+from amazon_product_search.reranking.reranker import from_string
+from amazon_product_search.retrieval.rank_fusion import RankFusion
+from amazon_product_search.retrieval.retriever import Retriever
+from amazon_product_search.source import Locale
 from demo.apps.es.search_ui import (
     draw_input_form,
     draw_products,

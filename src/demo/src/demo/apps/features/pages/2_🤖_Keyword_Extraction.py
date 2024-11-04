@@ -5,9 +5,9 @@ import streamlit as st
 from more_itertools import chunked
 from st_aggrid import AgGrid, GridOptionsBuilder
 
-from amazon_product_search.core.nlp.normalizer import normalize_doc
-from amazon_product_search.core.nlp.tokenizers.tokenizer import Tokenizer
-from amazon_product_search.core.retrieval.keyword_extractor import KeywordExtractor
+from amazon_product_search.nlp.normalizer import normalize_doc
+from amazon_product_search.nlp.tokenizers.tokenizer import Tokenizer
+from amazon_product_search.retrieval.keyword_extractor import KeywordExtractor
 from demo.page_config import set_page_config
 from demo.utils import load_products
 

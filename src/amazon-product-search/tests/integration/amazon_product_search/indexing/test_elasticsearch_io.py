@@ -6,7 +6,7 @@ import pytest
 from apache_beam.transforms.util import BatchElements
 from tests.integration.amazon_product_search.indexing.es_docker import EsDocker
 
-from amazon_product_search.core.es.es_client import EsClient
+from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.indexing.io.elasticsearch_io import WriteToElasticsearch
 from amazon_product_search.indexing.options import IndexerOptions
 

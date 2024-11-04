@@ -1,6 +1,6 @@
 from invoke import task
 
-from amazon_product_search.core.synonyms import generator
+from amazon_product_search.synonyms import generator
 
 
 @task

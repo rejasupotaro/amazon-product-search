@@ -1,6 +1,6 @@
 from invoke import task
 
-from amazon_product_search.core import source
+from amazon_product_search import source
 
 
 @task

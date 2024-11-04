@@ -2,7 +2,7 @@ import plotly.express as px
 import polars as pl
 import streamlit as st
 
-from amazon_product_search.core import source
+from amazon_product_search import source
 from demo.page_config import set_page_config
 from demo.utils import analyze_dataframe
 

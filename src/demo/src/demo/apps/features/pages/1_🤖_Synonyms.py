@@ -1,7 +1,7 @@
 import polars as pl
 import streamlit as st
 
-from amazon_product_search.core.synonyms.synonym_dict import SynonymDict
+from amazon_product_search.synonyms.synonym_dict import SynonymDict
 from demo.page_config import set_page_config
 from demo.utils import load_labels
 

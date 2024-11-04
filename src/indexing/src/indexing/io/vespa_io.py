@@ -4,7 +4,7 @@ from typing import Any, Callable, Dict, List
 import apache_beam as beam
 from vespa.io import VespaResponse
 
-from amazon_product_search.core.vespa.vespa_client import VespaClient
+from amazon_product_search.vespa.vespa_client import VespaClient
 
 
 def callback_fn(response: VespaResponse, id: str) -> None:

@@ -3,7 +3,7 @@ from typing import Any, Callable, Dict, List, Optional
 
 import apache_beam as beam
 
-from amazon_product_search.core.es.es_client import EsClient
+from amazon_product_search.es.es_client import EsClient
 
 
 class WriteToElasticsearch(beam.DoFn):

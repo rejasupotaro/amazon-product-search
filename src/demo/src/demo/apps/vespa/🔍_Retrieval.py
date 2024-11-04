@@ -5,12 +5,12 @@ import plotly.express as px
 import seaborn as sns
 import streamlit as st
 
+from amazon_product_search import source
 from amazon_product_search.constants import HF
-from amazon_product_search.core import source
-from amazon_product_search.core.retrieval.response import Response
-from amazon_product_search.core.source import Locale
-from amazon_product_search.core.vespa.query_builder import QueryBuilder
-from amazon_product_search.core.vespa.vespa_client import VespaClient
+from amazon_product_search.retrieval.response import Response
+from amazon_product_search.source import Locale
+from amazon_product_search.vespa.query_builder import QueryBuilder
+from amazon_product_search.vespa.vespa_client import VespaClient
 from demo.apps.es.search_ui import (
     draw_products,
 )

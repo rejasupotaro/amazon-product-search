@@ -6,8 +6,8 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from amazon_product_search.core.metrics import compute_cosine_similarity
-from amazon_product_search.core.retrieval.response import Response, Result
+from amazon_product_search.metrics import compute_cosine_similarity
+from amazon_product_search.retrieval.response import Response, Result
 
 
 @dataclass

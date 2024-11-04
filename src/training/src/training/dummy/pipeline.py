@@ -6,7 +6,7 @@ from kfp.dsl import Metrics, Output
 from amazon_product_search.constants import (
     TRAINING_IMAGE_URI,
 )
-from amazon_product_search.core.timestamp import get_unix_timestamp
+from amazon_product_search.timestamp import get_unix_timestamp
 
 
 @dsl.component(

@@ -6,10 +6,10 @@ import polars as pl
 import streamlit as st
 from more_itertools import chunked
 
+from amazon_product_search import metrics, source
 from amazon_product_search.constants import HF
-from amazon_product_search.core import metrics, source
-from amazon_product_search.core.es.es_client import EsClient
-from amazon_product_search.core.reranking.reranker import (
+from amazon_product_search.es.es_client import EsClient
+from amazon_product_search.reranking.reranker import (
     ColBERTReranker,
     DotReranker,
     NoOpReranker,
@@ -17,7 +17,7 @@ from amazon_product_search.core.reranking.reranker import (
     Reranker,
     SpladeReranker,
 )
-from amazon_product_search.core.retrieval.response import Result
+from amazon_product_search.retrieval.response import Result
 from demo.page_config import set_page_config
 
 RERANKER_NAMES = [

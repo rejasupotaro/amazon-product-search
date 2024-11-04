@@ -2,9 +2,9 @@ from typing import Any, Dict, Iterator, cast
 
 import apache_beam as beam
 
-from amazon_product_search.core.nlp.normalizer import normalize_doc
-from amazon_product_search.core.nlp.tokenizers import Tokenizer, locale_to_tokenizer
-from amazon_product_search.core.source import Locale
+from amazon_product_search.nlp.normalizer import normalize_doc
+from amazon_product_search.nlp.tokenizers import Tokenizer, locale_to_tokenizer
+from amazon_product_search.source import Locale
 
 
 class AnalyzeDocFn(beam.DoFn):
