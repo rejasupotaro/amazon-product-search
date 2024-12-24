@@ -1,58 +1,27 @@
 from google.cloud import aiplatform
 from kfp import dsl
 from kfp.compiler import Compiler
-from kfp.dsl import Metrics, Output
 
-from amazon_product_search.constants import (
-    TRAINING_IMAGE_URI,
-)
 from amazon_product_search.timestamp import get_unix_timestamp
-
-
-@dsl.component(
-    base_image=TRAINING_IMAGE_URI,
-    install_kfp_package=False,
-)
-def preprocess(message: str) -> None:
-    import logging
-
-    logging.info(message)
-
-
-@dsl.container_component
-def train() -> dsl.ContainerSpec:
-    return dsl.ContainerSpec(
-        image=TRAINING_IMAGE_URI,
-        command=["python"],
-        args=["-c", "print('Hello World')"],
-    )
-
-
-@dsl.component
-def evaluate(metrics_output: Output[Metrics]) -> None:
-    print("Evaluate")
-    metrics_output.log_metric("loss", [0.2, 0.1])
-    metrics_output.log_metric("acc", [0.8, 0.9])
-
-
-@dsl.component
-def predict() -> None:
-    print("Predict")
+from training.dummy.components.evaluate import build_evaluate_func
+from training.dummy.components.predict import build_predict_func
+from training.dummy.components.preprocess import build_preprocess_func
+from training.dummy.components.train import build_train_func
 
 
 @dsl.pipeline(
     name="dummy",
 )
 def pipeline_func(training_image: str, message: str) -> None:
-    preprocess(message=message)
+    preprocess_task = build_preprocess_func(image=training_image)(message=message)
 
-    train_task = train()
-    train_task.after(preprocess)
+    train_task = build_train_func(image=training_image)()
+    train_task.after(preprocess_task)
 
-    evaluate_task = evaluate()
+    evaluate_task = build_evaluate_func()()
     evaluate_task.after(train_task)
 
-    predict_task = predict()
+    predict_task = build_predict_func()()
     predict_task.after(evaluate_task)
 
 
