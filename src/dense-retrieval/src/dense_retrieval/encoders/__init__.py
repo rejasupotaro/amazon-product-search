@@ -3,8 +3,8 @@ from .sbert_encoder import SBERTEncoder
 
 __all__ = [
     "BiEncoder",
+    "PoolingMode",
     "ProductEncoder",
     "QueryEncoder",
-    "PoolingMode",
     "SBERTEncoder",
 ]

@@ -89,7 +89,6 @@ class TextEncoder(Module):
                 for key in tokens:
                     if isinstance(tokens[key], Tensor):
                         tokens[key] = tokens[key].to(self.device)
-                embs: Tensor = self(tokens)
-                embs = embs.detach().cpu().numpy()
+                embs = self(tokens).detach().cpu().numpy()
                 all_embs.extend(embs)
         return np.array(all_embs)[0] if input_was_string else np.array(all_embs)

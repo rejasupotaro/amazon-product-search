@@ -3,6 +3,7 @@ from collections import Counter
 from math import log
 
 import polars as pl
+from polars import DataFrame
 from tqdm import tqdm
 
 from amazon_product_search.constants import DATA_DIR, HF
@@ -13,19 +14,19 @@ from amazon_product_search.synonyms.filters import utils
 from amazon_product_search.synonyms.filters.similarity_filter import SimilarityFilter
 
 
-def load_query_title_pairs(locale: Locale, nrows: int = -1) -> pl.DataFrame:
+def load_query_title_pairs(locale: Locale, nrows: int = -1) -> DataFrame:
     """Load query title pairs."""
     df = load_merged(locale, nrows)
     df = df.filter(pl.col("esci_label") == "E")
     return df
 
 
-def preprocess_query_title_pairs(df: pl.DataFrame) -> pl.DataFrame:
+def preprocess_query_title_pairs(df: DataFrame) -> DataFrame:
     df = df.filter((pl.col("query").is_not_null() & pl.col("product_title").is_not_null()))
     return df.with_columns(
         [
-            pl.col("query").apply(normalize_doc),
-            pl.col("product_title").apply(normalize_doc),
+            pl.col("query").map_elements(normalize_doc),
+            pl.col("product_title").map_elements(normalize_doc),
         ]
     )
 
@@ -81,7 +82,7 @@ def apply_fast_filters(
     pair_counter: Counter,
     min_cooccurrence: int,
     min_npmi: float,
-) -> pl.DataFrame:
+) -> DataFrame:
     total_word_count = sum(word_counter.values())
     log_total_word_count = log(total_word_count)
 
@@ -164,7 +165,7 @@ def generate(
     pairs_df = preprocess_query_title_pairs(pairs_df)
 
     print("Generate candidates from query-title pairs")
-    pairs = pairs_df.select(["query", "product_title"]).to_numpy().tolist()
+    pairs: list[list[str]] = pairs_df.select(["query", "product_title"]).to_numpy().tolist()  # type: ignore
     word_counter, pair_counter = count_words(locale, pairs)
     candidates_df = apply_fast_filters(word_counter, pair_counter, min_cooccurrence, min_npmi)
     print(f"{len(candidates_df)} candidates were generated")

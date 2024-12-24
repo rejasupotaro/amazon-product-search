@@ -7,6 +7,7 @@ python = "3.11.8"
 [tool.poetry.group.dev.dependencies]
 amazon_product_search = { path = "src/amazon-product-search" }
 ruff = "^0.8.4"
+mypy = "^1.14.0"
 
 [tool.ruff]
 line-length = 120
