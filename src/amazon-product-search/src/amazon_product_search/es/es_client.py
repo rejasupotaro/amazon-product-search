@@ -1,10 +1,30 @@
 import json
+from pathlib import Path
 from typing import Any, Callable, Iterator, Optional
 
 from elasticsearch import Elasticsearch, helpers
 
 from amazon_product_search.retrieval.response import Response, Result
 from amazon_product_search.source import Locale
+
+
+def get_package_root() -> Path:
+    """Return the package root directory."""
+    current_dir = Path(__file__).resolve()
+    package_root = current_dir.parents[3]
+    return package_root
+
+
+def get_schema_filepath(locale: Locale) -> Path:
+    """Return the schema file path for the given locale.
+
+    Args:
+        locale (Locale): A locale to get a schema file path.
+
+    Returns:
+        Path: A schema file path.
+    """
+    return get_package_root() / f"elasticsearch/schemas/products_{locale}.json"
 
 
 class EsClient:
@@ -25,7 +45,7 @@ class EsClient:
         Args:
             index_name (str): An index name to create.
         """
-        with open(f"elasticsearch/schemas/products_{locale}.json") as file:
+        with open(get_schema_filepath(locale)) as file:
             schema = json.load(file)
             print(schema)
         self.es.indices.create(index=index_name, settings=schema.get("settings"), mappings=schema.get("mappings"))

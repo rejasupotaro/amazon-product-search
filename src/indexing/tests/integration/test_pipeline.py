@@ -4,11 +4,11 @@ from typing import Iterator
 import apache_beam as beam
 import pytest
 from apache_beam.transforms.util import BatchElements
-from tests.integration.amazon_product_search.indexing.es_docker import EsDocker
+from tests.integration.es_docker import EsDocker
 
 from amazon_product_search.es.es_client import EsClient
-from amazon_product_search.indexing.io.elasticsearch_io import WriteToElasticsearch
-from amazon_product_search.indexing.options import IndexerOptions
+from indexing.io.elasticsearch_io import WriteToElasticsearch
+from indexing.options import IndexerOptions
 
 
 @pytest.fixture
