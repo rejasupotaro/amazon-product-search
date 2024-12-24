@@ -8,11 +8,11 @@ TEMPLATES_DIR:=templates
 # -------------------------------------
 .PHONY: lint
 lint:
-	python -m ruff check --fix --unsafe-fixes --show-fixes
-	python -m mypy src/dense-retrieval/src --explicit-package-bases --namespace-packages
-	python -m mypy src/amazon-product-search/src --explicit-package-bases --namespace-packages
-	python -m mypy src/training/src --explicit-package-bases --namespace-packages
-	python -m mypy src/indexing/src --explicit-package-bases --namespace-packages
+	poetry run ruff check --fix --unsafe-fixes --show-fixes
+	poetry run mypy src/dense-retrieval/src --explicit-package-bases --namespace-packages
+	poetry run mypy src/amazon-product-search/src --explicit-package-bases --namespace-packages
+	poetry run mypy src/training/src --explicit-package-bases --namespace-packages
+	poetry run mypy src/indexing/src --explicit-package-bases --namespace-packages
 
 .PHONY: build_training
 build_training:
