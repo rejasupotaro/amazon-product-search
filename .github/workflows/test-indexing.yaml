@@ -1,0 +1,29 @@
+name: test-indexing
+
+on: push
+
+defaults:
+  run:
+    working-directory: src/indexing
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        python-version: ["3.11.8"]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        env:
+          SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL: True
+        run: |
+          pip install poetry
+          poetry install
+          poetry run python -m unidic download
+      - run: poetry run pytest tests/unit -vv --cov
+      # - run: poetry run pytest tests/integration -vv
