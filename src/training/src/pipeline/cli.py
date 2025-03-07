@@ -1,3 +1,5 @@
+from collections.abc import Callable
+
 import typer
 from google.cloud import aiplatform
 from kfp import dsl
@@ -13,20 +15,27 @@ from training.dummy.components.train import build_train_func
 app = typer.Typer()
 
 
-@dsl.pipeline(
-    name="dummy",
-)
-def pipeline_func(training_image: str, message: str) -> None:
-    preprocess_task = build_preprocess_func(image=training_image)(message=message)
+@app.command()
+def greet():
+    print("Hello, World!")
 
-    train_task = build_train_func(image=training_image)()
-    train_task.after(preprocess_task)
 
-    evaluate_task = build_evaluate_func()()
-    evaluate_task.after(train_task)
+def build_pipeline_func(training_image: str, message: str) -> Callable[[], None]:
+    @dsl.pipeline(
+        name="dummy",
+    )
+    def pipeline_func() -> None:
+        preprocess_task = build_preprocess_func(image=training_image)(message=message)
 
-    predict_task = build_predict_func()()
-    predict_task.after(evaluate_task)
+        train_task = build_train_func(image=training_image)()
+        train_task.after(preprocess_task)
+
+        evaluate_task = build_evaluate_func(image=training_image)()
+        evaluate_task.after(train_task)
+
+        predict_task = build_predict_func(image=training_image)()
+        predict_task.after(evaluate_task)
+    return pipeline_func
 
 
 @app.command()
@@ -61,13 +70,12 @@ def run(
     )
 
     Compiler().compile(
-        pipeline_func=pipeline_func,
+        pipeline_func=build_pipeline_func(
+            training_image=training_image,
+            message="Hello World",
+        ),
         package_path=package_path,
-        type_check=True,
-        pipeline_parameters={
-            "training_image": training_image,
-            "message": "Hello World",
-        },
+        # type_check=True,
     )
 
     job = aiplatform.PipelineJob(
@@ -79,3 +87,6 @@ def run(
         experiment=experiment,
     )
     job._block_until_complete()
+
+if __name__ == "__main__":
+    app()
