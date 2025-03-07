@@ -13,7 +13,7 @@ build:
 
 .PHONY: run
 run:
-	poetry run python -m training run \
+	poetry run python -m pipeline run \
 		--project-id=$(PROJECT_ID) \
 		--region=$(REGION) \
 		--service-account=$(SERVICE_ACCOUNT) \

@@ -1,12 +1,16 @@
+import typer
 from google.cloud import aiplatform
 from kfp import dsl
 from kfp.compiler import Compiler
+from typing_extensions import Annotated
 
 from amazon_product_search.timestamp import get_unix_timestamp
 from training.dummy.components.evaluate import build_evaluate_func
 from training.dummy.components.predict import build_predict_func
 from training.dummy.components.preprocess import build_preprocess_func
 from training.dummy.components.train import build_train_func
+
+app = typer.Typer()
 
 
 @dsl.pipeline(
@@ -25,13 +29,14 @@ def pipeline_func(training_image: str, message: str) -> None:
     predict_task.after(evaluate_task)
 
 
+@app.command()
 def run(
-    project_id: str,
-    region: str,
-    service_account: str,
-    templates_dir: str,
-    training_image: str,
-    staging_bucket: str,
+    project_id: Annotated[str, typer.Option()],
+    region: Annotated[str, typer.Option()],
+    service_account: Annotated[str, typer.Option()],
+    templates_dir: Annotated[str, typer.Option()],
+    training_image: Annotated[str, typer.Option()],
+    staging_bucket: Annotated[str, typer.Option()],
 ) -> None:
     """Invoke a Vertex AI custom training job.
 
