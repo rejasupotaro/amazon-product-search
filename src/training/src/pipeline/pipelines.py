@@ -31,7 +31,7 @@ class BasePipeline(ABC):
 
 class DummyPipeline(BasePipeline):
     def build_pipeline_func(self, config: DictConfig) -> Any:
-        @dsl.pipeline(name="dummy")
+        @dsl.pipeline(name=config.pipeline_type)
         def pipeline_func(
             message: str,
         ) -> None:
@@ -48,7 +48,7 @@ class DummyPipeline(BasePipeline):
 
 class FineTuningCLPipeline(BasePipeline):
     def build_pipeline_func(self, config: DictConfig) -> Any:
-        @dsl.pipeline(name="fine_tuning_cl")
+        @dsl.pipeline(name=config.pipeline_type)
         def pipeline_func(
             project_dir: str,
             input_filename: str,
@@ -73,7 +73,7 @@ class FineTuningCLPipeline(BasePipeline):
 
 class FineTuningMLMPipeline(BasePipeline):
     def build_pipeline_func(self, config: DictConfig) -> Any:
-        @dsl.pipeline(name="fine_tuning_mlm")
+        @dsl.pipeline(name=config.pipeline_type)
         def pipeline_func(
             project_dir: str,
             max_epochs: int,

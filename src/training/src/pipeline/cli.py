@@ -40,6 +40,7 @@ def run(
     overrides = [
         f"project_id={project_id}",
         f"project_dir=gs://{project_name}",
+        f"pipeline_type={pipeline_type}",
         f"compile_parameters.image={training_image}",
         f"runtime_parameters={pipeline_type}.yaml",
     ]
