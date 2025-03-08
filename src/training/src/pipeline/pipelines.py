@@ -1,11 +1,11 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Type
+from typing import Any, Optional, Type
 
 from kfp import dsl
 from kfp.compiler import Compiler
 from pipeline.components.dummy import build_evaluate_func, build_preprocess_func, build_train_func
-from pipeline.components.fine_tuning import build_fine_tune_func
+from pipeline.components.fine_tuning import build_fine_tune_cl_func, build_fine_tune_mlm_func
 
 logger = logging.getLogger(__name__)
 
@@ -31,8 +31,10 @@ class BasePipeline(ABC):
 class DummyPipeline(BasePipeline):
     def build_pipeline_func(self, image: str) -> Any:
         @dsl.pipeline(name="dummy")
-        def pipeline_func() -> None:
-            preprocess_task = build_preprocess_func(image=image)(message="Hello World")
+        def pipeline_func(
+            message: str,
+        ) -> None:
+            preprocess_task = build_preprocess_func(image=image)(message=message)
 
             train_task = build_train_func(image=image)()
             train_task.after(preprocess_task)
@@ -45,7 +47,7 @@ class DummyPipeline(BasePipeline):
 
 class FineTuningCLPipeline(BasePipeline):
     def build_pipeline_func(self, image: str) -> Any:
-        @dsl.pipeline(name="fine_tuning")
+        @dsl.pipeline(name="fine_tuning_cl")
         def pipeline_func(
             project_dir: str,
             input_filename: str,
@@ -55,7 +57,7 @@ class FineTuningCLPipeline(BasePipeline):
             num_gpus = 1
             debug = True
 
-            fine_tune_task = build_fine_tune_func(image=image)(
+            fine_tune_task = build_fine_tune_cl_func(image=image)(
                 project_dir=project_dir,
                 input_filename=input_filename,
                 bert_model_name=bert_model_name,
@@ -68,7 +70,26 @@ class FineTuningCLPipeline(BasePipeline):
         return pipeline_func
 
 
+class FineTuningMLMPipeline(BasePipeline):
+    def build_pipeline_func(self, image: str) -> Any:
+        @dsl.pipeline(name="fine_tuning_mlm")
+        def pipeline_func(
+            project_dir: str,
+            max_epochs: int,
+            batch_size: int,
+            num_sentences: Optional[int],
+        ) -> None:
+            build_fine_tune_mlm_func(image=image)(
+                project_dir=project_dir,
+                max_epochs=max_epochs,
+                batch_size=batch_size,
+                num_sentences=num_sentences,
+            )
+        return pipeline_func
+
+
 PIPELINE_DICT: dict[str, Type[BasePipeline]] = {
     "dummy": DummyPipeline,
     "fine_tuning_cl": FineTuningCLPipeline,
+    "fine_tuning_mlm": FineTuningMLMPipeline,
 }

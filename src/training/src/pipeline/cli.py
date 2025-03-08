@@ -25,8 +25,8 @@ def run(
     staging_bucket: Annotated[str, typer.Option()],
     pipeline_type: Annotated[str, typer.Option()],
 ) -> None:
-    experiment = "dummy-1"
-    pipeline_name = f"dummy-{get_unix_timestamp()}"
+    experiment = f"{pipeline_type}-1"
+    pipeline_name = f"{pipeline_type}-{get_unix_timestamp()}"
     template_path = f"{templates_dir}/{pipeline_type}.yaml"
 
     aiplatform.init(
@@ -41,9 +41,13 @@ def run(
 
     project_dir = f"gs://{project_name}"
     runtime_parameters = {
-        "project_dir": project_dir,
-        "input_filename": "merged_us.parquet",
-        "bert_model_name": "cl-tohoku/bert-base-japanese-char-v2",
+        "message": "Hello, World!",
+        # "project_dir": project_dir,
+        # "input_filename": "merged_us.parquet",
+        # "bert_model_name": "cl-tohoku/bert-base-japanese-char-v2",
+        # "max_epochs": 1,
+        # "batch_size": 2,
+        # "num_sentences": 20,
     }
 
     job = aiplatform.PipelineJob(
