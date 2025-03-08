@@ -4,13 +4,10 @@ import typer
 from google.cloud import aiplatform
 from kfp import dsl
 from kfp.compiler import Compiler
+from pipeline.components.dummy import build_evaluate_func, build_preprocess_func, build_train_func
 from typing_extensions import Annotated
 
 from amazon_product_search.timestamp import get_unix_timestamp
-from training.dummy.components.evaluate import build_evaluate_func
-from training.dummy.components.predict import build_predict_func
-from training.dummy.components.preprocess import build_preprocess_func
-from training.dummy.components.train import build_train_func
 
 app = typer.Typer()
 
@@ -32,9 +29,6 @@ def build_pipeline_func(training_image: str, message: str) -> Callable[[], None]
 
         evaluate_task = build_evaluate_func(image=training_image)()
         evaluate_task.after(train_task)
-
-        predict_task = build_predict_func(image=training_image)()
-        predict_task.after(evaluate_task)
     return pipeline_func
 
 
