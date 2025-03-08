@@ -1,6 +1,7 @@
 REGION?=asia-northeast1
 TRAINING_IMAGE:=gcr.io/$(PROJECT_ID)/training:latest
 TEMPLATES_DIR:=templates
+PIPELINE_TYPE?=dummy
 
 # -------------------------------------
 #  Execution Commands
@@ -19,4 +20,5 @@ run:
 		--service-account=$(SERVICE_ACCOUNT) \
 		--templates-dir=$(TEMPLATES_DIR) \
 		--training-image=$(TRAINING_IMAGE) \
-		--staging-bucket=$(STAGING_BUCKET)
+		--staging-bucket=$(STAGING_BUCKET) \
+		--pipeline-type=$(PIPELINE_TYPE)
