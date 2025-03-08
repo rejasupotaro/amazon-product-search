@@ -1,0 +1,6 @@
+project_dir: ${project_dir}
+input_filename: merged_us.parquet
+bert_model_name: cl-tohoku/bert-base-japanese-char-v2
+max_epochs: 1
+batch_size: 2
+num_sentences: 20

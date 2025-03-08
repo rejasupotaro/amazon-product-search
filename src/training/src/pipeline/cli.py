@@ -3,11 +3,19 @@ import typer
 from google.cloud import aiplatform
 from pipeline.pipelines import PIPELINE_DICT
 from typing_extensions import Annotated
+from omegaconf import OmegaConf
+from hydra import initialize, compose
 
 from amazon_product_search.timestamp import get_unix_timestamp
 
 app = typer.Typer()
 
+
+def load_config(overrides: list[str]):
+    with initialize(config_path="../../conf"):
+        cfg = compose(config_name="config", overrides=overrides)
+    OmegaConf.resolve(cfg)
+    return cfg
 
 @app.command()
 def greet():
@@ -29,6 +37,14 @@ def run(
     pipeline_name = f"{pipeline_type}-{get_unix_timestamp()}"
     template_path = f"{templates_dir}/{pipeline_type}.yaml"
 
+    overrides = [
+        f"project_id={project_id}",
+        f"project_dir=gs://{project_name}",
+        f"runtime_parameters={pipeline_type}.yaml",
+    ]
+
+    cfg = load_config(overrides)
+
     aiplatform.init(
         project=project_id,
         location=region,
@@ -39,21 +55,10 @@ def run(
     pipeline = PIPELINE_DICT[pipeline_type](image=training_image)
     pipeline.compile(template_path=template_path)
 
-    project_dir = f"gs://{project_name}"
-    runtime_parameters = {
-        "message": "Hello, World!",
-        # "project_dir": project_dir,
-        # "input_filename": "merged_us.parquet",
-        # "bert_model_name": "cl-tohoku/bert-base-japanese-char-v2",
-        # "max_epochs": 1,
-        # "batch_size": 2,
-        # "num_sentences": 20,
-    }
-
     job = aiplatform.PipelineJob(
         display_name=pipeline_name,
         template_path=template_path,
-        parameter_values=runtime_parameters,
+        parameter_values=cfg.runtime_parameters,
     )
     job.submit(
         service_account=service_account,
