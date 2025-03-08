@@ -1,5 +1,7 @@
 defaults:
+  - compile_parameters: default.yaml
   - runtime_parameters: dummy.yaml
 
 project_id: ???
 project_dir: ???
+

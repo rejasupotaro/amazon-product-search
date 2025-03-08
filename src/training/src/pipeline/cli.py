@@ -1,10 +1,10 @@
 
 import typer
 from google.cloud import aiplatform
+from hydra import compose, initialize
+from omegaconf import OmegaConf
 from pipeline.pipelines import PIPELINE_DICT
 from typing_extensions import Annotated
-from omegaconf import OmegaConf
-from hydra import initialize, compose
 
 from amazon_product_search.timestamp import get_unix_timestamp
 
@@ -40,6 +40,7 @@ def run(
     overrides = [
         f"project_id={project_id}",
         f"project_dir=gs://{project_name}",
+        f"compile_parameters.image={training_image}",
         f"runtime_parameters={pipeline_type}.yaml",
     ]
 
@@ -52,7 +53,7 @@ def run(
         experiment=experiment,
     )
 
-    pipeline = PIPELINE_DICT[pipeline_type](image=training_image)
+    pipeline = PIPELINE_DICT[pipeline_type](cfg.compile_parameters)
     pipeline.compile(template_path=template_path)
 
     job = aiplatform.PipelineJob(

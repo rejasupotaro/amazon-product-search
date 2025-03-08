@@ -4,6 +4,7 @@ from typing import Any, Optional, Type
 
 from kfp import dsl
 from kfp.compiler import Compiler
+from omegaconf.dictconfig import DictConfig
 from pipeline.components.dummy import build_evaluate_func, build_preprocess_func, build_train_func
 from pipeline.components.fine_tuning import build_fine_tune_cl_func, build_fine_tune_mlm_func
 
@@ -12,11 +13,11 @@ logger = logging.getLogger(__name__)
 
 
 class BasePipeline(ABC):
-    def __init__(self, image: str) -> None:
-        self.pipeline_func = self.build_pipeline_func(image=image)
+    def __init__(self, config: DictConfig) -> None:
+        self.pipeline_func = self.build_pipeline_func(config=config)
 
     @abstractmethod
-    def build_pipeline_func(self, image: str) -> Any:
+    def build_pipeline_func(self, config: DictConfig) -> Any:
         raise NotImplementedError
 
     def compile(self, template_path: str) -> None:
@@ -29,24 +30,24 @@ class BasePipeline(ABC):
 
 
 class DummyPipeline(BasePipeline):
-    def build_pipeline_func(self, image: str) -> Any:
+    def build_pipeline_func(self, config: DictConfig) -> Any:
         @dsl.pipeline(name="dummy")
         def pipeline_func(
             message: str,
         ) -> None:
-            preprocess_task = build_preprocess_func(image=image)(message=message)
+            preprocess_task = build_preprocess_func(image=config.image)(message=message)
 
-            train_task = build_train_func(image=image)()
+            train_task = build_train_func(image=config.image)()
             train_task.after(preprocess_task)
 
-            evaluate_task = build_evaluate_func(image=image)()
+            evaluate_task = build_evaluate_func(image=config.image)()
             evaluate_task.after(train_task)
 
         return pipeline_func
 
 
 class FineTuningCLPipeline(BasePipeline):
-    def build_pipeline_func(self, image: str) -> Any:
+    def build_pipeline_func(self, config: DictConfig) -> Any:
         @dsl.pipeline(name="fine_tuning_cl")
         def pipeline_func(
             project_dir: str,
@@ -57,7 +58,7 @@ class FineTuningCLPipeline(BasePipeline):
             num_gpus = 1
             debug = True
 
-            fine_tune_task = build_fine_tune_cl_func(image=image)(
+            fine_tune_task = build_fine_tune_cl_func(image=config.image)(
                 project_dir=project_dir,
                 input_filename=input_filename,
                 bert_model_name=bert_model_name,
@@ -71,7 +72,7 @@ class FineTuningCLPipeline(BasePipeline):
 
 
 class FineTuningMLMPipeline(BasePipeline):
-    def build_pipeline_func(self, image: str) -> Any:
+    def build_pipeline_func(self, config: DictConfig) -> Any:
         @dsl.pipeline(name="fine_tuning_mlm")
         def pipeline_func(
             project_dir: str,
@@ -79,7 +80,7 @@ class FineTuningMLMPipeline(BasePipeline):
             batch_size: int,
             num_sentences: Optional[int],
         ) -> None:
-            build_fine_tune_mlm_func(image=image)(
+            build_fine_tune_mlm_func(image=config.image)(
                 project_dir=project_dir,
                 max_epochs=max_epochs,
                 batch_size=batch_size,
