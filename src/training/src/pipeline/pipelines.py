@@ -5,6 +5,7 @@ from typing import Any, Type
 from kfp import dsl
 from kfp.compiler import Compiler
 from pipeline.components.dummy import build_evaluate_func, build_preprocess_func, build_train_func
+from pipeline.components.fine_tuning import build_fine_tune_func
 
 logger = logging.getLogger(__name__)
 
@@ -29,9 +30,7 @@ class BasePipeline(ABC):
 
 class DummyPipeline(BasePipeline):
     def build_pipeline_func(self, image: str) -> Any:
-        @dsl.pipeline(
-            name="dummy",
-        )
+        @dsl.pipeline(name="dummy")
         def pipeline_func() -> None:
             preprocess_task = build_preprocess_func(image=image)(message="Hello World")
 
@@ -44,6 +43,32 @@ class DummyPipeline(BasePipeline):
         return pipeline_func
 
 
+class FineTuningCLPipeline(BasePipeline):
+    def build_pipeline_func(self, image: str) -> Any:
+        @dsl.pipeline(name="fine_tuning")
+        def pipeline_func(
+            project_dir: str,
+            input_filename: str,
+            bert_model_name: str,
+        ) -> None:
+            max_epochs = 1
+            num_gpus = 1
+            debug = True
+
+            fine_tune_task = build_fine_tune_func(image=image)(
+                project_dir=project_dir,
+                input_filename=input_filename,
+                bert_model_name=bert_model_name,
+                max_epochs=max_epochs,
+                debug=debug,
+            )
+            if num_gpus > 0:
+                fine_tune_task.set_accelerator_type("NVIDIA_TESLA_T4")
+                fine_tune_task.set_accelerator_limit(num_gpus)
+        return pipeline_func
+
+
 PIPELINE_DICT: dict[str, Type[BasePipeline]] = {
     "dummy": DummyPipeline,
+    "fine_tuning_cl": FineTuningCLPipeline,
 }

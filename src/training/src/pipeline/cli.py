@@ -17,6 +17,7 @@ def greet():
 @app.command()
 def run(
     project_id: Annotated[str, typer.Option()],
+    project_name: Annotated[str, typer.Option()],
     region: Annotated[str, typer.Option()],
     service_account: Annotated[str, typer.Option()],
     templates_dir: Annotated[str, typer.Option()],
@@ -25,7 +26,7 @@ def run(
     pipeline_type: Annotated[str, typer.Option()],
 ) -> None:
     experiment = "dummy-1"
-    display_name = f"dummy-{get_unix_timestamp()}"
+    pipeline_name = f"dummy-{get_unix_timestamp()}"
     template_path = f"{templates_dir}/{pipeline_type}.yaml"
 
     aiplatform.init(
@@ -38,9 +39,17 @@ def run(
     pipeline = PIPELINE_DICT[pipeline_type](image=training_image)
     pipeline.compile(template_path=template_path)
 
+    project_dir = f"gs://{project_name}"
+    runtime_parameters = {
+        "project_dir": project_dir,
+        "input_filename": "merged_us.parquet",
+        "bert_model_name": "cl-tohoku/bert-base-japanese-char-v2",
+    }
+
     job = aiplatform.PipelineJob(
-        display_name=display_name,
+        display_name=pipeline_name,
         template_path=template_path,
+        parameter_values=runtime_parameters,
     )
     job.submit(
         service_account=service_account,

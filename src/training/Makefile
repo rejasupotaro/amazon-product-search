@@ -16,6 +16,7 @@ build:
 run:
 	poetry run python -m pipeline run \
 		--project-id=$(PROJECT_ID) \
+		--project-name=$(PROJECT_NAME) \
 		--region=$(REGION) \
 		--service-account=$(SERVICE_ACCOUNT) \
 		--templates-dir=$(TEMPLATES_DIR) \
