@@ -13,7 +13,7 @@ def build_preprocess_func(image: str) -> Callable[[str], PipelineTask]:
     return preprocess
 
 
-def build_train_func(image: str) -> ContainerComponent:
+def build_train_func(image: str) -> Callable[[None], ContainerComponent]:
     @dsl.container_component
     def train() -> dsl.ContainerSpec:
         return dsl.ContainerSpec(

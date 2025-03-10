@@ -17,7 +17,7 @@ def build_fine_tune_cl_func(image: str) -> Callable[[str], PipelineTask]:
     ) -> None:
         from collections import defaultdict
 
-        from training.fine_tuning_cl.components import run
+        from training.runners.fine_tuning_cl import run
 
         metrics: list[dict[str, Any]] = run(
             project_dir,
@@ -57,7 +57,7 @@ def build_fine_tune_mlm_func(image: str) -> Callable[[str], PipelineTask]:
     ) -> None:
         from collections import defaultdict
 
-        from training.fine_tuning_mlm.components import run
+        from training.runners.fine_tuning_mlm import run
 
         metrics: list[dict[str, Any]] = run(
             project_dir,
