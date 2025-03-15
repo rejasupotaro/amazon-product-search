@@ -1,9 +1,14 @@
 defaults:
   - _self_
   - compile_parameters: default
-  - runtime_parameters: dummy
+  - runtime_parameters: ${pipeline_type}
 
-project_id: null
-project_dir: null
-pipeline_type: null
+project_id: ${oc.env:PROJECT_ID}
+project_dir: gs://${oc.env:PROJECT_NAME}
+service_account: ${oc.env:SERVICE_ACCOUNT}
+region: ${oc.env:REGION}
+staging_bucket: ${oc.env:STAGING_BUCKET}
+
+pipeline_type: ???
+template_filepath: templates/${pipeline_type}.yaml
 
