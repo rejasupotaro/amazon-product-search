@@ -42,7 +42,7 @@ def run(
         f"project_dir=gs://{project_name}",
         f"pipeline_type={pipeline_type}",
         f"compile_parameters.image={training_image}",
-        f"runtime_parameters={pipeline_type}.yaml",
+        f"runtime_parameters={pipeline_type}",
     ]
 
     config = load_config(overrides)

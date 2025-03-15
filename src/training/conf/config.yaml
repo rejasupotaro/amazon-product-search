@@ -1,9 +1,9 @@
 defaults:
   - _self_
-  - compile_parameters: default.yaml
-  - runtime_parameters: dummy.yaml
+  - compile_parameters: default
+  - runtime_parameters: dummy
 
-project_id: ???
-project_dir: ???
-pipeline_type: ???
+project_id: null
+project_dir: null
+pipeline_type: null
 
