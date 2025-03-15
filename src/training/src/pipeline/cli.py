@@ -2,7 +2,7 @@
 import typer
 from google.cloud import aiplatform
 from hydra import compose, initialize
-from omegaconf import OmegaConf
+from omegaconf import DictConfig, OmegaConf
 from pipeline.pipelines import PIPELINE_DICT
 from typing_extensions import Annotated
 
@@ -11,11 +11,11 @@ from amazon_product_search.timestamp import get_unix_timestamp
 app = typer.Typer()
 
 
-def load_config(overrides: list[str]):
+def load_config(overrides: list[str]) -> DictConfig:
     with initialize(config_path="../../conf"):
-        cfg = compose(config_name="config", overrides=overrides)
-    OmegaConf.resolve(cfg)
-    return cfg
+        config= compose(config_name="config", overrides=overrides)
+    OmegaConf.resolve(config)
+    return config
 
 @app.command()
 def greet():
@@ -45,7 +45,7 @@ def run(
         f"runtime_parameters={pipeline_type}.yaml",
     ]
 
-    cfg = load_config(overrides)
+    config = load_config(overrides)
 
     aiplatform.init(
         project=project_id,
@@ -54,13 +54,13 @@ def run(
         experiment=experiment,
     )
 
-    pipeline = PIPELINE_DICT[pipeline_type](cfg.compile_parameters)
+    pipeline = PIPELINE_DICT[pipeline_type](config.compile_parameters)
     pipeline.compile(template_path=template_path)
 
     job = aiplatform.PipelineJob(
         display_name=pipeline_name,
         template_path=template_path,
-        parameter_values=cfg.runtime_parameters,
+        parameter_values=config.runtime_parameters,
     )
     job.submit(
         service_account=service_account,
