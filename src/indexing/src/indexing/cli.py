@@ -43,15 +43,13 @@ def create_index(
 
 
 @app.command()
-def import_model(
-) -> None:
+def import_model() -> None:
     es_client = EsClient()
     es_client.import_model(model_id=HF.JA_SBERT)
 
 
 @app.command()
-def transform(
-) -> None:
+def transform() -> None:
     config = load_config("transform", [])
 
     command = [
@@ -92,6 +90,47 @@ def transform(
         command += [
             f"--table_id={config.table_id}",
         ]
+
+    if config.nrows:
+        command.append(f"--nrows={config.nrows}")
+
+    subprocess.run(command)
+
+
+@app.command()
+def feed() -> None:
+    config = load_config("feed", [])
+
+    command = [
+        "poetry run python src/indexing/feeding_pipeline.py",
+        f"--locale={config.locale}",
+        f"--index_name={config.index_name}",
+        f"--runner={config.runner}",
+        f"--dest={config.dest}",
+        f"--dest_host={config.dest_host}",
+        f"--table_id={config.table_id}",
+    ]
+
+    if config.runner == "DirectRunner":
+        command += [
+            # https://github.com/apache/beam/blob/master/sdks/python/apache_beam/options/pipeline_options.py#L617-L621
+            "--direct_num_workers=0",
+        ]
+    elif config.runner == "DataflowRunner":
+        config.command += [
+            "--num_workers=1",
+            "--worker_machine_type=n2-highmem-8",
+            "--sdk_location=container",
+            f"--sdk_container_image=gcr.io/{config.project_id}/{config.project_name}/indexing",
+            f"--worker_zone={config.region}-c",
+        ]
+
+    command += [
+        f"--project={config.project_id}",
+        f"--region={config.region}",
+        f"--temp_location=gs://{config.project_name}/temp",
+        f"--staging_location=gs://{config.project_name}/staging",
+    ]
 
     if config.nrows:
         command.append(f"--nrows={config.nrows}")

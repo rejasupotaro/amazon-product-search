@@ -12,3 +12,4 @@ dest: bq
 dest_host: http://localhost:9200
 nrows: null
 table_id: ${index_name}
+encode_text: False

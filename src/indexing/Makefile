@@ -26,3 +26,7 @@ import-model:
 .PHONY: transform
 transform:
 	poetry run python -m indexing transform
+
+.PHONY: feed
+feed:
+	poetry run python -m indexing feed
