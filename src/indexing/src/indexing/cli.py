@@ -10,9 +10,12 @@ app = typer.Typer()
 
 
 @app.command()
-def greet():
-    print("Hello, World!")
-
+def delete_index(
+    index_name: Annotated[str, typer.Option()],
+) -> None:
+    es_client = EsClient()
+    es_client.delete_index(index_name)
+    print(f"{index_name} was deleted.")
 
 
 @app.command()

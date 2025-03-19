@@ -8,6 +8,11 @@ build:
 		--config=cloudbuild.yaml \
 		--substitutions=_IMAGE=$(INDEXING_IMAGE_URI)
 
+.PHONY: delete-index
+delete-index:
+	poetry run python -m indexing delete-index \
+		--index-name=$(INDEX_NAME) \
+
 .PHONY: create-index
 create-index:
 	poetry run python -m indexing create-index \
