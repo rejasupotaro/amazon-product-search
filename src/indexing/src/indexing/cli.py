@@ -122,7 +122,7 @@ def feed(
             f"--direct_num_workers={config.runner.num_workers}",
         ]
     elif config.runner.name == "DataflowRunner":
-        config.command += [
+        command += [
             f"--num_workers={config.runner.num_workers}",
             f"--worker_machine_type={config.runner.worker_machine_type}",
             "--sdk_location=container",
