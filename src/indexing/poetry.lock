@@ -2166,18 +2166,6 @@ files = [
 ]
 
 [[package]]
-name = "invoke"
-version = "2.2.0"
-description = "Pythonic task execution"
-optional = false
-python-versions = ">=3.6"
-groups = ["dev"]
-files = [
-    {file = "invoke-2.2.0-py3-none-any.whl", hash = "sha256:6ea924cc53d4f78e3d98bc436b08069a03077e6f85ad1ddaa8a116d7dad15820"},
-    {file = "invoke-2.2.0.tar.gz", hash = "sha256:ee6cbb101af1a859c7fe84f2a264c059020b0cb7fe3535f9424300ab568f6bd5"},
-]
-
-[[package]]
 name = "ipadic"
 version = "1.0.0"
 description = "IPAdic packaged for Python"
@@ -5630,4 +5618,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "~3.11"
-content-hash = "40b2ac7a18260188fdb760998b106641b164265a388fec17b35cd5be6cc07da4"
+content-hash = "5b06e5621b76b81eefb8a86fd6373ec244ff865eac47d3dcb0a1309ab11fa35f"
