@@ -22,3 +22,7 @@ create-index:
 .PHONY: import-model
 import-model:
 	poetry run python -m indexing import-model
+
+.PHONY: transform
+transform:
+	poetry run python -m indexing transform
