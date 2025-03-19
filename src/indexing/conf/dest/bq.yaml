@@ -1,0 +1,2 @@
+name: bq
+table_id: ${table_id}

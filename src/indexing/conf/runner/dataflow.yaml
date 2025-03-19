@@ -1,0 +1,5 @@
+name: DataflowRunner
+num_workers: 1
+sdk_container_image: gcr.io/${project_id}/${project_name}/indexing
+worker_machine_type: n2-highmem-8
+worker_zone: ${region}-c

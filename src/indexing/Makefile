@@ -1,6 +1,11 @@
+export
+
 INDEX_NAME?=products_jp
 LOCALE?=jp
 INDEXING_IMAGE_URI:=gcr.io/$(PROJECT_ID)/indexing:latest
+
+RUNNER?=direct
+DEST?=bq
 
 .PHONY: build
 build:
@@ -25,8 +30,17 @@ import-model:
 
 .PHONY: transform
 transform:
-	poetry run python -m indexing transform
+	poetry run python -m indexing transform \
+		--runner=$(RUNNER)
 
 .PHONY: feed
 feed:
-	poetry run python -m indexing feed
+	poetry run python -m indexing feed \
+		--runner=$(RUNNER)
+		--dest=$(DEST)
+
+.PHONY: encode
+encode:
+	poetry run python -m indexing encode \
+		--runner=$(RUNNER)
+		--dest=$(DEST)

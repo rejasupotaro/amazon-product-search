@@ -13,9 +13,9 @@ from amazon_product_search.es.es_client import EsClient
 app = typer.Typer()
 
 
-def load_config(config_name: str, overrides: list[str]) -> DictConfig:
+def load_config(overrides: list[str]) -> DictConfig:
     with initialize(config_path="../../conf"):
-        config= compose(config_name=config_name, overrides=overrides)
+        config= compose(config_name="config", overrides=overrides)
     OmegaConf.resolve(config)
     return config
 
@@ -49,46 +49,43 @@ def import_model() -> None:
 
 
 @app.command()
-def transform() -> None:
-    config = load_config("transform", [])
+def transform(
+    runner: Annotated[str, typer.Option()],
+) -> None:
+    """Transform data and load it into the destination (if specified)."""
+    overrides = [
+        f"runner={runner}",
+        "dest=bq",
+    ]
+    config = load_config(overrides)
 
     command = [
         "poetry run python src/indexing/doc_pipeline.py",
         f"--locale={config.locale}",
         f"--index_name={config.index_name}",
-        f"--runner={config.runner}",
-        f"--dest={config.dest}",
-        f"--dest_host={config.dest_host}",
+        f"--runner={config.runner.name}",
+        f"--dest={config.dest.name}",
     ]
 
     if config.encode_text:
         command.append("--encode_text")
 
-    if config.runner == "DirectRunner":
+    if config.runner.name == "DirectRunner":
         command += [
             # https://github.com/apache/beam/blob/master/sdks/python/apache_beam/options/pipeline_options.py#L617-L621
-            "--direct_num_workers=0",
+            f"--direct_num_workers={config.runner.num_workers}",
         ]
-    elif config.runner == "DataflowRunner":
-        command += [
-            "--num_workers=1",
-            "--worker_machine_type=n2-highmem-8",
-            "--sdk_location=container",
-            f"--sdk_container_image=gcr.io/{config.project_id}/{config.project_name}/indexing",
-            f"--worker_zone={config.region}-c",
-        ]
-
-    if (config.runner == "DataflowRunner") or (config.dest == "bq"):
+    elif config.runner.name == "DataflowRunner":
         command += [
             f"--project={config.project_id}",
             f"--region={config.region}",
-            f"--temp_location=gs://{config.project_name}/temp",
-            f"--staging_location=gs://{config.project_name}/staging",
-        ]
-
-    if config.dest == "bq" and config.table_id:
-        command += [
-            f"--table_id={config.table_id}",
+            f"--num_workers={config.runner.num_workers}",
+            f"--worker_machine_type={config.runner.worker_machine_type}",
+            "--sdk_location=container",
+            f"--sdk_container_image=${config.runner.sdk_container_image}",
+            f"--worker_zone={config.runner.worker_zone}",
+            f"--temp_location={config.temp_location}",
+            f"--staging_location={config.staging_location}",
         ]
 
     if config.nrows:
@@ -98,31 +95,39 @@ def transform() -> None:
 
 
 @app.command()
-def feed() -> None:
-    config = load_config("feed", [])
+def feed(
+    runner: Annotated[str, typer.Option()],
+    dest: Annotated[str, typer.Option()],
+) -> None:
+    """Feed data into the destination."""
+    overrides = [
+        f"runner={runner}",
+        f"dest={dest}",
+    ]
+    config = load_config(overrides)
 
     command = [
         "poetry run python src/indexing/feeding_pipeline.py",
         f"--locale={config.locale}",
         f"--index_name={config.index_name}",
-        f"--runner={config.runner}",
-        f"--dest={config.dest}",
-        f"--dest_host={config.dest_host}",
+        f"--runner={config.runner.name}",
+        f"--dest={config.dest.name}",
+        f"--dest_host={config.dest.host}",
         f"--table_id={config.table_id}",
     ]
 
-    if config.runner == "DirectRunner":
+    if config.runner.name == "DirectRunner":
         command += [
             # https://github.com/apache/beam/blob/master/sdks/python/apache_beam/options/pipeline_options.py#L617-L621
-            "--direct_num_workers=0",
+            f"--direct_num_workers={config.runner.num_workers}",
         ]
-    elif config.runner == "DataflowRunner":
+    elif config.runner.name == "DataflowRunner":
         config.command += [
-            "--num_workers=1",
-            "--worker_machine_type=n2-highmem-8",
+            f"--num_workers={config.runner.num_workers}",
+            f"--worker_machine_type={config.runner.worker_machine_type}",
             "--sdk_location=container",
-            f"--sdk_container_image=gcr.io/{config.project_id}/{config.project_name}/indexing",
-            f"--worker_zone={config.region}-c",
+            f"--sdk_container_image=${config.runner.sdk_container_image}",
+            f"--worker_zone={config.runner.worker_zone}",
         ]
 
     command += [
@@ -139,32 +144,40 @@ def feed() -> None:
 
 
 @app.command()
-def encode() -> None:
-    config = load_config("encode", [])
+def encode(
+    runner: Annotated[str, typer.Option()],
+    dest: Annotated[str, typer.Option()],
+) -> None:
+    """Encode text data and load it into the destination."""
+    overrides = [
+        f"runner={runner}",
+        f"dest={dest}",
+    ]
+    config = load_config(overrides)
 
     command = [
         "poetry run python src/indexing/query_pipeline.py",
         f"--locale={config.locale}",
-        f"--runner={config.runner}",
-        f"--dest={config.dest}",
+        f"--runner={config.runner.name}",
+        f"--dest={config.dest.name}",
         f"--table_id={config.table_id}",
     ]
 
-    if config.runner == "DirectRunner":
+    if config.runner.name == "DirectRunner":
         command += [
             # https://github.com/apache/beam/blob/master/sdks/python/apache_beam/options/pipeline_options.py#L617-L621
-            "--direct_num_workers=0",
+            f"--direct_num_workers={config.runner.num_workers}",
         ]
-    elif config.runner == "DataflowRunner":
+    elif config.runner.name == "DataflowRunner":
         command += [
-            "--num_workers=1",
-            "--worker_machine_type=n2-highmem-8",
+            f"--num_workers={config.runner.num_workers}",
+            f"--worker_machine_type={config.runner.worker_machine_type}",
             "--sdk_location=container",
-            f"--sdk_container_image=gcr.io/{config.project_id}/{config.project_name}/indexing",
-            f"--worker_zone={config.region}-c",
+            f"--sdk_container_image=${config.runner.sdk_container_image}",
+            f"--worker_zone={config.runner.worker_zone}",
         ]
 
-    if (config.runner == "DataflowRunner") or (config.dest == "bq"):
+    if config.runner.name == "DataflowRunner":
         command += [
             f"--project={config.project_id}",
             f"--region={config.region}",
