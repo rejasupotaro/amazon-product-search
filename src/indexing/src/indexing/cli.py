@@ -4,6 +4,7 @@ import typer
 from elasticsearch import NotFoundError
 from typing_extensions import Annotated
 
+from amazon_product_search.constants import HF
 from amazon_product_search.es.es_client import EsClient
 
 app = typer.Typer()
@@ -29,3 +30,10 @@ def create_index(
 
     es_client.create_index(locale, index_name)
     print(f"{index_name} was created")
+
+
+@app.command()
+def import_model(
+) -> None:
+    es_client = EsClient()
+    es_client.import_model(model_id=HF.JA_SBERT)

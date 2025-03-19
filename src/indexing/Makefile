@@ -18,3 +18,7 @@ create-index:
 	poetry run python -m indexing create-index \
 		--index-name=$(INDEX_NAME) \
 		--locale=$(LOCALE)
+
+.PHONY: import-model
+import-model:
+	poetry run python -m indexing import-model
