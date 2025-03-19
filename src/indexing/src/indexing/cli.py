@@ -136,3 +136,43 @@ def feed() -> None:
         command.append(f"--nrows={config.nrows}")
 
     subprocess.run(command)
+
+
+@app.command()
+def encode() -> None:
+    config = load_config("encode", [])
+
+    command = [
+        "poetry run python src/indexing/query_pipeline.py",
+        f"--locale={config.locale}",
+        f"--runner={config.runner}",
+        f"--dest={config.dest}",
+        f"--table_id={config.table_id}",
+    ]
+
+    if config.runner == "DirectRunner":
+        command += [
+            # https://github.com/apache/beam/blob/master/sdks/python/apache_beam/options/pipeline_options.py#L617-L621
+            "--direct_num_workers=0",
+        ]
+    elif config.runner == "DataflowRunner":
+        command += [
+            "--num_workers=1",
+            "--worker_machine_type=n2-highmem-8",
+            "--sdk_location=container",
+            f"--sdk_container_image=gcr.io/{config.project_id}/{config.project_name}/indexing",
+            f"--worker_zone={config.region}-c",
+        ]
+
+    if (config.runner == "DataflowRunner") or (config.dest == "bq"):
+        command += [
+            f"--project={config.project_id}",
+            f"--region={config.region}",
+            f"--temp_location=gs://{config.project_name}/temp",
+            f"--staging_location=gs://{config.project_name}/staging",
+        ]
+
+    if config.nrows:
+        command.append(f"--nrows={config.nrows}")
+
+    subprocess.run(command)
