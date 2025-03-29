@@ -11,7 +11,7 @@ from transformers import BatchEncoding
 def convert_dict_config_to_dict(d: DictConfig | Any) -> Any:
     """Convert a DictConfig object to a regular dictionary.
 
-    This is necessary because DictConfig objects are not be directly
+    This is necessary because DictConfig objects are not directly
     compatible with `torch.onnx.export` that expect a standard dict.
     """
     if isinstance(d, DictConfig):

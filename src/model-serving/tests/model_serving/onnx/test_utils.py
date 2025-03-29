@@ -35,7 +35,7 @@ def test_convert_dict_config_to_dict() -> None:
 )
 def test_measure_precision(onnx_embeddings: torch.Tensor, torch_embeddings: torch.Tensor, expected: float) -> None:
     mae = measure_mae(onnx_embeddings, torch_embeddings)
-    assert pytest.approx(mae, 0.01) == mae
+    assert pytest.approx(mae, 0.01) == expected
 
 
 @pytest.mark.parametrize(
