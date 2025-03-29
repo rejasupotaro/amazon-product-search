@@ -1,0 +1,3 @@
+defaults:
+  - __self__:
+  - export_params: cl-nagoya/ruri-small-v2

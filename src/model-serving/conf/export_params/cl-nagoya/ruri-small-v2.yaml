@@ -1,0 +1,23 @@
+model_name: cl-nagoya/ruri-small-v2
+tokenizer_parameters:
+  max_length: 512
+  padding: true
+  truncation: true
+onnx_parameters:
+  input_names:
+    - "input_ids"
+    - "attention_mask"
+  output_names:
+    - "output"
+  dynamic_axes:
+    input_ids:
+      0: batch_size
+      1: sequence_length
+    attention_mask:
+      0: batch_size
+      1: sequence_length
+    output:
+      0: batch_size
+      1: sequence_length
+  opset_version: 17
+  do_constant_folding: true
