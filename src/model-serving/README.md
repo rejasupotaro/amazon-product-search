@@ -43,7 +43,7 @@ $ curl -X POST http://localhost:8000/v2/models/tokenizer/infer \
 
 ```
 $ curl http://localhost:8000/v2/models/embedder
-{"name":"embedder","versions":["1"],"platform":"onnxruntime_onnx","inputs":[{"name":"input_ids","datatype":"INT64","shape":[-1,-1]},{"name":"attention_mask","datatype":"INT64","shape":[-1,-1]}],"outputs":[{"name":"output","datatype":"FP32","shape":[-1,-1,768]}]}
+{"name":"embedder","versions":["1"],"platform":"onnxruntime_onnx","inputs":[{"name":"input_ids","datatype":"INT64","shape":[-1,-1]},{"name":"attention_mask","datatype":"INT64","shape":[-1,-1]}],"outputs":[{"name":"output","datatype":"FP32","shape":[-1,-1]}]}
 $ curl -X POST http://localhost:8000/v2/models/embedder/infer \
 -H "Content-Type: application/json" \
 -d '{
@@ -66,7 +66,7 @@ $ curl -X POST http://localhost:8000/v2/models/embedder/infer \
 
 ```
 $ curl http://localhost:8000/v2/models/ensemble
-{"name":"ensemble","versions":["1"],"platform":"ensemble","inputs":[{"name":"text","datatype":"BYTES","shape":[-1]}],"outputs":[{"name":"output","datatype":"FP32","shape":[-1,-1,768]}]}
+{"name":"ensemble","versions":["1"],"platform":"ensemble","inputs":[{"name":"text","datatype":"BYTES","shape":[-1]}],"outputs":[{"name":"output","datatype":"FP32","shape":[-1,-1]}]}
 $ curl -X POST http://localhost:8000/v2/models/ensemble/infer \
 -H "Content-Type: application/json" \
 -d '{
