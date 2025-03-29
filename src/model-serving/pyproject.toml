@@ -13,11 +13,11 @@ dependencies = [
     "sentencepiece (>=0.2.0,<0.3.0)",
     "fugashi (>=1.4.0,<2.0.0)",
     "unidic-lite (>=1.0.8,<2.0.0)",
+    "pytest (>=8.3.5,<9.0.0)",
 ]
 
 [tool.poetry]
 packages = [{include = "model_serving", from = "src"}]
-
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
