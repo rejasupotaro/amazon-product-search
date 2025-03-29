@@ -130,3 +130,7 @@ data/*
 .envrc
 google_application_credentials.json
 *.onnx
+outputs/
+lightning_logs/
+templates/
+
