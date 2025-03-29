@@ -18,6 +18,5 @@ onnx_parameters:
       1: sequence_length
     output:
       0: batch_size
-      1: sequence_length
   opset_version: 17
   do_constant_folding: true
