@@ -1,6 +1,5 @@
 from typing import Any
 
-import numpy as np
 import onnx
 import torch
 from omegaconf import DictConfig
@@ -37,15 +36,11 @@ def generate_embeddings(
     onnx_params: dict[str, Any], onnx_model_filepath: str, tokenized: BatchEncoding
 ) -> torch.Tensor:
     session = InferenceSession(onnx_model_filepath)
-    last_hidden_state = session.run(
+    embeddings = session.run(
         output_names=onnx_params["output_names"],
         input_feed={input_name: tokenized[input_name].numpy() for input_name in onnx_params["input_names"]},
     )[0]
-
-    attention_mask = tokenized["attention_mask"]
-    masked_hidden_state = last_hidden_state * np.expand_dims(attention_mask, axis=-1)
-    embeddings = masked_hidden_state.sum(axis=1) / attention_mask.sum(axis=1, keepdims=True)
-    return embeddings
+    return torch.tensor(embeddings)
 
 
 def measure_mae(onnx_embeddings: torch.Tensor, torch_embeddings: torch.Tensor) -> torch.Tensor:
