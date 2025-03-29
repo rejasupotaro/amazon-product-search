@@ -22,6 +22,17 @@ def convert_dict_config_to_dict(d: DictConfig | Any) -> Any:
         return d
 
 
+def print_input_and_output_names(onnx_model_filepath: str) -> None:
+    model = onnx.load(onnx_model_filepath)
+    for i, input in enumerate(model.graph.input):
+        print("[Input #{}]".format(i))
+        print(input)
+
+    for i, output in enumerate(model.graph.output):
+        print("[Output #{}]".format(i))
+        print(output)
+
+
 def generate_embeddings(
     onnx_params: dict[str, Any], onnx_model_filepath: str, tokenized: BatchEncoding
 ) -> torch.Tensor:
