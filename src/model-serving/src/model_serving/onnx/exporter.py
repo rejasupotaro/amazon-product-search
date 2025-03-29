@@ -1,16 +1,15 @@
 import os
 
 import torch
+from model_serving.onnx.utils import (
+    convert_dict_config_to_dict,
+    print_input_and_output_names,
+    verify_onnx_model,
+)
 from omegaconf import DictConfig
 from onnxruntime.quantization import quantize_dynamic
 from onnxruntime.quantization.shape_inference import quant_pre_process
-from model_serving.onnx.utils import (
-    convert_dict_config_to_dict,
-    verify_onnx_model,
-    print_input_and_output_names,
-)
-from transformers import AutoModel, AutoTokenizer
-from transformers import AutoTokenizer, BertModel, BertPreTrainedModel
+from transformers import AutoModel, AutoTokenizer, BertModel, BertPreTrainedModel
 from transformers.models.bert.configuration_bert import BertConfig
 
 

@@ -58,7 +58,7 @@ def measure_cosine_similarity(onnx_embeddings: torch.Tensor, torch_embeddings: t
     dot_products = torch.sum(onnx_embeddings * torch_embeddings, dim=1)
     norms = torch.norm(onnx_embeddings, dim=1) * torch.norm(torch_embeddings, dim=1)
     cosine_similarities = dot_products / norms
-    return torch.mean(cosine_similarities).item()
+    return torch.mean(cosine_similarities)
 
 
 def verify_onnx_model(

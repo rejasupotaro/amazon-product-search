@@ -12,7 +12,7 @@ dependencies = [
     "transformers (>=4.50.3,<5.0.0)",
     "sentencepiece (>=0.2.0,<0.3.0)",
     "fugashi (>=1.4.0,<2.0.0)",
-    "unidic-lite (>=1.0.8,<2.0.0)"
+    "unidic-lite (>=1.0.8,<2.0.0)",
 ]
 
 [tool.poetry]
