@@ -32,7 +32,7 @@ def export(cfg: DictConfig) -> None:
         f"{onnx_model_dir}/{model_name}_quantized.onnx"  # "models/org_name/model_name_quantized.onnx"
     )
 
-    model = SentenceTransformerWrapper(model_full_name).to("cpu")
+    model = SentenceTransformerWrapper(model_full_name)
     model.eval()
 
     tokenized = model.tokenizer(

@@ -6,7 +6,9 @@ from transformers import PreTrainedTokenizer
 class SentenceTransformerWrapper(torch.nn.Module):
     def __init__(self, model_name: str) -> None:
         super().__init__()
-        self.model = SentenceTransformer(model_name, trust_remote_code=True)
+        # When exporting a model to ONNX, using CPU is generally the preferred and safe choice.
+        self.model = SentenceTransformer(model_name, trust_remote_code=True, device="cpu")
+        self.to("cpu")
 
     @property
     def transformer(self) -> torch.nn.Module:
