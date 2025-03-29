@@ -1,4 +1,3 @@
-version: "3"
 services:
   server:
     build: .
@@ -16,7 +15,7 @@ services:
     networks:
       - triton
     healthcheck:
-      test: ["CMD", "curl", "-f", "localhost:8000/v2/models/text_embedding/ready" ]
+      test: ["CMD", "curl", "-f", "localhost:8000/v2/models/ensemble/ready" ]
       interval: 1s
       timeout: 3s
       retries: 30

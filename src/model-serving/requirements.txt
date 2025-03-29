@@ -1,1 +1,4 @@
 transformers
+sentencepiece
+fugashi
+unidic-lite
