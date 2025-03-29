@@ -1,6 +1,7 @@
 import os
 
 import torch
+from model_serving.modules.sentence_transformer_wrapper import SentenceTransformerWrapper
 from model_serving.onnx.utils import (
     convert_dict_config_to_dict,
     print_input_and_output_names,
@@ -9,27 +10,6 @@ from model_serving.onnx.utils import (
 from omegaconf import DictConfig
 from onnxruntime.quantization import quantize_dynamic
 from onnxruntime.quantization.shape_inference import quant_pre_process
-from transformers import AutoModel, AutoTokenizer, BertModel, BertPreTrainedModel
-from transformers.models.bert.configuration_bert import BertConfig
-
-
-class MeanPoolingEncoder(BertPreTrainedModel):
-    def __init__(self, config: BertConfig) -> None:
-        super().__init__(config)
-        self.bert = BertModel(config)
-        self.init_weights()
-
-    def forward(
-        self,
-        input_ids: torch.Tensor,
-        attention_mask: torch.Tensor,
-        token_type_ids: torch.Tensor | None = None,
-    ) -> torch.Tensor:
-        last_hidden_state = self.bert(input_ids, attention_mask=attention_mask).last_hidden_state
-        attention_mask = attention_mask.unsqueeze(dim=-1)
-        last_hidden_state = last_hidden_state * attention_mask
-        mean_vector = last_hidden_state.sum(dim=1) / attention_mask.sum(dim=1)
-        return mean_vector
 
 
 def export(cfg: DictConfig) -> None:
@@ -52,22 +32,17 @@ def export(cfg: DictConfig) -> None:
         f"{onnx_model_dir}/{model_name}_quantized.onnx"  # "models/org_name/model_name_quantized.onnx"
     )
 
-    tokenizer = AutoTokenizer.from_pretrained(model_full_name, trust_remote_code=True)
-    tokenized = tokenizer(
+    model = SentenceTransformerWrapper(model_full_name).to("cpu")
+    model.eval()
+
+    tokenized = model.tokenizer(
         "dummy_input",
         return_tensors="pt",
         **export_params.tokenizer_parameters,
     )
 
-    model = AutoModel.from_pretrained(model_full_name)
-    model.eval()
-
     # Generate embeddings (torch.Tensor) to verify the model output.
-    model_output = model(**tokenized)
-    last_hidden_state = model_output.last_hidden_state
-    attention_mask = tokenized["attention_mask"]
-    masked_hidden_state = last_hidden_state * attention_mask.unsqueeze(-1)
-    embeddings = masked_hidden_state.sum(dim=1) / attention_mask.sum(dim=1, keepdim=True)
+    embeddings = model(**tokenized)
 
     # Create the directory if it does not exist.
     os.makedirs(onnx_model_dir, exist_ok=True)
