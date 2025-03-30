@@ -24,29 +24,30 @@ def export(cfg: DictConfig) -> None:
     model_full_name = export_params.model_name  # "org_name/model_name"
     model_org_name, model_name = export_params.model_name.split("/")  # "org_name", "model_name"
     model_dir = f"models/{model_org_name}"  # "models/org_name"
-    torchscript_model_filepath = f"{model_dir}/{model_name}.pt"  # "models/org_name/model_name.onnx"
-    onnx_model_filepath = f"{model_dir}/{model_name}.onnx"  # "models/org_name/model_name.onnx"
-    preprocessed_model_filepath = (
-        f"{model_dir}/{model_name}_preprocessed.onnx"  # "models/org_name/model_name_preprocessed.onnx"
-    )
-    quantized_onnx_model_filepath = (
-        f"{model_dir}/{model_name}_quantized.onnx"  # "models/org_name/model_name_quantized.onnx"
-    )
 
     model = SentenceTransformerWrapper(model_full_name)
     model.eval()
 
+    # Create the directory if it does not exist.
+    os.makedirs(model_dir, exist_ok=True)
+
+    export_model_to_torchscript(cfg, model, model_dir, model_name)
+    export_model_to_onnx(cfg, model, model_dir, model_name)
+
+
+def export_model_to_torchscript(
+    cfg: DictConfig,
+    model: SentenceTransformerWrapper,
+    model_dir: str,
+    model_name: str,
+) -> None:
+    torchscript_model_filepath = f"{model_dir}/{model_name}.pt"  # "models/org_name/model_name.onnx"
+
     tokenized = model.tokenizer(
         "dummy_input",
         return_tensors="pt",
-        **export_params.tokenizer_parameters,
+        **cfg.export_params.tokenizer_parameters,
     )
-
-    # Generate embeddings (torch.Tensor) to verify the model output.
-    embeddings = model(**tokenized)
-
-    # Create the directory if it does not exist.
-    os.makedirs(model_dir, exist_ok=True)
 
     print("Exporting to TorchScript format...")
     # Use torch.jit.trace for static models
@@ -57,8 +58,32 @@ def export(cfg: DictConfig) -> None:
     torch.jit.save(traced_script_module, torchscript_model_filepath)
     print(f"TorchScript model saved to {torchscript_model_filepath}")
 
+
+def export_model_to_onnx(
+    cfg: DictConfig,
+    model: SentenceTransformerWrapper,
+    model_dir: str,
+    model_name: str,
+) -> None:
+    onnx_model_filepath = f"{model_dir}/{model_name}.onnx"  # "models/org_name/model_name.onnx"
+    preprocessed_model_filepath = (
+        f"{model_dir}/{model_name}_preprocessed.onnx"  # "models/org_name/model_name_preprocessed.onnx"
+    )
+    quantized_onnx_model_filepath = (
+        f"{model_dir}/{model_name}_quantized.onnx"  # "models/org_name/model_name_quantized.onnx"
+    )
+
+    tokenized = model.tokenizer(
+        "dummy_input",
+        return_tensors="pt",
+        **cfg.export_params.tokenizer_parameters,
+    )
+
+    # Generate embeddings (torch.Tensor) to verify the model output.
+    embeddings = model(**tokenized)
+
     print("Exporting to ONNX format...")
-    onnx_params = convert_dict_config_to_dict(export_params.onnx_parameters)
+    onnx_params = convert_dict_config_to_dict(cfg.export_params.onnx_parameters)
     # For available options, see: https://glaringlee.github.io/onnx.html#functions
     torch.onnx.export(
         model,
