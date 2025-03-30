@@ -56,6 +56,25 @@ def measure_cosine_similarity(onnx_embeddings: torch.Tensor, torch_embeddings: t
     return torch.mean(cosine_similarities)
 
 
+def verify_torchscript_model(
+    torchscript_model_filepath: str, tokenized: BatchEncoding, torch_embeddings: torch.Tensor
+) -> None:
+    print(f"Verifying {torchscript_model_filepath}...")
+    loaded_model = torch.jit.load(torchscript_model_filepath)
+    loaded_model.eval()
+
+    torchscript_embeddings = loaded_model(**tokenized)
+
+    # Measure precision using Mean Absolute Error (MAE)
+    mae = measure_mae(torchscript_embeddings, torch_embeddings)
+    print(f"Mean Absolute Error (MAE) between TorchScript and PyTorch embeddings: {mae:.8f}")
+
+    # Optionally, measure cosine similarity
+    cosine_similarity = measure_cosine_similarity(torchscript_embeddings, torch_embeddings)
+    print(f"Cosine Similarity between TorchScript and PyTorch embeddings: {cosine_similarity:.8f}")
+
+
+
 def verify_onnx_model(
     onnx_params: dict[str, Any], onnx_model_filepath: str, tokenized: BatchEncoding, torch_embeddings: torch.Tensor
 ) -> None:

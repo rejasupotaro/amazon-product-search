@@ -6,6 +6,7 @@ from model_serving.onnx.utils import (
     convert_dict_config_to_dict,
     print_input_and_output_names,
     verify_onnx_model,
+    verify_torchscript_model,
 )
 from omegaconf import DictConfig
 from onnxruntime.quantization import quantize_dynamic
@@ -49,6 +50,9 @@ def export_model_to_torchscript(
         **cfg.export_params.tokenizer_parameters,
     )
 
+    # Generate embeddings (torch.Tensor) to verify the model output.
+    embeddings = model(**tokenized)
+
     print("Exporting to TorchScript format...")
     # Use torch.jit.trace for static models
     traced_script_module = torch.jit.trace(
@@ -56,6 +60,7 @@ def export_model_to_torchscript(
         example_inputs=tuple(tokenized.values()),
     )
     torch.jit.save(traced_script_module, torchscript_model_filepath)
+    verify_torchscript_model(torchscript_model_filepath, tokenized, embeddings)
     print(f"TorchScript model saved to {torchscript_model_filepath}")
 
 
