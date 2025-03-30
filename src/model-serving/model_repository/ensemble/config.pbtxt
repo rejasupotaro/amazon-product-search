@@ -33,7 +33,7 @@ ensemble_scheduling {
             }
         },
         {
-            model_name: "embedder"
+            model_name: "embedder_pt"
             model_version: -1
             input_map {
                 key: "input_ids"
