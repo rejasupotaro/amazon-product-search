@@ -1,3 +1,4 @@
+import logging
 import os
 from abc import ABC, abstractmethod
 from typing import Any
@@ -16,6 +17,8 @@ from onnxruntime import InferenceSession
 from onnxruntime.quantization import quantize_dynamic
 from onnxruntime.quantization.shape_inference import quant_pre_process
 from transformers import BatchEncoding
+
+logger = logging.getLogger(__name__)
 
 
 class BaseModelExporter(ABC):
@@ -52,11 +55,11 @@ class BaseModelExporter(ABC):
     ) -> None:
         # Measure precision using Mean Absolute Error (MAE)
         mae = measure_mae(exported_embeddings, original_embeddings)
-        print(f"Mean Absolute Error (MAE): {mae:.8f}")
+        logger.info(f"Mean Absolute Error (MAE): {mae:.8f}")
 
         # Optionally, measure cosine similarity
         cosine_similarity = measure_cosine_similarity(exported_embeddings, original_embeddings)
-        print(f"Cosine Similarity: {cosine_similarity:.8f}")
+        logger.info(f"Cosine Similarity: {cosine_similarity:.8f}")
 
 
     @abstractmethod
@@ -71,7 +74,7 @@ class TorchScriptModelExporter(BaseModelExporter):
         # Generate embeddings (torch.Tensor) to verify the model output.
         original_embeddings = self.original_model(**self.tokenized)
 
-        print("Exporting to TorchScript format...")
+        logger.info("Exporting to TorchScript format...")
         # Use torch.jit.trace for static models
         traced_script_module = torch.jit.trace(
             func=self.original_model,
@@ -79,13 +82,13 @@ class TorchScriptModelExporter(BaseModelExporter):
         )
         torch.jit.save(traced_script_module, model_filepath)
 
-        print(f"Verifying {model_filepath}...")
+        logger.info(f"Verifying {model_filepath}...")
         exported_model = torch.jit.load(model_filepath)
         exported_model.eval()
 
         exported_embeddings = exported_model(**self.tokenized)
         self.compare_embeddings(exported_embeddings, original_embeddings)
-        print(f"TorchScript model saved to {model_filepath}")
+        logger.info(f"TorchScript model saved to {model_filepath}")
 
 
 class ONNXModelExporter(BaseModelExporter):
@@ -106,10 +109,10 @@ class ONNXModelExporter(BaseModelExporter):
         tokenized: BatchEncoding,
         original_embeddings: torch.Tensor,
     ) -> None:
-        print(f"Verifying {model_filepath}...")
+        logger.info(f"Verifying {model_filepath}...")
         exported_model = onnx.load(model_filepath)
         onnx.checker.check_model(exported_model)
-        print("ONNX model is valid")
+        logger.info("ONNX model is valid")
 
         exported_embeddings = self.generate_embeddings(onnx_params, model_filepath, tokenized)
         self.compare_embeddings(exported_embeddings, original_embeddings)
@@ -123,7 +126,7 @@ class ONNXModelExporter(BaseModelExporter):
         tokenized = self.tokenize_dummy_input()
         original_embeddings = self.original_model(**tokenized)
 
-        print("Exporting to ONNX format...")
+        logger.info("Exporting to ONNX format...")
         onnx_params = convert_dict_config_to_dict(self.cfg.export_params.onnx_parameters)
         # For available options, see: https://glaringlee.github.io/onnx.html#functions
         torch.onnx.export(
@@ -134,20 +137,20 @@ class ONNXModelExporter(BaseModelExporter):
             **onnx_params,
         )
         self.verify_model(onnx_params, model_filepath, tokenized, original_embeddings)
-        print(f"ONNX model saved to {model_filepath}")
+        logger.info(f"ONNX model saved to {model_filepath}")
 
-        print("Preprocessing ONNX model for quantization...")
+        logger.info("Preprocessing ONNX model for quantization...")
         quant_pre_process(
             model_filepath,
             preprocessed_model_filepath,
             auto_merge=True,
         )
         self.verify_model(onnx_params, preprocessed_model_filepath, tokenized, original_embeddings)
-        print(f"Preprocessed ONNX model saved to {preprocessed_model_filepath}")
+        logger.info(f"Preprocessed ONNX model saved to {preprocessed_model_filepath}")
 
         quantize_dynamic(preprocessed_model_filepath, quantized_model_filepath)
         self.verify_model(onnx_params, quantized_model_filepath, tokenized, original_embeddings)
-        print(f"Quantized ONNX model saved to {quantized_model_filepath}")
+        logger.info(f"Quantized ONNX model saved to {quantized_model_filepath}")
 
         if self.cfg.verbose:
             print_input_and_output_names(quantized_model_filepath)
