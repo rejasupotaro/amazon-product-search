@@ -123,20 +123,19 @@ class ONNXModelExporter(BaseModelExporter):
         quantized_model_filepath = self.get_filepath("_quantized.onnx")
 
         # Generate embeddings (torch.Tensor) to verify the model output.
-        tokenized = self.tokenize_dummy_input()
-        original_embeddings = self.original_model(**tokenized)
+        original_embeddings = self.original_model(**self.tokenized)
 
         logger.info("Exporting to ONNX format...")
         onnx_params = convert_dict_config_to_dict(self.cfg.export_params.onnx_parameters)
         # For available options, see: https://glaringlee.github.io/onnx.html#functions
         torch.onnx.export(
             self.original_model,
-            args=tuple(tokenized.values()),
+            args=tuple(self.tokenized.values()),
             f=model_filepath,
             operator_export_type=torch.onnx.OperatorExportTypes.ONNX,
             **onnx_params,
         )
-        self.verify_model(onnx_params, model_filepath, tokenized, original_embeddings)
+        self.verify_model(onnx_params, model_filepath, self.tokenized, original_embeddings)
         logger.info(f"ONNX model saved to {model_filepath}")
 
         logger.info("Preprocessing ONNX model for quantization...")
@@ -145,11 +144,11 @@ class ONNXModelExporter(BaseModelExporter):
             preprocessed_model_filepath,
             auto_merge=True,
         )
-        self.verify_model(onnx_params, preprocessed_model_filepath, tokenized, original_embeddings)
+        self.verify_model(onnx_params, preprocessed_model_filepath, self.tokenized, original_embeddings)
         logger.info(f"Preprocessed ONNX model saved to {preprocessed_model_filepath}")
 
         quantize_dynamic(preprocessed_model_filepath, quantized_model_filepath)
-        self.verify_model(onnx_params, quantized_model_filepath, tokenized, original_embeddings)
+        self.verify_model(onnx_params, quantized_model_filepath, self.tokenized, original_embeddings)
         logger.info(f"Quantized ONNX model saved to {quantized_model_filepath}")
 
         if self.cfg.verbose:
