@@ -23,13 +23,14 @@ def export(cfg: DictConfig) -> None:
     # for example, "hotchpotch/static-embedding-japanese".
     model_full_name = export_params.model_name  # "org_name/model_name"
     model_org_name, model_name = export_params.model_name.split("/")  # "org_name", "model_name"
-    onnx_model_dir = f"models/{model_org_name}"  # "models/org_name"
-    onnx_model_filepath = f"{onnx_model_dir}/{model_name}.onnx"  # "models/org_name/model_name.onnx"
+    model_dir = f"models/{model_org_name}"  # "models/org_name"
+    torchscript_model_filepath = f"{model_dir}/{model_name}.pt"  # "models/org_name/model_name.onnx"
+    onnx_model_filepath = f"{model_dir}/{model_name}.onnx"  # "models/org_name/model_name.onnx"
     preprocessed_model_filepath = (
-        f"{onnx_model_dir}/{model_name}_preprocessed.onnx"  # "models/org_name/model_name_preprocessed.onnx"
+        f"{model_dir}/{model_name}_preprocessed.onnx"  # "models/org_name/model_name_preprocessed.onnx"
     )
     quantized_onnx_model_filepath = (
-        f"{onnx_model_dir}/{model_name}_quantized.onnx"  # "models/org_name/model_name_quantized.onnx"
+        f"{model_dir}/{model_name}_quantized.onnx"  # "models/org_name/model_name_quantized.onnx"
     )
 
     model = SentenceTransformerWrapper(model_full_name)
@@ -45,7 +46,16 @@ def export(cfg: DictConfig) -> None:
     embeddings = model(**tokenized)
 
     # Create the directory if it does not exist.
-    os.makedirs(onnx_model_dir, exist_ok=True)
+    os.makedirs(model_dir, exist_ok=True)
+
+    print("Exporting to TorchScript format...")
+    # Use torch.jit.trace for static models
+    traced_script_module = torch.jit.trace(
+        func=model,
+        example_inputs=tuple(tokenized.values()),
+    )
+    torch.jit.save(traced_script_module, torchscript_model_filepath)
+    print(f"TorchScript model saved to {torchscript_model_filepath}")
 
     print("Exporting to ONNX format...")
     onnx_params = convert_dict_config_to_dict(export_params.onnx_parameters)
