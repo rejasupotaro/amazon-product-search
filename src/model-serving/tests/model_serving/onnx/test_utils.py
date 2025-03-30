@@ -1,6 +1,6 @@
 import pytest
 import torch
-from model_serving.onnx.utils import (
+from model_serving.export.utils import (
     convert_dict_config_to_dict,
     measure_cosine_similarity,
     measure_mae,

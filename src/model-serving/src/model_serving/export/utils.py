@@ -74,7 +74,6 @@ def verify_torchscript_model(
     print(f"Cosine Similarity between TorchScript and PyTorch embeddings: {cosine_similarity:.8f}")
 
 
-
 def verify_onnx_model(
     onnx_params: dict[str, Any], onnx_model_filepath: str, tokenized: BatchEncoding, torch_embeddings: torch.Tensor
 ) -> None:
