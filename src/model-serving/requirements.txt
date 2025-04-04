@@ -1,4 +1,4 @@
-transformers
-sentencepiece
-fugashi
-unidic-lite
+transformers==4.50.3
+sentencepiece==0.2.0
+fugashi==1.4.0
+unidic-lite==1.0.8
