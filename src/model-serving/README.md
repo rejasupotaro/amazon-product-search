@@ -81,6 +81,46 @@ $ curl -X POST http://localhost:8000/v2/models/ensemble/infer \
 }'
 ```
 
+## Benchmark
+
+You can benchmark the Triton server using the `make benchmark`:
+
+```
+$ make benchmark
+Summary:
+  Count:	100
+  Total:	1.89 s
+  Slowest:	75.24 ms
+  Fastest:	34.75 ms
+  Average:	37.29 ms
+  Requests/sec:	52.90
+
+Response time histogram:
+  34.751 [1]  |
+  38.800 [93] |∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎
+  42.850 [3]  |∎
+  46.899 [1]  |
+  50.948 [1]  |
+  54.998 [0]  |
+  59.047 [0]  |
+  63.097 [0]  |
+  67.146 [0]  |
+  71.195 [0]  |
+  75.245 [1]  |
+
+Latency distribution:
+  10 % in 35.70 ms
+  25 % in 35.99 ms
+  50 % in 36.31 ms
+  75 % in 37.07 ms
+  90 % in 37.93 ms
+  95 % in 40.71 ms
+  99 % in 49.94 ms
+
+Status code distribution:
+  [OK]   100 responses
+```
+
 ## Host on Vertex AI
 
 [Serving Predictions with NVIDIA Triton  |  Vertex AI  |  Google Cloud](https://cloud.google.com/vertex-ai/docs/predictions/using-nvidia-triton)
