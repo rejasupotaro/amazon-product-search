@@ -15,7 +15,8 @@ def draw_column_info(products_df: DataFrame) -> None:
 
 def draw_brand_info(products_df: DataFrame) -> None:
     st.write("### Brand")
-    count_df = products_df.groupby("product_brand").size().reset_index(name="count").sort_values("count", ascending=False).head(100)
+    count_df = products_df.groupby("product_brand").size().reset_index(name="count")
+    count_df = count_df.sort_values("count", ascending=False).head(100)
 
     fig = px.bar(count_df, x="product_brand", y="count")
     fig.update_layout(title="Top 50 brands")
@@ -24,7 +25,8 @@ def draw_brand_info(products_df: DataFrame) -> None:
 
 def draw_color_info(products_df: DataFrame) -> None:
     st.write("### Color")
-    count_df = products_df.groupby("product_color").size().reset_index(name="count").sort_values("count", ascending=False).head(100)
+    count_df = products_df.groupby("product_color").size().reset_index(name="count")
+    count_df = count_df.sort_values("count", ascending=False).head(100)
 
     fig = px.bar(count_df, x="product_color", y="count")
     fig.update_layout(title="Top 50 color names")
