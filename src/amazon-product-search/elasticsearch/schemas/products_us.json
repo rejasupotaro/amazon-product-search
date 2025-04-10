@@ -46,11 +46,6 @@
           }
         }
       },
-      "product_keybert": {
-        "type": "text",
-        "analyzer": "whitespace",
-        "search_analyzer": "whitespace"
-      },
       "product_vector": {
         "type": "dense_vector",
         "dims": 384,
