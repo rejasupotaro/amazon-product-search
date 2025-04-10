@@ -37,7 +37,7 @@ class SimilarityFilter:
             The filtered dataframe.
         """
         scores = []
-        chunks = chunked(synonyms_df.to_dicts(), self.batch_size)
+        chunks = chunked(synonyms_df.to_dict("records"), self.batch_size)
         for batch in tqdm(list(chunks)):
             queries = [row["query"] for row in batch]
             titles = [row["title"] for row in batch]

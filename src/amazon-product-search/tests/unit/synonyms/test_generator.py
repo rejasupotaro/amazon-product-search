@@ -17,7 +17,7 @@ def test_preprocess_query_title_pairs():
         ]
     )
     df = preprocess_query_title_pairs(df)
-    assert df.to_dicts() == [{"query": "hello", "product_title": "world"}]
+    assert df.to_dict("records") == [{"query": "hello", "product_title": "world"}]
 
 
 @pytest.mark.parametrize(

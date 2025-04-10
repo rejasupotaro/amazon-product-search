@@ -2,7 +2,7 @@ import itertools
 from collections import Counter
 from math import log
 
-from data_source import Locale, load_merged
+from data_source import Locale, loader
 from pandas import DataFrame
 from tqdm import tqdm
 
@@ -15,7 +15,7 @@ from amazon_product_search.synonyms.filters.similarity_filter import SimilarityF
 
 def load_query_title_pairs(locale: Locale, nrows: int = -1) -> DataFrame:
     """Load query title pairs."""
-    df = load_merged("../data-source/data", locale)[:nrows]
+    df = loader.load_merged("../data-source/data", locale)[:nrows]
     df = df[df["esci_label"] == "E"]
     return df
 
