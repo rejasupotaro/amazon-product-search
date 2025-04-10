@@ -60,7 +60,7 @@ def transform(
     config = load_config(overrides)
 
     command = [
-        "poetry run python src/indexing/doc_pipeline.py",
+        "poetry run python src/indexing/pipelines/doc_pipeline.py",
         f"--locale={config.locale}",
         f"--index_name={config.index_name}",
         f"--runner={config.runner.name}",
@@ -107,7 +107,7 @@ def feed(
     config = load_config(overrides)
 
     command = [
-        "poetry run python src/indexing/feeding_pipeline.py",
+        "poetry run python src/indexing/pipelines/feeding_pipeline.py",
         f"--locale={config.locale}",
         f"--index_name={config.index_name}",
         f"--runner={config.runner.name}",
@@ -156,7 +156,7 @@ def encode(
     config = load_config(overrides)
 
     command = [
-        "poetry run python src/indexing/query_pipeline.py",
+        "poetry run python src/indexing/pipelines/query_pipeline.py",
         f"--locale={config.locale}",
         f"--runner={config.runner.name}",
         f"--dest={config.dest.name}",
