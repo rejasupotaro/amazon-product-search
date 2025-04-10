@@ -2,33 +2,29 @@ import itertools
 from collections import Counter
 from math import log
 
-import polars as pl
-from polars import DataFrame
+from data_source import Locale, load_merged
+from pandas import DataFrame
 from tqdm import tqdm
 
 from amazon_product_search.constants import DATA_DIR, HF
 from amazon_product_search.nlp.normalizer import normalize_doc
 from amazon_product_search.nlp.tokenizers import locale_to_tokenizer
-from amazon_product_search.source import Locale, load_merged
 from amazon_product_search.synonyms.filters import utils
 from amazon_product_search.synonyms.filters.similarity_filter import SimilarityFilter
 
 
 def load_query_title_pairs(locale: Locale, nrows: int = -1) -> DataFrame:
     """Load query title pairs."""
-    df = load_merged(locale, nrows)
-    df = df.filter(pl.col("esci_label") == "E")
+    df = load_merged("../data-source/data", locale)[:nrows]
+    df = df[df["esci_label"] == "E"]
     return df
 
 
 def preprocess_query_title_pairs(df: DataFrame) -> DataFrame:
-    df = df.filter((pl.col("query").is_not_null() & pl.col("product_title").is_not_null()))
-    return df.with_columns(
-        [
-            pl.col("query").map_elements(normalize_doc),
-            pl.col("product_title").map_elements(normalize_doc),
-        ]
-    )
+    df = df[df["query"].notnull() & df["product_title"].notnull()]
+    df["query"] = df["query"].apply(normalize_doc)
+    df["product_title"] = df["product_title"].apply(normalize_doc)
+    return df
 
 
 def generate_ngrams(tokens: list[str], n: int) -> list[str]:
@@ -132,7 +128,7 @@ def apply_fast_filters(
     diff = original_num_candidates - filtered_num_candidates
     print(f"Filtered out {diff} candidates ({original_num_candidates} -> {filtered_num_candidates})")
 
-    candidates_df = pl.from_dicts(rows)
+    candidates_df = DataFrame(rows)
     return candidates_df
 
 

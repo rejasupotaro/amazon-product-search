@@ -1,9 +1,7 @@
 import streamlit as st
-from data_source import loader
+from data_source import Locale, loader
 from pandas import DataFrame
 from pandas.api.types import is_object_dtype
-
-from amazon_product_search.source import Locale
 
 
 @st.cache_data

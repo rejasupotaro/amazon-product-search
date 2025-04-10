@@ -2,11 +2,11 @@ import logging
 import os
 
 import pandas as pd
+from data_source import Locale
 from google.cloud import bigquery
 from pandas import DataFrame
 
 from amazon_product_search.constants import DATA_DIR, DATASET_ID, PROJECT_ID
-from amazon_product_search.source import Locale
 
 
 class QueryVectorCache:

@@ -8,12 +8,11 @@ from apache_beam.options.pipeline_options import GoogleCloudOptions
 from apache_beam.transforms.ptransform import PTransform
 from apache_beam.transforms.util import BatchElements
 from apache_beam.utils.shared import Shared
-from data_source import loader
+from data_source import Locale, loader
 from torch import Tensor
 
 from amazon_product_search.constants import DATASET_ID, HF, PROJECT_ID
 from amazon_product_search.nlp.normalizer import normalize_query
-from amazon_product_search.source import Locale
 from dense_retrieval.encoders import SBERTEncoder
 from dense_retrieval.encoders.modules.pooler import PoolingMode
 from indexing.options import IndexerOptions

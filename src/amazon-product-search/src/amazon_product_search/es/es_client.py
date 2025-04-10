@@ -2,10 +2,10 @@ import json
 from pathlib import Path
 from typing import Any, Callable, Iterator, Optional
 
+from data_source import Locale
 from elasticsearch import Elasticsearch, helpers
 
 from amazon_product_search.retrieval.response import Response, Result
-from amazon_product_search.source import Locale
 
 
 def get_package_root() -> Path:

@@ -2,10 +2,10 @@ import re
 from collections import defaultdict
 
 import polars as pl
+from data_source import Locale
 
 from amazon_product_search.constants import DATA_DIR
 from amazon_product_search.nlp.tokenizers import locale_to_tokenizer
-from amazon_product_search.source import Locale
 
 
 def has_numbers(s: str) -> bool:

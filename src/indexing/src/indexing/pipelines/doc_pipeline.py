@@ -7,10 +7,9 @@ from apache_beam.options.pipeline_options import GoogleCloudOptions
 from apache_beam.transforms.ptransform import PTransform
 from apache_beam.transforms.util import BatchElements
 from apache_beam.utils.shared import Shared
-from data_source import loader
+from data_source import Locale, loader
 
 from amazon_product_search.constants import DATA_DIR, DATASET_ID, HF, PROJECT_ID
-from amazon_product_search.source import Locale
 from indexing.io.elasticsearch_io import WriteToElasticsearch
 from indexing.io.vespa_io import WriteToVespa
 from indexing.options import IndexerOptions
