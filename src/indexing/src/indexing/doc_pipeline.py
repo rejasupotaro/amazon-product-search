@@ -19,9 +19,6 @@ from indexing.options import IndexerOptions
 from indexing.transforms.add_image_url import AddImageUrlFn
 from indexing.transforms.analyze_doc import AnalyzeDocFn
 from indexing.transforms.encode_product import EncodeProduct
-from indexing.transforms.extract_keywords import (
-    ExtractKeywordsFn,
-)
 from indexing.transforms.filters import is_indexable
 
 
@@ -36,9 +33,6 @@ def get_input_source(data_dir: str, locale: Locale, nrows: int = -1) -> PTransfo
 def join_branches(kv: Tuple[str, Dict[str, Any]]) -> Dict[str, Any]:
     (product_id, group) = kv
     product = group["product"][-1]
-
-    if "extracted_keywords" in group:
-        product |= group["extracted_keywords"][-1]
 
     if "product_vector" in group:
         product["product_vector"] = group["product_vector"][-1]
@@ -67,8 +61,6 @@ def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
         | "Add image URL" >> beam.ParDo(AddImageUrlFn(product_images_filepath, locale))
     )
     branches = {}
-    if options.extract_keywords:
-        branches["extracted_keywords"] = products | "Extract keywords" >> beam.ParDo(ExtractKeywordsFn())
     if options.encode_text:
         branches["product_vector"] = products | "Encode products" >> EncodeProduct(
             Shared(),
