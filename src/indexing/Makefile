@@ -28,23 +28,23 @@ create-index:
 import-model:
 	poetry run python -m indexing import-model
 
-.PHONY: doc
-doc:
+.PHONY: query-pipeline
+query-pipeline:
+	poetry run python -m indexing query \
+		--pipeline-type=query \
+		--runner=$(RUNNER) \
+		--dest=$(DEST)
+
+.PHONY: doc-pipeline
+doc-pipeline:
 	poetry run python -m indexing doc \
 		--pipeline-type=doc \
 		--runner=$(RUNNER) \
 		--dest=$(DEST)
 
-.PHONY: feed
-feed:
+.PHONY: feed-pipeline
+feed-pipeline:
 	poetry run python -m indexing feed \
 		--pipeline-type=feed \
-		--runner=$(RUNNER) \
-		--dest=$(DEST)
-
-.PHONY: query
-query:
-	poetry run python -m indexing query \
-		--pipeline-type=query \
 		--runner=$(RUNNER) \
 		--dest=$(DEST)
