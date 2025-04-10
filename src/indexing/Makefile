@@ -5,7 +5,7 @@ LOCALE?=jp
 INDEXING_IMAGE_URI:=gcr.io/$(PROJECT_ID)/indexing:latest
 
 RUNNER?=direct
-DEST?=bq
+DEST?=stdout
 
 .PHONY: build
 build:
@@ -28,19 +28,23 @@ create-index:
 import-model:
 	poetry run python -m indexing import-model
 
-.PHONY: transform
-transform:
-	poetry run python -m indexing transform \
-		--runner=$(RUNNER)
+.PHONY: doc
+doc:
+	poetry run python -m indexing doc \
+		--pipeline-type=doc \
+		--runner=$(RUNNER) \
+		--dest=$(DEST)
 
 .PHONY: feed
 feed:
 	poetry run python -m indexing feed \
-		--runner=$(RUNNER)
+		--pipeline-type=feed \
+		--runner=$(RUNNER) \
 		--dest=$(DEST)
 
-.PHONY: encode
-encode:
-	poetry run python -m indexing encode \
-		--runner=$(RUNNER)
+.PHONY: query
+query:
+	poetry run python -m indexing query \
+		--pipeline-type=query \
+		--runner=$(RUNNER) \
 		--dest=$(DEST)

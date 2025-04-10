@@ -8,10 +8,11 @@ project_name: ${oc.env:PROJECT_NAME}
 region: ${oc.env:REGION}
 temp_location: gs://${project_name}/temp
 staging_location: gs://${project_name}/staging
+data_dir: ../data-source/data
 
 locale: jp
 index_name: products_${locale}
-nrows: null
+nrows: 10
 
 encode_text: False
-table_id: ${project_name}
+table_id: docs_jp

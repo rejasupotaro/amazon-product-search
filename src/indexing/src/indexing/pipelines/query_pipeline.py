@@ -1,5 +1,4 @@
 import logging
-import os
 from functools import partial
 from typing import Any, Dict, Iterator, List
 
@@ -9,20 +8,21 @@ from apache_beam.options.pipeline_options import GoogleCloudOptions
 from apache_beam.transforms.ptransform import PTransform
 from apache_beam.transforms.util import BatchElements
 from apache_beam.utils.shared import Shared
+from data_source import loader
 from torch import Tensor
 
-from amazon_product_search import source
 from amazon_product_search.constants import DATASET_ID, HF, PROJECT_ID
 from amazon_product_search.nlp.normalizer import normalize_query
 from amazon_product_search.source import Locale
 from dense_retrieval.encoders import SBERTEncoder
 from dense_retrieval.encoders.modules.pooler import PoolingMode
 from indexing.options import IndexerOptions
+from indexing.pipelines.base import BasePipeline
 
 
 def get_input_source(data_dir: str, locale: Locale, nrows: int = -1) -> PTransform:
-    df = source.load_labels(locale=locale, data_dir=data_dir)
-    queries = df.get_column("query").unique()
+    df = loader.load_examples(data_dir, locale)
+    queries = df["query"].unique()
     if nrows:
         queries = queries[:nrows]
     query_dicts = [{"query": query} for query in queries]
@@ -58,63 +58,41 @@ class EncodeQueriesInBatchFn(beam.DoFn):
             yield query_dict
 
 
-def create_pipeline(options: IndexerOptions) -> beam.Pipeline:
-    locale = options.locale
-    hf_model_name = HF.LOCALE_TO_MODEL_NAME[locale]
+class QueryPipeline(BasePipeline):
+    def build(self, options: IndexerOptions) -> beam.Pipeline:
+        locale = options.locale
+        hf_model_name = HF.LOCALE_TO_MODEL_NAME[locale]
 
-    project_id = PROJECT_ID if PROJECT_ID else options.view_as(GoogleCloudOptions).project
-    table_spec = f"{project_id}:{DATASET_ID}.{options.table_id}"
+        project_id = PROJECT_ID if PROJECT_ID else options.view_as(GoogleCloudOptions).project
+        table_spec = f"{project_id}:{DATASET_ID}.{options.table_id}"
 
-    pipeline = beam.Pipeline(options=options)
-    queries = (
-        pipeline
-        | get_input_source(options.data_dir, locale, options.nrows)
-        | "Analyze queries" >> beam.ParDo(NormalizeQueryFn())
-        | "Filter queries" >> beam.Filter(lambda query_dict: bool(query_dict["query"]))
-        | "Batch queries for encoding" >> BatchElements(min_batch_size=8)
-        | "Encode queries"
-        >> beam.ParDo(
-            EncodeQueriesInBatchFn(
-                shared_handle=Shared(),
-                hf_model_name=hf_model_name,
-            )
-        )
-    )
-
-    match options.dest:
-        case "stdout":
-            queries | beam.Map(logging.info)
-        case "bq":
-            (
-                queries
-                | WriteToBigQuery(
-                    table=table_spec,
-                    schema=beam.io.SCHEMA_AUTODETECT,
-                    write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
-                    create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
+        pipeline = beam.Pipeline(options=options)
+        queries = (
+            pipeline
+            | get_input_source(options.data_dir, locale, options.nrows)
+            | "Analyze queries" >> beam.ParDo(NormalizeQueryFn())
+            | "Filter queries" >> beam.Filter(lambda query_dict: bool(query_dict["query"]))
+            | "Batch queries for encoding" >> BatchElements(min_batch_size=8)
+            | "Encode queries"
+            >> beam.ParDo(
+                EncodeQueriesInBatchFn(
+                    shared_handle=Shared(),
+                    hf_model_name=hf_model_name,
                 )
             )
-    return pipeline
+        )
 
-
-def run(options: IndexerOptions) -> None:
-    pipeline = create_pipeline(options)
-    result = pipeline.run()
-    result.wait_until_finish()
-
-
-if __name__ == "__main__":
-    logging.getLogger().setLevel(logging.INFO)
-
-    # Disable the warning as suggested:
-    # ```
-    # huggingface/tokenizers: The current process just got forked,
-    # after parallelism has already been used. Disabling parallelism to avoid deadlocks...
-    # To disable this warning, you can either:
-    # - Avoid using `tokenizers` before the fork if possible
-    # - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
-    # ```
-    os.environ["TOKENIZERS_PARALLELISM"] = "false"
-
-    options = IndexerOptions()
-    run(options)
+        match options.dest:
+            case "stdout":
+                queries | beam.Map(logging.info)
+            case "bq":
+                (
+                    queries
+                    | WriteToBigQuery(
+                        table=table_spec,
+                        schema=beam.io.SCHEMA_AUTODETECT,
+                        write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
+                        create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
+                    )
+                )
+        return pipeline
