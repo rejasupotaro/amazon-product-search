@@ -1,6 +1,6 @@
-import polars as pl
 import torch
 from more_itertools import chunked
+from pandas import DataFrame
 from torch.nn.functional import cosine_similarity
 from tqdm import tqdm
 
@@ -27,7 +27,7 @@ class SimilarityFilter:
         right_tensor = torch.from_numpy(self.encoder.encode(right))
         return cosine_similarity(left_tensor, right_tensor, dim=1).tolist()
 
-    def apply(self, synonyms_df: pl.DataFrame, threshold: float = 0.5) -> pl.DataFrame:
+    def apply(self, synonyms_df: DataFrame, threshold: float = 0.5) -> DataFrame:
         """Filter out synonyms based on the similarity between terms.
 
         Args:
@@ -43,9 +43,7 @@ class SimilarityFilter:
             titles = [row["title"] for row in batch]
             scores.extend(self.calculate_score(queries, titles))
 
-        synonyms_df = (
-            synonyms_df.with_columns(pl.Series(name="similarity", values=scores))
-            .filter(pl.col("similarity") > threshold)
-            .sort("similarity", descending=True)
-        )
+        synonyms_df["similarity"] = scores
+        synonyms_df = synonyms_df[synonyms_df["similarity"] > threshold]
+        synonyms_df = synonyms_df.sort_values(by="similarity", ascending=False)
         return synonyms_df

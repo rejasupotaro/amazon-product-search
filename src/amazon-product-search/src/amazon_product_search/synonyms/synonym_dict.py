@@ -1,7 +1,7 @@
 import re
 from collections import defaultdict
 
-import polars as pl
+import pandas as pd
 from data_source import Locale
 
 from amazon_product_search.constants import DATA_DIR
@@ -71,9 +71,9 @@ class SynonymDict:
         Returns:
             dict[str, list[str]]: The converted synonym dict.
         """
-        df = pl.read_csv(f"{data_dir}/includes/{synonym_filename}")
+        df = pd.read_csv(f"{data_dir}/includes/{synonym_filename}")
         entry_dict = defaultdict(list)
-        for row in df.to_dicts():
+        for row in df.to_dict("records"):
             query: str = row["query"]
             title: str = row["title"]
             score: float = row["npmi"] * row["similarity"]
