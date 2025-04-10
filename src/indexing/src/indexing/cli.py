@@ -1,5 +1,4 @@
 import contextlib
-import subprocess
 
 import typer
 from elasticsearch import NotFoundError
@@ -51,49 +50,52 @@ def import_model() -> None:
 
 
 @app.command()
-def transform(
+def doc(
+    pipeline_type: Annotated[PipelineType, typer.Option()],
     runner: Annotated[str, typer.Option()],
+    dest: Annotated[str, typer.Option()],
 ) -> None:
     """Transform data and load it into the destination (if specified)."""
     overrides = [
         f"runner={runner}",
-        "dest=bq",
+        f"dest={dest}",
     ]
     config = load_config(overrides)
 
-    command = [
-        "poetry run python src/indexing/pipelines/doc_pipeline.py",
-        f"--locale={config.locale}",
-        f"--index_name={config.index_name}",
-        f"--runner={config.runner.name}",
-        f"--dest={config.dest.name}",
-    ]
+    kwargs = {
+        "pipeline_type": str(pipeline_type),
+        "locale": config.locale,
+        "index_name": config.index_name,
+        "runner": config.runner.name,
+        "dest": config.dest.name,
+        "data_dir": config.data_dir,
+    }
 
     if config.encode_text:
-        command.append("--encode_text")
+        kwargs["encode_text"] = True
 
     if config.runner.name == "DirectRunner":
-        command += [
-            # https://github.com/apache/beam/blob/master/sdks/python/apache_beam/options/pipeline_options.py#L617-L621
-            f"--direct_num_workers={config.runner.num_workers}",
-        ]
+        # https://github.com/apache/beam/blob/master/sdks/python/apache_beam/options/pipeline_options.py#L617-L621
+        kwargs["direct_num_workers"] = config.runner.num_workers
     elif config.runner.name == "DataflowRunner":
-        command += [
-            f"--project={config.project_id}",
-            f"--region={config.region}",
-            f"--num_workers={config.runner.num_workers}",
-            f"--worker_machine_type={config.runner.worker_machine_type}",
-            "--sdk_location=container",
-            f"--sdk_container_image=${config.runner.sdk_container_image}",
-            f"--worker_zone={config.runner.worker_zone}",
-            f"--temp_location={config.temp_location}",
-            f"--staging_location={config.staging_location}",
-        ]
+        kwargs |= {
+            "project": config.project_id,
+            "region": config.region,
+            "num_workers": config.runner.num_workers,
+            "worker_machine_type": config.runner.worker_machine_type,
+            "sdk_location": "container",
+            "sdk_container_image": config.runner.sdk_container_image,
+            "worker_zone": config.runner.worker_zone,
+            "temp_location": config.temp_location,
+            "staging_location": config.staging_location,
+        }
 
     if config.nrows:
-        command.append(f"--nrows={config.nrows}")
+        kwargs["nrows"] = config.nrows
 
-    subprocess.run(command)
+    options = IndexerOptions(**kwargs)
+    pipeline = PipelineType(options.pipeline_type).pipeline_class(options)
+    pipeline.run()
 
 
 @app.command()

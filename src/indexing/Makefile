@@ -28,10 +28,12 @@ create-index:
 import-model:
 	poetry run python -m indexing import-model
 
-.PHONY: transform
-transform:
-	poetry run python -m indexing transform \
-		--runner=$(RUNNER)
+.PHONY: doc
+doc:
+	poetry run python -m indexing doc \
+		--pipeline-type=doc \
+		--runner=$(RUNNER) \
+		--dest=$(DEST)
 
 .PHONY: feed
 feed:
