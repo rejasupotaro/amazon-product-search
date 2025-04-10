@@ -6,7 +6,7 @@ eda:
 	poetry run streamlit run src/demo/apps/eda/📊_Product_Catalogue.py
 
 .PHONY: tokenization
-features:
+tokenization:
 	poetry run streamlit run src/demo/apps/features/🤖_Tokenization.py
 
 .PHONY: es
