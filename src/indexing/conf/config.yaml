@@ -15,4 +15,4 @@ index_name: products_${locale}
 nrows: 10
 
 encode_text: False
-table_id: ${project_name}
+table_id: docs_jp

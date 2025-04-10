@@ -36,6 +36,7 @@ transform:
 .PHONY: feed
 feed:
 	poetry run python -m indexing feed \
+		--pipeline-type=feed \
 		--runner=$(RUNNER) \
 		--dest=$(DEST)
 
