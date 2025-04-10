@@ -1,18 +1,18 @@
 # -------------------------------------
 #  Execution Commands
 # -------------------------------------
-.PHONY: run_eda
-run_eda:
+.PHONY: eda
+eda:
 	poetry run streamlit run src/demo/apps/eda/📊_Product_Catalogue.py
 
-.PHONY: run_tokenization
-run_features:
+.PHONY: tokenization
+features:
 	poetry run streamlit run src/demo/apps/features/🤖_Tokenization.py
 
-.PHONY: run_es
-run_es:
+.PHONY: es
+es:
 	poetry run streamlit run src/demo/apps/es/🔍_Retrieval.py
 
-.PHONY: run_vespa
-run_vespa:
+.PHONY: vespa
+vespa:
 	poetry run streamlit run src/demo/apps/vespa/🔍_Retrieval.py
