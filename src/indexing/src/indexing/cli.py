@@ -9,6 +9,8 @@ from typing_extensions import Annotated
 
 from amazon_product_search.constants import HF
 from amazon_product_search.es.es_client import EsClient
+from indexing.options import IndexerOptions
+from indexing.pipelines.pipelien_types import PipelineType
 
 app = typer.Typer()
 
@@ -144,7 +146,8 @@ def feed(
 
 
 @app.command()
-def encode(
+def query(
+    pipeline_type: Annotated[PipelineType, typer.Option()],
     runner: Annotated[str, typer.Option()],
     dest: Annotated[str, typer.Option()],
 ) -> None:
@@ -155,37 +158,38 @@ def encode(
     ]
     config = load_config(overrides)
 
-    command = [
-        "poetry run python src/indexing/pipelines/query_pipeline.py",
-        f"--locale={config.locale}",
-        f"--runner={config.runner.name}",
-        f"--dest={config.dest.name}",
-        f"--table_id={config.table_id}",
-    ]
+    kwargs = {
+        "pipeline_type": str(pipeline_type),
+        "locale": config.locale,
+        "runner": config.runner.name,
+        "dest": config.dest.name,
+        "table_id": config.table_id,
+        "data_dir": config.data_dir,
+    }
 
     if config.runner.name == "DirectRunner":
-        command += [
             # https://github.com/apache/beam/blob/master/sdks/python/apache_beam/options/pipeline_options.py#L617-L621
-            f"--direct_num_workers={config.runner.num_workers}",
-        ]
+        kwargs["direct_num_workers"] = config.runner.num_workers
     elif config.runner.name == "DataflowRunner":
-        command += [
-            f"--num_workers={config.runner.num_workers}",
-            f"--worker_machine_type={config.runner.worker_machine_type}",
-            "--sdk_location=container",
-            f"--sdk_container_image=${config.runner.sdk_container_image}",
-            f"--worker_zone={config.runner.worker_zone}",
-        ]
+        kwargs |= {
+            "num_workers": config.runner.num_workers,
+            "worker_machine_type": config.runner.worker_machine_type,
+            "sdk_location": "container",
+            "sdk_container_image": config.runner.sdk_container_image,
+            "worker_zone": config.runner.worker_zone,
+        }
 
     if config.runner.name == "DataflowRunner":
-        command += [
-            f"--project={config.project_id}",
-            f"--region={config.region}",
-            f"--temp_location=gs://{config.project_name}/temp",
-            f"--staging_location=gs://{config.project_name}/staging",
-        ]
+        kwargs |= {
+            "project": config.project_id,
+            "region": config.region,
+            "temp_location": f"gs://{config.project_name}/temp",
+            "staging_location": f"gs://{config.project_name}/staging",
+        }
 
     if config.nrows:
-        command.append(f"--nrows={config.nrows}")
+        kwargs["nrows"] = config.nrows
 
-    subprocess.run(command)
+    options = IndexerOptions(**kwargs)
+    pipeline = PipelineType(options.pipeline_type).pipeline_class(options)
+    pipeline.run()

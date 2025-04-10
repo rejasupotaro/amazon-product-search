@@ -5,7 +5,7 @@ LOCALE?=jp
 INDEXING_IMAGE_URI:=gcr.io/$(PROJECT_ID)/indexing:latest
 
 RUNNER?=direct
-DEST?=bq
+DEST?=stdout
 
 .PHONY: build
 build:
@@ -36,11 +36,12 @@ transform:
 .PHONY: feed
 feed:
 	poetry run python -m indexing feed \
-		--runner=$(RUNNER)
+		--runner=$(RUNNER) \
 		--dest=$(DEST)
 
-.PHONY: encode
-encode:
-	poetry run python -m indexing encode \
-		--runner=$(RUNNER)
+.PHONY: query
+query:
+	poetry run python -m indexing query \
+		--pipeline-type=query \
+		--runner=$(RUNNER) \
 		--dest=$(DEST)
