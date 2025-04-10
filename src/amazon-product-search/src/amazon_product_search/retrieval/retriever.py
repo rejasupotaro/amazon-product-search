@@ -1,9 +1,10 @@
+from data_source import Locale
+
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.query_builder import QueryBuilder
 from amazon_product_search.nlp.normalizer import normalize_query
 from amazon_product_search.retrieval.rank_fusion import RankFusion, fuse
 from amazon_product_search.retrieval.response import Response
-from amazon_product_search.source import Locale
 
 
 def split_fields(fields: list[str]) -> tuple[list[str], list[str]]:

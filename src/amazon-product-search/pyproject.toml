@@ -30,7 +30,7 @@ tritonclient = "^2.41.1"
 openai = "^1.14.2"
 tenacity = "^8.2.3"
 torch = "^2.5.1"
-polars = "^1.17.1"
+data-source = {path = "../data-source", develop = true}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2"

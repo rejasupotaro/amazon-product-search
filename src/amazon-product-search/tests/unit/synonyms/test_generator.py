@@ -1,5 +1,5 @@
-import polars as pl
 import pytest
+from pandas import DataFrame
 
 from amazon_product_search.synonyms.generator import (
     generate_ngrams,
@@ -9,7 +9,7 @@ from amazon_product_search.synonyms.generator import (
 
 
 def test_preprocess_query_title_pairs():
-    df = pl.from_dicts(
+    df = DataFrame(
         [
             {"query": "Hello", "product_title": "World"},
             {"query": None, "product_title": "product_title"},
@@ -17,7 +17,7 @@ def test_preprocess_query_title_pairs():
         ]
     )
     df = preprocess_query_title_pairs(df)
-    assert df.to_dicts() == [{"query": "hello", "product_title": "world"}]
+    assert df.to_dict("records") == [{"query": "hello", "product_title": "world"}]
 
 
 @pytest.mark.parametrize(

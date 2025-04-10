@@ -4,10 +4,10 @@ import pandas as pd
 import plotly.express as px
 import seaborn as sns
 import streamlit as st
+from data_source import Locale
 
 from amazon_product_search.constants import HF
 from amazon_product_search.retrieval.response import Response
-from amazon_product_search.source import Locale
 from amazon_product_search.vespa.query_builder import QueryBuilder
 from amazon_product_search.vespa.vespa_client import VespaClient
 from demo.apps.es.search_ui import (

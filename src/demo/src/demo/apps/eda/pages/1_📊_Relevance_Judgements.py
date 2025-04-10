@@ -1,8 +1,7 @@
 import plotly.express as px
-import polars as pl
 import streamlit as st
+from data_source import loader
 
-from amazon_product_search import source
 from demo.page_config import set_page_config
 from demo.utils import analyze_dataframe
 
@@ -12,23 +11,23 @@ def main() -> None:
     st.write("## Relevance Judgements")
 
     locale = st.selectbox("Locale:", ["us", "jp", "es"])
-    df = source.load_merged(locale)
+    df = loader.load_examples("../data-source/data", locale)
 
     st.write("### Columns")
     analyzed_df = analyze_dataframe(df)
-    st.write(analyzed_df.to_pandas())
+    st.write(analyzed_df)
 
-    count_df = df.groupby("esci_label").count().sort("count", reverse=True)
-    fig = px.bar(count_df.to_pandas(), x="esci_label", y="count")
+    count_df = df.groupby("esci_label").size().reset_index(name="count").sort_values("count", ascending=False)
+    fig = px.bar(count_df, x="esci_label", y="count")
     fig.update_layout(title="The number of labels")
     st.plotly_chart(fig)
 
-    queries = sorted(df.get_column("query").unique().to_list())
+    queries = sorted(df["query"].unique().tolist())
     query = st.selectbox("Query:", queries)
-    filtered_df = df.filter(pl.col("query") == query)
+    filtered_df = df[df["query"] == query]
 
     st.write("### Examples")
-    st.write(filtered_df.to_pandas())
+    st.write(filtered_df)
 
 
 if __name__ == "__main__":

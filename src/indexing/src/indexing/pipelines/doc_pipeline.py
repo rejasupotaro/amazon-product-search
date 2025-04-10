@@ -7,10 +7,9 @@ from apache_beam.options.pipeline_options import GoogleCloudOptions
 from apache_beam.transforms.ptransform import PTransform
 from apache_beam.transforms.util import BatchElements
 from apache_beam.utils.shared import Shared
-from data_source import loader
+from data_source import Locale, loader
 
 from amazon_product_search.constants import DATA_DIR, DATASET_ID, HF, PROJECT_ID
-from amazon_product_search.source import Locale
 from indexing.io.elasticsearch_io import WriteToElasticsearch
 from indexing.io.vespa_io import WriteToVespa
 from indexing.options import IndexerOptions
@@ -22,9 +21,7 @@ from indexing.transforms.filters import is_indexable
 
 
 def get_input_source(data_dir: str, locale: Locale, nrows: int = -1) -> PTransform:
-    products_df = loader.load_products(data_dir, locale)
-    if nrows:
-        products_df = products_df[:nrows]
+    products_df = loader.load_products(data_dir, locale, nrows)
     products_df = products_df.fillna("")
     products = products_df.to_dict("records")
     logging.info(f"{len(products)} products are going to be indexed")

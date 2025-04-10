@@ -3,8 +3,7 @@ from typing import Any, Dict, Iterator
 
 import apache_beam as beam
 import pandas as pd
-
-from amazon_product_search.source import Locale
+from data_source import Locale
 
 
 class AddImageUrlFn(beam.DoFn):

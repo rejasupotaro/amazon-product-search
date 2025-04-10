@@ -1,8 +1,8 @@
 from typing import Any, Optional
 
 import streamlit as st
+from data_source import Locale, loader
 
-from amazon_product_search import source
 from amazon_product_search.constants import HF
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.es.query_builder import QueryBuilder
@@ -14,7 +14,6 @@ from amazon_product_search.metrics import (
 from amazon_product_search.reranking.reranker import from_string
 from amazon_product_search.retrieval.rank_fusion import RankFusion
 from amazon_product_search.retrieval.retriever import Retriever
-from amazon_product_search.source import Locale
 from demo.apps.es.search_ui import (
     draw_input_form,
     draw_products,
@@ -37,7 +36,7 @@ def get_retriever(locale: Locale, es_client: EsClient, query_builder: QueryBuild
 
 @st.cache_data
 def load_dataset(locale: Locale) -> dict[str, dict[str, tuple[str, str]]]:
-    df = source.load_merged(locale).to_pandas()
+    df = loader.load_merged("../data-source/data", locale)
     df = df[df["split"] == "test"]
     query_to_label: dict[str, dict[str, tuple[str, str]]] = {}
     for query, group in df.groupby("query"):

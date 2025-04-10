@@ -1,12 +1,13 @@
 import json
 from typing import Any, cast
 
+from data_source import Locale
+
 from amazon_product_search.cache import weak_lru_cache
 from amazon_product_search.constants import DATA_DIR, HF, PROJECT_DIR
 from amazon_product_search.es.templates.template_loader import TemplateLoader
 from amazon_product_search.nlp.tokenizers import Tokenizer, locale_to_tokenizer
 from amazon_product_search.retrieval.query_vector_cache import QueryVectorCache
-from amazon_product_search.source import Locale
 from amazon_product_search.synonyms.synonym_dict import SynonymDict, expand_synonyms
 from dense_retrieval.encoders import SBERTEncoder
 
