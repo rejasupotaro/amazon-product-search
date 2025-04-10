@@ -4,8 +4,8 @@ import pandas as pd
 import plotly.express as px
 import seaborn as sns
 import streamlit as st
+from data_source import loader
 
-from amazon_product_search import source
 from amazon_product_search.constants import HF
 from amazon_product_search.retrieval.response import Response
 from amazon_product_search.source import Locale
@@ -27,7 +27,7 @@ def get_query_builder(locale: Locale) -> QueryBuilder:
 
 @st.cache_data
 def load_dataset(locale: Locale) -> dict[str, dict[str, tuple[str, str]]]:
-    df = source.load_merged(locale).to_pandas()
+    df = loader.load_merged()
     df = df[df["split"] == "test"]
     query_to_label: dict[str, dict[str, tuple[str, str]]] = {}
     for query, group in df.groupby("query"):
