@@ -2,11 +2,12 @@ import random
 from os import path
 from typing import Any, Literal, Optional
 
-import polars as pl
 import streamlit as st
+from data_source import loader
 from more_itertools import chunked
+from pandas import DataFrame
 
-from amazon_product_search import metrics, source
+from amazon_product_search import metrics
 from amazon_product_search.constants import HF
 from amazon_product_search.es.es_client import EsClient
 from amazon_product_search.reranking.reranker import (
@@ -45,9 +46,9 @@ rerankers = init_rerankers()
 
 
 @st.cache_data
-def load_dataset(split: Literal["-", "train", "test"]) -> pl.DataaFrame:
-    merged_df = source.load_merged(locale="jp")
-    df = merged_df if split == "-" else merged_df.filter(pl.col("split") == split)
+def load_dataset(split: Literal["-", "train", "test"]) -> DataFrame:
+    merged_df = loader.load_merged("../data-source/data", locale="jp")
+    df = merged_df if split == "=" else merged_df[merged_df["split"] == split]
     return df
 
 
@@ -92,8 +93,8 @@ def draw_results(results: list[Result]) -> None:
     ndcg = compute_ndcg(products)
     st.write(f"NDCG: {ndcg}")
 
-    df = pl.from_dicts(products)
-    st.write(df.select(["esci_label", "query", "product_title", "product_id"]).to_pandas())
+    df = DataFrame(products)
+    st.write(df[["esci_label", "query", "product_title", "product_id"]])
 
 
 def draw_examples(query: str, results: list[Result]) -> None:
@@ -107,7 +108,7 @@ def draw_examples(query: str, results: list[Result]) -> None:
 
 
 def run_comparison(
-    df: pl.DataFrame,
+    df: DataFrame,
     id_to_label: dict[str, str],
     num_queries: int,
     reranker_names: list[str],
@@ -120,7 +121,7 @@ def run_comparison(
         progress_text.text(f"Query ({i} / {num_queries}): {query}")
         progress_bar.progress(i / num_queries)
 
-        products = df.filter(pl.col("query") == query).to_dicts()
+        products = df[df["query"] == query].to_dict("records")
         results = [Result(product=product, score=1) for product in products]
 
         rows.append(
@@ -150,8 +151,12 @@ def run_comparison(
                 }
             )
 
-    metrics_df = pl.from_dicts(rows)
-    stats_df = metrics_df.groupby("variant").agg([pl.col("ndcg").mean().round(4)])
+    metrics_df = DataFrame(rows)
+    stats_df = (
+        metrics_df.groupby("variant")
+        .agg(ndcg_mean=("ndcg", lambda x: round(x.mean(), 4)))
+        .reset_index()
+    )
 
     st.write("### Overall")
     st.write(stats_df.to_pandas())
@@ -166,15 +171,15 @@ def main() -> None:
 
     split = st.selectbox("split", ["-", "train", "test"], index=2)
     df = load_dataset(split)
-    id_to_label = {row["product_id"]: row["esci_label"] for row in df.select(["product_id", "esci_label"]).to_dicts()}
+    id_to_label = {row["product_id"]: row["esci_label"] for row in df[["product_id", "esci_label"]].to_dict("records")}
 
     st.write("### Example")
 
     queries = df["query"].unique()
     query = str(st.selectbox("Query:", queries))
-    filtered_df = df.filter(pl.col("query") == query)
+    filtered_df = df[df["query"] == query]
 
-    products = filtered_df.to_dicts()
+    products = filtered_df.to_dict("records")
     results = [Result(product=product, score=1) for product in products]
 
     draw_examples(query, results)
