@@ -7,7 +7,8 @@ authors = ["rejasupotaro"]
 [tool.poetry.dependencies]
 python = "~3.11"
 amazon_product_search = { path = "../amazon-product-search", develop = true }
-apache-beam = {version = "2.50.0", extras = ["gcp"]}
+apache-beam = {extras = ["gcp"], version = "^2.64.0"}
+data-source = {path = "../data-source", develop = true}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2"
