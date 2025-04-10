@@ -20,10 +20,8 @@ from indexing.pipelines.base import BasePipeline
 
 
 def get_input_source(data_dir: str, locale: Locale, nrows: int = -1) -> PTransform:
-    df = loader.load_examples(data_dir, locale)
+    df = loader.load_examples(data_dir, locale, nrows)
     queries = df["query"].unique()
-    if nrows:
-        queries = queries[:nrows]
     query_dicts = [{"query": query} for query in queries]
     return beam.Create(query_dicts)
 

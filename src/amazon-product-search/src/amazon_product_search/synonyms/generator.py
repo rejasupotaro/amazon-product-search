@@ -15,7 +15,7 @@ from amazon_product_search.synonyms.filters.similarity_filter import SimilarityF
 
 def load_query_title_pairs(locale: Locale, nrows: int = -1) -> DataFrame:
     """Load query title pairs."""
-    df = loader.load_merged("../data-source/data", locale)[:nrows]
+    df = loader.load_merged("../data-source/data", locale, nrows)
     df = df[df["esci_label"] == "E"]
     return df
 

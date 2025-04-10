@@ -21,9 +21,7 @@ from indexing.transforms.filters import is_indexable
 
 
 def get_input_source(data_dir: str, locale: Locale, nrows: int = -1) -> PTransform:
-    products_df = loader.load_products(data_dir, locale)
-    if nrows:
-        products_df = products_df[:nrows]
+    products_df = loader.load_products(data_dir, locale, nrows)
     products_df = products_df.fillna("")
     products = products_df.to_dict("records")
     logging.info(f"{len(products)} products are going to be indexed")
