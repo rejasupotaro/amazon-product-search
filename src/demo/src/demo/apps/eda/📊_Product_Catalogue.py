@@ -43,11 +43,10 @@ def draw_examples(products_df: DataFrame) -> None:
     grid_options = gb.build()
     selected_rows = AgGrid(products_df, gridOptions=grid_options).selected_rows
 
-    if not selected_rows:
+    if selected_rows is None:
         return
 
-    product = selected_rows[0]
-    del product["_selectedRowNodeInfo"]
+    product = selected_rows.to_dict("records")[0]
     for key, value in product.items():
         st.write(f"#### {key}")
         st.text(value)
@@ -58,7 +57,7 @@ def main() -> None:
     st.write("## Product Catalogue")
 
     with st.sidebar:
-        locale = st.selectbox("Locale:", ["us", "jp", "es"])
+        locale = st.selectbox("Locale:", ["jp", "us", "es"])
 
     products_df = load_products(locale)
     draw_column_info(products_df)

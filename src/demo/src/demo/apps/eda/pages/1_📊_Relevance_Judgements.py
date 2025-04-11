@@ -10,7 +10,7 @@ def main() -> None:
     set_page_config()
     st.write("## Relevance Judgements")
 
-    locale = st.selectbox("Locale:", ["us", "jp", "es"])
+    locale = st.selectbox("Locale:", ["jp", "us", "es"])
     df = loader.load_examples("../data-source/data", locale)
 
     st.write("### Columns")
