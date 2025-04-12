@@ -7,7 +7,7 @@ eda:
 
 .PHONY: features
 features:
-	poetry run streamlit run src/demo/apps/features/🤖_Tokenization.py
+	poetry run streamlit run src/demo/apps/features/🤖_AutoTokenizer.py
 
 .PHONY: es
 es:
