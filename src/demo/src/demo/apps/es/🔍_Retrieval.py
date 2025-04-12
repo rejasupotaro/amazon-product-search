@@ -36,7 +36,7 @@ def get_retriever(locale: Locale, es_client: EsClient, query_builder: QueryBuild
 
 @st.cache_data
 def load_dataset(locale: Locale) -> dict[str, dict[str, tuple[str, str]]]:
-    df = loader.load_merged("../data-source/data", locale)
+    df = loader.load_merged(locale=locale)
     df = df[df["split"] == "test"]
     query_to_label: dict[str, dict[str, tuple[str, str]]] = {}
     for query, group in df.groupby("query"):
@@ -69,7 +69,7 @@ def main() -> None:
     st.write("## Search")
 
     with st.sidebar:
-        locale = st.selectbox("Locale", ["us", "jp"])
+        locale = st.selectbox("Locale", ["jp", "us", "es"])
         index_name = st.selectbox("Index:", es_client.list_indices())
 
         queries, query_to_label = None, {}

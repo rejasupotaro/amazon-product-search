@@ -11,7 +11,7 @@ def main() -> None:
     st.write("## Relevance Judgements")
 
     locale = st.selectbox("Locale:", ["jp", "us", "es"])
-    df = loader.load_examples("../data-source/data", locale)
+    df = loader.load_examples(locale=locale)
 
     st.write("### Columns")
     analyzed_df = analyze_dataframe(df)
