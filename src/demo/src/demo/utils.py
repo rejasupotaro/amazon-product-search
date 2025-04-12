@@ -6,12 +6,12 @@ from pandas.api.types import is_object_dtype
 
 @st.cache_data
 def load_products(locale: Locale, nrows: int = -1) -> DataFrame:
-    return loader.load_products("../data-source/data", locale, nrows)
+    return loader.load_products(locale=locale, nrows=nrows)
 
 
 @st.cache_data
 def load_labels(locale: Locale, nrows: int = -1) -> DataFrame:
-    return loader.load_examples("../data-source/data", locale, nrows)
+    return loader.load_examples(locale=locale, nrows=nrows)
 
 
 def analyze_dataframe(df: DataFrame) -> DataFrame:

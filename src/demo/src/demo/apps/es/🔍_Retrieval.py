@@ -36,7 +36,7 @@ def get_retriever(locale: Locale, es_client: EsClient, query_builder: QueryBuild
 
 @st.cache_data
 def load_dataset(locale: Locale) -> dict[str, dict[str, tuple[str, str]]]:
-    df = loader.load_merged("../data-source/data", locale)
+    df = loader.load_merged(locale=locale)
     df = df[df["split"] == "test"]
     query_to_label: dict[str, dict[str, tuple[str, str]]] = {}
     for query, group in df.groupby("query"):

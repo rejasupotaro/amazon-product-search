@@ -47,7 +47,7 @@ rerankers = init_rerankers()
 
 @st.cache_data
 def load_dataset(split: Literal["-", "train", "test"]) -> DataFrame:
-    merged_df = loader.load_merged("../data-source/data", locale="jp")
+    merged_df = loader.load_merged(locale="jp")
     df = merged_df if split == "=" else merged_df[merged_df["split"] == split]
     return df
 
