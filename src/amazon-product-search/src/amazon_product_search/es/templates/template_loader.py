@@ -1,12 +1,12 @@
 from jinja2 import Environment, FileSystemLoader, Template
-
-from amazon_product_search.constants import PROJECT_DIR
+from importlib import resources
 
 
 class TemplateLoader:
-    def __init__(self, project_dir: str = PROJECT_DIR) -> None:
-        searchpath = f"{project_dir}/src/amazon_product_search/es/templates"
-        file_system_loader = FileSystemLoader(searchpath=searchpath)
+    def __init__(self) -> None:
+        package_path = str(resources.files("amazon_product_search"))
+        search_path = f"{package_path}/es/templates"
+        file_system_loader = FileSystemLoader(searchpath=search_path)
         self.environment = Environment(loader=file_system_loader)
 
     def load(self, template_name: str) -> Template:

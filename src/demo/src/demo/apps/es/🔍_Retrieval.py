@@ -69,7 +69,7 @@ def main() -> None:
     st.write("## Search")
 
     with st.sidebar:
-        locale = st.selectbox("Locale", ["us", "jp"])
+        locale = st.selectbox("Locale", ["jp", "us", "es"])
         index_name = st.selectbox("Index:", es_client.list_indices())
 
         queries, query_to_label = None, {}

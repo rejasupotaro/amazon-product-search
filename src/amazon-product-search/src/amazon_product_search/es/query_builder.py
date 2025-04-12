@@ -4,7 +4,7 @@ from typing import Any, cast
 from data_source import Locale
 
 from amazon_product_search.cache import weak_lru_cache
-from amazon_product_search.constants import DATA_DIR, HF, PROJECT_DIR
+from amazon_product_search.constants import DATA_DIR, HF
 from amazon_product_search.es.templates.template_loader import TemplateLoader
 from amazon_product_search.nlp.tokenizers import Tokenizer, locale_to_tokenizer
 from amazon_product_search.retrieval.query_vector_cache import QueryVectorCache
@@ -17,7 +17,6 @@ class QueryBuilder:
         self,
         locale: Locale,
         data_dir: str = DATA_DIR,
-        project_dir: str = PROJECT_DIR,
         hf_model_name: str = HF.JP_SLUKE_MEAN,
         synonym_dict: SynonymDict | None = None,
         vector_cache: QueryVectorCache | None = None,
@@ -26,7 +25,7 @@ class QueryBuilder:
         self.locale = locale
         self.tokenizer: Tokenizer = locale_to_tokenizer(locale)
         self.encoder: SBERTEncoder = SBERTEncoder(hf_model_name)
-        self.template_loader = TemplateLoader(project_dir)
+        self.template_loader = TemplateLoader()
         if vector_cache is None:
             vector_cache = QueryVectorCache()
         self.vector_cache = vector_cache
