@@ -128,7 +128,7 @@ def to_string(reranker: Reranker) -> str:
     return reranker.__class__.__name__
 
 
-def from_string(reranker_str: str) -> Reranker:
+def get_reranker_from_string(reranker_str: str) -> Reranker:
     return {
         "NoOpReranker": NoOpReranker,
         "RandomReranker": RandomReranker,

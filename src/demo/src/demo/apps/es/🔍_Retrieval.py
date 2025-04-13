@@ -11,7 +11,7 @@ from amazon_product_search.metrics import (
     compute_precision,
     compute_recall,
 )
-from amazon_product_search.reranking.reranker import from_string
+from amazon_product_search.reranking.reranker import get_reranker_from_string
 from amazon_product_search.retrieval.rank_fusion import RankFusion
 from amazon_product_search.retrieval.retriever import Retriever
 from demo.apps.es.search_ui import (
@@ -98,7 +98,7 @@ def main() -> None:
             score_transformation_method=form_input.score_transformation_method,
         ),
     )
-    reranker = from_string(form_input.reranker_str)
+    reranker = get_reranker_from_string(form_input.reranker_str)
 
     st.write("----")
 
