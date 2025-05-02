@@ -18,7 +18,20 @@ class TritonPythonModel:
         )
 
     def execute(self, requests: list["pb_utils.InferenceRequest"]) -> list["pb_utils.InferenceResponse"]:
-        return [self.handle_request(request) for request in requests]
+        responses = []
+        for request in requests:
+            # https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/python_backend/README.html#request-cancellation-handling
+            if request.is_cancelled():
+                error = pb_utils.TritonError("Cancelled", pb_utils.TritonError.CANCELLED)
+                responses.append(pb_utils.InferenceResponse(error=error))
+                continue
+            try:
+                responses.append(self.handle_request(request))
+            except Exception as e:
+                error = pb_utils.TritonError(str(e))
+                responses.append(pb_utils.InferenceResponse(error=error))
+
+        return responses
 
     def handle_request(self, request: "pb_utils.InferenceRequest") -> "pb_utils.InferenceResponse":
         tensor = pb_utils.get_input_tensor_by_name(request, "text")
