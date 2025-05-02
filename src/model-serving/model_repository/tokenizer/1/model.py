@@ -30,12 +30,12 @@ class TritonPythonModel:
             except Exception as e:
                 error = pb_utils.TritonError(str(e))
                 responses.append(pb_utils.InferenceResponse(error=error))
-
         return responses
 
     def handle_request(self, request: "pb_utils.InferenceRequest") -> "pb_utils.InferenceResponse":
         tensor = pb_utils.get_input_tensor_by_name(request, "text")
         texts = [str_bytes.decode() for str_bytes in tensor.as_numpy()]
+        pb_utils.Logger.log_verbose(f"Process texts: {texts}")
         encoded_texts = self._tokenize(texts)
         input_ids, attention_mask = encoded_texts["input_ids"], encoded_texts["attention_mask"]
         return pb_utils.InferenceResponse(
