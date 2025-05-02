@@ -4,7 +4,7 @@ This directory contains a text embedding model and its server.
 
 ## Export Model
 
-Before launching the server, convert a text embedding model into the ONNX format. To do this, execute the following command:
+Before launching the server, you need to convert the text embedding model to ONNX format. Run the following command:
 
 ```
 make export
@@ -14,14 +14,14 @@ Then, move the exported ONNX model to `model_repository/embedder/1/model.onnx`.
 
 ## Launch Server
 
-To launch the Triton Inference Server, execute the following commands:
+To start the Triton Inference Server, run these commands:
 
 ```
 docker compose build
 docker compose up
 ```
 
-It launches the following services:
+## Send Request
 
 ```
 $ curl http://localhost:8000/v2/models/tokenizer
@@ -83,7 +83,7 @@ $ curl -X POST http://localhost:8000/v2/models/ensemble/infer \
 
 ## Benchmark
 
-You can benchmark the Triton server using the `make benchmark`:
+You can benchmark the Triton server by running `make benchmark`:
 
 ```
 $ make benchmark
@@ -121,6 +121,17 @@ Status code distribution:
   [OK]   100 responses
 ```
 
+## Debugging Tips
+
+You can adjust the logging verbosity by calling the logging API:
+
+```
+$ curl -X POST localhost:8000/v2/logging \
+     -d '{"log_verbose_level":1}' -H "Content-Type: application/json"
+```
+
+Setting `log_verbose_level` to 0 disables verbose logging in the Triton server.
+
 ## Host on Vertex AI
 
-[Serving Predictions with NVIDIA Triton  |  Vertex AI  |  Google Cloud](https://cloud.google.com/vertex-ai/docs/predictions/using-nvidia-triton)
+[Serving Predictions with NVIDIA Triton  |  Vertex AI  |  Google Cloud](https://cloud.google.com/vertex-ai/docs/predictions/using-nvidia-triton)
