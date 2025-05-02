@@ -17,7 +17,10 @@ class TritonPythonModel:
             return_tensors="np",
         )
 
-    def process_request(self, request: Any) -> Any:
+    def execute(self, requests: list["pb_utils.InferenceRequest"]) -> list["pb_utils.InferenceResponse"]:
+        return [self.handle_request(request) for request in requests]
+
+    def handle_request(self, request: "pb_utils.InferenceRequest") -> "pb_utils.InferenceResponse":
         tensor = pb_utils.get_input_tensor_by_name(request, "text")
         texts = [str_bytes.decode() for str_bytes in tensor.as_numpy()]
         encoded_texts = self._tokenize(texts)
@@ -28,6 +31,3 @@ class TritonPythonModel:
                 pb_utils.Tensor("attention_mask", attention_mask),
             ]
         )
-
-    def execute(self, requests: list[Any]) -> list[Any]:
-        return [self.process_request(request) for request in requests]
