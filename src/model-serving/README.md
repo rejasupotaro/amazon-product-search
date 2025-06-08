@@ -2,6 +2,15 @@
 
 This directory contains a text embedding model and its server.
 
+## Installation
+
+This package is part of the Amazon Product Search workspace. Install from the root directory:
+
+```shell
+# From the root directory
+$ uv sync
+```
+
 ## Export Model
 
 Before launching the server, you need to convert the text embedding model to ONNX format. Run the following command:
