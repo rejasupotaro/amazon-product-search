@@ -1,10 +1,6 @@
-name: test-amazon-product-search
+name: Test Amazon Product Search
 
 on: push
-
-defaults:
-  run:
-    working-directory: src/amazon-product-search
 
 jobs:
   test:
@@ -14,16 +10,37 @@ jobs:
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
       - name: Install dependencies
         env:
-          SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL: True
+          SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL: true
         run: |
-          pip install poetry
-          poetry install
-          poetry run python -m unidic download
-      - run: poetry run pytest tests/unit -vv --cov
-      # - run: poetry run pytest tests/integration -vv
+          uv sync --dev
+          uv pip install -e src/data-source
+          uv pip install -e src/dense-retrieval  
+          uv pip install -e src/amazon-product-search
+          uv pip install -e src/indexing
+          uv add unidic
+
+      - name: Download unidic dictionary
+        run: uv run python -m unidic download
+
+      - name: Run unit tests
+        env:
+          PYTHONPATH: src/amazon-product-search/src:src/dense-retrieval/src:src/data-source/src
+        run: uv run pytest src/amazon-product-search/tests/unit -vv --cov
+
+      # - name: Run integration tests
+      #   run: uv run --package amazon-product-search pytest src/amazon-product-search/tests/integration -vv

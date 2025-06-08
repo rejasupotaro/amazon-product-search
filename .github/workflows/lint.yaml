@@ -1,18 +1,30 @@
-name: ruff
+name: Lint and Type Check
 
 on: push
 
 jobs:
-  ruff:
+  lint:
     strategy:
       matrix:
         python-version: ["3.11.8"]
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - run: pip install ruff mypy poetry
-      - run: make lint
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run linting and type checking
+        run: make lint

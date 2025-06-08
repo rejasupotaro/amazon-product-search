@@ -19,3 +19,6 @@ dependencies = [
 amazon-product-search = { workspace = true }
 data-source = { workspace = true }
 
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+

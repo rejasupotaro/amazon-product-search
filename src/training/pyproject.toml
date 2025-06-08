@@ -16,6 +16,9 @@ dependencies = [
 [tool.uv.sources]
 amazon-product-search = { workspace = true }
 
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
 [tool.uv]
 dev-dependencies = [
     "pytest>=7.2",

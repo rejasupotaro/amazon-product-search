@@ -40,6 +40,9 @@ dependencies = [
 dense-retrieval = { workspace = true }
 data-source = { workspace = true }
 
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
 [tool.uv]
 dev-dependencies = [
     "pytest>=7.2",
