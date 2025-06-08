@@ -1,3 +1,25 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "demo"
+version = "0.1.0"
+description = ""
+authors = [{name = "rejasupotaro"}]
+requires-python = ">=3.11"
+dependencies = [
+    "amazon-product-search",
+    "streamlit>=1.39.0",
+    "streamlit-aggrid>=1.0.5",
+    "data-source",
+]
+
+[tool.uv.sources]
+amazon-product-search = { workspace = true }
+data-source = { workspace = true }
+
+# Keep Poetry config for backward compatibility during transition
 [tool.poetry]
 name = "demo"
 version = "0.1.0"
@@ -12,7 +34,3 @@ streamlit-aggrid = "^1.0.5"
 data-source = {path = "../data-source", develop = true}
 
 [tool.poetry.group.dev.dependencies]
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"

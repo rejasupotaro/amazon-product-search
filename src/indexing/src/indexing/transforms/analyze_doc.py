@@ -19,7 +19,7 @@ class AnalyzeDocFn(beam.DoFn):
     def _normalize(self, s: str) -> str:
         s = normalize_doc(s)
         tokens = self.tokenizer.tokenize(s)
-        return " ".join(cast(list, tokens))
+        return " ".join(cast("list", tokens))
 
     def process(self, product: Dict[str, Any]) -> Iterator[Dict[str, Any]]:
         for field in self.text_fields:

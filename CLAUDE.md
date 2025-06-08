@@ -19,8 +19,28 @@ make lint
 ```
 
 This command runs:
-- `ruff check --fix --unsafe-fixes --show-fixes` for code formatting and linting
-- `mypy` type checking across all project modules
+- `uv run ruff check --fix --unsafe-fixes --show-fixes` for code formatting and linting
+- `uv run mypy` type checking across all project modules
+
+### Package Management - UV Workspace
+The project uses **UV workspaces** for fast, modern Python package management:
+
+**Initial Setup:**
+```bash
+uv sync  # Install all workspace packages and dependencies
+```
+
+**Common Commands:**
+```bash
+uv sync                                    # Install/update all dependencies
+uv add --package indexing pandas          # Add dependency to specific package
+uv run --package demo streamlit run app.py # Run command for specific package
+uv run ruff check src/                    # Run command across workspace
+```
+
+**Backward Compatibility:**
+- Poetry configurations are maintained for team members still using Poetry
+- Use `make lint-poetry` for Poetry-based linting if needed
 
 ### Project Structure
 The project uses a monorepo structure with multiple components in `src/`:
@@ -33,6 +53,7 @@ The project uses a monorepo structure with multiple components in `src/`:
 - `demo/` - Demo applications
 
 ### Python Environment
-- Python 3.11.8
-- Poetry for dependency management
-- Each component has its own `pyproject.toml` and dependencies
+- Python 3.11+ required
+- UV for fast dependency management and workspace support
+- Each component has its own `pyproject.toml` with both UV and Poetry configurations
+- Unified `uv.lock` file for deterministic builds across all packages

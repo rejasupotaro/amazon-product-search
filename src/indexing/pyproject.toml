@@ -1,3 +1,32 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "indexing"
+version = "0.1.0"
+description = ""
+authors = [{name = "rejasupotaro"}]
+requires-python = ">=3.11"
+dependencies = [
+    "amazon-product-search",
+    "apache-beam[gcp]>=2.64.0",
+    "data-source",
+]
+
+[tool.uv.sources]
+amazon-product-search = { workspace = true }
+data-source = { workspace = true }
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=7.2",
+    "pytest-cov>=4.0.0",
+    "typer>=0.15.2",
+    "hydra-core>=1.3.2",
+]
+
+# Keep Poetry config for backward compatibility during transition
 [tool.poetry]
 name = "indexing"
 version = "0.1.0"
@@ -15,7 +44,3 @@ pytest = "^7.2"
 pytest-cov = "^4.0.0"
 typer = "^0.15.2"
 hydra-core = "^1.3.2"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"

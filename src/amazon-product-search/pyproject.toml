@@ -1,3 +1,54 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "amazon-product-search"
+version = "0.1.0"
+description = "Amazon Product Search Core"
+authors = [{name = "rejasupotaro"}]
+requires-python = ">=3.11"
+dependencies = [
+    "fugashi[unidic]>=1.2.0",
+    "ipadic>=1.0.0",
+    "elasticsearch==8.16.0",
+    "plotly>=5.10.0",
+    "tqdm>=4.64.1",
+    "transformers>=4.25.1",
+    "sentence-transformers>=2.3.1",
+    "watchdog>=2.1.9",
+    "more-itertools>=9.0.0",
+    "scikit-learn>=1.2.0",
+    "tabulate>=0.9.0",
+    "tensorboard>=2.11.0",
+    "unidic-lite>=1.0.8",
+    "types-requests>=2.28.11.17",
+    "docker>=7.0.0",
+    "dense-retrieval",
+    "gcsfs>=2023.6.0",
+    "jinja2>=3.1.2",
+    "google-cloud-bigquery[pandas]>=3.12.0",
+    "pyvespa>=0.39.0",
+    "tritonclient>=2.41.1",
+    "openai>=1.14.2",
+    "tenacity>=8.2.3",
+    "torch>=2.5.1",
+    "data-source"
+]
+
+[tool.uv.sources]
+dense-retrieval = { workspace = true }
+data-source = { workspace = true }
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=7.2",
+    "pytest-cov>=4.0.0",
+    "optuna>=3.5.0",
+    "invoke>=2.2.0"
+]
+
+# Keep Poetry config for backward compatibility during transition
 [tool.poetry]
 name = "amazon-product-search"
 version = "0.1.0"
@@ -37,7 +88,3 @@ pytest = "^7.2"
 pytest-cov = "^4.0.0"
 optuna = "^3.5.0"
 invoke = "^2.2.0"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"

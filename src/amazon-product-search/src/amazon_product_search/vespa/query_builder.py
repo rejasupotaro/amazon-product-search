@@ -74,7 +74,7 @@ class QueryBuilder:
         description_weight: float = 1.0,
     ) -> dict[str, Any]:
         query_str = normalize_query(query_str)
-        tokens = cast(list, self.tokenizer.tokenize(query_str))
+        tokens = cast("list", self.tokenizer.tokenize(query_str))
         query_str = " ".join(tokens)
 
         if not fields:

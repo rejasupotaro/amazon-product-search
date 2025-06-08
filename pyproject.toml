@@ -1,3 +1,30 @@
+[project]
+name = "amazon-product-search-workspace"
+version = "0.1.0"
+description = "Amazon Product Search - Multi-component workspace"
+requires-python = ">=3.11"
+dependencies = []
+
+# Virtual package - no build system needed for workspace root
+
+[tool.uv.workspace]
+members = [
+    "src/amazon-product-search",
+    "src/data-source", 
+    "src/dense-retrieval",
+    "src/indexing",
+    "src/model-serving",
+    "src/training",
+    "src/demo"
+]
+
+[tool.uv]
+dev-dependencies = [
+    "ruff>=0.8.4",
+    "mypy>=1.14.0"
+]
+
+# Keep Poetry config for backward compatibility during transition
 [tool.poetry]
 package-mode = false
 

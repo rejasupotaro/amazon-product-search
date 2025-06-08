@@ -178,7 +178,7 @@ class EsClient:
         Returns:
             dict[str, Any]: A term vector response.
         """
-        doc = {field: text for field in fields}
+        doc = dict.fromkeys(fields, text)
         es_response = self.es.termvectors(
             index=index_name,
             doc=doc,

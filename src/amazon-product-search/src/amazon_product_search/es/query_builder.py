@@ -60,7 +60,7 @@ class QueryBuilder:
         if not query:
             return self.match_all()
 
-        tokens = cast(list, self.tokenizer.tokenize(query))
+        tokens = cast("list", self.tokenizer.tokenize(query))
 
         if enable_synonym_expansion and self.synonym_dict:
             token_chain = self.synonym_dict.look_up(tokens)

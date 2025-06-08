@@ -15,7 +15,7 @@ class EsDocker:
             container = docker_client.containers.get(container_id=container_id)
             if not isinstance(container, Container):
                 raise TypeError("The type of container must be Container")
-            self.container = cast(Container, container)
+            self.container = cast("Container", container)
             self.container.restart()
         except NotFound:
             self.container = docker_client.containers.run(
