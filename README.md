@@ -24,6 +24,17 @@ This repo showcases and compares various search algorithms and models using [Sho
 
 Copy `.envrc.example` and fill in the necessary environment variables. Afterwards, proceed with installing the dependencies.
 
+### Option 1: UV (Recommended - Fast & Modern)
+
+```shell
+$ pyenv install 3.11.8
+$ pyenv local 3.11.8
+$ pip install uv
+$ uv sync
+```
+
+### Option 2: Poetry (Backward Compatibility)
+
 ```shell
 $ pyenv install 3.11.8
 $ pyenv local 3.11.8
@@ -34,8 +45,29 @@ $ poetry install
 
 ## Development
 
-Run the following tasks after adding any modifications.
+This project uses **UV workspaces** for fast, modern Python package management. The monorepo contains 7 interconnected packages that are managed as a unified workspace.
+
+### Quick Commands
 
 ```shell
+# Install/update all dependencies
+$ uv sync
+
+# Run linting and type checking (recommended)
 $ make lint
+
+# Add a dependency to a specific package
+$ uv add --package indexing pandas
+
+# Run a command for a specific package
+$ uv run --package demo streamlit run app.py
+```
+
+### Linting & Type Checking
+
+Run the following tasks after adding any modifications:
+
+```shell
+$ make lint           # Uses UV (fast)
+$ make lint-poetry    # Uses Poetry (for backward compatibility)
 ```
