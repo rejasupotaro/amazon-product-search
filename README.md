@@ -24,23 +24,11 @@ This repo showcases and compares various search algorithms and models using [Sho
 
 Copy `.envrc.example` and fill in the necessary environment variables. Afterwards, proceed with installing the dependencies.
 
-### Option 1: UV (Recommended - Fast & Modern)
-
 ```shell
 $ pyenv install 3.11.8
 $ pyenv local 3.11.8
 $ pip install uv
 $ uv sync
-```
-
-### Option 2: Poetry (Backward Compatibility)
-
-```shell
-$ pyenv install 3.11.8
-$ pyenv local 3.11.8
-$ pip install poetry
-$ poetry env use python
-$ poetry install
 ```
 
 ## Development
@@ -68,6 +56,5 @@ $ uv run --package demo streamlit run app.py
 Run the following tasks after adding any modifications:
 
 ```shell
-$ make lint           # Uses UV (fast)
-$ make lint-poetry    # Uses Poetry (for backward compatibility)
+$ make lint
 ```

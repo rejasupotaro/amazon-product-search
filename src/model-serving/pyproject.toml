@@ -17,8 +17,6 @@ dependencies = [
     "sentence-transformers (>=4.0.1,<5.0.0)",
 ]
 
-[tool.poetry]
-packages = [{include = "model_serving", from = "src"}]
 
 [build-system]
 requires = ["hatchling"]

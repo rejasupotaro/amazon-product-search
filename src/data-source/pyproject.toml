@@ -13,9 +13,6 @@ dependencies = [
     "fastparquet (>=2024.11.0,<2025.0.0)"
 ]
 
-[tool.poetry]
-packages = [{include = "data_source", from = "src"}]
-
 
 [build-system]
 requires = ["hatchling"]

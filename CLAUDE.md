@@ -38,10 +38,6 @@ uv run --package demo streamlit run app.py # Run command for specific package
 uv run ruff check src/                    # Run command across workspace
 ```
 
-**Backward Compatibility:**
-- Poetry configurations are maintained for team members still using Poetry
-- Use `make lint-poetry` for Poetry-based linting if needed
-
 ### Project Structure
 The project uses a monorepo structure with multiple components in `src/`:
 - `amazon-product-search/` - Core search functionality
@@ -55,5 +51,5 @@ The project uses a monorepo structure with multiple components in `src/`:
 ### Python Environment
 - Python 3.11+ required
 - UV for fast dependency management and workspace support
-- Each component has its own `pyproject.toml` with both UV and Poetry configurations
+- Each component has its own `pyproject.toml` with standard Python project configuration
 - Unified `uv.lock` file for deterministic builds across all packages

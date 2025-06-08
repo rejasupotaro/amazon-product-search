@@ -26,21 +26,3 @@ dev-dependencies = [
     "hydra-core>=1.3.2",
 ]
 
-# Keep Poetry config for backward compatibility during transition
-[tool.poetry]
-name = "indexing"
-version = "0.1.0"
-description = ""
-authors = ["rejasupotaro"]
-
-[tool.poetry.dependencies]
-python = "~3.11"
-amazon_product_search = { path = "../amazon-product-search", develop = true }
-apache-beam = {extras = ["gcp"], version = "^2.64.0"}
-data-source = {path = "../data-source", develop = true}
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^7.2"
-pytest-cov = "^4.0.0"
-typer = "^0.15.2"
-hydra-core = "^1.3.2"
