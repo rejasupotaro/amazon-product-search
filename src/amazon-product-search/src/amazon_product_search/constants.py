@@ -6,7 +6,6 @@ DATA_DIR = os.getenv("DATA_DIR", "data")
 LOGS_DIR = os.getenv("LOGS_DIR", "logs")
 MODELS_DIR = os.getenv("MODELS_DIR", "models")
 VERTEX_DIR = os.getenv("VERTEX_DIR", "vertex")
-VESPA_DIR = os.getenv("VESPA_DIR", "vespa")
 
 PROJECT_ID = os.getenv("PROJECT_ID", "")
 PROJECT_NAME = os.getenv("PROJECT_NAME", "")

@@ -12,7 +12,3 @@ features:
 .PHONY: es
 es:
 	poetry run streamlit run src/demo/apps/es/🔍_Retrieval.py
-
-.PHONY: vespa
-vespa:
-	poetry run streamlit run src/demo/apps/vespa/🔍_Retrieval.py

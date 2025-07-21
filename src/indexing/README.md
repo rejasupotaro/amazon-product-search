@@ -20,7 +20,7 @@ $ poetry run python -m unidic download
 
 ## Index Products
 
-This project involves indexing products into search engines. If you'd like to test it on your own machine, you can start by launching Elasticsearch or Vespa locally. Then, execute the document indexing pipeline against the created index.
+This project involves indexing products into search engines. If you'd like to test it on your own machine, you can start by launching Elasticsearch locally. Then, execute the document indexing pipeline against the created index.
 
 ```shell
 $ docker compose --profile elasticsearch up

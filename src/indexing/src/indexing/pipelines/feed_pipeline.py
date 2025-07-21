@@ -7,7 +7,6 @@ from apache_beam.transforms.util import BatchElements
 
 from amazon_product_search.constants import DATA_DIR, DATASET_ID, PROJECT_ID
 from indexing.io.elasticsearch_io import WriteToElasticsearch
-from indexing.io.vespa_io import WriteToVespa
 from indexing.options import IndexerOptions
 from indexing.pipelines.base import BasePipeline
 from indexing.transforms.add_image_url import AddImageUrlFn
@@ -38,19 +37,6 @@ class FeedPipeline(BasePipeline):
                         WriteToElasticsearch(
                             es_host=options.dest_host,
                             index_name=options.index_name,
-                            id_fn=lambda doc: doc["product_id"],
-                        )
-                    )
-                )
-            case "vespa":
-                (
-                    products
-                    | "Batch products for WriteToVespa" >> BatchElements()
-                    | "Index products"
-                    >> beam.ParDo(
-                        WriteToVespa(
-                            host=options.dest_host,
-                            schema=options.index_name,
                             id_fn=lambda doc: doc["product_id"],
                         )
                     )
