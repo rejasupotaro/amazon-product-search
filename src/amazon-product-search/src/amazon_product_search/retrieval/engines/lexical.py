@@ -65,7 +65,7 @@ class LexicalRetrievalEngine(BaseRetrievalEngine):
 
     def supports_fields(self, fields: list[str]) -> bool:
         """Check if we can handle lexical fields (non-vector fields)."""
-        return all("vector" not in field.lower() for field in fields)
+        return all("vector" not in field.lower() and "embedding" not in field.lower() for field in fields)
 
     def _build_lexical_query(self, queries: list[str], fields: list[str], filters: dict) -> dict:
         """Build lexical search query using templates."""

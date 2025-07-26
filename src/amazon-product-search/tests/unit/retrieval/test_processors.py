@@ -1,4 +1,4 @@
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
@@ -31,7 +31,11 @@ def retrieval_config():
 def mock_synonym_dict():
     """Mock synonym dictionary."""
     synonym_dict = Mock(spec=SynonymDict)
-    synonym_dict.get_synonyms.return_value = ["bluetooth headphones", "cordless headphones"]
+    # Mock the look_up method that returns token chain format
+    synonym_dict.look_up.return_value = [
+        ("wireless", [("wireless", 1.0), ("bluetooth", 0.8), ("cordless", 0.7)]),
+        ("headphones", [("headphones", 1.0), ("earphones", 0.7)])
+    ]
     return synonym_dict
 
 
@@ -134,7 +138,7 @@ class TestSynonymExpandingProcessor:
         query = processor.process("wireless headphones", retrieval_config)
 
         # Verify synonyms were retrieved
-        mock_synonym_dict.get_synonyms.assert_called_once_with("wireless headphones")
+        mock_synonym_dict.look_up.assert_called_once_with(["wireless", "headphones"])
 
         # Verify synonyms were added to query
         assert isinstance(query, ProcessedQuery)
@@ -153,14 +157,14 @@ class TestSynonymExpandingProcessor:
         query = processor.process("wireless headphones", retrieval_config)
 
         # Should not call synonym dictionary
-        mock_synonym_dict.get_synonyms.assert_not_called()
+        mock_synonym_dict.look_up.assert_not_called()
 
         # Should not have synonyms
         assert query.synonyms is None or len(query.synonyms) == 0
 
     def test_process_no_synonyms_found(self, mock_synonym_dict, retrieval_config):
         """Test processing when no synonyms are found."""
-        mock_synonym_dict.get_synonyms.return_value = []
+        mock_synonym_dict.look_up.return_value = []
 
         base_processor = BaseQueryProcessor(locale="jp")
         processor = SynonymExpandingProcessor(base_processor, mock_synonym_dict)
@@ -180,8 +184,8 @@ class TestSynonymExpandingProcessor:
 
         # Should have base metadata plus synonym metadata
         assert "locale" in query.metadata  # From base processor
-        assert "synonyms_expanded" in query.metadata
-        assert query.metadata["synonyms_expanded"] is True
+        assert "synonym_expansions" in query.metadata
+        assert query.metadata["synonym_expansions"] > 0
 
 
 class TestSemanticQueryProcessor:
@@ -251,7 +255,7 @@ class TestSemanticQueryProcessor:
     def test_vector_caching(self, mock_cache_class, mock_resource_manager, retrieval_config):
         """Test that vector encoding uses caching."""
         # Mock cache instance
-        mock_cache = Mock()
+        mock_cache = MagicMock()
         mock_cache.__getitem__.return_value = None  # Cache miss
         mock_cache_class.return_value = mock_cache
 

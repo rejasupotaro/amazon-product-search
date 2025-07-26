@@ -9,6 +9,7 @@ def locale_to_tokenizer(locale: Locale) -> Tokenizer:
     return {
         "us": EnglishTokenizer,
         "jp": JapaneseTokenizer,
+        "es": EnglishTokenizer,  # Spanish uses Latin script like English
     }[locale]()
 
 

@@ -18,6 +18,7 @@ class BaseQueryProcessor(QueryProcessor):
     def __init__(self, locale: Locale):
         self.locale = locale
         self.tokenizer: Tokenizer = locale_to_tokenizer(locale)
+        self.normalizer = normalize_query  # Expose normalizer function
 
     def process(self, raw_query: str, config: RetrievalConfig) -> ProcessedQuery:
         """Process a raw query into structured format."""
@@ -28,7 +29,7 @@ class BaseQueryProcessor(QueryProcessor):
             raw=raw_query,
             normalized=normalized,
             tokens=tokens,
-            metadata={"locale": self.locale}
+            metadata={"locale": self.locale, "tokenized": True}
         )
 
 
@@ -48,16 +49,23 @@ class SynonymExpandingProcessor(QueryProcessor):
 
         # Expand synonyms
         token_chain = self.synonym_dict.look_up(query.tokens)
-        expanded_tokens: list[list[tuple[str, float | None]]] = []
-        expand_synonyms(
-            [((token, None), synonym_score_tuples) for token, synonym_score_tuples in token_chain],
-            [],
-            expanded_tokens,
-        )
 
-        # Take first 10 expansions and convert to string list
-        synonyms = [" ".join([token for token, _ in token_scores])
-                   for token_scores in expanded_tokens[:10]]
+        if not token_chain:
+            # No synonyms found
+            synonyms = []
+        else:
+            expanded_tokens: list[list[tuple[str, float | None]]] = []
+            expand_synonyms(
+                [((token, None), synonym_score_tuples) for token, synonym_score_tuples in token_chain],
+                [],
+                expanded_tokens,
+            )
+
+            # Take first 10 expansions and convert to string list
+            synonyms = [" ".join([token for token, _ in token_scores])
+                       for token_scores in expanded_tokens[:10]]
+            # Remove empty strings
+            synonyms = [s for s in synonyms if s.strip()]
 
         query.synonyms = synonyms
         query.metadata["synonym_expansions"] = len(synonyms)
@@ -69,12 +77,13 @@ class ProcessorChain(QueryProcessor):
     """Chain multiple query processors together."""
 
     def __init__(self, processors: Sequence[QueryProcessor]):
-        if not processors:
-            raise ValueError("ProcessorChain requires at least one processor")
         self.processors = list(processors)
 
     def process(self, raw_query: str, config: RetrievalConfig) -> ProcessedQuery:
         """Apply all processors in sequence."""
+        if not self.processors:
+            raise ValueError("ProcessorChain requires at least one processor")
+
         query = self.processors[0].process(raw_query, config)
 
         for processor in self.processors[1:]:

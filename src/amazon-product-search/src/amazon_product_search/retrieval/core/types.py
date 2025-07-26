@@ -13,7 +13,7 @@ class FieldType(Enum):
     HYBRID = "hybrid"
 
 
-@dataclass
+@dataclass(frozen=True)
 class SearchField:
     """Represents a searchable field with its properties."""
     name: str
@@ -30,7 +30,7 @@ class ProcessedQuery:
     tokens: list[str] = field(default_factory=list)
     vector: Optional[list[float]] = None
     sparse_vector: Optional[dict[str, float]] = None
-    synonyms: list[str] = field(default_factory=list)
+    synonyms: Optional[list[str]] = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
@@ -67,7 +67,7 @@ class RetrievalResponse:
 class FusionConfig:
     """Configuration for result fusion."""
     method: str = "weighted_sum"  # weighted_sum, rrf, borda_count
-    normalization: str = "min_max"  # min_max, z_score, rank_based
+    normalization: str = "none"  # min_max, z_score, rank_based, none
     weights: dict[str, float] = field(default_factory=dict)
     ranking_constant: int = 60  # For RRF
     metadata: dict[str, Any] = field(default_factory=dict)

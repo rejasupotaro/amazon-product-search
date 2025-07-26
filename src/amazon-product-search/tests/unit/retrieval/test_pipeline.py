@@ -215,7 +215,7 @@ class TestRetrievalPipeline:
         # Verify fuser was called with weights
         mock_result_fuser.fuse.assert_called_once()
         call_args = mock_result_fuser.fuse.call_args
-        assert call_args[1]["fusion_weights"] == fusion_weights
+        assert call_args[1]["weights"] == fusion_weights
 
     def test_add_post_processor(self, mock_query_processor, mock_retrieval_engine,
                                mock_result_fuser, mock_post_processor):

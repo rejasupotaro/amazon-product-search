@@ -70,7 +70,7 @@ class SemanticRetrievalEngine(BaseRetrievalEngine):
 
     def supports_fields(self, fields: list[str]) -> bool:
         """Check if we can handle semantic fields (vector fields)."""
-        return any("vector" in field.lower() for field in fields)
+        return all("vector" in field.lower() or "embedding" in field.lower() for field in fields)
 
     def _build_semantic_query(
         self,

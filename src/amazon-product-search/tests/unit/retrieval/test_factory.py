@@ -207,14 +207,14 @@ class TestCreateRetrievalSystem:
     @patch("amazon_product_search.retrieval.factory.EsClient")
     def test_create_advanced_system(self, mock_es_client, mock_resource_manager):
         """Test creating advanced system with all features."""
-        system = create_retrieval_system("advanced", locale="jp")
+        system = create_retrieval_system("colbert_advanced", locale="jp")
 
         assert isinstance(system, RetrievalPipeline)
         # Should have reranking and filtering enabled
 
     def test_invalid_system_type(self):
         """Test handling invalid system type."""
-        with pytest.raises(ValueError, match="Unknown retrieval system type"):
+        with pytest.raises(ValueError, match="Unknown config"):
             create_retrieval_system("invalid_type", locale="jp")
 
     @patch("amazon_product_search.retrieval.factory.SharedResourceManager")

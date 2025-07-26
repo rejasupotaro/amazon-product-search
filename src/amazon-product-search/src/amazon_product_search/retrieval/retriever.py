@@ -134,7 +134,8 @@ class Retriever:
 
         search_fields = []
         for field_name in fields:
-            field_type = FieldType.SEMANTIC if "vector" in field_name.lower() else FieldType.LEXICAL
+            is_semantic = "vector" in field_name.lower() or "embedding" in field_name.lower()
+            field_type = FieldType.SEMANTIC if is_semantic else FieldType.LEXICAL
             search_fields.append(SearchField(name=field_name, field_type=field_type))
 
         config = RetrievalConfig(

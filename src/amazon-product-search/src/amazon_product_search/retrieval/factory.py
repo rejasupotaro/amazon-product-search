@@ -29,12 +29,12 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-def create_search_fields(field_names: list[str], weights: dict[str, float] | None = None) -> list[SearchField]:
+def create_search_fields(field_names: list[str | dict], weights: dict[str, float] | None = None) -> list[SearchField]:
     """Create SearchField objects from field names with automatic type detection.
 
     Args:
-        field_names: List of field names
-        weights: Optional weights for each field
+        field_names: List of field names (strings) or field configs (dicts with 'name' and optional 'weight')
+        weights: Optional weights for each field (ignored if field configs are dicts with weights)
 
     Returns:
         List of SearchField objects
@@ -43,9 +43,17 @@ def create_search_fields(field_names: list[str], weights: dict[str, float] | Non
         weights = {}
 
     fields = []
-    for name in field_names:
+    for field_spec in field_names:
+        # Handle both string and dict formats
+        if isinstance(field_spec, dict):
+            name = field_spec["name"]
+            weight = field_spec.get("weight", 1.0)
+        else:
+            name = field_spec
+            weight = weights.get(name, 1.0)
+
         # Auto-detect field type
-        if "vector" in name.lower():
+        if "vector" in name.lower() or "embedding" in name.lower():
             field_type = FieldType.SEMANTIC
         elif "sparse" in name.lower() or "splade" in name.lower():
             field_type = FieldType.SPARSE
@@ -55,7 +63,7 @@ def create_search_fields(field_names: list[str], weights: dict[str, float] | Non
         fields.append(SearchField(
             name=name,
             field_type=field_type,
-            weight=weights.get(name, 1.0)
+            weight=weight
         ))
 
     return fields

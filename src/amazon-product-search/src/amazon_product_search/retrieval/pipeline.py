@@ -40,6 +40,10 @@ class RetrievalPipeline:
         self.post_processors = list(post_processors or [])
         self.resource_manager = resource_manager
 
+        # Validation
+        if not self.retrieval_engines:
+            raise ValueError("At least one retrieval engine is required")
+
         logger.info(
             f"Initialized RetrievalPipeline with {len(retrieval_engines)} engines "
             f"and {len(self.post_processors)} post-processors"
@@ -102,13 +106,9 @@ class RetrievalPipeline:
                 processing_time_ms=(time.time() - start_time) * 1000
             )
 
-        # Step 3: Fuse results from multiple engines
-        if len(retrieval_responses) == 1:
-            fused_response = retrieval_responses[0]
-            logger.debug("Only one engine returned results, skipping fusion")
-        else:
-            fused_response = self.result_fuser.fuse(retrieval_responses, fusion_weights)
-            logger.debug(f"Fused {len(retrieval_responses)} responses into {len(fused_response.results)} results")
+        # Step 3: Fuse results from engines (fuser will optimize single-response case)
+        fused_response = self.result_fuser.fuse(retrieval_responses, weights=fusion_weights)
+        logger.debug(f"Fused {len(retrieval_responses)} responses into {len(fused_response.results)} results")
 
         # Step 4: Apply post-processing (reranking, filtering, etc.)
         final_response = fused_response
@@ -163,8 +163,8 @@ class RetrievalPipeline:
         """Get information about the pipeline configuration."""
         return {
             "query_processor": self.query_processor.__class__.__name__,
-            "retrieval_engines": [engine.__class__.__name__ for engine in self.retrieval_engines],
+            "retrieval_engines": len(self.retrieval_engines),
             "result_fuser": self.result_fuser.__class__.__name__,
-            "post_processors": [processor.__class__.__name__ for processor in self.post_processors],
+            "post_processors": len(self.post_processors),
             "has_resource_manager": self.resource_manager is not None
         }

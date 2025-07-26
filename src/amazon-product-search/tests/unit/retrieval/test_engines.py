@@ -332,7 +332,12 @@ class TestEngineIntegration:
         mock_es_response.total_hits = 1
         mock_es_client.search.return_value = mock_es_response
 
-        with patch("amazon_product_search.retrieval.engines.lexical.TemplateLoader"):
+        with patch("amazon_product_search.retrieval.engines.lexical.TemplateLoader") as mock_template_loader:
+            # Mock template loader to return valid JSON
+            mock_template = Mock()
+            mock_template.render.return_value = '{"query": {"bool": {"must": []}}}'
+            mock_template_loader.return_value.load.return_value = mock_template
+
             engine = LexicalRetrievalEngine(es_client=mock_es_client)
             response = engine.retrieve(lexical_query, lexical_config)
 
@@ -350,7 +355,12 @@ class TestEngineIntegration:
         mock_es_response.total_hits = 1
         mock_es_client.search.return_value = mock_es_response
 
-        with patch("amazon_product_search.retrieval.engines.semantic.TemplateLoader"):
+        with patch("amazon_product_search.retrieval.engines.semantic.TemplateLoader") as mock_template_loader:
+            # Mock template loader to return valid JSON
+            mock_template = Mock()
+            mock_template.render.return_value = '{"knn": {"field": "vector", "query_vector": [], "k": 20}}'
+            mock_template_loader.return_value.load.return_value = mock_template
+
             engine = SemanticRetrievalEngine(es_client=mock_es_client)
             response = engine.retrieve(semantic_query, semantic_config)
 
@@ -363,7 +373,12 @@ class TestEngineIntegration:
         # Mock ES client to raise exception
         mock_es_client.search.side_effect = Exception("ES connection error")
 
-        with patch("amazon_product_search.retrieval.engines.lexical.TemplateLoader"):
+        with patch("amazon_product_search.retrieval.engines.lexical.TemplateLoader") as mock_template_loader:
+            # Mock template loader to return valid JSON
+            mock_template = Mock()
+            mock_template.render.return_value = '{"query": {"bool": {"must": []}}}'
+            mock_template_loader.return_value.load.return_value = mock_template
+
             engine = LexicalRetrievalEngine(es_client=mock_es_client)
 
             # Should propagate the exception

@@ -105,7 +105,7 @@ class TestProcessedQuery:
     def test_processed_query_empty_metadata(self):
         """Test ProcessedQuery with empty metadata."""
         query = ProcessedQuery(
-            original="test",
+            raw="test",
             normalized="test",
             tokens=["test"],
             metadata={}
@@ -333,6 +333,9 @@ class TestModernizedRetriever:
         """Test adding post processors."""
         retriever = Retriever(locale="jp")
         mock_processor = Mock()
+
+        # Mock the pipeline's add_post_processor method
+        retriever.pipeline.add_post_processor = Mock()
 
         retriever.add_post_processor(mock_processor)
 
