@@ -40,7 +40,7 @@ class RerankerProcessor(ResultProcessor):
 
         try:
             # Rerank the results
-            reranked_results = self.reranker.rerank(query.original, response.results)
+            reranked_results = self.reranker.rerank(query.raw, response.results)
 
             # Create new response with reranked results
             reranked_response = RetrievalResponse(

@@ -25,7 +25,7 @@ class BaseQueryProcessor(QueryProcessor):
         tokens = cast(list[str], self.tokenizer.tokenize(normalized))
 
         return ProcessedQuery(
-            original=raw_query,
+            raw=raw_query,
             normalized=normalized,
             tokens=tokens,
             metadata={"locale": self.locale}
@@ -82,6 +82,6 @@ class ProcessorChain(QueryProcessor):
             # This allows processors to build on each other's work
             query = processor.process(query.normalized, config)
             # Preserve original query reference
-            query.original = raw_query
+            query.raw = raw_query
 
         return query

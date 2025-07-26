@@ -4,43 +4,44 @@ globs: ["**/*.py"]
 alwaysApply: false
 ---
 
-# Amazon Product Search - Cursor Rules
+# Amazon Product Search - Python Rules
 
 ## Architecture Guidelines
-- Follow a modular architecture with clear separation of concerns
-- Each component should be in its own package under `src/` directory
+- Follow modular architecture with clear separation of concerns
 - Use dependency injection for external services (Elasticsearch, models)
-- Implement proper interfaces and abstract base classes for extensibility
 - Keep business logic separate from infrastructure concerns
 
 ## Code Organization
-- Organize code into logical packages: `src/amazon-product-search/`, `src/dense-retrieval/`, `src/model-serving/`, etc.
 - Each package should have its own `pyproject.toml` for dependencies
 - Place tests in `tests/` directories mirroring source structure
 - Use `__init__.py` files to define package APIs
-- Keep configuration files in `conf/` directories using Hydra when applicable
 
 ## Development Commands
-- `make lint` - Run linting and type checking
+- `make lint` - Run linting and type checking (includes ruff)
 - `poetry install` - Install project dependencies
-- `poetry add <package>` - Add new dependency to project
 - `poetry run pytest` - Run tests with pytest
-- `make up` - Start services with Docker compose
-- `poetry run ruff check` - Check code formatting
-- `poetry run ruff check --fix` - Fix formatting issues automatically
 
-## Code Style
-- Follow PEP 8 with line length of 120 characters (Ruff formatter)
-- Use type hints consistently, especially for public APIs
-- Prefer dataclasses and Pydantic models for data structures
-- Use dependency injection patterns for better testability
+## Code Style & Linting (Ruff - 120 char line length, Python 3.11)
+- **Quotes**: Double quotes for all strings, docstrings, multiline strings
+- **Imports**: Sort alphabetically, group by type (stdlib → 3rd-party → 1st-party)
+- **Naming**: PascalCase classes, snake_case functions/variables, UPPER_SNAKE_CASE constants
+- **Type hints**: Use consistently for public APIs, import types under TYPE_CHECKING when needed
+- **Pytest**: Use `@pytest.fixture`, descriptive test names starting with `test_`, group in `TestClass`
+- **String formatting**: Prefer f-strings over `.format()` or `%`
+- **Comparisons**: Use `isinstance()` not `type()`, `is/is not` for None
+- **Functions**: Keep McCabe complexity < 10, avoid mutable default arguments
 
-## Documentation Requirements
-- Write Google-style docstrings for all public functions/classes
-- Include type information in docstrings when helpful
-- Document complex algorithms and business logic
+## Documentation
+- Google-style docstrings for public functions/classes
+- Use triple double-quotes: `"""This is a docstring."""`
 
-## Dependencies
-- Use Poetry for dependency management (pyproject.toml files)
-- Pin exact versions for production dependencies
-- Keep dev dependencies separate from runtime dependencies
+## Testing Standards
+- Use pytest framework with descriptive test names
+- Mock external dependencies (ES client, models, etc.)
+- Test both success and error cases
+
+## Common Anti-Patterns to Avoid
+- ❌ `from module import *` (use specific imports)
+- ❌ Bare `except:` clauses (specify exception types)
+- ❌ Mutable default arguments
+- ❌ `lambda` assignments (use proper function definitions)

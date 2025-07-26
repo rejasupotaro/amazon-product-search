@@ -25,7 +25,7 @@ class SearchField:
 @dataclass
 class ProcessedQuery:
     """Structured representation of a processed query."""
-    original: str
+    raw: str
     normalized: str
     tokens: list[str] = field(default_factory=list)
     vector: Optional[list[float]] = None
