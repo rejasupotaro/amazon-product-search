@@ -5,7 +5,6 @@ from data_source import Locale, loader
 
 from amazon_product_search.constants import HF
 from amazon_product_search.es.es_client import EsClient
-from amazon_product_search.es.query_builder import QueryBuilder
 from amazon_product_search.metrics import (
     compute_ndcg,
     compute_precision,
@@ -20,18 +19,19 @@ from demo.apps.es.search_ui import (
     draw_response_stats,
 )
 from demo.page_config import set_page_config
+from dense_retrieval.encoders import SBERTEncoder
 
 es_client = EsClient()
 
 
 @st.cache_resource
-def get_query_builder(locale: Locale) -> QueryBuilder:
+def get_encoder(locale: Locale) -> SBERTEncoder:
     hf_model_name = HF.LOCALE_TO_MODEL_NAME[locale]
-    return QueryBuilder(locale=locale, hf_model_name=hf_model_name)
+    return SBERTEncoder(hf_model_name)
 
 
-def get_retriever(locale: Locale, es_client: EsClient, query_builder: QueryBuilder) -> Retriever:
-    return Retriever(locale, es_client, query_builder)
+def get_retriever(locale: Locale, es_client: EsClient) -> Retriever:
+    return Retriever(locale, es_client)
 
 
 @st.cache_data
@@ -84,7 +84,7 @@ def main() -> None:
         if not st.form_submit_button("Search"):
             return
 
-    response = get_retriever(locale, es_client, get_query_builder(locale)).search(
+    response = get_retriever(locale, es_client).search(
         index_name=index_name,
         query=form_input.query,
         fields=form_input.fields,
@@ -114,7 +114,7 @@ def main() -> None:
         return
     response.results = reranker.rerank(form_input.query, response.results)
 
-    query_vector = get_query_builder(locale).encode(form_input.query)
+    query_vector = get_encoder(locale).encode(form_input.query)
     draw_response_stats(response, query_vector, label_dict)
 
     header = f"{response.total_hits} products found"
