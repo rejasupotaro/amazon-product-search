@@ -1,16 +1,14 @@
 import streamlit as st
 from data_source import Locale, loader
 
-from amazon_product_search.constants import HF
 from amazon_product_search.es.es_client import EsClient
-from amazon_product_search.es.query_builder import QueryBuilder
 from amazon_product_search.metrics import (
     compute_iou,
     compute_ndcg,
     compute_precision,
     compute_recall,
 )
-from amazon_product_search.nlp.normalizer import normalize_query
+from amazon_product_search.retrieval.factory import create_retriever
 from amazon_product_search.retrieval.response import Response
 from demo.apps.es.search_ui import draw_products
 from demo.page_config import set_page_config
@@ -19,9 +17,8 @@ es_client = EsClient()
 
 
 @st.cache_resource
-def get_query_builder(locale: Locale) -> QueryBuilder:
-    hf_model_name = HF.LOCALE_TO_MODEL_NAME[locale]
-    return QueryBuilder(locale=locale, hf_model_name=hf_model_name)
+def get_retriever(locale: Locale):
+    return create_retriever(locale=locale)
 
 
 @st.cache_data
@@ -47,23 +44,29 @@ def search(
     enable_synonym_expansion: bool,
     size: int = 100,
 ) -> tuple[Response, Response]:
-    normalized_query = normalize_query(query)
-    lexical_query = get_query_builder(locale).build_lexical_search_query(
-        query=normalized_query,
-        fields=lexical_fields,
+    retriever = get_retriever(locale)
+
+    # Perform lexical-only search
+    lexical_response = retriever.search(
+        index_name=index_name,
+        query=query,
+        fields=lexical_fields,  # Only lexical fields
         enable_synonym_expansion=enable_synonym_expansion,
+        lexical_boost=1.0,
+        semantic_boost=0.0,  # Disable semantic search
+        size=size
     )
 
-    query_vector = get_query_builder(locale).encode(normalized_query)
-    semantic_query = {
-        "query_vector": query_vector,
-        "field": "product_vector",
-        "k": size,
-        "num_candidates": size,
-    }
-
-    lexical_response = es_client.search(index_name=index_name, query=lexical_query, size=size)
-    semantic_response = es_client.search(index_name=index_name, knn_query=semantic_query)
+    # Perform semantic-only search
+    semantic_response = retriever.search(
+        index_name=index_name,
+        query=query,
+        fields=["product_vector"],  # Only semantic field
+        enable_synonym_expansion=False,  # Not relevant for semantic
+        lexical_boost=0.0,  # Disable lexical search
+        semantic_boost=1.0,
+        size=size
+    )
 
     return lexical_response, semantic_response
 

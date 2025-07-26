@@ -10,7 +10,6 @@ from amazon_product_search.retrieval.core.protocols import (
     RetrievalEngine,
 )
 from amazon_product_search.retrieval.core.types import RetrievalConfig, RetrievalResponse
-from amazon_product_search.retrieval.response import Response  # For backward compatibility
 
 logger = logging.getLogger(__name__)
 
@@ -146,50 +145,7 @@ class RetrievalPipeline:
         )
         return final_response
 
-    def search_legacy(
-        self,
-        index_name: str,
-        query: str,
-        fields: list[str],
-        enable_synonym_expansion: bool = False,
-        product_ids: list[str] | None = None,
-        lexical_boost: float = 1.0,
-        semantic_boost: float = 1.0,
-        size: int = 20,
-        window_size: int | None = None,
-        rank_fusion: Any | None = None,
-    ) -> Response:
-        """Legacy interface for backward compatibility with existing Retriever API."""
-        logger.debug("Using legacy search interface")
 
-        # Convert legacy parameters to new format
-        from amazon_product_search.retrieval.core.types import FieldType, SearchField
-
-        search_fields = []
-        for field_name in fields:
-            field_type = FieldType.SEMANTIC if "vector" in field_name.lower() else FieldType.LEXICAL
-            search_fields.append(SearchField(name=field_name, field_type=field_type))
-
-        config = RetrievalConfig(
-            index_name=index_name,
-            fields=search_fields,
-            size=size,
-            window_size=window_size,
-            enable_synonyms=enable_synonym_expansion,
-            filters={"product_id": product_ids} if product_ids else {}
-        )
-
-        # Set up fusion weights
-        fusion_weights = {
-            "lexical": lexical_boost,
-            "semantic": semantic_boost
-        }
-
-        # Execute new pipeline
-        response = self.search(query, config, fusion_weights)
-
-        # Convert back to legacy format
-        return response.to_legacy_response()
 
     def add_post_processor(self, processor: ResultProcessor) -> None:
         """Add a post-processor to the pipeline."""

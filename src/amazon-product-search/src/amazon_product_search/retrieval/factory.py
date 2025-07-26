@@ -172,13 +172,13 @@ def create_advanced_retrieval_pipeline(
     return pipeline
 
 
-def create_retriever_with_new_architecture(
+def create_retriever(
     locale: Locale,
     es_client: EsClient | None = None,
     synonym_dict: SynonymDict | None = None,
     enable_reranking: bool = True
 ) -> Retriever:
-    """Create a Retriever instance using the new modular architecture.
+    """Create a Retriever instance with the modular architecture.
 
     Args:
         locale: Locale for query processing
@@ -187,7 +187,7 @@ def create_retriever_with_new_architecture(
         enable_reranking: Whether to enable reranking
 
     Returns:
-        Configured Retriever with new architecture
+        Configured Retriever instance
     """
     resource_manager = SharedResourceManager()
 
@@ -202,8 +202,7 @@ def create_retriever_with_new_architecture(
         locale=locale,
         es_client=es_client,
         synonym_dict=synonym_dict,
-        resource_manager=resource_manager,
-        use_new_architecture=True
+        resource_manager=resource_manager
     )
 
     # Add reranking if enabled
@@ -215,31 +214,11 @@ def create_retriever_with_new_architecture(
         retriever.add_post_processor(reranker_processor)
         logger.info("Added dot product reranker to retriever")
 
-    logger.info(f"Created retriever with new architecture for locale: {locale}")
+    logger.info(f"Created retriever for locale: {locale}")
     return retriever
 
 
-def create_retriever_with_legacy_architecture(
-    locale: Locale,
-    es_client: EsClient | None = None,
-    query_builder: Any | None = None
-) -> Retriever:
-    """Create a Retriever instance using the legacy architecture.
 
-    Args:
-        locale: Locale for query processing
-        es_client: Optional Elasticsearch client
-        query_builder: Optional legacy query builder
-
-    Returns:
-        Configured Retriever with legacy architecture
-    """
-    return Retriever(
-        locale=locale,
-        es_client=es_client,
-        query_builder=query_builder,
-        use_new_architecture=False
-    )
 
 
 def create_fusion_config(

@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Optional
 
-from amazon_product_search.retrieval.response import Response, Result  # Keep compatibility
+from amazon_product_search.retrieval.response import Result  # Keep compatibility
 
 
 class FieldType(Enum):
@@ -60,9 +60,7 @@ class RetrievalResponse:
     processing_time_ms: float = 0.0
     metadata: dict[str, Any] = field(default_factory=dict)
 
-    def to_legacy_response(self) -> Response:
-        """Convert to legacy Response format for backward compatibility."""
-        return Response(results=self.results, total_hits=self.total_hits)
+
 
 
 @dataclass

@@ -1,12 +1,11 @@
-"""Examples demonstrating the new modular retrieval architecture."""
+"""Examples demonstrating the modular retrieval architecture."""
 
 import logging
 
 from amazon_product_search.retrieval.core.types import RetrievalConfig
 from amazon_product_search.retrieval.factory import (
     create_retrieval_system,
-    create_retriever_with_legacy_architecture,
-    create_retriever_with_new_architecture,
+    create_retriever,
     create_search_fields,
 )
 
@@ -19,8 +18,8 @@ def example_1_backward_compatibility():
     """Example 1: Using the new Retriever with legacy API for backward compatibility."""
     logger.info("=== Example 1: Backward Compatibility ===")
 
-    # Create retriever with new architecture but legacy API
-    retriever = create_retriever_with_new_architecture(locale="jp", enable_reranking=True)
+    # Create retriever with backward compatible API
+    retriever = create_retriever(locale="jp", enable_reranking=True)
 
     # Use the same API as before - complete backward compatibility
     response = retriever.search(
@@ -80,7 +79,7 @@ def example_3_adding_custom_engines():
     logger.info("=== Example 3: Custom Engines ===")
 
     # Start with basic retriever
-    retriever = create_retriever_with_new_architecture(locale="jp", enable_reranking=False)
+    retriever = create_retriever(locale="jp", enable_reranking=False)
 
     # You could add custom engines like this:
     # custom_engine = MyCustomRetrievalEngine(some_config)
@@ -120,36 +119,28 @@ def example_4_different_configurations():
             logger.error(f"Failed to create system with config {config_name}: {e}")
 
 
-def example_5_legacy_vs_new():
-    """Example 5: Comparing legacy vs new architecture performance."""
-    logger.info("=== Example 5: Legacy vs New Architecture ===")
+def example_5_architecture_features():
+    """Example 5: Demonstrating architecture features."""
+    logger.info("=== Example 5: Architecture Features ===")
 
-    # Legacy architecture
-    create_retriever_with_legacy_architecture(locale="jp")
-    logger.info("Created legacy retriever")
+    # Modular architecture
+    retriever = create_retriever(locale="jp")
+    logger.info("Created modular retriever")
 
-    # New architecture
-    create_retriever_with_new_architecture(locale="jp")
-    logger.info("Created new retriever")
+    # The architecture is flexible and maintainable
+    logger.info(f"Pipeline info: {retriever.get_pipeline_info()}")
 
-    # Both use the same API, but new architecture is more flexible and maintainable
-
-    # Same search parameters for both
-
-    # Could compare results and performance here
-    # legacy_results = legacy_retriever.search(**search_params)
-    # new_results = new_retriever.search(**search_params)
-
-    logger.info("Both retrievers use identical API")
+    # Can add custom engines and processors
+    logger.info("Architecture supports extensible components")
 
 
 def example_6_resource_management():
     """Example 6: Demonstrating resource management benefits."""
     logger.info("=== Example 6: Resource Management ===")
 
-    # The new architecture uses shared resource management
-    retriever1 = create_retriever_with_new_architecture(locale="jp")
-    create_retriever_with_new_architecture(locale="jp")  # Shares resources
+    # The architecture uses shared resource management
+    retriever1 = create_retriever(locale="jp")
+    create_retriever(locale="jp")  # Shares resources
 
     # Both retrievers use the same underlying models/encoders - no duplication!
     resource_manager = retriever1.resource_manager
@@ -165,7 +156,7 @@ def example_6_resource_management():
 
 
 if __name__ == "__main__":
-    """Run all examples to demonstrate the new retrieval architecture."""
+    """Run all examples to demonstrate the retrieval architecture."""
 
     logger.info("Running retrieval architecture examples...")
 
@@ -177,12 +168,12 @@ if __name__ == "__main__":
         example_2_new_pipeline_api()
         example_3_adding_custom_engines()
         example_4_different_configurations()
-        example_5_legacy_vs_new()
+        example_5_architecture_features()
         example_6_resource_management()
 
         logger.info("\n=== Summary ===")
         logger.info("✅ Backward compatibility maintained")
-        logger.info("✅ New modular architecture provides flexibility")
+        logger.info("✅ Modular architecture provides flexibility")
         logger.info("✅ Resource management eliminates duplication")
         logger.info("✅ Easy to add new engines and post-processors")
         logger.info("✅ Multiple fusion strategies available")

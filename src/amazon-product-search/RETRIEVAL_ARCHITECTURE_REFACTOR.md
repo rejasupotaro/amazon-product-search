@@ -154,10 +154,10 @@ No changes needed - backward compatibility is maintained.
 Use the factory functions for easy setup:
 
 ```python
-from amazon_product_search.retrieval.factory import create_retriever_with_new_architecture
+from amazon_product_search.retrieval.factory import create_retriever
 
 # Basic usage
-retriever = create_retriever_with_new_architecture(locale="jp")
+retriever = create_retriever(locale="jp")
 
 # Advanced usage with custom configuration
 pipeline = create_advanced_retrieval_pipeline(
