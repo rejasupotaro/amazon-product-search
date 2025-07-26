@@ -1,0 +1,46 @@
+---
+description: Python coding standards and best practices for the Amazon Product Search project
+globs: ["**/*.py"]
+alwaysApply: false
+---
+
+# Amazon Product Search - Cursor Rules
+
+## Architecture Guidelines
+- Follow a modular architecture with clear separation of concerns
+- Each component should be in its own package under `src/` directory
+- Use dependency injection for external services (Elasticsearch, models)
+- Implement proper interfaces and abstract base classes for extensibility
+- Keep business logic separate from infrastructure concerns
+
+## Code Organization
+- Organize code into logical packages: `src/amazon-product-search/`, `src/dense-retrieval/`, `src/model-serving/`, etc.
+- Each package should have its own `pyproject.toml` for dependencies
+- Place tests in `tests/` directories mirroring source structure
+- Use `__init__.py` files to define package APIs
+- Keep configuration files in `conf/` directories using Hydra when applicable
+
+## Development Commands
+- `make lint` - Run linting and type checking
+- `poetry install` - Install project dependencies
+- `poetry add <package>` - Add new dependency to project
+- `poetry run pytest` - Run tests with pytest
+- `make up` - Start services with Docker compose
+- `poetry run ruff check` - Check code formatting
+- `poetry run ruff check --fix` - Fix formatting issues automatically
+
+## Code Style
+- Follow PEP 8 with line length of 120 characters (Ruff formatter)
+- Use type hints consistently, especially for public APIs
+- Prefer dataclasses and Pydantic models for data structures
+- Use dependency injection patterns for better testability
+
+## Documentation Requirements
+- Write Google-style docstrings for all public functions/classes
+- Include type information in docstrings when helpful
+- Document complex algorithms and business logic
+
+## Dependencies
+- Use Poetry for dependency management (pyproject.toml files)
+- Pin exact versions for production dependencies
+- Keep dev dependencies separate from runtime dependencies
