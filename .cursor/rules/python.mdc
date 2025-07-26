@@ -39,6 +39,7 @@ alwaysApply: false
 - Use pytest framework with descriptive test names
 - Mock external dependencies (ES client, models, etc.)
 - Test both success and error cases
+- **Always run `make lint` and `poetry run pytest` before committing**
 
 ## Common Anti-Patterns to Avoid
 - ❌ `from module import *` (use specific imports)
